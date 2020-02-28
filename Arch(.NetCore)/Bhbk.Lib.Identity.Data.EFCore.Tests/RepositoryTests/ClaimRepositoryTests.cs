@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -100,8 +100,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
-                .Where(x => x.Type == Constants.ApiTestClaim)
-                .ToLambda()).Single();
+                .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
+                .Single();
             claim.Value += "(Updated)";
 
             var result = UoW.Claims.Update(claim);

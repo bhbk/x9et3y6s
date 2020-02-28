@@ -6,9 +6,6 @@ CREATE PROCEDURE [svc].[usp_Audience_Insert]
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
-    ,@ConcurrencyStamp		NVARCHAR (MAX)
-    ,@PasswordHash			NVARCHAR (MAX)
-    ,@SecurityStamp			NVARCHAR (MAX)
     ,@AudienceType			NVARCHAR (MAX) 
     ,@Created				DATETIME2 (7) 
     ,@LastUpdated			DATETIME2 (7)
@@ -32,9 +29,6 @@ INSERT INTO [dbo].[tbl_Audiences]
     ,ActorId    
     ,Name           
     ,Description   
-	,ConcurrencyStamp
-	,PasswordHash
-	,SecurityStamp
 	,AudienceType
     ,Created           
     ,LastUpdated      
@@ -53,9 +47,6 @@ VALUES
     ,@ActorId   
     ,@Name           
     ,@Description       
-	,@ConcurrencyStamp
-	,@PasswordHash
-	,@SecurityStamp
 	,@AudienceType
     ,@Created           
     ,@LastUpdated      
@@ -68,6 +59,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [dbo].[tbl_Audiences] WHERE [dbo].[tbl_Audiences].Id = @AUDIENCEID
+SELECT * FROM [svc].[uvw_Audiences] WHERE [svc].[uvw_Audiences].Id = @AUDIENCEID
 
 END

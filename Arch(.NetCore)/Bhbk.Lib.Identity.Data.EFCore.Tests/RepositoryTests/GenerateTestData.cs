@@ -275,7 +275,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.States.Create(
-                    _mapper.Map<tbl_States>(new StateModel()
+                    _mapper.Map<tbl_States>(new StateV1()
                     {
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
@@ -288,7 +288,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.States.Create(
-                    _mapper.Map<tbl_States>(new StateModel()
+                    _mapper.Map<tbl_States>(new StateV1()
                     {
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
@@ -493,7 +493,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     }));
 
                 _uow.States.Create(
-                    _mapper.Map<tbl_States>(new StateModel()
+                    _mapper.Map<tbl_States>(new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,

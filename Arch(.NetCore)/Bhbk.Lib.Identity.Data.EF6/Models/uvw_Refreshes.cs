@@ -20,8 +20,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public Nullable<System.Guid> UserId { get; set; }
         public string RefreshValue { get; set; }
         public string RefreshType { get; set; }
+        public System.DateTime IssuedUtc { get; set; }
         public System.DateTime ValidFromUtc { get; set; }
         public System.DateTime ValidToUtc { get; set; }
-        public System.DateTime IssuedUtc { get; set; }
     }
 }

@@ -39,6 +39,6 @@ VALUES
 	,@ValidToUtc
 	);
 
-SELECT * FROM [dbo].[tbl_Refreshes] WHERE [dbo].[tbl_Refreshes].Id = @REFRESHID
+SELECT * FROM [svc].[uvw_Refreshes] WHERE [svc].[uvw_Refreshes].Id = @REFRESHID
 
 END

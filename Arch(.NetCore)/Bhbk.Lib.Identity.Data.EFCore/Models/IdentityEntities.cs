@@ -122,9 +122,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.Value).IsRequired();
 
-                entity.Property(e => e.ValueType)
-                    .IsRequired()
-                    .HasMaxLength(64);
+                entity.Property(e => e.ValueType).HasMaxLength(64);
 
                 entity.HasOne(d => d.Actor)
                     .WithMany(p => p.tbl_Claims)

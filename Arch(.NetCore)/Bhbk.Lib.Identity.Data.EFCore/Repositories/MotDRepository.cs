@@ -4,9 +4,9 @@ using Bhbk.Lib.Identity.Data.EFCore.Models;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
-    public class MotDRepository : GenericRepository<tbl_MOTDs>
+    public class MOTDRepository : GenericRepository<tbl_MOTDs>
     {
-        public MotDRepository(IdentityEntities context, InstanceContext instance)
+        public MOTDRepository(IdentityEntities context, InstanceContext instance)
             : base(context, instance) { }
     }
 }

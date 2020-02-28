@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             };
 
             var state = UoW.States.Create(
-                Mapper.Map<tbl_States>(new StateModel()
+                Mapper.Map<tbl_States>(new StateV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,

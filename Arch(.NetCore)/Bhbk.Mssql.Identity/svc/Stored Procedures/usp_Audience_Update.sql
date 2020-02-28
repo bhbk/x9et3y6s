@@ -1,16 +1,12 @@
 ﻿
 
 
-
 CREATE PROCEDURE [svc].[usp_Audience_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@IssuerId				UNIQUEIDENTIFIER
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
-    ,@ConcurrencyStamp		NVARCHAR (MAX)
-    ,@PasswordHash			NVARCHAR (MAX)
-    ,@SecurityStamp			NVARCHAR (MAX)
     ,@AudienceType			NVARCHAR (MAX) 
     ,@Created				DATETIME2 (7) 
     ,@LastUpdated			DATETIME2 (7)
@@ -32,9 +28,6 @@ SET
     ,IssuerId				= @IssuerId
 	,Name					= @Name
 	,Description			= @Description
-	,ConcurrencyStamp		= @ConcurrencyStamp
-	,PasswordHash			= @PasswordHash
-	,SecurityStamp			= @SecurityStamp
 	,AudienceType			= @AudienceType
 	,Created				= @Created
     ,LastUpdated			= @LastUpdated
@@ -46,5 +39,7 @@ SET
     ,AccessSuccessCount		= @AccessSuccessCount
     ,Immutable				= @Immutable
 WHERE Id = @Id
+
+SELECT * FROM [svc].[uvw_Audiences] WHERE [svc].[uvw_Audiences].Id = @Id
 
 END

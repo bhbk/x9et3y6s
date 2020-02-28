@@ -4,26 +4,16 @@
 CREATE PROCEDURE [svc].[usp_User_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@ActorId				UNIQUEIDENTIFIER
-    ,@Email					NVARCHAR (MAX) 
-    ,@EmailConfirmed		BIT          
-    ,@FirstName				NVARCHAR (MAX)
-    ,@LastName				NVARCHAR (MAX) 
-    ,@PhoneNumber			NVARCHAR (16)
-    ,@PhoneNumberConfirmed	BIT      
-    ,@LastUpdated			DATETIME2 (7)
-    ,@LockoutEnabled		BIT     
-    ,@LockoutEnd			DATETIMEOFFSET (7)
-    ,@LastLoginSuccess		DATETIME2 (7)
-    ,@LastLoginFailure		DATETIME2 (7)
-    ,@AccessFailedCount		INT  
-    ,@AccessSuccessCount	INT  
-    ,@ConcurrencyStamp		NVARCHAR (MAX)
-    ,@PasswordHash			NVARCHAR (MAX)
-    ,@PasswordConfirmed		BIT  
-    ,@SecurityStamp			NVARCHAR (MAX)
-    ,@TwoFactorEnabled		BIT
-    ,@HumanBeing			BIT
-    ,@Immutable				BIT
+    ,@Email                NVARCHAR (MAX) 
+    ,@FirstName            NVARCHAR (MAX)
+    ,@LastName             NVARCHAR (MAX) 
+    ,@PhoneNumber          NVARCHAR (16)
+    ,@Created              DATETIME2 (7) 
+    ,@LastUpdated          DATETIME2 (7)
+    ,@LockoutEnabled       BIT     
+    ,@LockoutEnd           DATETIMEOFFSET (7)
+    ,@HumanBeing           BIT
+    ,@Immutable            BIT
 
 AS
 BEGIN
@@ -33,25 +23,15 @@ SET
      Id						= @Id
     ,ActorId				= @ActorId
     ,Email					= @Email
-    ,EmailConfirmed		    = @EmailConfirmed
     ,FirstName				= @FirstName
     ,LastName				= @LastName
     ,PhoneNumber			= @PhoneNumber
-    ,PhoneNumberConfirmed	= @PhoneNumberConfirmed  
     ,LastUpdated			= @LastUpdated
     ,LockoutEnabled			= @LockoutEnabled
     ,LockoutEnd				= @LockoutEnd
-    ,LastLoginSuccess		= @LastLoginSuccess
-    ,LastLoginFailure		= @LastLoginFailure
-    ,AccessFailedCount		= @AccessFailedCount
-    ,AccessSuccessCount		= @AccessSuccessCount
-    ,ConcurrencyStamp		= @ConcurrencyStamp
-    ,PasswordHash			= @PasswordHash
-    ,PasswordConfirmed		= @PasswordConfirmed
-    ,SecurityStamp			= @SecurityStamp
-    ,TwoFactorEnabled		= @TwoFactorEnabled
     ,HumanBeing				= @HumanBeing
     ,Immutable				= @Immutable
 WHERE Id = @Id
 
+SELECT * FROM [svc].[uvw_Users] WHERE [svc].[uvw_Users].Id = @Id
 END

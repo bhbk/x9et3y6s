@@ -1,6 +1,7 @@
 ﻿
 
 
+
 CREATE PROCEDURE [svc].[usp_Claim_Insert]
      @IssuerId				UNIQUEIDENTIFIER
     ,@ActorId				UNIQUEIDENTIFIER
@@ -44,6 +45,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [dbo].[tbl_Claims] WHERE [dbo].[tbl_Claims].Id = @CLAIMID
+SELECT * FROM [svc].[uvw_Claims] WHERE [svc].[uvw_Claims].Id = @CLAIMID
 
 END

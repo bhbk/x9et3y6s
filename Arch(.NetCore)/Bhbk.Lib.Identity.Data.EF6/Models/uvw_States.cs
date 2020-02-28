@@ -22,9 +22,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public string StateType { get; set; }
         public Nullable<bool> StateDecision { get; set; }
         public bool StateConsume { get; set; }
+        public System.DateTime IssuedUtc { get; set; }
         public System.DateTime ValidFromUtc { get; set; }
         public System.DateTime ValidToUtc { get; set; }
-        public System.DateTime Created { get; set; }
         public System.DateTime LastPolling { get; set; }
     }
 }

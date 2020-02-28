@@ -7,6 +7,8 @@ CREATE PROCEDURE [svc].[usp_User_Delete]
 AS
 BEGIN
 
+SELECT * FROM [svc].[uvw_Users] WHERE [svc].[uvw_Users].Id = @UserID
+
 DELETE [dbo].[tbl_Activities]
 WHERE UserId = @UserID
 

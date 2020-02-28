@@ -1,8 +1,10 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.EF6.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Primitives.Enums;
-using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -21,7 +23,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.States.Create(
-                    Mapper.Map<tbl_States>(new StateModel()));
+                    Mapper.Map<tbl_States>(new StateV1()));
                 UoW.Commit();
             });
         }
@@ -37,7 +39,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
 
             var result = UoW.States.Create(
-                Mapper.Map<tbl_States>(new StateModel()
+                Mapper.Map<tbl_States>(
+                    new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -93,6 +96,28 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 UoW.States.Update(new tbl_States());
                 UoW.Commit();
             });
+        }
+
+        [Fact]
+        public void Repo_States_UpdateV1_Success()
+        {
+            new GenerateTestData(UoW, Mapper).Destroy();
+            new GenerateTestData(UoW, Mapper).Create();
+
+            var user = UoW.Users.Get(new QueryExpression<tbl_Users>()
+                .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
+                .Single();
+
+            var state = UoW.States.Get(new QueryExpression<tbl_States>()
+                .Where(x => x.UserId == user.Id).ToLambda())
+                .First();
+
+            state.StateConsume = true;
+
+            var result = UoW.States.Update(state);
+            result.Should().BeAssignableTo<tbl_States>();
+
+            UoW.Commit();
         }
     }
 }

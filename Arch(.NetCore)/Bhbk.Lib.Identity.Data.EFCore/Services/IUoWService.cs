@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Services
         public ClaimRepository Claims { get; }
         public IssuerRepository Issuers { get; }
         public LoginRepository Logins { get; }
-        public MotDRepository MOTDs { get; }
+        public MOTDRepository MOTDs { get; }
         public QueueEmailRepository QueueEmails { get; }
         public QueueTextRepository QueueTexts { get; }
         public RoleRepository Roles { get; }

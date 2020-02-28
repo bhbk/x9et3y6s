@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
@@ -31,6 +32,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
                 "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8", pvalues.ToArray()).Single();
         }
 
+        public override IEnumerable<uvw_Activities> Create(IEnumerable<uvw_Activities> entities)
+        {
+            var results = new List<uvw_Activities>();
+
+            foreach (var entity in entities)
+            {
+                var result = Create(entity);
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
         public override uvw_Activities Delete(uvw_Activities entity)
         {
             var pvalues = new List<SqlParameter>();
@@ -38,6 +53,35 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
             return _context.Database.SqlQuery<uvw_Activities>("[svc].[usp_Activity_Delete]" +
                 "@p0", pvalues.ToArray()).Single();
+        }
+
+        public override IEnumerable<uvw_Activities> Delete(IEnumerable<uvw_Activities> entities)
+        {
+            var results = new List<uvw_Activities>();
+
+            foreach (var entity in entities)
+            {
+                var result = Delete(entity);
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public override IEnumerable<uvw_Activities> Delete(LambdaExpression lambda)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override uvw_Activities Update(uvw_Activities entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<uvw_Activities> Update(IEnumerable<uvw_Activities> entities)
+        {
+            throw new NotImplementedException();
         }
     }
 }

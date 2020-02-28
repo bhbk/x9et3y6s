@@ -26,17 +26,18 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool StateConsume { get; set; }
 
         [Required]
+        public DateTime IssuedUtc { get; set; }
+
+        [Required]
         public DateTime ValidFromUtc { get; set; }
 
         [Required]
         public DateTime ValidToUtc { get; set; }
     }
 
-    public class StateModel : States
+    public class StateV1 : States
     {
         [Required]
         public Guid Id { get; set; }
-
-        public DateTime Created { get; set; }
     }
 }

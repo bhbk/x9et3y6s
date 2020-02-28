@@ -38,5 +38,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return _context.Database.SqlQuery<uvw_Refreshes>("[svc].[usp_Refresh_Delete]" +
                 "@p0", pvalues.ToArray()).Single();
         }
+
+        public override uvw_Refreshes Update(uvw_Refreshes entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<uvw_Refreshes> Update(IEnumerable<uvw_Refreshes> entities)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

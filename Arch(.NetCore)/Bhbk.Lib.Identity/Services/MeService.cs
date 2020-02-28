@@ -81,12 +81,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<IEnumerable<StateModel>> Info_GetCodesV1()
+        public async ValueTask<IEnumerable<StateV1>> Info_GetCodesV1()
         {
             var response = await Http.Info_GetCodesV1(_ropg.AccessToken.RawData);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<StateModel>>().Result;
+                return response.Content.ReadAsAsync<IEnumerable<StateV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

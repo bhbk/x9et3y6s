@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             var states = UoW.States.Get(x => x.UserId == user.Id);
 
-            var result = states.Select(x => Mapper.Map<StateModel>(x));
+            var result = states.Select(x => Mapper.Map<StateV1>(x));
 
             return Ok(result);
         }

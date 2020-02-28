@@ -22,51 +22,48 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 UoW.Activities.Create(new uvw_Activities());
             });
         }
-
+        
         [Fact]
         public void Repo_Activities_CreateV1_Success()
         {
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
-            
-            var audience = UoW.Context.Set<uvw_Audiences>()
-                .Where(x => x.Name == Constants.ApiTestAudience)
+
+            var audiences = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
+                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
                 .Single();
 
             var result = UoW.Activities.Create(
                 new uvw_Activities()
                 {
-                    AudienceId = audience.Id,
+                    AudienceId = audiences.Id,
                     ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
                     Created = DateTime.Now,
                     Immutable = false,
                 });
             result.Should().BeAssignableTo<uvw_Activities>();
-
-            UoW.Commit();
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Activities_DeleteV1_Fail()
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Activities.Delete(new uvw_Activities());
-                UoW.Commit();
             });
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Activities_DeleteV1_Success()
         {
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
             var activity = UoW.Activities.Get(new QueryExpression<uvw_Activities>()
-                .Where(x => x.Immutable == false).ToLambda());
+                .Where(x => x.Immutable == false).ToLambda())
+                .First();
 
             UoW.Activities.Delete(activity);
-            UoW.Commit();
         }
 
         [Fact]
@@ -80,13 +77,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             results.Count().Should().Be(UoW.Activities.Count());
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Activities_UpdateV1_Fail()
         {
             Assert.Throws<NotImplementedException>(() =>
             {
                 UoW.Activities.Update(new uvw_Activities());
-                UoW.Commit();
             });
         }
     }

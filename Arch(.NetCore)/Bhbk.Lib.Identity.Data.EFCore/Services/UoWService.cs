@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Services
         public ClaimRepository Claims { get; private set; }
         public IssuerRepository Issuers { get; private set; }
         public LoginRepository Logins { get; private set; }
-        public MotDRepository MOTDs { get; private set; }
+        public MOTDRepository MOTDs { get; private set; }
         public QueueEmailRepository QueueEmails { get; private set; }
         public QueueTextRepository QueueTexts { get; private set; }
         public RefreshRepository Refreshes { get; private set; }
@@ -84,7 +84,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Services
             Claims = new ClaimRepository(_context, instance.InstanceType);
             Issuers = new IssuerRepository(_context, instance.InstanceType);
             Logins = new LoginRepository(_context, instance.InstanceType);
-            MOTDs = new MotDRepository(_context, instance.InstanceType);
+            MOTDs = new MOTDRepository(_context, instance.InstanceType);
             QueueEmails = new QueueEmailRepository(_context, instance.InstanceType);
             QueueTexts = new QueueTextRepository(_context, instance.InstanceType);
             Refreshes = new RefreshRepository(_context, instance.InstanceType);

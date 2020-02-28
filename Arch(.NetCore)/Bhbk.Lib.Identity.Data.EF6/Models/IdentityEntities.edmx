@@ -5,20 +5,6 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="IdentityModels.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="tbl_MOTDs">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="varchar" MaxLength="128" Nullable="false" />
-          <Property Name="Title" Type="varchar(max)" />
-          <Property Name="Author" Type="varchar(max)" Nullable="false" />
-          <Property Name="Quote" Type="varchar(max)" Nullable="false" />
-          <Property Name="Category" Type="varchar(max)" />
-          <Property Name="Date" Type="datetime2" Precision="7" />
-          <Property Name="Tags" Type="varchar(max)" />
-          <Property Name="Length" Type="int" />
-          <Property Name="Background" Type="varchar(max)" />
-        </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_Activities' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="uvw_Activities">
@@ -161,6 +147,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_QueueEmails' does not have a 
         <EntityType Name="uvw_QueueEmails">
           <Key>
             <PropertyRef Name="Id" />
+            
+            
+            
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
@@ -181,6 +172,12 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_QueueTexts' does not have a p
         <EntityType Name="uvw_QueueTexts">
           <Key>
             <PropertyRef Name="Id" />
+            
+            
+            
+            
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" Nullable="false" />
@@ -259,6 +256,13 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_States' does not have a prima
         <EntityType Name="uvw_States">
           <Key>
             <PropertyRef Name="Id" />
+            
+            
+            
+            
+            
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
@@ -270,7 +274,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_States' does not have a prima
           <Property Name="StateConsume" Type="bit" Nullable="false" />
           <Property Name="ValidFromUtc" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="ValidToUtc" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="LastPolling" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
@@ -278,6 +282,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Urls' does not have a primary
         <EntityType Name="uvw_Urls">
           <Key>
             <PropertyRef Name="Id" />
+            
+            
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
@@ -331,176 +339,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="HumanBeing" Type="bit" Nullable="false" />
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
-        <Function Name="usp_Activity_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ActivityID" Type="uniqueidentifier" Mode="In" />
-        </Function>
-        <Function Name="usp_Activity_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="AudienceId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="ActivityType" Type="nvarchar" Mode="In" />
-          <Parameter Name="TableName" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="KeyValues" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="OriginalValues" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="CurrentValues" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Created" Type="datetime2" Mode="In" />
-          <Parameter Name="Immutable" Type="bit" Mode="In" />
-        </Function>
-        <Function Name="usp_Audience_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="AudienceID" Type="uniqueidentifier" Mode="In" />
-        </Function>
-        <Function Name="usp_Audience_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Description" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="ConcurrencyStamp" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PasswordHash" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="SecurityStamp" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="AudienceType" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Created" Type="datetime2" Mode="In" />
-          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
-          <Parameter Name="LockoutEnabled" Type="bit" Mode="In" />
-          <Parameter Name="LockoutEnd" Type="datetimeoffset" Mode="In" />
-          <Parameter Name="LastLoginSuccess" Type="datetime2" Mode="In" />
-          <Parameter Name="LastLoginFailure" Type="datetime2" Mode="In" />
-          <Parameter Name="AccessFailedCount" Type="int" Mode="In" />
-          <Parameter Name="AccessSuccessCount" Type="int" Mode="In" />
-          <Parameter Name="Immutable" Type="bit" Mode="In" />
-        </Function>
-        <Function Name="usp_Audience_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Description" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="ConcurrencyStamp" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PasswordHash" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="SecurityStamp" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="AudienceType" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Created" Type="datetime2" Mode="In" />
-          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
-          <Parameter Name="LockoutEnabled" Type="bit" Mode="In" />
-          <Parameter Name="LockoutEnd" Type="datetimeoffset" Mode="In" />
-          <Parameter Name="LastLoginSuccess" Type="datetime2" Mode="In" />
-          <Parameter Name="LastLoginFailure" Type="datetime2" Mode="In" />
-          <Parameter Name="AccessFailedCount" Type="int" Mode="In" />
-          <Parameter Name="AccessSuccessCount" Type="int" Mode="In" />
-          <Parameter Name="Immutable" Type="bit" Mode="In" />
-        </Function>
-        <Function Name="usp_Claim_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ClaimID" Type="uniqueidentifier" Mode="In" />
-        </Function>
-        <Function Name="usp_Claim_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="Subject" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Type" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Value" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="ValueType" Type="nvarchar" Mode="In" />
-          <Parameter Name="Created" Type="datetime2" Mode="In" />
-          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
-          <Parameter Name="Immutable" Type="bit" Mode="In" />
-        </Function>
-        <Function Name="usp_Claim_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="Subject" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Type" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Value" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="ValueType" Type="nvarchar" Mode="In" />
-          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
-          <Parameter Name="Immutable" Type="bit" Mode="In" />
-        </Function>
-        <Function Name="usp_Issuer_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="IssuerID" Type="uniqueidentifier" Mode="In" />
-        </Function>
-        <Function Name="usp_Issuer_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Description" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="IssuerKey" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Enabled" Type="bit" Mode="In" />
-          <Parameter Name="Created" Type="datetime2" Mode="In" />
-          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
-          <Parameter Name="Immutable" Type="bit" Mode="In" />
-        </Function>
-        <Function Name="usp_Issuer_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Description" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="IssuerKey" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="Enabled" Type="bit" Mode="In" />
-          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
-          <Parameter Name="Immutable" Type="bit" Mode="In" />
-        </Function>
-        <Function Name="usp_Refresh_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="RefreshID" Type="uniqueidentifier" Mode="In" />
-        </Function>
-        <Function Name="usp_Refresh_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="AudienceId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="RefreshValue" Type="nvarchar" Mode="In" />
-          <Parameter Name="RefreshType" Type="nvarchar" Mode="In" />
-          <Parameter Name="IssuedUtc" Type="datetime2" Mode="In" />
-          <Parameter Name="ValidFromUtc" Type="datetime2" Mode="In" />
-          <Parameter Name="ValidToUtc" Type="datetime2" Mode="In" />
-        </Function>
-        <Function Name="usp_User_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="UserID" Type="uniqueidentifier" Mode="In" />
-        </Function>
-        <Function Name="usp_User_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="Email" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="EmailConfirmed" Type="bit" Mode="In" />
-          <Parameter Name="FirstName" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="LastName" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PhoneNumber" Type="nvarchar" Mode="In" />
-          <Parameter Name="PhoneNumberConfirmed" Type="bit" Mode="In" />
-          <Parameter Name="Created" Type="datetime2" Mode="In" />
-          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
-          <Parameter Name="LockoutEnabled" Type="bit" Mode="In" />
-          <Parameter Name="LockoutEnd" Type="datetimeoffset" Mode="In" />
-          <Parameter Name="LastLoginSuccess" Type="datetime2" Mode="In" />
-          <Parameter Name="LastLoginFailure" Type="datetime2" Mode="In" />
-          <Parameter Name="AccessFailedCount" Type="int" Mode="In" />
-          <Parameter Name="AccessSuccessCount" Type="int" Mode="In" />
-          <Parameter Name="ConcurrencyStamp" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PasswordHash" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PasswordConfirmed" Type="bit" Mode="In" />
-          <Parameter Name="SecurityStamp" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="TwoFactorEnabled" Type="bit" Mode="In" />
-          <Parameter Name="HumanBeing" Type="bit" Mode="In" />
-          <Parameter Name="Immutable" Type="bit" Mode="In" />
-        </Function>
-        <Function Name="usp_User_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="ActorId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="Email" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="EmailConfirmed" Type="bit" Mode="In" />
-          <Parameter Name="FirstName" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="LastName" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PhoneNumber" Type="nvarchar" Mode="In" />
-          <Parameter Name="PhoneNumberConfirmed" Type="bit" Mode="In" />
-          <Parameter Name="LastUpdated" Type="datetime2" Mode="In" />
-          <Parameter Name="LockoutEnabled" Type="bit" Mode="In" />
-          <Parameter Name="LockoutEnd" Type="datetimeoffset" Mode="In" />
-          <Parameter Name="LastLoginSuccess" Type="datetime2" Mode="In" />
-          <Parameter Name="LastLoginFailure" Type="datetime2" Mode="In" />
-          <Parameter Name="AccessFailedCount" Type="int" Mode="In" />
-          <Parameter Name="AccessSuccessCount" Type="int" Mode="In" />
-          <Parameter Name="ConcurrencyStamp" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PasswordHash" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PasswordConfirmed" Type="bit" Mode="In" />
-          <Parameter Name="SecurityStamp" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="TwoFactorEnabled" Type="bit" Mode="In" />
-          <Parameter Name="HumanBeing" Type="bit" Mode="In" />
-          <Parameter Name="Immutable" Type="bit" Mode="In" />
-        </Function>
         <EntityContainer Name="IdentityModelsStoreContainer">
-          <EntitySet Name="tbl_MOTDs" EntityType="Self.tbl_MOTDs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="uvw_Activities" EntityType="Self.uvw_Activities" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
     [uvw_Activities].[Id] AS [Id], 
@@ -671,7 +510,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
     [uvw_States].[StateConsume] AS [StateConsume], 
     [uvw_States].[ValidFromUtc] AS [ValidFromUtc], 
     [uvw_States].[ValidToUtc] AS [ValidToUtc], 
-    [uvw_States].[Created] AS [Created], 
+    [uvw_States].[IssuedUtc] AS [IssuedUtc], 
     [uvw_States].[LastPolling] AS [LastPolling]
     FROM [svc].[uvw_States] AS [uvw_States]</DefiningQuery>
           </EntitySet>
@@ -826,9 +665,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="UserId" Type="Guid" />
           <Property Name="RefreshValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="RefreshType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="uvw_Users">
           <Key>
@@ -867,178 +706,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <EntitySet Name="uvw_MOTDs" EntityType="Self.uvw_MOTDs" />
           <EntitySet Name="uvw_Refreshes" EntityType="Self.uvw_Refreshes" />
           <EntitySet Name="uvw_Users" EntityType="Self.uvw_Users" />
-          <FunctionImport Name="usp_User_Delete">
-          <Parameter Name="UserID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_User_Insert" ReturnType="Collection(Decimal)">
-            <Parameter Name="ActorId" Mode="In" Type="Guid" />
-            <Parameter Name="Email" Mode="In" Type="String" />
-            <Parameter Name="EmailConfirmed" Mode="In" Type="Boolean" />
-            <Parameter Name="FirstName" Mode="In" Type="String" />
-            <Parameter Name="LastName" Mode="In" Type="String" />
-            <Parameter Name="PhoneNumber" Mode="In" Type="String" />
-            <Parameter Name="PhoneNumberConfirmed" Mode="In" Type="Boolean" />
-            <Parameter Name="Created" Mode="In" Type="DateTime" />
-            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
-            <Parameter Name="LockoutEnabled" Mode="In" Type="Boolean" />
-            <Parameter Name="LockoutEnd" Mode="In" Type="DateTimeOffset" />
-            <Parameter Name="LastLoginSuccess" Mode="In" Type="DateTime" />
-            <Parameter Name="LastLoginFailure" Mode="In" Type="DateTime" />
-            <Parameter Name="AccessFailedCount" Mode="In" Type="Int32" />
-            <Parameter Name="AccessSuccessCount" Mode="In" Type="Int32" />
-            <Parameter Name="ConcurrencyStamp" Mode="In" Type="String" />
-            <Parameter Name="PasswordHash" Mode="In" Type="String" />
-            <Parameter Name="PasswordConfirmed" Mode="In" Type="Boolean" />
-            <Parameter Name="SecurityStamp" Mode="In" Type="String" />
-            <Parameter Name="TwoFactorEnabled" Mode="In" Type="Boolean" />
-            <Parameter Name="HumanBeing" Mode="In" Type="Boolean" />
-            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_User_Update">
-            <Parameter Name="Id" Mode="In" Type="Guid" />
-            <Parameter Name="ActorId" Mode="In" Type="Guid" />
-            <Parameter Name="Email" Mode="In" Type="String" />
-            <Parameter Name="EmailConfirmed" Mode="In" Type="Boolean" />
-            <Parameter Name="FirstName" Mode="In" Type="String" />
-            <Parameter Name="LastName" Mode="In" Type="String" />
-            <Parameter Name="PhoneNumber" Mode="In" Type="String" />
-            <Parameter Name="PhoneNumberConfirmed" Mode="In" Type="Boolean" />
-            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
-            <Parameter Name="LockoutEnabled" Mode="In" Type="Boolean" />
-            <Parameter Name="LockoutEnd" Mode="In" Type="DateTimeOffset" />
-            <Parameter Name="LastLoginSuccess" Mode="In" Type="DateTime" />
-            <Parameter Name="LastLoginFailure" Mode="In" Type="DateTime" />
-            <Parameter Name="AccessFailedCount" Mode="In" Type="Int32" />
-            <Parameter Name="AccessSuccessCount" Mode="In" Type="Int32" />
-            <Parameter Name="ConcurrencyStamp" Mode="In" Type="String" />
-            <Parameter Name="PasswordHash" Mode="In" Type="String" />
-            <Parameter Name="PasswordConfirmed" Mode="In" Type="Boolean" />
-            <Parameter Name="SecurityStamp" Mode="In" Type="String" />
-            <Parameter Name="TwoFactorEnabled" Mode="In" Type="Boolean" />
-            <Parameter Name="HumanBeing" Mode="In" Type="Boolean" />
-            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
-          </FunctionImport>
           <EntitySet Name="uvw_Roles" EntityType="IdentityModels.uvw_Roles" />
-          <EntitySet Name="tbl_MOTDs" EntityType="IdentityModels.tbl_MOTDs" />
           <EntitySet Name="uvw_QueueEmails" EntityType="IdentityModels.uvw_QueueEmails" />
           <EntitySet Name="uvw_QueueTexts" EntityType="IdentityModels.uvw_QueueTexts" />
-          <FunctionImport Name="usp_Activity_Delete">
-          <Parameter Name="ActivityID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Activity_Insert" ReturnType="Collection(IdentityModels.usp_Activity_Insert_Result)">
-            <Parameter Name="AudienceId" Mode="In" Type="Guid" />
-            <Parameter Name="UserId" Mode="In" Type="Guid" />
-            <Parameter Name="ActivityType" Mode="In" Type="String" />
-            <Parameter Name="TableName" Mode="In" Type="String" />
-            <Parameter Name="KeyValues" Mode="In" Type="String" />
-            <Parameter Name="OriginalValues" Mode="In" Type="String" />
-            <Parameter Name="CurrentValues" Mode="In" Type="String" />
-            <Parameter Name="Created" Mode="In" Type="DateTime" />
-            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Audience_Delete">
-          <Parameter Name="AudienceID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Audience_Insert" ReturnType="Collection(IdentityModels.usp_Audience_Insert_Result)">
-            <Parameter Name="IssuerId" Mode="In" Type="Guid" />
-            <Parameter Name="ActorId" Mode="In" Type="Guid" />
-            <Parameter Name="Name" Mode="In" Type="String" />
-            <Parameter Name="Description" Mode="In" Type="String" />
-            <Parameter Name="ConcurrencyStamp" Mode="In" Type="String" />
-            <Parameter Name="PasswordHash" Mode="In" Type="String" />
-            <Parameter Name="SecurityStamp" Mode="In" Type="String" />
-            <Parameter Name="AudienceType" Mode="In" Type="String" />
-            <Parameter Name="Created" Mode="In" Type="DateTime" />
-            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
-            <Parameter Name="LockoutEnabled" Mode="In" Type="Boolean" />
-            <Parameter Name="LockoutEnd" Mode="In" Type="DateTimeOffset" />
-            <Parameter Name="LastLoginSuccess" Mode="In" Type="DateTime" />
-            <Parameter Name="LastLoginFailure" Mode="In" Type="DateTime" />
-            <Parameter Name="AccessFailedCount" Mode="In" Type="Int32" />
-            <Parameter Name="AccessSuccessCount" Mode="In" Type="Int32" />
-            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Audience_Update">
-            <Parameter Name="Id" Mode="In" Type="Guid" />
-            <Parameter Name="IssuerId" Mode="In" Type="Guid" />
-            <Parameter Name="ActorId" Mode="In" Type="Guid" />
-            <Parameter Name="Name" Mode="In" Type="String" />
-            <Parameter Name="Description" Mode="In" Type="String" />
-            <Parameter Name="ConcurrencyStamp" Mode="In" Type="String" />
-            <Parameter Name="PasswordHash" Mode="In" Type="String" />
-            <Parameter Name="SecurityStamp" Mode="In" Type="String" />
-            <Parameter Name="AudienceType" Mode="In" Type="String" />
-            <Parameter Name="Created" Mode="In" Type="DateTime" />
-            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
-            <Parameter Name="LockoutEnabled" Mode="In" Type="Boolean" />
-            <Parameter Name="LockoutEnd" Mode="In" Type="DateTimeOffset" />
-            <Parameter Name="LastLoginSuccess" Mode="In" Type="DateTime" />
-            <Parameter Name="LastLoginFailure" Mode="In" Type="DateTime" />
-            <Parameter Name="AccessFailedCount" Mode="In" Type="Int32" />
-            <Parameter Name="AccessSuccessCount" Mode="In" Type="Int32" />
-            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Claim_Delete">
-          <Parameter Name="ClaimID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Claim_Insert" ReturnType="Collection(IdentityModels.usp_Claim_Insert_Result)">
-            <Parameter Name="IssuerId" Mode="In" Type="Guid" />
-            <Parameter Name="ActorId" Mode="In" Type="Guid" />
-            <Parameter Name="Subject" Mode="In" Type="String" />
-            <Parameter Name="Type" Mode="In" Type="String" />
-            <Parameter Name="Value" Mode="In" Type="String" />
-            <Parameter Name="ValueType" Mode="In" Type="String" />
-            <Parameter Name="Created" Mode="In" Type="DateTime" />
-            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
-            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Claim_Update">
-            <Parameter Name="Id" Mode="In" Type="Guid" />
-            <Parameter Name="IssuerId" Mode="In" Type="Guid" />
-            <Parameter Name="ActorId" Mode="In" Type="Guid" />
-            <Parameter Name="Subject" Mode="In" Type="String" />
-            <Parameter Name="Type" Mode="In" Type="String" />
-            <Parameter Name="Value" Mode="In" Type="String" />
-            <Parameter Name="ValueType" Mode="In" Type="String" />
-            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
-            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Issuer_Delete">
-          <Parameter Name="IssuerID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Issuer_Insert" ReturnType="Collection(IdentityModels.usp_Issuer_Insert_Result)">
-            <Parameter Name="ActorId" Mode="In" Type="Guid" />
-            <Parameter Name="Name" Mode="In" Type="String" />
-            <Parameter Name="Description" Mode="In" Type="String" />
-            <Parameter Name="IssuerKey" Mode="In" Type="String" />
-            <Parameter Name="Enabled" Mode="In" Type="Boolean" />
-            <Parameter Name="Created" Mode="In" Type="DateTime" />
-            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
-            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Issuer_Update">
-            <Parameter Name="Id" Mode="In" Type="Guid" />
-            <Parameter Name="ActorId" Mode="In" Type="Guid" />
-            <Parameter Name="Name" Mode="In" Type="String" />
-            <Parameter Name="Description" Mode="In" Type="String" />
-            <Parameter Name="IssuerKey" Mode="In" Type="String" />
-            <Parameter Name="Enabled" Mode="In" Type="Boolean" />
-            <Parameter Name="LastUpdated" Mode="In" Type="DateTime" />
-            <Parameter Name="Immutable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Refresh_Delete">
-          <Parameter Name="RefreshID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Refresh_Insert" ReturnType="Collection(IdentityModels.usp_Refresh_Insert_Result)">
-            <Parameter Name="IssuerId" Mode="In" Type="Guid" />
-            <Parameter Name="AudienceId" Mode="In" Type="Guid" />
-            <Parameter Name="UserId" Mode="In" Type="Guid" />
-            <Parameter Name="RefreshValue" Mode="In" Type="String" />
-            <Parameter Name="RefreshType" Mode="In" Type="String" />
-            <Parameter Name="IssuedUtc" Mode="In" Type="DateTime" />
-            <Parameter Name="ValidFromUtc" Mode="In" Type="DateTime" />
-            <Parameter Name="ValidToUtc" Mode="In" Type="DateTime" />
-          </FunctionImport>
           <EntitySet Name="uvw_Settings" EntityType="IdentityModels.uvw_Settings" />
           <EntitySet Name="uvw_States" EntityType="IdentityModels.uvw_States" />
           <EntitySet Name="uvw_Urls" EntityType="IdentityModels.uvw_Urls" />
@@ -1056,20 +726,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
-        </EntityType>
-        <EntityType Name="tbl_MOTDs">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Author" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Quote" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Category" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Date" Type="DateTime" Precision="7" />
-          <Property Name="Tags" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Length" Type="Int32" />
-          <Property Name="Background" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="uvw_QueueEmails">
           <Key>
@@ -1103,73 +759,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
-        <ComplexType Name="usp_Activity_Insert_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="Guid" Name="AudienceId" Nullable="true" />
-          <Property Type="Guid" Name="UserId" Nullable="true" />
-          <Property Type="String" Name="ActivityType" Nullable="false" MaxLength="64" />
-          <Property Type="String" Name="TableName" Nullable="true" />
-          <Property Type="String" Name="KeyValues" Nullable="true" />
-          <Property Type="String" Name="OriginalValues" Nullable="true" />
-          <Property Type="String" Name="CurrentValues" Nullable="true" />
-          <Property Type="DateTime" Name="Created" Nullable="false" />
-          <Property Type="Boolean" Name="Immutable" Nullable="false" />
-        </ComplexType>
-        <ComplexType Name="usp_Audience_Insert_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="Guid" Name="IssuerId" Nullable="false" />
-          <Property Type="Guid" Name="ActorId" Nullable="true" />
-          <Property Type="String" Name="Name" Nullable="false" />
-          <Property Type="String" Name="Description" Nullable="true" />
-          <Property Type="String" Name="ConcurrencyStamp" Nullable="true" />
-          <Property Type="String" Name="PasswordHash" Nullable="true" />
-          <Property Type="String" Name="SecurityStamp" Nullable="true" />
-          <Property Type="String" Name="AudienceType" Nullable="false" MaxLength="64" />
-          <Property Type="Boolean" Name="Enabled" Nullable="false" />
-          <Property Type="DateTime" Name="Created" Nullable="false" />
-          <Property Type="Boolean" Name="LockoutEnabled" Nullable="false" />
-          <Property Type="DateTimeOffset" Name="LockoutEnd" Nullable="true" />
-          <Property Type="DateTime" Name="LastLoginSuccess" Nullable="true" />
-          <Property Type="DateTime" Name="LastLoginFailure" Nullable="true" />
-          <Property Type="Int32" Name="AccessFailedCount" Nullable="false" />
-          <Property Type="Int32" Name="AccessSuccessCount" Nullable="false" />
-          <Property Type="DateTime" Name="LastUpdated" Nullable="true" />
-          <Property Type="Boolean" Name="Immutable" Nullable="false" />
-        </ComplexType>
-        <ComplexType Name="usp_Claim_Insert_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="Guid" Name="IssuerId" Nullable="false" />
-          <Property Type="Guid" Name="ActorId" Nullable="true" />
-          <Property Type="String" Name="Subject" Nullable="true" />
-          <Property Type="String" Name="Type" Nullable="false" />
-          <Property Type="String" Name="Value" Nullable="false" />
-          <Property Type="String" Name="ValueType" Nullable="false" MaxLength="64" />
-          <Property Type="DateTime" Name="Created" Nullable="false" />
-          <Property Type="DateTime" Name="LastUpdated" Nullable="true" />
-          <Property Type="Boolean" Name="Immutable" Nullable="false" />
-        </ComplexType>
-        <ComplexType Name="usp_Issuer_Insert_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="Guid" Name="ActorId" Nullable="true" />
-          <Property Type="String" Name="Name" Nullable="false" />
-          <Property Type="String" Name="Description" Nullable="true" />
-          <Property Type="String" Name="IssuerKey" Nullable="false" />
-          <Property Type="Boolean" Name="Enabled" Nullable="false" />
-          <Property Type="DateTime" Name="Created" Nullable="false" />
-          <Property Type="DateTime" Name="LastUpdated" Nullable="true" />
-          <Property Type="Boolean" Name="Immutable" Nullable="false" />
-        </ComplexType>
-        <ComplexType Name="usp_Refresh_Insert_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="Guid" Name="IssuerId" Nullable="false" />
-          <Property Type="Guid" Name="AudienceId" Nullable="true" />
-          <Property Type="Guid" Name="UserId" Nullable="true" />
-          <Property Type="String" Name="RefreshValue" Nullable="false" />
-          <Property Type="String" Name="RefreshType" Nullable="false" MaxLength="64" />
-          <Property Type="DateTime" Name="ValidFromUtc" Nullable="false" />
-          <Property Type="DateTime" Name="ValidToUtc" Nullable="false" />
-          <Property Type="DateTime" Name="IssuedUtc" Nullable="false" />
-        </ComplexType>
         <EntityType Name="uvw_Settings">
           <Key>
             <PropertyRef Name="Id" />
@@ -1199,9 +788,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="StateType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
           <Property Name="StateDecision" Type="Boolean" />
           <Property Name="StateConsume" Type="Boolean" Nullable="false" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastPolling" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="uvw_Urls">
@@ -1370,9 +959,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="usp_User_Delete" FunctionName="IdentityModels.Store.usp_User_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_User_Insert" FunctionName="IdentityModels.Store.usp_User_Insert" />
-          <FunctionImportMapping FunctionImportName="usp_User_Update" FunctionName="IdentityModels.Store.usp_User_Update" />
           <EntitySetMapping Name="uvw_Roles">
             <EntityTypeMapping TypeName="IdentityModels.uvw_Roles">
               <MappingFragment StoreEntitySet="uvw_Roles">
@@ -1384,21 +970,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="ActorId" ColumnName="ActorId" />
                 <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="tbl_MOTDs">
-            <EntityTypeMapping TypeName="IdentityModels.tbl_MOTDs">
-              <MappingFragment StoreEntitySet="tbl_MOTDs">
-                <ScalarProperty Name="Background" ColumnName="Background" />
-                <ScalarProperty Name="Length" ColumnName="Length" />
-                <ScalarProperty Name="Tags" ColumnName="Tags" />
-                <ScalarProperty Name="Date" ColumnName="Date" />
-                <ScalarProperty Name="Category" ColumnName="Category" />
-                <ScalarProperty Name="Quote" ColumnName="Quote" />
-                <ScalarProperty Name="Author" ColumnName="Author" />
-                <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -1437,101 +1008,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="usp_Activity_Delete" FunctionName="IdentityModels.Store.usp_Activity_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_Activity_Insert" FunctionName="IdentityModels.Store.usp_Activity_Insert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_Activity_Insert_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
-                <ScalarProperty Name="TableName" ColumnName="TableName" />
-                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
-                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
-                <ScalarProperty Name="CurrentValues" ColumnName="CurrentValues" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="usp_Audience_Delete" FunctionName="IdentityModels.Store.usp_Audience_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_Audience_Insert" FunctionName="IdentityModels.Store.usp_Audience_Insert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_Audience_Insert_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
-                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
-                <ScalarProperty Name="AudienceType" ColumnName="AudienceType" />
-                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
-                <ScalarProperty Name="LockoutEnd" ColumnName="LockoutEnd" />
-                <ScalarProperty Name="LastLoginSuccess" ColumnName="LastLoginSuccess" />
-                <ScalarProperty Name="LastLoginFailure" ColumnName="LastLoginFailure" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="usp_Audience_Update" FunctionName="IdentityModels.Store.usp_Audience_Update" />
-          <FunctionImportMapping FunctionImportName="usp_Claim_Delete" FunctionName="IdentityModels.Store.usp_Claim_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_Claim_Insert" FunctionName="IdentityModels.Store.usp_Claim_Insert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_Claim_Insert_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Subject" ColumnName="Subject" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
-                <ScalarProperty Name="Value" ColumnName="Value" />
-                <ScalarProperty Name="ValueType" ColumnName="ValueType" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="usp_Claim_Update" FunctionName="IdentityModels.Store.usp_Claim_Update" />
-          <FunctionImportMapping FunctionImportName="usp_Issuer_Delete" FunctionName="IdentityModels.Store.usp_Issuer_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_Issuer_Insert" FunctionName="IdentityModels.Store.usp_Issuer_Insert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_Issuer_Insert_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="IssuerKey" ColumnName="IssuerKey" />
-                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="usp_Issuer_Update" FunctionName="IdentityModels.Store.usp_Issuer_Update" />
-          <FunctionImportMapping FunctionImportName="usp_Refresh_Delete" FunctionName="IdentityModels.Store.usp_Refresh_Delete" />
-          <FunctionImportMapping FunctionImportName="usp_Refresh_Insert" FunctionName="IdentityModels.Store.usp_Refresh_Insert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_Refresh_Insert_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="RefreshValue" ColumnName="RefreshValue" />
-                <ScalarProperty Name="RefreshType" ColumnName="RefreshType" />
-                <ScalarProperty Name="ValidFromUtc" ColumnName="ValidFromUtc" />
-                <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
-                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           <EntitySetMapping Name="uvw_Settings">
             <EntityTypeMapping TypeName="IdentityModels.uvw_Settings">
               <MappingFragment StoreEntitySet="uvw_Settings">
@@ -1549,8 +1025,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <EntitySetMapping Name="uvw_States">
             <EntityTypeMapping TypeName="IdentityModels.uvw_States">
               <MappingFragment StoreEntitySet="uvw_States">
+                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
                 <ScalarProperty Name="LastPolling" ColumnName="LastPolling" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
                 <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
                 <ScalarProperty Name="ValidFromUtc" ColumnName="ValidFromUtc" />
                 <ScalarProperty Name="StateConsume" ColumnName="StateConsume" />

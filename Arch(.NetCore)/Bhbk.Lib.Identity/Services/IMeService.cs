@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<bool> Info_DeleteRefreshesV1();
         ValueTask<bool> Info_DeleteRefreshV1(Guid refreshID);
         ValueTask<MOTDV1> Info_GetMOTDV1();
-        ValueTask<IEnumerable<StateModel>> Info_GetCodesV1();
+        ValueTask<IEnumerable<StateV1>> Info_GetCodesV1();
         ValueTask<IEnumerable<RefreshV1>> Info_GetRefreshesV1();
         ValueTask<UserV1> Info_GetV1();
         ValueTask<bool> Info_SetPasswordV1(PasswordAddV1 model);

@@ -9,6 +9,8 @@ CREATE PROCEDURE [svc].[usp_Issuer_Delete]
 AS
 BEGIN
 
+SELECT * FROM [svc].[uvw_Issuers] WHERE [svc].[uvw_Issuers].Id = @IssuerID
+
 DELETE [dbo].[tbl_Claims]
 WHERE IssuerId = @IssuerID
 

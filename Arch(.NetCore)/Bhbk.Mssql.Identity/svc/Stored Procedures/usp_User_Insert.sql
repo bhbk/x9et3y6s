@@ -4,24 +4,13 @@
 CREATE PROCEDURE [svc].[usp_User_Insert]
     @ActorId              UNIQUEIDENTIFIER
     ,@Email                NVARCHAR (MAX) 
-    ,@EmailConfirmed       BIT          
     ,@FirstName            NVARCHAR (MAX)
     ,@LastName             NVARCHAR (MAX) 
     ,@PhoneNumber          NVARCHAR (16)
-    ,@PhoneNumberConfirmed BIT      
     ,@Created              DATETIME2 (7) 
     ,@LastUpdated          DATETIME2 (7)
     ,@LockoutEnabled       BIT     
     ,@LockoutEnd           DATETIMEOFFSET (7)
-    ,@LastLoginSuccess     DATETIME2 (7)
-    ,@LastLoginFailure     DATETIME2 (7)
-    ,@AccessFailedCount    INT  
-    ,@AccessSuccessCount   INT  
-    ,@ConcurrencyStamp     NVARCHAR (MAX)
-    ,@PasswordHash         NVARCHAR (MAX)
-    ,@PasswordConfirmed    BIT  
-    ,@SecurityStamp        NVARCHAR (MAX)
-    ,@TwoFactorEnabled     BIT
     ,@HumanBeing           BIT
     ,@Immutable            BIT
 
@@ -44,14 +33,9 @@ INSERT INTO [dbo].[tbl_Users]
     ,LastUpdated      
     ,LockoutEnabled      
     ,LockoutEnd        
-    ,LastLoginSuccess 
-    ,LastLoginFailure  
     ,AccessFailedCount  
     ,AccessSuccessCount  
-    ,ConcurrencyStamp  
-    ,PasswordHash      
     ,PasswordConfirmed 
-    ,SecurityStamp     
     ,TwoFactorEnabled 
     ,HumanBeing         
     ,Immutable        
@@ -61,28 +45,23 @@ VALUES
      @USERID       
     ,@ActorId    
     ,@Email           
-    ,@EmailConfirmed       
+    ,'FALSE'     
     ,@FirstName       
     ,@LastName     
     ,@PhoneNumber      
-    ,@PhoneNumberConfirmed  
+    ,'FALSE'     
     ,@Created           
     ,@LastUpdated      
     ,@LockoutEnabled      
     ,@LockoutEnd        
-    ,@LastLoginSuccess 
-    ,@LastLoginFailure  
-    ,@AccessFailedCount  
-    ,@AccessSuccessCount  
-    ,@ConcurrencyStamp  
-    ,@PasswordHash      
-    ,@PasswordConfirmed 
-    ,@SecurityStamp     
-    ,@TwoFactorEnabled 
+    ,0
+    ,0  
+    ,'FALSE'     
+    ,'FALSE'     
     ,@HumanBeing         
     ,@Immutable        
 	);
 
-SELECT * FROM [dbo].[tbl_Users] WHERE [dbo].[tbl_Users].Id = @USERID
+SELECT * FROM [svc].[uvw_Users] WHERE [svc].[uvw_Users].Id = @USERID
 
 END

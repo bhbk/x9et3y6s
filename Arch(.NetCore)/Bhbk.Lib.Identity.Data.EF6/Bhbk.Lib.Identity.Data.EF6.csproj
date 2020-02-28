@@ -95,24 +95,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models\tbl_MOTDs.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\usp_Activity_Insert_Result.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\usp_Audience_Insert_Result.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\usp_Claim_Insert_Result.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\usp_Issuer_Insert_Result.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\usp_Refresh_Insert_Result.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\uvw_Activities.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
@@ -159,8 +141,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ActivityRepository.cs" />
     <Compile Include="Repositories\AudienceRepository.cs" />
+    <Compile Include="Repositories\ClaimRepository.cs" />
     <Compile Include="Repositories\IssuerRepository.cs" />
+    <Compile Include="Repositories\LoginRepository.cs" />
+    <Compile Include="Repositories\MOTDRepository.cs" />
+    <Compile Include="Repositories\QueueEmailRepository.cs" />
+    <Compile Include="Repositories\QueueTextRepository.cs" />
     <Compile Include="Repositories\RefreshRespository.cs" />
+    <Compile Include="Repositories\RoleRepository.cs" />
+    <Compile Include="Repositories\SettingRepository.cs" />
+    <Compile Include="Repositories\StateRepository.cs" />
+    <Compile Include="Repositories\UrlRepository.cs" />
+    <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Services\IUoWService.cs" />
     <Compile Include="Services\UoWService.cs" />
   </ItemGroup>

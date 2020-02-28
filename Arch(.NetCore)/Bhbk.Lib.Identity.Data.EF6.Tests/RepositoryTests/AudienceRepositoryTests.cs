@@ -1,0 +1,105 @@
+﻿using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.EF6.Models;
+using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
+using FluentAssertions;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using Xunit;
+
+namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
+{
+    [Collection("RepositoryTests")]
+    public class AudienceRepositoryTests : BaseRepositoryTests
+    {
+        [Fact]
+        public void Repo_Audiences_CreateV1_Fail()
+        {
+            Assert.Throws<SqlException>(() =>
+            {
+                UoW.Audiences.Create(new uvw_Audiences());
+            });
+        }
+
+        [Fact]
+        public void Repo_Audiences_CreateV1_Success()
+        {
+            new GenerateTestData(UoW, Mapper).Destroy();
+            new GenerateTestData(UoW, Mapper).Create();
+
+            var issuer = UoW.Issuers.Get(new QueryExpression<uvw_Issuers>()
+                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Single();
+
+            var result = UoW.Audiences.Create(
+                new uvw_Audiences()
+                {
+                    IssuerId = issuer.Id,
+                    Name = Constants.ApiTestAudience,
+                    AudienceType = AudienceType.user_agent.ToString(),
+                    Enabled = true,
+                    Immutable = false,
+                });
+            result.Should().BeAssignableTo<uvw_Audiences>();
+        }
+
+        [Fact]
+        public void Repo_Audiences_DeleteV1_Fail()
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                UoW.Audiences.Delete(new uvw_Audiences());
+            });
+        }
+
+        [Fact]
+        public void Repo_Audiences_DeleteV1_Success()
+        {
+            new GenerateTestData(UoW, Mapper).Destroy();
+            new GenerateTestData(UoW, Mapper).Create();
+
+            var audience = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
+                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Single();
+
+            UoW.Audiences.Delete(audience);
+        }
+
+        [Fact]
+        public void Repo_Audiences_GetV1_Success()
+        {
+            new GenerateTestData(UoW, Mapper).Destroy();
+            new GenerateTestData(UoW, Mapper).Create();
+
+            var results = UoW.Audiences.Get();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Audiences>>();
+            results.Count().Should().Be(UoW.Audiences.Count());
+        }
+
+        [Fact]
+        public void Repo_Audiences_UpdateV1_Fail()
+        {
+            Assert.Throws<SqlException>(() =>
+            {
+                UoW.Audiences.Update(new uvw_Audiences());
+            });
+        }
+
+        [Fact(Skip = "NotImplemented")]
+        public void Repo_Audiences_UpdateV1_Success()
+        {
+            new GenerateTestData(UoW, Mapper).Destroy();
+            new GenerateTestData(UoW, Mapper).Create();
+
+            var audience = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
+                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Single();
+            audience.Name += "(Updated)";
+
+            var result = UoW.Audiences.Update(audience);
+            result.Should().BeAssignableTo<uvw_Audiences>();
+        }
+    }
+}

@@ -40,6 +40,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [dbo].[tbl_Issuers] WHERE [dbo].[tbl_Issuers].Id = @ISSUERID
+SELECT * FROM [svc].[uvw_Issuers] WHERE [svc].[uvw_Issuers].Id = @ISSUERID
 
 END

@@ -27,4 +27,6 @@ SET
     ,Immutable				= @Immutable
 WHERE Id = @Id
 
+SELECT * FROM [svc].[uvw_Issuers] WHERE [svc].[uvw_Issuers].Id = @Id
+
 END

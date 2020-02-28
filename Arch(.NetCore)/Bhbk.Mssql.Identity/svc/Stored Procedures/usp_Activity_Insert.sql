@@ -44,6 +44,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [dbo].[tbl_Activities] WHERE [dbo].[tbl_Activities].Id = @ACTIVITYID
+SELECT * FROM [svc].[uvw_Activities] WHERE [svc].[uvw_Activities].Id = @ACTIVITYID
 
 END
