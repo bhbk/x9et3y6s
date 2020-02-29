@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Authorize;
-using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
@@ -49,7 +49,10 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-            sc.AddScoped<IUoWService, UoWService>();
+            sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
+            {
+                return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+            });
             sc.AddSingleton<IHostedService, MaintainRefreshesTask>();
             sc.AddSingleton<IHostedService, MaintainStatesTask>();
             sc.AddSingleton<IAlertService, AlertService>();
@@ -60,7 +63,7 @@ namespace Bhbk.WebApi.Identity.Sts
              * only for owin authentication configuration.
              */
 
-            var owin = new UoWService(conf["Databases:IdentityEntities"], instance);
+            var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
             if (owin.InstanceType != InstanceContext.DeployedOrLocal)
                 throw new NotSupportedException();

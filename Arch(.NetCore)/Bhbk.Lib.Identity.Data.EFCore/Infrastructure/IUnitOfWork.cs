@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.DataAccess.EFCore.UnitOfWorks;
 using Bhbk.Lib.Identity.Data.EFCore.Repositories;
 
-namespace Bhbk.Lib.Identity.Data.EFCore.Services
+namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
 {
-    public interface IUoWService : IGenericUnitOfWork
+    public interface IUnitOfWork : IGenericUnitOfWork
     {
         public ActivityRepository Activities { get; }
         public AudienceRepository Audiences { get; }

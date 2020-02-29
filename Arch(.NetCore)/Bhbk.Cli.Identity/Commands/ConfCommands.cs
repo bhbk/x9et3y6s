@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -32,7 +32,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);
-                var uow = new UoWService(conf["Databases:IdentityEntities"], instance);
+                var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
                 if (ReadConfig)
                 {

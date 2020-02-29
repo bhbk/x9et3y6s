@@ -23,11 +23,10 @@ namespace Bhbk.Lib.Identity.Factories
         {
             _instance = instance.InstanceType;
 
-            if (_instance == InstanceContext.DeployedOrLocal)
-                _type = "JWT:" + InstanceContext.DeployedOrLocal.ToString();
-
-            else if (_instance == InstanceContext.UnitTest)
-                _type = "JWT:" + InstanceContext.UnitTest.ToString();
+            if (_instance == InstanceContext.DeployedOrLocal
+                || _instance == InstanceContext.End2EndTest
+                || _instance == InstanceContext.IntegrationTest)
+                _type = "JWT:" + _instance.ToString();
 
             else
                 throw new NotImplementedException();
@@ -142,9 +141,6 @@ namespace Bhbk.Lib.Identity.Factories
 
         private List<Claim> GenerateClaims(KeyValuePair<string, List<string>> claims)
         {
-            if (_instance != InstanceContext.UnitTest)
-                throw new NotSupportedException();
-
             var principal = new List<Claim>();
 
             principal.Add(new Claim(ClaimTypes.NameIdentifier, claims.Key));

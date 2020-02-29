@@ -2,8 +2,8 @@
     [Id]          UNIQUEIDENTIFIER NOT NULL,
     [AudienceId]  UNIQUEIDENTIFIER NOT NULL,
     [ActorId]     UNIQUEIDENTIFIER NULL,
-    [Name]        NVARCHAR (MAX)   NOT NULL,
-    [Description] NVARCHAR (MAX)   NULL,
+    [Name]        NVARCHAR (128)   NOT NULL,
+    [Description] NVARCHAR (256)   NULL,
     [Enabled]     BIT              CONSTRAINT [DF_AppRole_Enabled] DEFAULT ((0)) NOT NULL,
     [Created]     DATETIME2 (7)    NOT NULL,
     [LastUpdated] DATETIME2 (7)    NULL,
@@ -11,6 +11,8 @@
     CONSTRAINT [PK_Roles] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Roles_AudienceID] FOREIGN KEY ([AudienceId]) REFERENCES [dbo].[tbl_Audiences] ([Id])
 );
+
+
 
 
 

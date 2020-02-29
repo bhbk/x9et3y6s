@@ -2,8 +2,8 @@
     [Id]          UNIQUEIDENTIFIER NOT NULL,
     [AudienceId]  UNIQUEIDENTIFIER NOT NULL,
     [ActorId]     UNIQUEIDENTIFIER NULL,
-    [UrlHost]     NVARCHAR (MAX)   NULL,
-    [UrlPath]     NVARCHAR (MAX)   NULL,
+    [UrlHost]     NVARCHAR (512)   NULL,
+    [UrlPath]     NVARCHAR (512)   NULL,
     [Enabled]     BIT              CONSTRAINT [DF_TUrls_Enabled] DEFAULT ((0)) NOT NULL,
     [Created]     DATETIME2 (7)    NOT NULL,
     [LastUpdated] DATETIME2 (7)    NULL,
@@ -11,6 +11,8 @@
     CONSTRAINT [PK_Urls] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Urls_AudienceID] FOREIGN KEY ([AudienceId]) REFERENCES [dbo].[tbl_Audiences] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 

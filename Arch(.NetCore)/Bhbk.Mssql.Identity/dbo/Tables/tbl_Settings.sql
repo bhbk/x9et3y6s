@@ -3,8 +3,8 @@
     [IssuerId]    UNIQUEIDENTIFIER NULL,
     [AudienceId]  UNIQUEIDENTIFIER NULL,
     [UserId]      UNIQUEIDENTIFIER NULL,
-    [ConfigKey]   VARCHAR (MAX)    NOT NULL,
-    [ConfigValue] VARCHAR (MAX)    NOT NULL,
+    [ConfigKey]   VARCHAR (128)    NOT NULL,
+    [ConfigValue] VARCHAR (256)    NOT NULL,
     [Created]     DATETIME2 (7)    NOT NULL,
     [Immutable]   BIT              NOT NULL,
     CONSTRAINT [PK_Settings] PRIMARY KEY CLUSTERED ([Id] ASC),
@@ -12,6 +12,8 @@
     CONSTRAINT [FK_Settings_IssuerID] FOREIGN KEY ([IssuerId]) REFERENCES [dbo].[tbl_Issuers] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT [FK_Settings_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[tbl_Users] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Bhbk.Lib.Identity.Domain.Helpers
+namespace Bhbk.Lib.Identity.Domain.Infrastructure
 {
     public class ValidationHelper
     {

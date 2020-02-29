@@ -24,8 +24,7 @@ namespace Bhbk.Lib.Identity.Repositories
             _conf = conf;
             _instance = instance;
 
-            if (instance == InstanceContext.DeployedOrLocal 
-                || instance == InstanceContext.IntegrationTest)
+            if (instance == InstanceContext.DeployedOrLocal)
             {
                 var connect = new HttpClientHandler();
 
@@ -34,9 +33,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
                 _http = new HttpClient(connect);
             }
-
-            if (instance == InstanceContext.UnitTest)
+            else if (instance == InstanceContext.End2EndTest)
                 _http = http;
+            else
+                throw new NotImplementedException();
 
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -49,11 +49,10 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
             var endpoint = "/email/v1";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -66,11 +65,10 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
             var endpoint = "/text/v1";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["AlertUrls:BaseApiUrl"], _conf["AlertUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();

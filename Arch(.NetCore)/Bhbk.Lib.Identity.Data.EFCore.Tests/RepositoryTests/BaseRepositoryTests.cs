@@ -2,10 +2,9 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
-using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Microsoft.Extensions.Configuration;
-using System;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
@@ -16,7 +15,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
     public class BaseRepositoryTests
     {
-        protected IUoWService UoW;
+        protected IUnitOfWork UoW;
         protected IMapper Mapper;
 
         public BaseRepositoryTests()
@@ -30,15 +29,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
             var instance = new ContextService(InstanceContext.UnitTest);
 
-            UoW = new UoWService(conf["Databases:IdentityEntities"], instance);
+            UoW = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
             Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
-
-            /*
-             * only test context allowed to run...
-             */
-
-            if (instance.InstanceType != InstanceContext.UnitTest)
-                throw new NotSupportedException();
         }
     }
 }

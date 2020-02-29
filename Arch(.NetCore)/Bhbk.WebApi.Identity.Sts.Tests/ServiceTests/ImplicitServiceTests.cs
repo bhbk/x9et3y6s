@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var service = new StsService(conf, InstanceContext.UnitTest, owin);
+                var service = new StsService(conf, InstanceContext.End2EndTest, owin);
 
                 var imp = await service.Http.Implicit_AuthV1(
                     new ImplicitV1()
@@ -59,8 +59,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var service = new StsService(conf, InstanceContext.UnitTest, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(conf, InstanceContext.End2EndTest, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -95,8 +95,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var service = new StsService(conf, InstanceContext.UnitTest, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(conf, InstanceContext.End2EndTest, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -131,8 +131,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var service = new StsService(conf, InstanceContext.UnitTest, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(conf, InstanceContext.End2EndTest, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -168,8 +168,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var service = new StsService(conf, InstanceContext.UnitTest, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new StsService(conf, InstanceContext.End2EndTest, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();

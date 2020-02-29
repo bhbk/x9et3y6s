@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -39,9 +38,6 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
 
         public Task Invoke(HttpContext context)
         {
-            var mapper = context.RequestServices.GetRequiredService<IMapper>();
-            var uow = context.RequestServices.GetRequiredService<IUoWService>();
-
             //check if correct v1 path, method, content and params...
             if (context.Request.Path.Equals("/oauth2/v1/ropg-sandbox", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
@@ -61,6 +57,8 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
                 string grantTypeValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrGrantTypeIDV1).Value;
                 string userValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrUserIDV1).Value;
                 string passwordValue = formValues.FirstOrDefault(x => x.Key == Constants.AttrResourceOwnerIDV1).Value;
+
+                var uow = context.RequestServices.GetRequiredService<IUnitOfWork>();
             }
 
             return _next(context);

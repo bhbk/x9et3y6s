@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bhbk.Lib.Common" Version="2019.10.21.2046" />
-    <PackageReference Include="Bhbk.Lib.DataAccess.EF" Version="2019.10.21.2046" />
-    <PackageReference Include="FluentAssertions" Version="5.10.2" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2020.2.25.1630" />
+    <PackageReference Include="Bhbk.Lib.DataAccess.EF" Version="2020.2.25.1630" />
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">

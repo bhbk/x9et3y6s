@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -70,7 +70,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     issuer = UoW.Issuers.Get(x => x.Name == Conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                         .Select(i => i.Value).First()).SingleOrDefault();
 
-                else if (UoW.InstanceType == InstanceContext.UnitTest)
+                else if (UoW.InstanceType == InstanceContext.End2EndTest
+                    || UoW.InstanceType == InstanceContext.IntegrationTest)
                     issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).SingleOrDefault();
 
                 else
@@ -177,7 +178,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     }
                     break;
 
-                case InstanceContext.UnitTest:
+                case InstanceContext.End2EndTest:
+                case InstanceContext.IntegrationTest:
                     {
                         //check if login provider is local or test...
                         if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
@@ -537,7 +539,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     }
                     break;
 
-                case InstanceContext.UnitTest:
+                case InstanceContext.End2EndTest:
+                case InstanceContext.IntegrationTest:
                     {
                         //check if login provider is local or test...
                         if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()

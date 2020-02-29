@@ -3,7 +3,7 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EF6.Models;
-using Bhbk.Lib.Identity.Data.EF6.Services;
+using Bhbk.Lib.Identity.Data.EF6.Infrastructure;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using System;
@@ -14,10 +14,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
 {
     public class GenerateTestData
     {
-        private readonly IUoWService _uow;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public GenerateTestData(IUoWService uow, IMapper mapper)
+        public GenerateTestData(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
             _mapper = mapper ?? throw new ArgumentNullException();
@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
 
         public void Create()
         {
-            if (_uow.InstanceType != InstanceContext.UnitTest)
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
                 throw new InvalidOperationException();
 
             /*
@@ -225,7 +225,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
 
         public void Destroy()
         {
-            if (_uow.InstanceType != InstanceContext.UnitTest)
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
                 throw new InvalidOperationException();
 
             /*

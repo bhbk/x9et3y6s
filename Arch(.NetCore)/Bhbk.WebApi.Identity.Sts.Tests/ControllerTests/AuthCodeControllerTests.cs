@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives;
@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new AuthCodeController(conf, instance);
                 controller.ControllerContext = new ControllerContext();

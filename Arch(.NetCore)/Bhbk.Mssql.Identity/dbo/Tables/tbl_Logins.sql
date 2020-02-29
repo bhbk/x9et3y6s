@@ -1,9 +1,9 @@
-CREATE TABLE [dbo].[tbl_Logins] (
+﻿CREATE TABLE [dbo].[tbl_Logins] (
     [Id]          UNIQUEIDENTIFIER NOT NULL,
     [ActorId]     UNIQUEIDENTIFIER NULL,
-    [Name]        NVARCHAR (MAX)   NOT NULL,
-    [Description] NVARCHAR (MAX)   NULL,
-    [LoginKey]    NVARCHAR (MAX)   NULL,
+    [Name]        NVARCHAR (128)   NOT NULL,
+    [Description] NVARCHAR (256)   NULL,
+    [LoginKey]    NVARCHAR (256)   NULL,
     [Enabled]     BIT              CONSTRAINT [DF_TLogins_Enabled] DEFAULT ((0)) NOT NULL,
     [Created]     DATETIME2 (7)    NOT NULL,
     [LastUpdated] DATETIME2 (7)    NULL,
@@ -11,6 +11,8 @@ CREATE TABLE [dbo].[tbl_Logins] (
     CONSTRAINT [PK_Logins] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Logins_ActorID] FOREIGN KEY ([ActorId]) REFERENCES [dbo].[tbl_Users] ([Id])
 );
+
+
 
 
 

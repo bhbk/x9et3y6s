@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Xunit;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Tests.LibraryTests

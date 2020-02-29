@@ -5,9 +5,9 @@ using Bhbk.Lib.Identity.Data.EF6.Repositories;
 using System;
 using System.Diagnostics;
 
-namespace Bhbk.Lib.Identity.Data.EF6.Services
+namespace Bhbk.Lib.Identity.Data.EF6.Infrastructure
 {
-    public class UoWService : IUoWService, IDisposable
+    public class UnitOfWork : IUnitOfWork, IDisposable
     {
         private readonly IdentityEntities _context;
         public InstanceContext InstanceType { get; private set; }
@@ -26,27 +26,27 @@ namespace Bhbk.Lib.Identity.Data.EF6.Services
         public UrlRepository Urls { get; private set; }
         public UserRepository Users { get; private set; }
 
-        public UoWService(string connection)
+        public UnitOfWork(string connection)
             : this(connection, new ContextService(InstanceContext.DeployedOrLocal)) { }
 
-        public UoWService(string connection, IContextService instance)
+        public UnitOfWork(string connection, IContextService instance)
         {
             switch (instance.InstanceType)
             {
                 case InstanceContext.DeployedOrLocal:
                     {
-#if RELEASE
-
-#elif !RELEASE
+                        _context = new IdentityEntitiesFactory(connection).Create();
+#if !RELEASE
                         _context.Database.Log = x => Debug.WriteLine(x);
 #endif
-                        _context = new IdentityContextFactory(connection).Create();
                     }
                     break;
 
+                case InstanceContext.End2EndTest:
+                case InstanceContext.IntegrationTest:
                 case InstanceContext.UnitTest:
                     {
-                        _context = new IdentityContextFactory(connection).Create();
+                        _context = new IdentityEntitiesFactory(connection).Create();
                     }
                     break;
 

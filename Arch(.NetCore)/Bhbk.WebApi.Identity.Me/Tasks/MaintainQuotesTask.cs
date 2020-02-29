@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                     using (var scope = _factory.CreateScope())
                     {
-                        var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                         var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
                         if (uow.InstanceType == InstanceContext.DeployedOrLocal)

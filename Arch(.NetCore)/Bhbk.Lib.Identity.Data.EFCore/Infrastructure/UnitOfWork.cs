@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Data.EFCore.Services
+namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
 {
-    public class UoWService : IUoWService, IDisposable
+    public class UnitOfWork : IUnitOfWork, IDisposable, IAsyncDisposable
     {
         private readonly IdentityEntities _context;
         private readonly ILoggerFactory _logger;
@@ -30,10 +31,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Services
         public UrlRepository Urls { get; private set; }
         public UserRepository Users { get; private set; }
 
-        public UoWService(string connection)
+        public UnitOfWork(string connection)
             : this(connection, new ContextService(InstanceContext.DeployedOrLocal)) { }
 
-        public UoWService(string connection, IContextService instance)
+        public UnitOfWork(string connection, IContextService instance)
         {
             _logger = LoggerFactory.Create(opt =>
             {
@@ -60,11 +61,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Services
                     }
                     break;
 
+                case InstanceContext.End2EndTest:
+                case InstanceContext.IntegrationTest:
                 case InstanceContext.UnitTest:
                     {
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                            .UseInMemoryDatabase(":InMemory:")
-                            .EnableSensitiveDataLogging();
+                            .UseInMemoryDatabase(":InMemory:");
 
                         _context = new IdentityEntities(builder.Options);
                     }
@@ -95,14 +97,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Services
             Users = new UserRepository(_context, instance.InstanceType);
         }
 
+        public void Commit()
+        {
+            _context.SaveChanges();
+        }
+
         public void Dispose()
         {
             _context.Dispose();
         }
 
-        public void Commit()
+        public ValueTask DisposeAsync()
         {
-            _context.SaveChanges();
+            return _context.DisposeAsync();
         }
     }
 }

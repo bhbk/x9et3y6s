@@ -1,8 +1,8 @@
 ﻿CREATE TABLE [dbo].[tbl_Issuers] (
     [Id]          UNIQUEIDENTIFIER NOT NULL,
     [ActorId]     UNIQUEIDENTIFIER NULL,
-    [Name]        NVARCHAR (MAX)   NOT NULL,
-    [Description] NVARCHAR (MAX)   NULL,
+    [Name]        NVARCHAR (128)   NOT NULL,
+    [Description] NVARCHAR (256)   NULL,
     [IssuerKey]   NVARCHAR (MAX)   NOT NULL,
     [Enabled]     BIT              CONSTRAINT [DF_TIssuers_Enabled] DEFAULT ((0)) NOT NULL,
     [Created]     DATETIME2 (7)    NOT NULL,
@@ -10,6 +10,8 @@
     [Immutable]   BIT              CONSTRAINT [DF_TIssuers_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_Issuers] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 

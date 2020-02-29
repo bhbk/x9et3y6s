@@ -25,8 +25,7 @@ namespace Bhbk.Lib.Identity.Grants
             _conf = conf;
             _instance = instance;
 
-            if (instance == InstanceContext.DeployedOrLocal 
-                || instance == InstanceContext.IntegrationTest)
+            if (instance == InstanceContext.DeployedOrLocal)
             {
                 var connect = new HttpClientHandler();
 
@@ -35,9 +34,10 @@ namespace Bhbk.Lib.Identity.Grants
 
                 _http = new HttpClient(connect);
             }
-
-            if (instance == InstanceContext.UnitTest)
+            else if (instance == InstanceContext.End2EndTest)
                 _http = http;
+            else
+                throw new NotImplementedException();
 
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -74,11 +74,10 @@ namespace Bhbk.Lib.Identity.Grants
 
                 var endpoint = "/oauth2/v2/ropg-rt";
 
-                if (_instance == InstanceContext.DeployedOrLocal
-                    || _instance == InstanceContext.IntegrationTest)
+                if (_instance == InstanceContext.DeployedOrLocal)
                     response = await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-                else if (_instance == InstanceContext.UnitTest)
+                else if (_instance == InstanceContext.End2EndTest)
                     response = await _http.PostAsync(endpoint, content);
 
                 else
@@ -114,11 +113,10 @@ namespace Bhbk.Lib.Identity.Grants
 
                 var endpoint = "/oauth2/v2/ropg";
 
-                if (_instance == InstanceContext.DeployedOrLocal
-                    || _instance == InstanceContext.IntegrationTest)
+                if (_instance == InstanceContext.DeployedOrLocal)
                     response = await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
 
-                else if (_instance == InstanceContext.UnitTest)
+                else if (_instance == InstanceContext.End2EndTest)
                     response = await _http.PostAsync(endpoint, content);
 
                 else

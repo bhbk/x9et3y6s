@@ -1,15 +1,17 @@
 ﻿CREATE TABLE [dbo].[tbl_MOTDs] (
     [Id]         VARCHAR (128) NOT NULL,
-    [Title]      VARCHAR (MAX) NULL,
-    [Author]     VARCHAR (MAX) NOT NULL,
+    [Title]      VARCHAR (256) NULL,
+    [Author]     VARCHAR (128) NOT NULL,
     [Quote]      VARCHAR (MAX) NOT NULL,
-    [Category]   VARCHAR (MAX) NULL,
+    [Category]   VARCHAR (256) NULL,
     [Date]       DATETIME2 (7) NULL,
-    [Tags]       VARCHAR (MAX) NULL,
+    [Tags]       VARCHAR (128) NULL,
     [Length]     INT           NULL,
-    [Background] VARCHAR (MAX) NULL,
+    [Background] VARCHAR (512) NULL,
     CONSTRAINT [PK_tbl_MotDType1] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 GO

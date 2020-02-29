@@ -2,8 +2,8 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
-using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.WebApi.Identity.Sts.Controllers;
 using Bhbk.WebApi.Identity.Sts.Tasks;
@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            var instance = new ContextService(InstanceContext.UnitTest);
+            var instance = new ContextService(InstanceContext.IntegrationTest);
             var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
@@ -35,9 +35,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 sc.AddSingleton<IConfiguration>(conf);
                 sc.AddSingleton<IContextService>(instance);
                 sc.AddSingleton<IMapper>(mapper);
-                sc.AddScoped<IUoWService, UoWService>(x =>
+                sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
                 {
-                    var uow = new UoWService(conf["Databases:IdentityEntities"], instance);
+                    var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
                     new GenerateDefaultData(uow, mapper).Create();
 
                     return uow;

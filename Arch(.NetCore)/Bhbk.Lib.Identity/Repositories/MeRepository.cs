@@ -26,8 +26,7 @@ namespace Bhbk.Lib.Identity.Repositories
             _conf = conf;
             _instance = instance;
 
-            if (instance == InstanceContext.DeployedOrLocal 
-                || instance == InstanceContext.IntegrationTest)
+            if (instance == InstanceContext.DeployedOrLocal)
             {
                 var connect = new HttpClientHandler();
 
@@ -36,9 +35,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
                 _http = new HttpClient(connect);
             }
-
-            if (instance == InstanceContext.UnitTest)
+            else if (instance == InstanceContext.End2EndTest)
                 _http = http;
+            else
+                throw new NotImplementedException();
 
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -50,11 +50,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
             var endpoint = "/info/v1/code/revoke";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
@@ -66,11 +65,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
             var endpoint = "/info/v1/code/" + codeID.ToString() + "/revoke";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
@@ -82,11 +80,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
             var endpoint = "/info/v1/refresh/revoke";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
@@ -98,11 +95,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
             var endpoint = "/info/v1/refresh/" + refreshID.ToString() + "/revoke";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.DeleteAsync(endpoint);
 
             throw new NotSupportedException();
@@ -112,11 +108,10 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             var endpoint = "/info/v1/msg-of-the-day";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
@@ -128,11 +123,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
             var endpoint = "/info/v1";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
@@ -144,11 +138,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
             var endpoint = "/info/v1/code";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
@@ -160,11 +153,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
             var endpoint = "/info/v1/refresh";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
@@ -177,11 +169,10 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
             var endpoint = "/info/v1/set-password";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.PutAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -194,11 +185,10 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new StringContent(JsonConvert.SerializeObject(statusValue), Encoding.UTF8, "application/json");
             var endpoint = "/info/v1/set-two-factor";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.PutAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -211,11 +201,10 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
             var endpoint = "/info/v1";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.PutAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.PutAsync(endpoint, content);
 
             throw new NotSupportedException();
@@ -227,11 +216,10 @@ namespace Bhbk.Lib.Identity.Repositories
 
             var endpoint = "/info/v1/code/" + codeValue + "/" + actionValue;
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityMeUrls:BaseApiUrl"], _conf["IdentityMeUrls:BaseApiPath"], endpoint));
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.GetAsync(endpoint);
 
             throw new NotSupportedException();
@@ -244,11 +232,10 @@ namespace Bhbk.Lib.Identity.Repositories
             var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
             var endpoint = "/init/v1/page";
 
-            if (_instance == InstanceContext.DeployedOrLocal 
-                || _instance == InstanceContext.IntegrationTest)
+            if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint), content);
 
-            if (_instance == InstanceContext.UnitTest)
+            if (_instance == InstanceContext.End2EndTest)
                 return await _http.PostAsync(endpoint, content);
 
             throw new NotSupportedException();

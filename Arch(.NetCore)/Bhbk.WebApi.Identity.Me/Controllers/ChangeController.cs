@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Primitives;
-using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             string token = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
                 .Generate(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
 
-            if (UoW.InstanceType == InstanceContext.UnitTest)
+            if (UoW.InstanceType != InstanceContext.DeployedOrLocal)
                 return Ok(token);
 
             var url = UrlFactory.GenerateConfirmEmailV1(Conf, user, token);
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             string token = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
                 .Generate(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
 
-            if (UoW.InstanceType == InstanceContext.UnitTest)
+            if (UoW.InstanceType != InstanceContext.DeployedOrLocal)
                 return Ok(token);
 
             var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);
@@ -161,7 +161,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             string token = HttpUtility.UrlEncode(new TimeBasedTokenFactory(8, 10).Generate(model.NewPhoneNumber, user));
 
-            if (UoW.InstanceType == InstanceContext.UnitTest)
+            if (UoW.InstanceType != InstanceContext.DeployedOrLocal)
                 return Ok(token);
 
             var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);

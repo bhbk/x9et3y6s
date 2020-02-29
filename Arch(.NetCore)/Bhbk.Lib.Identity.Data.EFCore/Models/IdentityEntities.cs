@@ -58,6 +58,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsRequired()
                     .HasMaxLength(64);
 
+                entity.Property(e => e.TableName).HasMaxLength(256);
+
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Activities)
                     .HasForeignKey(d => d.AudienceId)
@@ -101,7 +103,17 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsRequired()
                     .HasMaxLength(64);
 
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.ConcurrencyStamp).HasMaxLength(256);
+
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.PasswordHash).HasMaxLength(256);
+
+                entity.Property(e => e.SecurityStamp).HasMaxLength(256);
 
                 entity.HasOne(d => d.Issuer)
                     .WithMany(p => p.tbl_Audiences)
@@ -118,9 +130,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Type).IsRequired();
+                entity.Property(e => e.Subject).HasMaxLength(128);
 
-                entity.Property(e => e.Value).IsRequired();
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.Value)
+                    .IsRequired()
+                    .HasMaxLength(256);
 
                 entity.Property(e => e.ValueType).HasMaxLength(64);
 
@@ -143,9 +161,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.Description).HasMaxLength(256);
+
                 entity.Property(e => e.IssuerKey).IsRequired();
 
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128);
             });
 
             modelBuilder.Entity<tbl_Logins>(entity =>
@@ -156,7 +178,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.LoginKey).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128);
 
                 entity.HasOne(d => d.Actor)
                     .WithMany(p => p.tbl_Logins)
@@ -176,19 +204,28 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.Author)
                     .IsRequired()
+                    .HasMaxLength(128)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Background).IsUnicode(false);
+                entity.Property(e => e.Background)
+                    .HasMaxLength(512)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.Category).IsUnicode(false);
+                entity.Property(e => e.Category)
+                    .HasMaxLength(256)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Quote)
                     .IsRequired()
                     .IsUnicode(false);
 
-                entity.Property(e => e.Tags).IsUnicode(false);
+                entity.Property(e => e.Tags)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.Title).IsUnicode(false);
+                entity.Property(e => e.Title)
+                    .HasMaxLength(256)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<tbl_QueueEmails>(entity =>
@@ -199,9 +236,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.FromDisplay).IsUnicode(false);
+                entity.Property(e => e.FromDisplay)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.FromEmail).IsUnicode(false);
+                entity.Property(e => e.FromEmail)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.HtmlContent).IsUnicode(false);
 
@@ -209,11 +250,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.Subject)
                     .IsRequired()
+                    .HasMaxLength(256)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ToDisplay).IsUnicode(false);
+                entity.Property(e => e.ToDisplay)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.ToEmail).IsUnicode(false);
+                entity.Property(e => e.ToEmail)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.From)
                     .WithMany(p => p.tbl_QueueEmails)
@@ -307,7 +353,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128);
 
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Roles)
@@ -326,10 +376,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.ConfigKey)
                     .IsRequired()
+                    .HasMaxLength(128)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ConfigValue)
                     .IsRequired()
+                    .HasMaxLength(256)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.Audience)
@@ -363,6 +415,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsRequired()
                     .HasMaxLength(64);
 
+                entity.Property(e => e.StateValue).HasMaxLength(512);
+
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_States)
                     .HasForeignKey(d => d.AudienceId)
@@ -388,6 +442,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.UrlHost).HasMaxLength(512);
+
+                entity.Property(e => e.UrlPath).HasMaxLength(512);
 
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Urls)

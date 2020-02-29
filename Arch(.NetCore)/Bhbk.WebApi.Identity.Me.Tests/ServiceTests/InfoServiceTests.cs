@@ -3,7 +3,7 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
@@ -38,8 +38,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
-                var service = new MeService(conf, InstanceContext.UnitTest, owin);
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var service = new MeService(conf, InstanceContext.End2EndTest, owin);
 
                 new GenerateTestData(uow, mapper).CreateMOTD(3);
 
@@ -56,9 +56,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var service = new MeService(conf, InstanceContext.UnitTest, owin);
+                var service = new MeService(conf, InstanceContext.End2EndTest, owin);
 
                 var dc = await service.Http.Info_UpdateCodeV1(Base64.CreateString(8), AlphaNumeric.CreateString(32), ActionType.Allow.ToString());
                 dc.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -81,9 +81,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var service = new MeService(conf, InstanceContext.UnitTest, owin);
+                var service = new MeService(conf, InstanceContext.End2EndTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
@@ -124,9 +124,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var service = new MeService(conf, InstanceContext.UnitTest, owin);
+                var service = new MeService(conf, InstanceContext.End2EndTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
@@ -162,9 +162,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var service = new MeService(conf, InstanceContext.UnitTest, owin);
+                var service = new MeService(conf, InstanceContext.End2EndTest, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();

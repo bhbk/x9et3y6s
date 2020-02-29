@@ -5,7 +5,7 @@ using System.Text;
 
 //https://andrewlock.net/implementing-custom-token-providers-for-passwordless-authentication-in-asp-net-core-identity/
 
-namespace Bhbk.Lib.Identity.Domain.Helpers
+namespace Bhbk.Lib.Identity.Domain.Infrastructure
 {
     public static class IdentityTimeBasedTokenExtensions
     {

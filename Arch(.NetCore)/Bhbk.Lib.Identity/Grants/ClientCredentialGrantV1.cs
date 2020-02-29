@@ -25,8 +25,7 @@ namespace Bhbk.Lib.Identity.Grants
             _conf = conf;
             _instance = instance;
 
-            if (instance == InstanceContext.DeployedOrLocal 
-                || instance == InstanceContext.IntegrationTest)
+            if (instance == InstanceContext.DeployedOrLocal)
             {
                 var connect = new HttpClientHandler();
 
@@ -35,9 +34,10 @@ namespace Bhbk.Lib.Identity.Grants
 
                 _http = new HttpClient(connect);
             }
-
-            if (instance == InstanceContext.UnitTest)
+            else if (instance == InstanceContext.End2EndTest)
                 _http = http;
+            else
+                throw new NotImplementedException();
 
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EF6.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
@@ -8,7 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 
-namespace Bhbk.Lib.Identity.Domain.Helpers
+namespace Bhbk.Lib.Identity.Domain.Infrastructure
 {
     public class AutoMapperProfile_EF6 : Profile
     {

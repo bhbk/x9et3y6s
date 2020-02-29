@@ -1,10 +1,10 @@
-﻿using Bhbk.Lib.DataAccess.EF.UnitOfWorks;
-using Bhbk.Lib.Identity.Data.EF6.Models;
+﻿using Bhbk.Lib.DataAccess.EF.Repositories;
+using Bhbk.Lib.DataAccess.EF.UnitOfWorks;
 using Bhbk.Lib.Identity.Data.EF6.Repositories;
 
-namespace Bhbk.Lib.Identity.Data.EF6.Services
+namespace Bhbk.Lib.Identity.Data.EF6.Infrastructure
 {
-    public interface IUoWService : IGenericUnitOfWork
+    public interface IUnitOfWork : IGenericUnitOfWork
     {
         ActivityRepository Activities { get; }
         AudienceRepository Audiences { get; }

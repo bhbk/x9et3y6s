@@ -1,12 +1,12 @@
-CREATE TABLE [dbo].[tbl_Audiences] (
+﻿CREATE TABLE [dbo].[tbl_Audiences] (
     [Id]                 UNIQUEIDENTIFIER   NOT NULL,
     [IssuerId]           UNIQUEIDENTIFIER   NOT NULL,
     [ActorId]            UNIQUEIDENTIFIER   NULL,
-    [Name]               NVARCHAR (MAX)     NOT NULL,
-    [Description]        NVARCHAR (MAX)     NULL,
-    [ConcurrencyStamp]   NVARCHAR (MAX)     NULL,
-    [PasswordHash]       NVARCHAR (MAX)     NULL,
-    [SecurityStamp]      NVARCHAR (MAX)     NULL,
+    [Name]               NVARCHAR (128)     NOT NULL,
+    [Description]        NVARCHAR (256)     NULL,
+    [ConcurrencyStamp]   NVARCHAR (256)     NULL,
+    [PasswordHash]       NVARCHAR (256)     NULL,
+    [SecurityStamp]      NVARCHAR (256)     NULL,
     [AudienceType]       NVARCHAR (64)      NOT NULL,
     [Enabled]            BIT                CONSTRAINT [DF_AppAudience_Enabled] DEFAULT ((0)) NOT NULL,
     [Created]            DATETIME2 (7)      NOT NULL,
@@ -21,6 +21,8 @@ CREATE TABLE [dbo].[tbl_Audiences] (
     CONSTRAINT [PK_Audiences] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Audiences_IssuerID] FOREIGN KEY ([IssuerId]) REFERENCES [dbo].[tbl_Issuers] ([Id])
 );
+
+
 
 
 

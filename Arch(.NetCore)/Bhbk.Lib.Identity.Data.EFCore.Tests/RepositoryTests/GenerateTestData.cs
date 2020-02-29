@@ -3,8 +3,8 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
-using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -15,11 +15,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 {
     public class GenerateTestData
     {
-        private readonly IUoWService _uow;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly ValidationHelper _validate;
 
-        public GenerateTestData(IUoWService uow, IMapper mapper)
+        public GenerateTestData(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
             _mapper = mapper ?? throw new ArgumentNullException();
@@ -28,7 +28,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
         public void Create()
         {
-            if (_uow.InstanceType != InstanceContext.UnitTest)
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
                 throw new InvalidOperationException();
 
             /*
@@ -342,7 +342,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
         public void Create(uint sets)
         {
-            if (_uow.InstanceType != InstanceContext.UnitTest)
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
                 throw new InvalidOperationException();
 
             for (int i = 0; i < sets; i++)
@@ -558,7 +558,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
         public void CreateMOTD(uint sets)
         {
-            if (_uow.InstanceType != InstanceContext.UnitTest)
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
                 throw new InvalidOperationException();
 
             for (int i = 0; i < sets; i++)
@@ -583,7 +583,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
         public void Destroy()
         {
-            if (_uow.InstanceType != InstanceContext.UnitTest)
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
                 throw new InvalidOperationException();
 
             /*

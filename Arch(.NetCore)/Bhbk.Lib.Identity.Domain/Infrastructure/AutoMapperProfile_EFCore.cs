@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 
-namespace Bhbk.Lib.Identity.Domain.Helpers
+namespace Bhbk.Lib.Identity.Domain.Infrastructure
 {
     public class AutoMapperProfile_EFCore : Profile
     {

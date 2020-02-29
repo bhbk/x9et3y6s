@@ -2,8 +2,8 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
-using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController(conf, instance);
                 controller.ControllerContext = new ControllerContext();
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController(conf, instance);
                 controller.ControllerContext = new ControllerContext();
@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController(conf, instance);
                 controller.ControllerContext = new ControllerContext();
@@ -149,7 +149,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController(conf, instance);
                 controller.ControllerContext = new ControllerContext();
@@ -187,7 +187,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController(conf, instance);
                 controller.ControllerContext = new ControllerContext();
@@ -222,7 +222,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-                var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController(conf, instance);
                 controller.ControllerContext = new ControllerContext();

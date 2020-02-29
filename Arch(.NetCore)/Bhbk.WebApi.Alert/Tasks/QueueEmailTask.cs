@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.WebApi.Alert.Helpers;
 using Microsoft.Extensions.Configuration;
@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                     using (var scope = _factory.CreateScope())
                     {
-                        var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                         foreach (var entry in uow.QueueEmails.Get(new QueryExpression<tbl_QueueEmails>()
                             .Where(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).ToLambda()))
@@ -104,7 +104,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                     using (var scope = _factory.CreateScope())
                     {
-                        var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                         var provider = new SendGridProvider();
 
                         foreach (var msg in queue.OrderBy(x => x.Created))
@@ -131,7 +131,8 @@ namespace Bhbk.WebApi.Alert.Tasks
                                     }
                                     break;
 
-                                case InstanceContext.UnitTest:
+                                case InstanceContext.End2EndTest:
+                                case InstanceContext.IntegrationTest:
                                     {
                                         uow.QueueEmails.Delete(msg);
                                         Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
@@ -159,7 +160,7 @@ namespace Bhbk.WebApi.Alert.Tasks
             {
                 using (var scope = _factory.CreateScope())
                 {
-                    var uow = scope.ServiceProvider.GetRequiredService<IUoWService>();
+                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
                     var email = mapper.Map<tbl_QueueEmails>(model);

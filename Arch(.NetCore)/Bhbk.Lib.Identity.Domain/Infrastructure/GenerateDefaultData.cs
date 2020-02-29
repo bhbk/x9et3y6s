@@ -1,22 +1,22 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using System;
 using System.Linq;
 
-namespace Bhbk.Lib.Identity.Domain.Helpers
+namespace Bhbk.Lib.Identity.Domain.Infrastructure
 {
     public class GenerateDefaultData
     {
-        private readonly IUoWService _uow;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly ValidationHelper _validate;
 
-        public GenerateDefaultData(IUoWService uow, IMapper mapper)
+        public GenerateDefaultData(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
             _mapper = mapper ?? throw new ArgumentNullException();

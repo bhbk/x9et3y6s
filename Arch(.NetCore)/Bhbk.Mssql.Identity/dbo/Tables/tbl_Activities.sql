@@ -3,7 +3,7 @@
     [AudienceId]     UNIQUEIDENTIFIER NULL,
     [UserId]         UNIQUEIDENTIFIER NULL,
     [ActivityType]   NVARCHAR (64)    NOT NULL,
-    [TableName]      NVARCHAR (MAX)   NULL,
+    [TableName]      NVARCHAR (256)   NULL,
     [KeyValues]      NVARCHAR (MAX)   NULL,
     [OriginalValues] NVARCHAR (MAX)   NULL,
     [CurrentValues]  NVARCHAR (MAX)   NULL,
@@ -13,6 +13,8 @@
     CONSTRAINT [FK_Activities_AudienceID] FOREIGN KEY ([AudienceId]) REFERENCES [dbo].[tbl_Audiences] ([Id]),
     CONSTRAINT [FK_Activities_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[tbl_Users] ([Id])
 );
+
+
 
 
 

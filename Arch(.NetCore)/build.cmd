@@ -1,11 +1,15 @@
 
-rem call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\VsDevCmd.bat"
+rem call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
 rem dotnet tool install Octopus.DotNet.Cli --global --version 5.2.2
+rem powershell -command "& { write-output 2020.2.2.1630 | out-file -filepath .\version.tmp -nonewline -encoding ascii }"
 powershell -command "& { get-date -format yyyy.M.d.HHmm | out-file -filepath .\version.tmp -nonewline -encoding ascii }"
 set /p VERSION=< .\version.tmp
 
+rem build and test .net framework assemblies...
+nuget restore Bhbk.Lib.Identity.Data.EF6\Bhbk.Lib.Identity.Data.EF6.csproj -SolutionDirectory . -Verbosity quiet
+
 rem build and test .net standard/core assemblies...
-dotnet restore Bhbk.WebApi.Identity.sln --no-cache --verbosity quiet
+dotnet restore Bhbk.WebApi.Identity.sln --verbosity quiet
 dotnet build Bhbk.WebApi.Identity.sln --configuration Release --verbosity quiet
 rem dotnet test Bhbk.Lib.Identity.Domain.Tests\Bhbk.Lib.Identity.Domain.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
 rem dotnet test Bhbk.WebApi.Alert.Tests\Bhbk.WebApi.Alert.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\

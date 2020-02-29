@@ -2,9 +2,9 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Authorize;
-using Bhbk.Lib.Identity.Domain.Helpers;
+using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Validators;
@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            var instance = new ContextService(InstanceContext.UnitTest);
+            var instance = new ContextService(InstanceContext.End2EndTest);
             var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
@@ -54,9 +54,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
-                sc.AddScoped<IUoWService, UoWService>(x =>
+                sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    var uow = new UoWService(conf["Databases:IdentityEntities"], instance);
+                    var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
                     new GenerateDefaultData(uow, mapper).Create();
 
                     return uow;
@@ -70,11 +70,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 * only for owin authentication configuration.
                 */
 
-                var owin = new UoWService(conf["Databases:IdentityEntities"], instance);
+                var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
                 new GenerateDefaultData(owin, mapper).Create();
-
-                if (owin.InstanceType != InstanceContext.UnitTest)
-                    throw new NotSupportedException();
 
                 var issuers = owin.Issuers.Get()
                     .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);

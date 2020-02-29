@@ -14,16 +14,16 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="Bhbk.Lib.Common" Version="2019.10.21.2046" />
-    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2019.10.21.2046" />
-    <PackageReference Include="Bhbk.Lib.DataAccess.EFCore" Version="2019.10.21.2046" />
-    <PackageReference Include="Bhbk.Lib.DataState" Version="2019.10.21.2046" />
-    <PackageReference Include="coverlet.msbuild" Version="2.8.0">
+    <PackageReference Include="Bhbk.Lib.Common" Version="2020.2.25.1630" />
+    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2020.2.25.1630" />
+    <PackageReference Include="Bhbk.Lib.DataAccess.EFCore" Version="2020.2.25.1630" />
+    <PackageReference Include="Bhbk.Lib.DataState" Version="2020.2.25.1630" />
+    <PackageReference Include="coverlet.msbuild" Version="2.8.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="FluentAssertions" Version="5.10.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.2" />
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
