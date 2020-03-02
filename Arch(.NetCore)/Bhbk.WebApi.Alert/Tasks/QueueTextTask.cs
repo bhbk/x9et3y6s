@@ -145,6 +145,11 @@ namespace Bhbk.WebApi.Alert.Tasks
                 {
                     Log.Error(ex.ToString());
                 }
+
+                /*
+                 * https://docs.microsoft.com/en-us/aspnet/core/performance/memory?view=aspnetcore-3.1
+                 */
+                GC.Collect();
             }
         }
 

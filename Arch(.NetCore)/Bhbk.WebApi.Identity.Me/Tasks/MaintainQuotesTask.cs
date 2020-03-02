@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Models.Me;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -71,32 +71,80 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                             if (motdtype1_response.IsSuccessStatusCode)
                             {
+                                string msg = string.Empty;
                                 var model = mapper.Map<tbl_MOTDs>(motdtype1.contents.quotes[0]);
 
-                                var motd = uow.MOTDs.Get(new QueryExpression<tbl_MOTDs>()
+                                var found = uow.MOTDs.Get(new QueryExpression<tbl_MOTDs>()
                                     .Where(x => x.Author == model.Author && x.Quote == model.Quote)
-                                    .ToLambda()).SingleOrDefault();
+                                    .ToLambda());
 
-                                if (motd == null)
+                                if (!found.Any())
                                 {
                                     /*
-                                     * parts of model are broken and need be fixed...
+                                     * parts of model are missing...
                                      */
                                     if (model.Id == null)
                                         model.Id = Guid.NewGuid().ToString();
 
                                     uow.MOTDs.Create(model);
                                     uow.Commit();
+
+                                    msg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString() + " with new quote added";
                                 }
-                                else if (motd.Id != model.Id)
+                                else if (found.Count() == 1)
                                 {
-                                    motd.Id = model.Id;
+                                    var motd = found.Single();
+                                    var dirty = false;
 
-                                    uow.MOTDs.Create(motd);
-                                    uow.Commit();
+                                    /*
+                                     * parts of model are broken and need be fixed...
+                                     */
+                                    if (motd.Id != model.Id)
+                                    {
+                                        motd.Id = model.Id;
+                                        dirty = true;
+                                    }
+
+                                    if (motd.Title != model.Title)
+                                    {
+                                        motd.Title = model.Title;
+                                        dirty = true;
+                                    }
+
+                                    if (motd.Category != model.Category)
+                                    {
+                                        motd.Category = model.Category;
+                                        dirty = true;
+                                    }
+
+                                    if (motd.Date != model.Date)
+                                    {
+                                        motd.Date = model.Date;
+                                        dirty = true;
+                                    }
+
+                                    if (motd.Tags != model.Tags)
+                                    {
+                                        motd.Tags = model.Tags;
+                                        dirty = true;
+                                    }
+
+                                    if (motd.Background != model.Background)
+                                    {
+                                        motd.Background = model.Background;
+                                        dirty = true;
+                                    }
+
+                                    if (dirty)
+                                    {
+                                        uow.MOTDs.Update(motd);
+                                        uow.Commit();
+
+                                        msg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString() + " with existing quote updated";
+                                    }
                                 }
-
-                                var msg = typeof(MaintainQuotesTask).Name + " success on " + DateTime.Now.ToString();
+                                else
+                                    throw new NotImplementedException();
 
                                 Status = JsonConvert.SerializeObject(
                                     new
@@ -129,6 +177,11 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                 {
                     Log.Error(ex.ToString());
                 }
+
+                /*
+                 * https://docs.microsoft.com/en-us/aspnet/core/performance/memory?view=aspnetcore-3.1
+                 */
+                GC.Collect();
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -84,6 +84,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tasks
                 {
                     Log.Debug(ex.ToString());
                 }
+
+                /*
+                 * https://docs.microsoft.com/en-us/aspnet/core/performance/memory?view=aspnetcore-3.1
+                 */
+                GC.Collect();
             }
         }
     }

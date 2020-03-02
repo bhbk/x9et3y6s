@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Hosting.Options;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -10,37 +11,31 @@ namespace Bhbk.WebApi.Identity.Admin
 {
     public class Program
     {
-        public static IHostBuilder CreateIISHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(opt =>
+        public static IWebHostBuilder CreateIISHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+            .CaptureStartupErrors(true)
+            .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                opt.CaptureStartupErrors(true);
-                opt.ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                });
-                opt.UseIISIntegration();
-                opt.UseStartup<Startup>();
-            });
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            })
+            .UseIISIntegration()
+            .UseStartup<Startup>();
 
-        public static IHostBuilder CreateKestrelHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(opt =>
+        public static IWebHostBuilder CreateKestrelHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+            .CaptureStartupErrors(true)
+            .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                opt.CaptureStartupErrors(true);
-                opt.ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                });
-                opt.UseKestrel(options =>
-                {
-                    options.ConfigureEndpoints();
-                });
-                opt.UseUrls();
-                opt.UseStartup<Startup>();
-            });
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            })
+            .UseKestrel(options =>
+            {
+                options.ConfigureEndpoints();
+            })
+            .UseUrls()
+            .UseStartup<Startup>();
 
         public static void Main(string[] args)
         {
@@ -52,7 +47,8 @@ namespace Bhbk.WebApi.Identity.Admin
 
             var process = Process.GetCurrentProcess();
 
-            if (process.ProcessName.ToLower().Contains("iis"))
+            if (process.ProcessName.ToLower().Contains("iis")
+                || process.ProcessName.ToLower().Contains("w3wp"))
                 CreateIISHostBuilder(args).Build().Run();
 
             else
