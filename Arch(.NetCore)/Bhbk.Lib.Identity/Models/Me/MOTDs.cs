@@ -1,14 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models.Me
 {
     public abstract class MOTDs
     {
+        [Required]
         public string id { get; set; }
 
-        public string quote { get; set; }
-
+        [Required]
         public string author { get; set; }
+
+        [Required]
+        public string quote { get; set; }
     }
 
     public class MOTDV1 : MOTDs

@@ -56,15 +56,15 @@ namespace Bhbk.WebApi.Identity.Me
             sc.AddSingleton<IAlertService, AlertService>();
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
+            if (instance.InstanceType != InstanceContext.DeployedOrLocal)
+                throw new NotSupportedException();
+
             /*
              * do not use dependency injection for unit of work below. is used 
              * only for owin authentication configuration.
              */
 
             var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-
-            if (owin.InstanceType != InstanceContext.DeployedOrLocal)
-                throw new NotSupportedException();
 
             var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                 .Select(x => x.Value);

@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataAccess.EFCore.Repositories;
+﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +9,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
     public class IssuerRepository : GenericRepository<tbl_Issuers>
     {
-        public IssuerRepository(IdentityEntities context, InstanceContext instance)
-            : base(context, instance) { }
+        public IssuerRepository(IdentityEntities context)
+            : base(context) { }
 
         public override tbl_Issuers Create(tbl_Issuers issuer)
         {

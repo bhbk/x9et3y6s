@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataAccess.EF.Repositories;
+﻿using Bhbk.Lib.DataAccess.EF.Repositories;
 using Bhbk.Lib.Identity.Data.EF6.Models;
 using System;
 using System.Collections.Generic;
@@ -12,8 +11,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
     public class StateRepository : GenericRepository<uvw_States>
     {
-        public StateRepository(IdentityEntities context, InstanceContext instance)
-            : base(context, instance) { }
+        public StateRepository(IdentityEntities context)
+            : base(context) { }
 
         public override uvw_States Create(uvw_States entity)
         {

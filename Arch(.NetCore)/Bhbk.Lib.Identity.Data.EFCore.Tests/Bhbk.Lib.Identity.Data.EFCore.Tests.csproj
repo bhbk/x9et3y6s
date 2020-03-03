@@ -16,10 +16,10 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="Bhbk.Lib.Common" Version="2020.2.25.1630" />
-    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2020.2.25.1630" />
-    <PackageReference Include="Bhbk.Lib.DataAccess.EFCore" Version="2020.2.25.1630" />
-    <PackageReference Include="Bhbk.Lib.DataState" Version="2020.2.25.1630" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2020.2.27.1930" />
+    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2020.2.27.1930" />
+    <PackageReference Include="Bhbk.Lib.DataAccess.EFCore" Version="2020.2.27.1930" />
+    <PackageReference Include="Bhbk.Lib.DataState" Version="2020.2.27.1930" />
     <PackageReference Include="coverlet.msbuild" Version="2.8.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

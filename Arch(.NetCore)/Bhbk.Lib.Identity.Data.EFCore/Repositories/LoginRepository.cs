@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataAccess.EFCore.Repositories;
+﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,8 +8,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
     public class LoginRepository : GenericRepository<tbl_Logins>
     {
-        public LoginRepository(IdentityEntities context, InstanceContext instance)
-            : base(context, instance) { }
+        public LoginRepository(IdentityEntities context)
+            : base(context) { }
 
         public override tbl_Logins Update(tbl_Logins login)
         {

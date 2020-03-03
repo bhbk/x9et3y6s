@@ -1,10 +1,8 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Common.Services;
+﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Primitives;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,10 +16,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
     {
         private IClockService _clock;
 
-        public AudienceRepository(IdentityEntities context, InstanceContext instance)
-            : base(context, instance)
+        public AudienceRepository(IdentityEntities context, IContextService instance)
+            : base(context)
         {
-            _clock = new ClockService(new ContextService(instance));
+            _clock = new ClockService(instance);
         }
 
         public DateTimeOffset Clock

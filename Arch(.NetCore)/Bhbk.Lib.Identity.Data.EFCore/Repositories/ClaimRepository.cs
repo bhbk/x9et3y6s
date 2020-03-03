@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataAccess.EFCore.Repositories;
+﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,8 +8,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
     public class ClaimRepository : GenericRepository<tbl_Claims>
     {
-        public ClaimRepository(IdentityEntities context, InstanceContext instance)
-            : base(context, instance) { }
+        public ClaimRepository(IdentityEntities context)
+            : base(context) { }
 
         public override tbl_Claims Update(tbl_Claims model)
         {

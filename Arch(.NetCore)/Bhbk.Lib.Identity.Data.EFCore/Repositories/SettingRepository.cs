@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataAccess.EFCore.Repositories;
+﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -8,8 +7,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
     public class SettingRepository : GenericRepository<tbl_Settings>
     {
-        public SettingRepository(IdentityEntities context, InstanceContext instance)
-            : base(context, instance) { }
+        public SettingRepository(IdentityEntities context)
+            : base(context) { }
 
         public override tbl_Settings Update(tbl_Settings model)
         {

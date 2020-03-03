@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataAccess.EFCore.Repositories;
+﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -8,8 +7,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
     public class StateRepository : GenericRepository<tbl_States>
     {
-        public StateRepository(IdentityEntities context, InstanceContext instance)
-            : base(context, instance) { }
+        public StateRepository(IdentityEntities context)
+            : base(context) { }
 
         public override tbl_States Update(tbl_States model)
         {

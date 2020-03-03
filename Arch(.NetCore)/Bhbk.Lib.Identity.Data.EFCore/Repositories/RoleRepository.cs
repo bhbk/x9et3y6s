@@ -1,10 +1,8 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataAccess.EFCore.Repositories;
+﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
@@ -17,8 +15,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 
     public class RoleRepository : GenericRepository<tbl_Roles>
     {
-        public RoleRepository(IdentityEntities context, InstanceContext instance)
-            : base(context, instance) { }
+        public RoleRepository(IdentityEntities context)
+            : base(context) { }
 
         public  override tbl_Roles Update(tbl_Roles model)
         {

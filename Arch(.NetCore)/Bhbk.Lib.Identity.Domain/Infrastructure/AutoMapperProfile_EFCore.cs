@@ -100,7 +100,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * message of the day models
              */
             CreateMap<MOTDV1, tbl_MOTDs>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => val.id))
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.id == default || val.id == null) ? Guid.NewGuid().ToString() : val.id))
                 .ForMember(dest => dest.Title, src => src.MapFrom(val => val.title))
                 .ForMember(dest => dest.Author, src => src.MapFrom(val => val.author))
                 .ForMember(dest => dest.Quote, src => src.MapFrom(val => val.quote))

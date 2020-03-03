@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataAccess.EF.Repositories;
+﻿using Bhbk.Lib.DataAccess.EF.Repositories;
 using Bhbk.Lib.Identity.Data.EF6.Models;
 using System;
 using System.Collections.Generic;
@@ -12,8 +11,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
     public class LoginRepository : GenericRepository<uvw_Logins>
     {
-        public LoginRepository(IdentityEntities context, InstanceContext instance)
-            : base(context, instance) { }
+        public LoginRepository(IdentityEntities context)
+            : base(context) { }
 
         public override uvw_Logins Create(uvw_Logins entity)
         {

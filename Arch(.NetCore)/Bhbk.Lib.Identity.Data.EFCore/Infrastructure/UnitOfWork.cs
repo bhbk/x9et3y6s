@@ -12,9 +12,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
 {
     public class UnitOfWork : IUnitOfWork, IDisposable, IAsyncDisposable
     {
-        private readonly IdentityEntities _context;
+#if !RELEASE
         private readonly ILoggerFactory _logger;
-
+#endif
+        private readonly IdentityEntities _context;
         public InstanceContext InstanceType { get; private set; }
         public ActivityRepository Activities { get; private set; }
         public AudienceRepository Audiences { get; private set; }
@@ -36,6 +37,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
 
         public UnitOfWork(string connection, IContextService instance)
         {
+#if !RELEASE
             _logger = LoggerFactory.Create(opt =>
             {
                 opt.AddFilter("Microsoft", LogLevel.Warning)
@@ -43,19 +45,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
                     .AddFilter("System", LogLevel.Warning)
                     .AddConsole();
             });
+#endif
 
             switch (instance.InstanceType)
             {
                 case InstanceContext.DeployedOrLocal:
                     {
-#if RELEASE
-                        var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                            .UseSqlServer(connection);
-#elif !RELEASE
+#if !RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .UseSqlServer(connection)
                             .UseLoggerFactory(_logger)
                             .EnableSensitiveDataLogging();
+#elif RELEASE
+                        var builder = new DbContextOptionsBuilder<IdentityEntities>()
+                            .UseSqlServer(connection);
 #endif
                         _context = new IdentityEntities(builder.Options);
                     }
@@ -81,20 +84,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
 
             InstanceType = instance.InstanceType;
 
-            Activities = new ActivityRepository(_context, instance.InstanceType);
-            Audiences = new AudienceRepository(_context, instance.InstanceType);
-            Claims = new ClaimRepository(_context, instance.InstanceType);
-            Issuers = new IssuerRepository(_context, instance.InstanceType);
-            Logins = new LoginRepository(_context, instance.InstanceType);
-            MOTDs = new MOTDRepository(_context, instance.InstanceType);
-            QueueEmails = new QueueEmailRepository(_context, instance.InstanceType);
-            QueueTexts = new QueueTextRepository(_context, instance.InstanceType);
-            Refreshes = new RefreshRepository(_context, instance.InstanceType);
-            Roles = new RoleRepository(_context, instance.InstanceType);
-            Settings = new SettingRepository(_context, instance.InstanceType);
-            States = new StateRepository(_context, instance.InstanceType);
-            Urls = new UrlRepository(_context, instance.InstanceType);
-            Users = new UserRepository(_context, instance.InstanceType);
+            Activities = new ActivityRepository(_context);
+            Audiences = new AudienceRepository(_context, instance);
+            Claims = new ClaimRepository(_context);
+            Issuers = new IssuerRepository(_context);
+            Logins = new LoginRepository(_context);
+            MOTDs = new MOTDRepository(_context);
+            QueueEmails = new QueueEmailRepository(_context);
+            QueueTexts = new QueueTextRepository(_context);
+            Refreshes = new RefreshRepository(_context);
+            Roles = new RoleRepository(_context);
+            Settings = new SettingRepository(_context);
+            States = new StateRepository(_context);
+            Urls = new UrlRepository(_context);
+            Users = new UserRepository(_context, instance);
         }
 
         public void Commit()
