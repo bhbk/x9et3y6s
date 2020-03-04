@@ -16,10 +16,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Urls Create(uvw_Urls entity)
         {
-            var pvalues = new List<SqlParameter>();
-
-            return _context.Database.SqlQuery<uvw_Urls>("[svc].[usp_Url_Insert]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10,@p11,@p12,@p13", pvalues.ToArray()).Single();
+            throw new NotImplementedException();
         }
 
         public override IEnumerable<uvw_Urls> Create(IEnumerable<uvw_Urls> entities)
@@ -38,11 +35,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Urls Delete(uvw_Urls entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
 
-            return _context.Database.SqlQuery<uvw_Urls>("[svc].[usp_Url_Delete]" +
-                "@p0", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Urls>("[svc].[usp_Url_Delete] @Id", pvalues.ToArray())
+                .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_Urls> Delete(IEnumerable<uvw_Urls> entities)

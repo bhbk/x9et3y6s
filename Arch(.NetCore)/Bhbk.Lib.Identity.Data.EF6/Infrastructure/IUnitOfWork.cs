@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.DataAccess.EF.Repositories;
-using Bhbk.Lib.DataAccess.EF.UnitOfWorks;
+﻿using Bhbk.Lib.DataAccess.EF.UnitOfWorks;
 using Bhbk.Lib.Identity.Data.EF6.Repositories;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Infrastructure

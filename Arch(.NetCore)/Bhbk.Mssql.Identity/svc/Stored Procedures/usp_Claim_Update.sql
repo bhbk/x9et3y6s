@@ -10,11 +10,12 @@ CREATE PROCEDURE [svc].[usp_Claim_Update]
     ,@Type					NVARCHAR (MAX)
     ,@Value					NVARCHAR (MAX) 
     ,@ValueType             NVARCHAR (64) 
-    ,@LastUpdated			DATETIME2 (7)
     ,@Immutable				BIT
 
 AS
 BEGIN
+
+DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
 
 UPDATE [dbo].[tbl_Claims]
 SET
@@ -25,8 +26,10 @@ SET
 	,Type					= @Type
 	,Value					= @Value
 	,ValueType				= @ValueType
-    ,LastUpdated			= @LastUpdated
+    ,LastUpdated			= @LASTUPDATED
     ,Immutable				= @Immutable
 WHERE Id = @Id
+
+SELECT * FROM [svc].[uvw_Claims] WHERE [svc].[uvw_Claims].Id = @Id
 
 END

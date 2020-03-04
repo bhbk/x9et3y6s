@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;

@@ -9,14 +9,13 @@ CREATE PROCEDURE [svc].[usp_Claim_Insert]
     ,@Type					NVARCHAR (MAX)
     ,@Value					NVARCHAR (MAX) 
     ,@ValueType             NVARCHAR (64) 
-    ,@Created				DATETIME2 (7) 
-    ,@LastUpdated			DATETIME2 (7)
     ,@Immutable				BIT
 
 AS
 BEGIN
 
 DECLARE @CLAIMID UNIQUEIDENTIFIER = NEWID()
+DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
 INSERT INTO [dbo].[tbl_Claims]
 	(
@@ -28,7 +27,6 @@ INSERT INTO [dbo].[tbl_Claims]
     ,Value       
     ,ValueType     
     ,Created           
-    ,LastUpdated      
     ,Immutable        
 	)
 VALUES
@@ -40,8 +38,7 @@ VALUES
     ,@Type       
     ,@Value       
     ,@ValueType     
-    ,@Created           
-    ,@LastUpdated      
+    ,@CREATED           
     ,@Immutable        
 	);
 

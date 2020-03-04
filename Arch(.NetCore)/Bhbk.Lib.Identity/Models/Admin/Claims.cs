@@ -6,7 +6,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
 {
     public abstract class Claims
     {
-        public Guid ActorId { get; set; }
+        public Guid? ActorId { get; set; }
 
         [Required]
         public Guid IssuerId { get; set; }

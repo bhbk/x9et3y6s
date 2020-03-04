@@ -16,19 +16,37 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Activities Create(uvw_Activities entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId.HasValue ? (object)entity.AudienceId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.UniqueIdentifier) { Value = entity.UserId.HasValue ? (object)entity.UserId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.NVarChar) { Value = entity.ActivityType });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.NVarChar) { Value = (object)entity.TableName ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.NVarChar) { Value = (object)entity.KeyValues ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.NVarChar) { Value = (object)entity.OriginalValues ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.NVarChar) { Value = (object)entity.CurrentValues ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.DateTime2) { Value = entity.Created });
-            pvalues.Add(new SqlParameter("@p8", SqlDbType.Bit) { Value = entity.Immutable });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@AudienceId", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId.HasValue ? (object)entity.AudienceId.Value : DBNull.Value },
+                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) { Value = entity.UserId.HasValue ? (object)entity.UserId.Value : DBNull.Value },
+                new SqlParameter("@ActivityType", SqlDbType.NVarChar) { Value = entity.ActivityType },
+                new SqlParameter("@TableName", SqlDbType.NVarChar) { Value = (object)entity.TableName ?? DBNull.Value },
+                new SqlParameter("@KeyValues", SqlDbType.NVarChar) { Value = (object)entity.KeyValues ?? DBNull.Value },
+                new SqlParameter("@OriginalValues", SqlDbType.NVarChar) { Value = (object)entity.OriginalValues ?? DBNull.Value },
+                new SqlParameter("@CurrentValues", SqlDbType.NVarChar) { Value = (object)entity.CurrentValues ?? DBNull.Value },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
 
-            return _context.Database.SqlQuery<uvw_Activities>("[svc].[usp_Activity_Insert]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Activities>("[svc].[usp_Activity_Insert]" 
+                + "@AudienceId, @UserId, @ActivityType, @TableName, @KeyValues, @OriginalValues, @CurrentValues, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
+
+            /*
+            using (var conn = _context.Database.Connection)
+            {
+                var cmd = conn.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[svc].[usp_Activity_Insert]";
+                cmd.Parameters.AddRange(pvalues.ToArray());
+                cmd.Connection = conn;
+                conn.Open();
+
+                var result = cmd.ExecuteReader();
+
+                return result.Cast<uvw_Activities>().AsEnumerable().Single();
+            }
+            */
         }
 
         public override IEnumerable<uvw_Activities> Create(IEnumerable<uvw_Activities> entities)
@@ -47,11 +65,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Activities Delete(uvw_Activities entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
 
-            return _context.Database.SqlQuery<uvw_Activities>("[svc].[usp_Activity_Delete]" +
-                "@p0", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Activities>("[svc].[usp_Activity_Delete] @Id", pvalues.ToArray())
+                    .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_Activities> Delete(IEnumerable<uvw_Activities> entities)

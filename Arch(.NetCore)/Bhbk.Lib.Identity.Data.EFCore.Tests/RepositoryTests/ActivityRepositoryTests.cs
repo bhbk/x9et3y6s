@@ -1,10 +1,9 @@
 ﻿using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +14,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
     [Collection("RepositoryTests")]
     public class ActivityRepositoryTests : BaseRepositoryTests
     {
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Activities_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityV1()));
-
-                UoW.Commit();
+                UoW.Activities.Create(new uvw_Activities());
             });
         }
 
@@ -33,28 +29,26 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+            var audience = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
+                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Single();
 
             var result = UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityV1()
+                new uvw_Activities()
                 {
-                    AudienceId = Guid.NewGuid(),
-                    UserId = user.Id,
-                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
+                    AudienceId = audience.Id,
+                    ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
                     Immutable = false,
-                }));
-            result.Should().BeAssignableTo<tbl_Activities>();
-
-            UoW.Commit();
+                });
+            result.Should().BeAssignableTo<uvw_Activities>();
         }
 
         [Fact]
         public void Repo_Activities_DeleteV1_Fail()
         {
-            Assert.Throws<DbUpdateConcurrencyException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Activities.Delete(new tbl_Activities());
-                UoW.Commit();
+                UoW.Activities.Delete(new uvw_Activities());
             });
         }
 
@@ -64,11 +58,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var activity = UoW.Activities.Get(new QueryExpression<tbl_Activities>()
-                .Where(x => x.Immutable == false).ToLambda());
+            var activity = UoW.Activities.Get(new QueryExpression<uvw_Activities>()
+                .Where(x => x.Immutable == false).ToLambda())
+                .First();
 
             UoW.Activities.Delete(activity);
-            UoW.Commit();
         }
 
         [Fact]
@@ -78,7 +72,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Activities.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Activities>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Activities>>();
             results.Count().Should().Be(UoW.Activities.Count());
         }
 
@@ -87,8 +81,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<NotImplementedException>(() =>
             {
-                UoW.Activities.Update(new tbl_Activities());
-                UoW.Commit();
+                UoW.Activities.Update(new uvw_Activities());
             });
         }
     }

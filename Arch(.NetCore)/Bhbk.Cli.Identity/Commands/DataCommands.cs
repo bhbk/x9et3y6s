@@ -3,7 +3,7 @@ using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -36,7 +36,7 @@ namespace Bhbk.Cli.Identity.Commands
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);
-                var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
+                var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
                 var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
                 var data = new GenerateDefaultData(uow, mapper);
 

@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.End2EndTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {

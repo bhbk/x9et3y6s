@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;

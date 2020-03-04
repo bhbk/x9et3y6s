@@ -81,14 +81,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             });
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Logins_UpdateV1_Success()
         {
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
             var login = UoW.Logins.Get(new QueryExpression<uvw_Logins>()
-                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Where(x => x.Name == Constants.ApiTestLogin).ToLambda())
                 .Single();
             login.Name += "(Updated)";
 

@@ -75,6 +75,8 @@ namespace Bhbk.Lib.Identity.Primitives
         public const string ApiTestAudiencePassCurrent = "te$tAudiencePa$$word01!";
         public const string ApiTestAudiencePassNew = "te$tAudiencePa$$word01!new";
         public const string ApiTestClaim = "ClaimUnitTests";
+        public const string ApiTestClaimSubject = "ClaimUnitTestsSubject";
+        public const string ApiTestClaimValueType = "ClaimUnitTestsValueType";
         public const string ApiTestEmailContent = "EmailUnitTestsContent";
         public const string ApiTestEmailSubject = "EmailUnitTestsSubject";
         public const string ApiTestIssuer = "IssuerUnitTests";

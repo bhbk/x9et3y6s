@@ -7,8 +7,6 @@ CREATE PROCEDURE [svc].[usp_Audience_Insert]
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
     ,@AudienceType			NVARCHAR (MAX) 
-    ,@Created				DATETIME2 (7) 
-    ,@LastUpdated			DATETIME2 (7)
     ,@LockoutEnabled		BIT     
     ,@LockoutEnd			DATETIMEOFFSET (7)
     ,@LastLoginSuccess		DATETIME2 (7)
@@ -21,6 +19,7 @@ AS
 BEGIN
 
 DECLARE @AUDIENCEID UNIQUEIDENTIFIER = NEWID()
+DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
 INSERT INTO [dbo].[tbl_Audiences]
 	(
@@ -31,7 +30,6 @@ INSERT INTO [dbo].[tbl_Audiences]
     ,Description   
 	,AudienceType
     ,Created           
-    ,LastUpdated      
     ,LockoutEnabled      
     ,LockoutEnd        
     ,LastLoginSuccess 
@@ -48,8 +46,7 @@ VALUES
     ,@Name           
     ,@Description       
 	,@AudienceType
-    ,@Created           
-    ,@LastUpdated      
+    ,@CREATED         
     ,@LockoutEnabled      
     ,@LockoutEnd        
     ,@LastLoginSuccess 

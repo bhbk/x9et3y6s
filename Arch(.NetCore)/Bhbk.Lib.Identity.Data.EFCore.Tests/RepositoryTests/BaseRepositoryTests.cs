@@ -11,7 +11,7 @@ using Xunit;
 namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 {
     [CollectionDefinition("RepositoryTests")]
-    public class StartupTestsCollection : ICollectionFixture<BaseRepositoryTests> { }
+    public class BaseRepositoryTestsCollection : ICollectionFixture<BaseRepositoryTests> { }
 
     public class BaseRepositoryTests
     {
@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
                 .Build();
 
-            var instance = new ContextService(InstanceContext.UnitTest);
+            var instance = new ContextService(InstanceContext.IntegrationTest);
 
             UoW = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
             Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();

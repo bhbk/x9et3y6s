@@ -5,29 +5,29 @@
 
 
 CREATE PROCEDURE [svc].[usp_Audience_Delete]
-    @AudienceID uniqueidentifier
+    @ID uniqueidentifier
 
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Audiences] WHERE [svc].[uvw_Audiences].Id = @AudienceID
+SELECT * FROM [svc].[uvw_Audiences] WHERE [svc].[uvw_Audiences].Id = @ID
 
 DELETE [dbo].[tbl_Activities]
-WHERE AudienceId = @AudienceID
+WHERE AudienceId = @ID
 
 DELETE [dbo].[tbl_Refreshes]
-WHERE AudienceId = @AudienceID
+WHERE AudienceId = @ID
 
 DELETE [dbo].[tbl_Settings]
-WHERE AudienceId = @AudienceID
+WHERE AudienceId = @ID
 
 DELETE [dbo].[tbl_States]
-WHERE AudienceId = @AudienceID
+WHERE AudienceId = @ID
 
 DELETE [dbo].[tbl_Roles]
-WHERE AudienceId = @AudienceID
+WHERE AudienceId = @ID
 
 DELETE [dbo].[tbl_Audiences]
-WHERE Id = @AudienceID
+WHERE Id = @ID
 
 END

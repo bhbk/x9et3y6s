@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
 {
     public abstract class Users
     {
-        public Guid ActorId { get; set; }
+        public Guid? ActorId { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]

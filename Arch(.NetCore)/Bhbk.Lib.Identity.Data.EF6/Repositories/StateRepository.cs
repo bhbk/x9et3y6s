@@ -16,21 +16,40 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_States Create(uvw_States entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId.HasValue ? (object)entity.AudienceId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.UniqueIdentifier) { Value = entity.UserId.HasValue ? (object)entity.UserId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.NVarChar) { Value = string.IsNullOrEmpty(entity.StateValue) ? (object)entity.StateValue : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.NVarChar) { Value = entity.StateType });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.Bit) { Value = entity.StateDecision.HasValue ? (object)entity.StateDecision.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.Bit) { Value = entity.StateConsume });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.DateTime2) { Value = entity.IssuedUtc });
-            pvalues.Add(new SqlParameter("@p8", SqlDbType.DateTime2) { Value = entity.ValidToUtc });
-            pvalues.Add(new SqlParameter("@p9", SqlDbType.DateTime2) { Value = entity.ValidFromUtc });
-            pvalues.Add(new SqlParameter("@p10", SqlDbType.DateTime2) { Value = entity.LastPolling });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@IssuerId", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId },
+                new SqlParameter("@AudienceId", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId.HasValue ? (object)entity.AudienceId.Value : DBNull.Value },
+                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) { Value = entity.UserId.HasValue ? (object)entity.UserId.Value : DBNull.Value },
+                new SqlParameter("@StateValue", SqlDbType.NVarChar) { Value = (object)entity.StateValue ?? DBNull.Value },
+                new SqlParameter("@StateType", SqlDbType.NVarChar) { Value = entity.StateType },
+                new SqlParameter("@StateDecision", SqlDbType.Bit) { Value = entity.StateDecision.HasValue ? (object)entity.StateDecision.Value : DBNull.Value },
+                new SqlParameter("@StateConsume", SqlDbType.Bit) { Value = entity.StateConsume },
+                new SqlParameter("@IssuerUtc", SqlDbType.DateTime2) { Value = entity.IssuedUtc },
+                new SqlParameter("@ValidFromUtc", SqlDbType.DateTime2) { Value = entity.ValidFromUtc },
+                new SqlParameter("@ValidToUtc", SqlDbType.DateTime2) { Value = entity.ValidToUtc },
+                new SqlParameter("@LastPolling", SqlDbType.DateTime2) { Value = entity.LastPolling }
+            };
 
-            return _context.Database.SqlQuery<uvw_States>("[svc].[usp_State_Insert]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_States>("[svc].[usp_State_Insert]" 
+                + "@IssuerId, @AudienceId, @UserId, @StateValue, @StateType, @StateDecision, @StateConsume, @IssuerUtc, @ValidFromUtc, @ValidToUtc, @LastPolling", pvalues.ToArray())
+                    .AsEnumerable().Single();
+
+            /*
+            using (var conn = _context.Database.Connection)
+            {
+                var cmd = conn.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[svc].[usp_State_Insert]";
+                cmd.Parameters.AddRange(pvalues.ToArray());
+                cmd.Connection = conn;
+                conn.Open();
+
+                var result = cmd.ExecuteReader();
+
+                return result.Cast<uvw_States>().AsEnumerable().Single();
+            }
+            */
         }
 
         public override IEnumerable<uvw_States> Create(IEnumerable<uvw_States> entities)
@@ -49,11 +68,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_States Delete(uvw_States entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
 
-            return _context.Database.SqlQuery<uvw_States>("[svc].[usp_State_Delete]" +
-                "@p0", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_States>("[svc].[usp_State_Delete] @Id", pvalues.ToArray())
+                .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_States> Delete(IEnumerable<uvw_States> entities)
@@ -77,22 +98,25 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_States Update(uvw_States entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId.HasValue ? (object)entity.AudienceId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.UniqueIdentifier) { Value = entity.UserId.HasValue ? (object)entity.UserId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.NVarChar) { Value = string.IsNullOrEmpty(entity.StateValue) ? (object)entity.StateValue : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.NVarChar) { Value = entity.StateType });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.Bit) { Value = entity.StateDecision.HasValue ? (object)entity.StateDecision.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.Bit) { Value = entity.StateConsume });
-            pvalues.Add(new SqlParameter("@p8", SqlDbType.DateTime2) { Value = entity.IssuedUtc });
-            pvalues.Add(new SqlParameter("@p9", SqlDbType.DateTime2) { Value = entity.ValidToUtc });
-            pvalues.Add(new SqlParameter("@p10", SqlDbType.DateTime2) { Value = entity.ValidFromUtc });
-            pvalues.Add(new SqlParameter("@p11", SqlDbType.DateTime2) { Value = entity.LastPolling });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
+                new SqlParameter("@IssuerId", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId },
+                new SqlParameter("@AudienceId", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId.HasValue ? (object)entity.AudienceId.Value : DBNull.Value },
+                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) { Value = entity.UserId.HasValue ? (object)entity.UserId.Value : DBNull.Value },
+                new SqlParameter("@StateValue", SqlDbType.NVarChar) { Value = (object)entity.StateValue ?? DBNull.Value },
+                new SqlParameter("@StateType", SqlDbType.NVarChar) { Value = entity.StateType },
+                new SqlParameter("@StateDecision", SqlDbType.Bit) { Value = entity.StateDecision.HasValue ? (object)entity.StateDecision.Value : DBNull.Value },
+                new SqlParameter("@StateConsume", SqlDbType.Bit) { Value = entity.StateConsume },
+                new SqlParameter("@IssuerUtc", SqlDbType.DateTime2) { Value = entity.IssuedUtc },
+                new SqlParameter("@ValidFromUtc", SqlDbType.DateTime2) { Value = entity.ValidFromUtc },
+                new SqlParameter("@ValidToUtc", SqlDbType.DateTime2) { Value = entity.ValidToUtc },
+                new SqlParameter("@LastPolling", SqlDbType.DateTime2) { Value = entity.LastPolling }
+            };
 
-            return _context.Database.SqlQuery<uvw_States>("[svc].[usp_State_Update]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p11", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_States>("[svc].[usp_State_Update]"
+                + "@Id, @IssuerId, @AudienceId, @UserId, @StateValue, @StateType, @StateDecision, @StateConsume, @IssuerUtc, @ValidFromUtc, @ValidToUtc, @LastPolling", pvalues.ToArray())
+                    .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_States> Update(IEnumerable<uvw_States> entities)

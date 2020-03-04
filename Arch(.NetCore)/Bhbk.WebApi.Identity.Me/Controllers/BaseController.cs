@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -87,11 +87,17 @@
     <Reference Include="BouncyCastle.Crypto, Version=1.8.6.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.BouncyCastle.1.8.6.7\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
+    <Reference Include="Effort, Version=2.2.10.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Effort.EF6.2.2.10\lib\net45\Effort.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="NMemory, Version=3.0.0.0, Culture=neutral, PublicKeyToken=afc61983f100d280, processorArchitecture=MSIL">
+      <HintPath>..\packages\NMemory.3.1.1\lib\net45\NMemory.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -102,7 +108,7 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.SqlClient, Version=4.6.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.SqlClient.4.8.1\lib\net461\System.Data.SqlClient.dll</HintPath>
     </Reference>
@@ -123,6 +129,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Infrastructure_DIRECT\IUnitOfWork.cs" />
+    <Compile Include="Infrastructure_DIRECT\UnitOfWork.cs" />
     <Compile Include="Models\IdentityEntities.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -180,6 +188,79 @@
     <Compile Include="Models\uvw_Users.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models_DIRECT\IdentityEntities.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IdentityEntities.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\IdentityEntities.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\IdentityEntities.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IdentityEntities.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\IdentityEntitiesFactory.cs" />
+    <Compile Include="Models_DIRECT\tbl_Activities.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_AudienceRoles.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_Audiences.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_Claims.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_Issuers.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_Logins.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_MOTDs.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_QueueEmails.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_QueueTexts.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_Refreshes.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_RoleClaims.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_Roles.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_Settings.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_States.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_Urls.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_UserClaims.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_UserLogins.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_UserRoles.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_Users.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Primitives\EF6Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ActivityRepository.cs" />
@@ -198,6 +279,20 @@
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Infrastructure\IUnitOfWork.cs" />
     <Compile Include="Infrastructure\UnitOfWork.cs" />
+    <Compile Include="Repositories_DIRECT\ActivityRepository.cs" />
+    <Compile Include="Repositories_DIRECT\AudienceRepository.cs" />
+    <Compile Include="Repositories_DIRECT\ClaimRepository.cs" />
+    <Compile Include="Repositories_DIRECT\IssuerRepository.cs" />
+    <Compile Include="Repositories_DIRECT\LoginRepository.cs" />
+    <Compile Include="Repositories_DIRECT\MOTDRepository.cs" />
+    <Compile Include="Repositories_DIRECT\QueueEmailRepository.cs" />
+    <Compile Include="Repositories_DIRECT\QueueTextRepository.cs" />
+    <Compile Include="Repositories_DIRECT\RefreshRepository.cs" />
+    <Compile Include="Repositories_DIRECT\RoleRepository.cs" />
+    <Compile Include="Repositories_DIRECT\SettingRepository.cs" />
+    <Compile Include="Repositories_DIRECT\StateRepository.cs" />
+    <Compile Include="Repositories_DIRECT\UrlRepository.cs" />
+    <Compile Include="Repositories_DIRECT\UserRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -209,6 +304,13 @@
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </None>
     <Compile Include="Models\IdentityEntitiesFactory.cs" />
+    <EntityDeploy Include="Models_DIRECT\IdentityEntities.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>IdentityEntities.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Models_DIRECT\IdentityEntities.edmx.diagram">
+      <DependentUpon>IdentityEntities.edmx</DependentUpon>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -228,6 +330,16 @@
       <LastGenOutput>IdentityEntities.Context.cs</LastGenOutput>
     </Content>
     <Content Include="Models\IdentityEntities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>IdentityEntities.edmx</DependentUpon>
+      <LastGenOutput>IdentityEntities.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models_DIRECT\IdentityEntities.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>IdentityEntities.edmx</DependentUpon>
+      <LastGenOutput>IdentityEntities.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models_DIRECT\IdentityEntities.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
       <LastGenOutput>IdentityEntities.cs</LastGenOutput>

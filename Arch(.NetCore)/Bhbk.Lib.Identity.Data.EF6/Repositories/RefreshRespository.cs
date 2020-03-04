@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
@@ -15,27 +16,81 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Refreshes Create(uvw_Refreshes entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId.HasValue ? (object)entity.AudienceId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.UniqueIdentifier) { Value = entity.UserId.HasValue ? (object)entity.UserId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.NVarChar) { Value = entity.RefreshValue });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.NVarChar) { Value = entity.RefreshType });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.DateTime2) { Value = entity.IssuedUtc });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.DateTime2) { Value = entity.ValidFromUtc });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.DateTime2) { Value = entity.ValidToUtc });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@IssuerId", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId },
+                new SqlParameter("@AudienceId", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId.HasValue ? (object)entity.AudienceId.Value : DBNull.Value },
+                new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) { Value = entity.UserId.HasValue ? (object)entity.UserId.Value : DBNull.Value },
+                new SqlParameter("@RefreshValue", SqlDbType.NVarChar) { Value = entity.RefreshValue },
+                new SqlParameter("@RefreshType", SqlDbType.NVarChar) { Value = entity.RefreshType },
+                new SqlParameter("@IssuerUtc", SqlDbType.DateTime2) { Value = entity.IssuedUtc },
+                new SqlParameter("@ValueFromUtc", SqlDbType.DateTime2) { Value = entity.ValidFromUtc },
+                new SqlParameter("@ValueToUtc", SqlDbType.DateTime2) { Value = entity.ValidToUtc }
+            };
 
-            return _context.Database.SqlQuery<uvw_Refreshes>("[svc].[usp_Refresh_Insert]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Refreshes>("[svc].[usp_Refresh_Insert]"
+                + "@IssuerId, @AudienceId, @UserId, @RefreshValue, @RefreshType, @IssuerUtc, @ValueFromUtc, @ValueToUtc", pvalues.ToArray())
+                    .AsEnumerable().Single();
+
+            /*
+            using (var conn = _context.Database.Connection)
+            {
+                var cmd = conn.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[svc].[usp_Refresh_Insert]";
+                cmd.Parameters.AddRange(pvalues.ToArray());
+                cmd.Connection = conn;
+                conn.Open();
+
+                var result = cmd.ExecuteReader();
+
+                return result.Cast<uvw_Refreshes>().AsEnumerable().Single();
+            }
+            */
+        }
+
+        public override IEnumerable<uvw_Refreshes> Create(IEnumerable<uvw_Refreshes> entities)
+        {
+            var results = new List<uvw_Refreshes>();
+
+            foreach (var entity in entities)
+            {
+                var result = Create(entity);
+
+                results.Add(result);
+            }
+
+            return results;
         }
 
         public override uvw_Refreshes Delete(uvw_Refreshes entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
 
-            return _context.Database.SqlQuery<uvw_Refreshes>("[svc].[usp_Refresh_Delete]" +
-                "@p0", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Refreshes>("[svc].[usp_Refresh_Delete] @Id", pvalues.ToArray())
+                .AsEnumerable().Single();
+        }
+
+        public override IEnumerable<uvw_Refreshes> Delete(IEnumerable<uvw_Refreshes> entities)
+        {
+            var results = new List<uvw_Refreshes>();
+
+            foreach (var entity in entities)
+            {
+                var result = Delete(entity);
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public override IEnumerable<uvw_Refreshes> Delete(LambdaExpression lambda)
+        {
+            throw new NotImplementedException();
         }
 
         public override uvw_Refreshes Update(uvw_Refreshes entity)

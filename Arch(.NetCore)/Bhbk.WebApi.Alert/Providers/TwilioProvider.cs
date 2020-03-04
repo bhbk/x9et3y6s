@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;

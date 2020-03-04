@@ -1,10 +1,9 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +14,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
     [Collection("RepositoryTests")]
     public class ClaimRepositoryTests : BaseRepositoryTests
     {
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Claims_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Claims.Create(
-                    Mapper.Map<tbl_Claims>(new ClaimV1()));
-
-                UoW.Commit();
+                UoW.Claims.Create(new uvw_Claims());
             });
         }
 
@@ -33,28 +29,29 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+            var issuer = UoW.Issuers.Get(new QueryExpression<uvw_Issuers>()
+                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Single();
 
             var result = UoW.Claims.Create(
-                Mapper.Map<tbl_Claims>(new ClaimV1()
+                new uvw_Claims()
                 {
                     IssuerId = issuer.Id,
+                    Subject = "Subject-" + AlphaNumeric.CreateString(4),
                     Type = Constants.ApiTestClaim,
-                    Value = Base64.CreateString(8),
+                    Value = AlphaNumeric.CreateString(8),
+                    ValueType = "ValueType-" + AlphaNumeric.CreateString(4),
                     Immutable = false,
-                }));
-            result.Should().BeAssignableTo<tbl_Claims>();
-
-            UoW.Commit();
+                });
+            result.Should().BeAssignableTo<uvw_Claims>();
         }
 
         [Fact]
         public void Repo_Claims_DeleteV1_Fail()
         {
-            Assert.Throws<DbUpdateConcurrencyException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Claims.Delete(new tbl_Claims());
-                UoW.Commit();
+                UoW.Claims.Delete(new uvw_Claims());
             });
         }
 
@@ -64,12 +61,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(new QueryExpression<uvw_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                 .Single();
 
             UoW.Claims.Delete(claim);
-            UoW.Commit();
         }
 
         [Fact]
@@ -79,17 +75,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Claims.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Claims>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Claims>>();
             results.Count().Should().Be(UoW.Claims.Count());
         }
 
         [Fact]
         public void Repo_Claims_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Claims.Update(new tbl_Claims());
-                UoW.Commit();
+                UoW.Claims.Update(new uvw_Claims());
             });
         }
 
@@ -99,15 +94,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(new QueryExpression<uvw_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                 .Single();
             claim.Value += "(Updated)";
 
             var result = UoW.Claims.Update(claim);
-            result.Should().BeAssignableTo<tbl_Claims>();
-
-            UoW.Commit();
+            result.Should().BeAssignableTo<uvw_Claims>();
         }
     }
 }

@@ -8,8 +8,6 @@ CREATE PROCEDURE [svc].[usp_User_Update]
     ,@FirstName            NVARCHAR (MAX)
     ,@LastName             NVARCHAR (MAX) 
     ,@PhoneNumber          NVARCHAR (16)
-    ,@Created              DATETIME2 (7) 
-    ,@LastUpdated          DATETIME2 (7)
     ,@LockoutEnabled       BIT     
     ,@LockoutEnd           DATETIMEOFFSET (7)
     ,@HumanBeing           BIT
@@ -17,6 +15,8 @@ CREATE PROCEDURE [svc].[usp_User_Update]
 
 AS
 BEGIN
+
+DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
 
 UPDATE [dbo].[tbl_Users]
 SET
@@ -26,7 +26,7 @@ SET
     ,FirstName				= @FirstName
     ,LastName				= @LastName
     ,PhoneNumber			= @PhoneNumber
-    ,LastUpdated			= @LastUpdated
+    ,LastUpdated			= @LASTUPDATED
     ,LockoutEnabled			= @LockoutEnabled
     ,LockoutEnd				= @LockoutEnd
     ,HumanBeing				= @HumanBeing

@@ -14,22 +14,14 @@ namespace Bhbk.WebApi.Identity.Me
         public static IWebHostBuilder CreateIISHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .CaptureStartupErrors(true)
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            })
+            .UseSerilog()
             .UseIISIntegration()
             .UseStartup<Startup>();
 
         public static IWebHostBuilder CreateKestrelHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .CaptureStartupErrors(true)
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            })
+            .UseSerilog()
             .UseKestrel(options =>
             {
                 options.ConfigureEndpoints();
@@ -39,10 +31,16 @@ namespace Bhbk.WebApi.Identity.Me
 
         public static void Main(string[] args)
         {
+            var conf = (IConfiguration)new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .Enrich.FromLogContext()
+                .ReadFrom.Configuration(conf)
+                .WriteTo.Console()
                 .WriteTo.RollingFile(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7)
+                .Enrich.FromLogContext()
                 .CreateLogger();
 
             var process = Process.GetCurrentProcess();

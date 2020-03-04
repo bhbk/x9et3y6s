@@ -12,23 +12,40 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
     public class ClaimRepository : GenericRepository<uvw_Claims>
     {
         public ClaimRepository(IdentityEntities context)
-           : base(context) { }
+            : base(context) { }
 
         public override uvw_Claims Create(uvw_Claims entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.NVarChar) { Value = (object)entity.Subject ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.NVarChar) { Value = entity.Type });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.NVarChar) { Value = entity.Value });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.NVarChar) { Value = (object)entity.ValueType ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.DateTime2) { Value = entity.Created });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.DateTime2) { Value = entity.LastUpdated.HasValue ? (object)entity.LastUpdated.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p8", SqlDbType.Bit) { Value = entity.Immutable });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@IssuerId", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId },
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Subject", SqlDbType.NVarChar) { Value = entity.Subject },
+                new SqlParameter("@Type", SqlDbType.NVarChar) { Value = entity.Type },
+                new SqlParameter("@Value", SqlDbType.NVarChar) { Value = entity.Value },
+                new SqlParameter("@ValueType", SqlDbType.NVarChar) { Value = entity.ValueType },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
 
-            return _context.Database.SqlQuery<uvw_Claims>("[svc].[usp_Claim_Insert]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Claims>("[svc].[usp_Claim_Insert]"
+                + "@IssuerId, @ActorId, @Subject, @Type, @Value, @ValueType, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
+
+            /*
+            using (var conn = _context.Database.Connection)
+            {
+                var cmd = conn.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[svc].[usp_Claim_Insert]";
+                cmd.Parameters.AddRange(pvalues.ToArray());
+                cmd.Connection = conn;
+                conn.Open();
+
+                var result = cmd.ExecuteReader();
+
+                return result.Cast<uvw_Claims>().AsEnumerable().Single();
+            }
+            */
         }
 
         public override IEnumerable<uvw_Claims> Create(IEnumerable<uvw_Claims> entities)
@@ -47,11 +64,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Claims Delete(uvw_Claims entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
 
-            return _context.Database.SqlQuery<uvw_Claims>("[svc].[usp_Claim_Delete]" +
-                "@p0", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Claims>("[svc].[usp_Claim_Delete] @Id", pvalues.ToArray())
+                .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_Claims> Delete(IEnumerable<uvw_Claims> entities)
@@ -75,20 +94,21 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Claims Update(uvw_Claims entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.NVarChar) { Value = (object)entity.Subject ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.NVarChar) { Value = entity.Type });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.NVarChar) { Value = entity.Value });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.NVarChar) { Value = (object)entity.ValueType ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.DateTime2) { Value = entity.Created });
-            pvalues.Add(new SqlParameter("@p8", SqlDbType.DateTime2) { Value = entity.LastUpdated.HasValue ? (object)entity.LastUpdated.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p9", SqlDbType.Bit) { Value = entity.Immutable });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
+                new SqlParameter("@IssuerId", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId },
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Subject", SqlDbType.NVarChar) { Value = entity.Subject },
+                new SqlParameter("@Type", SqlDbType.NVarChar) { Value = entity.Type },
+                new SqlParameter("@Value", SqlDbType.NVarChar) { Value = entity.Value },
+                new SqlParameter("@ValueType", SqlDbType.NVarChar) { Value = entity.ValueType },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
 
-            return _context.Database.SqlQuery<uvw_Claims>("[svc].[usp_Claim_Update]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Claims>("[svc].[usp_Claim_Update]"
+                + "@Id, @IssuerId, @ActorId, @Subject, @Type, @Value, @ValueType, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_Claims> Update(IEnumerable<uvw_Claims> entities)

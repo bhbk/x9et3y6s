@@ -8,8 +8,6 @@ CREATE PROCEDURE [svc].[usp_Audience_Update]
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
     ,@AudienceType			NVARCHAR (MAX) 
-    ,@Created				DATETIME2 (7) 
-    ,@LastUpdated			DATETIME2 (7)
     ,@LockoutEnabled		BIT     
     ,@LockoutEnd			DATETIMEOFFSET (7)
     ,@LastLoginSuccess		DATETIME2 (7)
@@ -21,6 +19,8 @@ CREATE PROCEDURE [svc].[usp_Audience_Update]
 AS
 BEGIN
 
+DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
+
 UPDATE [dbo].[tbl_Audiences]
 SET
      Id						= @Id
@@ -29,8 +29,7 @@ SET
 	,Name					= @Name
 	,Description			= @Description
 	,AudienceType			= @AudienceType
-	,Created				= @Created
-    ,LastUpdated			= @LastUpdated
+    ,LastUpdated			= @LASTUPDATED
     ,LockoutEnabled			= @LockoutEnabled
     ,LockoutEnd				= @LockoutEnd
     ,LastLoginSuccess		= @LastLoginSuccess

@@ -37,8 +37,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 new uvw_Claims()
                 {
                     IssuerId = issuer.Id,
+                    Subject = "Subject-" + AlphaNumeric.CreateString(4),
                     Type = Constants.ApiTestClaim,
-                    Value = Base64.CreateString(8),
+                    Value = AlphaNumeric.CreateString(8),
+                    ValueType = "ValueType-" + AlphaNumeric.CreateString(4),
                     Immutable = false,
                 });
             result.Should().BeAssignableTo<uvw_Claims>();
@@ -59,11 +61,11 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audience = UoW.Claims.Get(new QueryExpression<uvw_Claims>()
+            var claim = UoW.Claims.Get(new QueryExpression<uvw_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                 .Single();
 
-            UoW.Claims.Delete(audience);
+            UoW.Claims.Delete(claim);
         }
 
         [Fact]
@@ -86,18 +88,18 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             });
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Claims_UpdateV1_Success()
         {
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audience = UoW.Claims.Get(new QueryExpression<uvw_Claims>()
-                .Where(x => x.Type == Constants.ApiTestAudience).ToLambda())
+            var claim = UoW.Claims.Get(new QueryExpression<uvw_Claims>()
+                .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                 .Single();
-            audience.Value += "(Updated)";
+            claim.Value += "(Updated)";
 
-            var result = UoW.Claims.Update(audience);
+            var result = UoW.Claims.Update(claim);
             result.Should().BeAssignableTo<uvw_Claims>();
         }
     }

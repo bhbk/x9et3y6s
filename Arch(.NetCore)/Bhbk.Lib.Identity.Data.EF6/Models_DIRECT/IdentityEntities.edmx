@@ -1,0 +1,2016 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="IdentityEntities.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="tbl_Activities">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AudienceId" Type="uniqueidentifier" />
+          <Property Name="UserId" Type="uniqueidentifier" />
+          <Property Name="ActivityType" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="TableName" Type="nvarchar" MaxLength="256" />
+          <Property Name="KeyValues" Type="nvarchar(max)" />
+          <Property Name="OriginalValues" Type="nvarchar(max)" />
+          <Property Name="CurrentValues" Type="nvarchar(max)" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_AudienceRoles">
+          <Key>
+            <PropertyRef Name="AudienceId" />
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Audiences">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="256" />
+          <Property Name="ConcurrencyStamp" Type="nvarchar" MaxLength="256" />
+          <Property Name="PasswordHash" Type="nvarchar" MaxLength="256" />
+          <Property Name="SecurityStamp" Type="nvarchar" MaxLength="256" />
+          <Property Name="AudienceType" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="Enabled" Type="bit" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
+          <Property Name="LockoutEnd" Type="datetimeoffset" Precision="7" />
+          <Property Name="LastLoginSuccess" Type="datetime2" Precision="7" />
+          <Property Name="LastLoginFailure" Type="datetime2" Precision="7" />
+          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
+          <Property Name="AccessSuccessCount" Type="int" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Claims">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Subject" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Type" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Value" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="ValueType" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Issuers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="256" />
+          <Property Name="IssuerKey" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Enabled" Type="bit" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Logins">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="256" />
+          <Property Name="LoginKey" Type="nvarchar" MaxLength="256" />
+          <Property Name="Enabled" Type="bit" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_MOTDs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="Title" Type="varchar" MaxLength="256" />
+          <Property Name="Author" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="Quote" Type="varchar(max)" Nullable="false" />
+          <Property Name="Category" Type="varchar" MaxLength="256" />
+          <Property Name="Date" Type="datetime2" Precision="7" />
+          <Property Name="Tags" Type="varchar" MaxLength="128" />
+          <Property Name="Length" Type="int" />
+          <Property Name="Background" Type="varchar" MaxLength="512" />
+        </EntityType>
+        <EntityType Name="tbl_QueueEmails">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="FromId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FromEmail" Type="varchar" MaxLength="128" />
+          <Property Name="FromDisplay" Type="varchar" MaxLength="128" />
+          <Property Name="ToId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ToEmail" Type="varchar" MaxLength="128" />
+          <Property Name="ToDisplay" Type="varchar" MaxLength="128" />
+          <Property Name="Subject" Type="varchar" MaxLength="256" Nullable="false" />
+          <Property Name="HtmlContent" Type="varchar(max)" />
+          <Property Name="PlaintextContent" Type="varchar(max)" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="SendAt" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_QueueTexts">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FromId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FromPhoneNumber" Type="varchar" MaxLength="15" />
+          <Property Name="ToId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ToPhoneNumber" Type="varchar" MaxLength="15" />
+          <Property Name="Body" Type="varchar(max)" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="SendAt" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Refreshes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AudienceId" Type="uniqueidentifier" />
+          <Property Name="UserId" Type="uniqueidentifier" />
+          <Property Name="RefreshValue" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="RefreshType" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="ValidFromUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="ValidToUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_RoleClaims">
+          <Key>
+            <PropertyRef Name="RoleId" />
+            <PropertyRef Name="ClaimId" />
+          </Key>
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ClaimId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Created" Type="datetime" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Roles">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="256" />
+          <Property Name="Enabled" Type="bit" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Settings">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IssuerId" Type="uniqueidentifier" />
+          <Property Name="AudienceId" Type="uniqueidentifier" />
+          <Property Name="UserId" Type="uniqueidentifier" />
+          <Property Name="ConfigKey" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="ConfigValue" Type="varchar" MaxLength="256" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_States">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AudienceId" Type="uniqueidentifier" />
+          <Property Name="UserId" Type="uniqueidentifier" />
+          <Property Name="StateValue" Type="nvarchar" MaxLength="512" />
+          <Property Name="StateType" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="StateDecision" Type="bit" />
+          <Property Name="StateConsume" Type="bit" Nullable="false" />
+          <Property Name="ValidFromUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="ValidToUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastPolling" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Urls">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="UrlHost" Type="nvarchar" MaxLength="512" />
+          <Property Name="UrlPath" Type="nvarchar" MaxLength="512" />
+          <Property Name="Enabled" Type="bit" Nullable="false" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_UserClaims">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="ClaimId" />
+          </Key>
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ClaimId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_UserLogins">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="LoginId" />
+          </Key>
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="LoginId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_UserRoles">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_Users">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="EmailConfirmed" Type="bit" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="PhoneNumber" Type="nvarchar" MaxLength="16" />
+          <Property Name="PhoneNumberConfirmed" Type="bit" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime2" Precision="7" />
+          <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
+          <Property Name="LockoutEnd" Type="datetimeoffset" Precision="7" />
+          <Property Name="LastLoginSuccess" Type="datetime2" Precision="7" />
+          <Property Name="LastLoginFailure" Type="datetime2" Precision="7" />
+          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
+          <Property Name="AccessSuccessCount" Type="int" Nullable="false" />
+          <Property Name="ConcurrencyStamp" Type="nvarchar(max)" />
+          <Property Name="PasswordHash" Type="nvarchar(max)" />
+          <Property Name="PasswordConfirmed" Type="bit" Nullable="false" />
+          <Property Name="SecurityStamp" Type="nvarchar(max)" />
+          <Property Name="TwoFactorEnabled" Type="bit" Nullable="false" />
+          <Property Name="HumanBeing" Type="bit" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Activities_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="0..1" />
+          <End Role="tbl_Activities" Type="Self.tbl_Activities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Activities">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Activities_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1" />
+          <End Role="tbl_Activities" Type="Self.tbl_Activities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Activities">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AudienceRoles_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_AudienceRoles" Type="Self.tbl_AudienceRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_AudienceRoles">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AudienceRoles_RoleID">
+          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_AudienceRoles" Type="Self.tbl_AudienceRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Roles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_AudienceRoles">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Audiences_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="1" />
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Audiences">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Claims_ActorID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1" />
+          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Claims">
+              <PropertyRef Name="ActorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Claims_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Claims">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Logins_ActorID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1" />
+          <End Role="tbl_Logins" Type="Self.tbl_Logins" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Logins">
+              <PropertyRef Name="ActorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_QueueEmails_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_QueueEmails" Type="Self.tbl_QueueEmails" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_QueueEmails">
+              <PropertyRef Name="FromId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_QueueTexts_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_QueueTexts" Type="Self.tbl_QueueTexts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_QueueTexts">
+              <PropertyRef Name="FromId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Refreshes_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="0..1" />
+          <End Role="tbl_Refreshes" Type="Self.tbl_Refreshes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Refreshes">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Refreshes_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Refreshes" Type="Self.tbl_Refreshes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Refreshes">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Refreshes_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1" />
+          <End Role="tbl_Refreshes" Type="Self.tbl_Refreshes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Refreshes">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RoleClaims_ClaimID">
+          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_RoleClaims" Type="Self.tbl_RoleClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Claims">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_RoleClaims">
+              <PropertyRef Name="ClaimId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RoleClaims_RoleID">
+          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_RoleClaims" Type="Self.tbl_RoleClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Roles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_RoleClaims">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Roles_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="1" />
+          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Roles">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Settings_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Settings" Type="Self.tbl_Settings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Settings">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Settings_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Settings" Type="Self.tbl_Settings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Settings">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Settings_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Settings" Type="Self.tbl_Settings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Settings">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_States_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_States" Type="Self.tbl_States" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_States">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_States_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_States" Type="Self.tbl_States" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_States">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_States_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_States" Type="Self.tbl_States" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_States">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Urls_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Urls" Type="Self.tbl_Urls" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Urls">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserClaims_ClaimID">
+          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserClaims" Type="Self.tbl_UserClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Claims">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserClaims">
+              <PropertyRef Name="ClaimId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserClaims_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserClaims" Type="Self.tbl_UserClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserClaims">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserLogins_LoginID">
+          <End Role="tbl_Logins" Type="Self.tbl_Logins" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserLogins" Type="Self.tbl_UserLogins" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Logins">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserLogins">
+              <PropertyRef Name="LoginId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserLogins_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserLogins" Type="Self.tbl_UserLogins" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserLogins">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserRoles_RoleID">
+          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserRoles" Type="Self.tbl_UserRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Roles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserRoles">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserRoles_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserRoles" Type="Self.tbl_UserRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserRoles">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="IdentityEntitiesStoreContainer">
+          <EntitySet Name="tbl_Activities" EntityType="Self.tbl_Activities" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_AudienceRoles" EntityType="Self.tbl_AudienceRoles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Audiences" EntityType="Self.tbl_Audiences" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Claims" EntityType="Self.tbl_Claims" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Issuers" EntityType="Self.tbl_Issuers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Logins" EntityType="Self.tbl_Logins" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_MOTDs" EntityType="Self.tbl_MOTDs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_QueueEmails" EntityType="Self.tbl_QueueEmails" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_QueueTexts" EntityType="Self.tbl_QueueTexts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Refreshes" EntityType="Self.tbl_Refreshes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_RoleClaims" EntityType="Self.tbl_RoleClaims" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Roles" EntityType="Self.tbl_Roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Settings" EntityType="Self.tbl_Settings" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_States" EntityType="Self.tbl_States" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Urls" EntityType="Self.tbl_Urls" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_UserClaims" EntityType="Self.tbl_UserClaims" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_UserLogins" EntityType="Self.tbl_UserLogins" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_UserRoles" EntityType="Self.tbl_UserRoles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_Users" EntityType="Self.tbl_Users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Activities_AudienceID" Association="Self.FK_Activities_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Activities" EntitySet="tbl_Activities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Activities_UserID" Association="Self.FK_Activities_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Activities" EntitySet="tbl_Activities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AudienceRoles_AudienceID" Association="Self.FK_AudienceRoles_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_AudienceRoles" EntitySet="tbl_AudienceRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AudienceRoles_RoleID" Association="Self.FK_AudienceRoles_RoleID">
+            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
+            <End Role="tbl_AudienceRoles" EntitySet="tbl_AudienceRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Audiences_IssuerID" Association="Self.FK_Audiences_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Claims_ActorID" Association="Self.FK_Claims_ActorID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Claims_IssuerID" Association="Self.FK_Claims_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Logins_ActorID" Association="Self.FK_Logins_ActorID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Logins" EntitySet="tbl_Logins" />
+          </AssociationSet>
+          <AssociationSet Name="FK_QueueEmails_UserID" Association="Self.FK_QueueEmails_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_QueueEmails" EntitySet="tbl_QueueEmails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_QueueTexts_UserID" Association="Self.FK_QueueTexts_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_QueueTexts" EntitySet="tbl_QueueTexts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Refreshes_AudienceID" Association="Self.FK_Refreshes_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Refreshes_IssuerID" Association="Self.FK_Refreshes_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Refreshes_UserID" Association="Self.FK_Refreshes_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleClaims_ClaimID" Association="Self.FK_RoleClaims_ClaimID">
+            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
+            <End Role="tbl_RoleClaims" EntitySet="tbl_RoleClaims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleClaims_RoleID" Association="Self.FK_RoleClaims_RoleID">
+            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
+            <End Role="tbl_RoleClaims" EntitySet="tbl_RoleClaims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Roles_AudienceID" Association="Self.FK_Roles_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Settings_AudienceID" Association="Self.FK_Settings_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Settings" EntitySet="tbl_Settings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Settings_IssuerID" Association="Self.FK_Settings_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_Settings" EntitySet="tbl_Settings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Settings_UserID" Association="Self.FK_Settings_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Settings" EntitySet="tbl_Settings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_States_AudienceID" Association="Self.FK_States_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_States" EntitySet="tbl_States" />
+          </AssociationSet>
+          <AssociationSet Name="FK_States_IssuerID" Association="Self.FK_States_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_States" EntitySet="tbl_States" />
+          </AssociationSet>
+          <AssociationSet Name="FK_States_UserID" Association="Self.FK_States_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_States" EntitySet="tbl_States" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Urls_AudienceID" Association="Self.FK_Urls_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Urls" EntitySet="tbl_Urls" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserClaims_ClaimID" Association="Self.FK_UserClaims_ClaimID">
+            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
+            <End Role="tbl_UserClaims" EntitySet="tbl_UserClaims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserClaims_UserID" Association="Self.FK_UserClaims_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_UserClaims" EntitySet="tbl_UserClaims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserLogins_LoginID" Association="Self.FK_UserLogins_LoginID">
+            <End Role="tbl_Logins" EntitySet="tbl_Logins" />
+            <End Role="tbl_UserLogins" EntitySet="tbl_UserLogins" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserLogins_UserID" Association="Self.FK_UserLogins_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_UserLogins" EntitySet="tbl_UserLogins" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserRoles_RoleID" Association="Self.FK_UserRoles_RoleID">
+            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
+            <End Role="tbl_UserRoles" EntitySet="tbl_UserRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserRoles_UserID" Association="Self.FK_UserRoles_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_UserRoles" EntitySet="tbl_UserRoles" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="IdentityEntities" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="tbl_Activities">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
+          <Property Name="ActivityType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TableName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="KeyValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="OriginalValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CurrentValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="Self.FK_Activities_AudienceID" FromRole="tbl_Activities" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_Activities_UserID" FromRole="tbl_Activities" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_AudienceRoles">
+          <Key>
+            <PropertyRef Name="AudienceId" />
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="Self.FK_AudienceRoles_AudienceID" FromRole="tbl_AudienceRoles" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Roles" Relationship="Self.FK_AudienceRoles_RoleID" FromRole="tbl_AudienceRoles" ToRole="tbl_Roles" />
+        </EntityType>
+        <EntityType Name="tbl_Audiences">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="IssuerId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="ConcurrencyStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHash" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="AudienceType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LockoutEnd" Type="DateTimeOffset" Precision="7" />
+          <Property Name="LastLoginSuccess" Type="DateTime" Precision="7" />
+          <Property Name="LastLoginFailure" Type="DateTime" Precision="7" />
+          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Activities" Relationship="Self.FK_Activities_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Activities" />
+          <NavigationProperty Name="tbl_AudienceRoles" Relationship="Self.FK_AudienceRoles_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_AudienceRoles" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="Self.FK_Audiences_IssuerID" FromRole="tbl_Audiences" ToRole="tbl_Issuers" />
+          <NavigationProperty Name="tbl_Refreshes" Relationship="Self.FK_Refreshes_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Refreshes" />
+          <NavigationProperty Name="tbl_Roles" Relationship="Self.FK_Roles_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Roles" />
+          <NavigationProperty Name="tbl_Settings" Relationship="Self.FK_Settings_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Settings" />
+          <NavigationProperty Name="tbl_States" Relationship="Self.FK_States_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_States" />
+          <NavigationProperty Name="tbl_Urls" Relationship="Self.FK_Urls_AudienceID" FromRole="tbl_Audiences" ToRole="tbl_Urls" />
+        </EntityType>
+        <EntityType Name="tbl_Claims">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="IssuerId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Subject" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Type" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Value" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ValueType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_Claims_ActorID" FromRole="tbl_Claims" ToRole="tbl_Users" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="Self.FK_Claims_IssuerID" FromRole="tbl_Claims" ToRole="tbl_Issuers" />
+          <NavigationProperty Name="tbl_RoleClaims" Relationship="Self.FK_RoleClaims_ClaimID" FromRole="tbl_Claims" ToRole="tbl_RoleClaims" />
+          <NavigationProperty Name="tbl_UserClaims" Relationship="Self.FK_UserClaims_ClaimID" FromRole="tbl_Claims" ToRole="tbl_UserClaims" />
+        </EntityType>
+        <EntityType Name="tbl_Issuers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="IssuerKey" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="Self.FK_Audiences_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Claims" Relationship="Self.FK_Claims_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Claims" />
+          <NavigationProperty Name="tbl_Refreshes" Relationship="Self.FK_Refreshes_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Refreshes" />
+          <NavigationProperty Name="tbl_Settings" Relationship="Self.FK_Settings_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_Settings" />
+          <NavigationProperty Name="tbl_States" Relationship="Self.FK_States_IssuerID" FromRole="tbl_Issuers" ToRole="tbl_States" />
+        </EntityType>
+        <EntityType Name="tbl_Logins">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="LoginKey" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_Logins_ActorID" FromRole="tbl_Logins" ToRole="tbl_Users" />
+          <NavigationProperty Name="tbl_UserLogins" Relationship="Self.FK_UserLogins_LoginID" FromRole="tbl_Logins" ToRole="tbl_UserLogins" />
+        </EntityType>
+        <EntityType Name="tbl_QueueEmails">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="FromId" Type="Guid" Nullable="false" />
+          <Property Name="FromEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="FromDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="ToId" Type="Guid" Nullable="false" />
+          <Property Name="ToEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="ToDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="Subject" Type="String" MaxLength="256" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="HtmlContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="PlaintextContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_QueueEmails_UserID" FromRole="tbl_QueueEmails" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_QueueTexts">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" Nullable="false" />
+          <Property Name="FromId" Type="Guid" Nullable="false" />
+          <Property Name="FromPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="ToId" Type="Guid" Nullable="false" />
+          <Property Name="ToPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="Body" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_QueueTexts_UserID" FromRole="tbl_QueueTexts" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_Refreshes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="IssuerId" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
+          <Property Name="RefreshValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="RefreshType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="Self.FK_Refreshes_AudienceID" FromRole="tbl_Refreshes" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="Self.FK_Refreshes_IssuerID" FromRole="tbl_Refreshes" ToRole="tbl_Issuers" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_Refreshes_UserID" FromRole="tbl_Refreshes" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_RoleClaims">
+          <Key>
+            <PropertyRef Name="RoleId" />
+            <PropertyRef Name="ClaimId" />
+          </Key>
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="ClaimId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Claims" Relationship="Self.FK_RoleClaims_ClaimID" FromRole="tbl_RoleClaims" ToRole="tbl_Claims" />
+          <NavigationProperty Name="tbl_Roles" Relationship="Self.FK_RoleClaims_RoleID" FromRole="tbl_RoleClaims" ToRole="tbl_Roles" />
+        </EntityType>
+        <EntityType Name="tbl_Roles">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_AudienceRoles" Relationship="Self.FK_AudienceRoles_RoleID" FromRole="tbl_Roles" ToRole="tbl_AudienceRoles" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="Self.FK_Roles_AudienceID" FromRole="tbl_Roles" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_RoleClaims" Relationship="Self.FK_RoleClaims_RoleID" FromRole="tbl_Roles" ToRole="tbl_RoleClaims" />
+          <NavigationProperty Name="tbl_UserRoles" Relationship="Self.FK_UserRoles_RoleID" FromRole="tbl_Roles" ToRole="tbl_UserRoles" />
+        </EntityType>
+        <EntityType Name="tbl_Settings">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="IssuerId" Type="Guid" />
+          <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
+          <Property Name="ConfigKey" Type="String" MaxLength="128" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ConfigValue" Type="String" MaxLength="256" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="Self.FK_Settings_AudienceID" FromRole="tbl_Settings" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="Self.FK_Settings_IssuerID" FromRole="tbl_Settings" ToRole="tbl_Issuers" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_Settings_UserID" FromRole="tbl_Settings" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_States">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="IssuerId" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
+          <Property Name="StateValue" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="StateType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="StateDecision" Type="Boolean" />
+          <Property Name="StateConsume" Type="Boolean" Nullable="false" />
+          <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastPolling" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="Self.FK_States_AudienceID" FromRole="tbl_States" ToRole="tbl_Audiences" />
+          <NavigationProperty Name="tbl_Issuers" Relationship="Self.FK_States_IssuerID" FromRole="tbl_States" ToRole="tbl_Issuers" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_States_UserID" FromRole="tbl_States" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_Urls">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="UrlHost" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="UrlPath" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Audiences" Relationship="Self.FK_Urls_AudienceID" FromRole="tbl_Urls" ToRole="tbl_Audiences" />
+        </EntityType>
+        <EntityType Name="tbl_UserClaims">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="ClaimId" />
+          </Key>
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="ClaimId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Claims" Relationship="Self.FK_UserClaims_ClaimID" FromRole="tbl_UserClaims" ToRole="tbl_Claims" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_UserClaims_UserID" FromRole="tbl_UserClaims" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_UserLogins">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="LoginId" />
+          </Key>
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="LoginId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Logins" Relationship="Self.FK_UserLogins_LoginID" FromRole="tbl_UserLogins" ToRole="tbl_Logins" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_UserLogins_UserID" FromRole="tbl_UserLogins" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_UserRoles">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Roles" Relationship="Self.FK_UserRoles_RoleID" FromRole="tbl_UserRoles" ToRole="tbl_Roles" />
+          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_UserRoles_UserID" FromRole="tbl_UserRoles" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_Users">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="FirstName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumberConfirmed" Type="Boolean" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LockoutEnd" Type="DateTimeOffset" Precision="7" />
+          <Property Name="LastLoginSuccess" Type="DateTime" Precision="7" />
+          <Property Name="LastLoginFailure" Type="DateTime" Precision="7" />
+          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
+          <Property Name="ConcurrencyStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="HumanBeing" Type="Boolean" Nullable="false" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tbl_Activities" Relationship="Self.FK_Activities_UserID" FromRole="tbl_Users" ToRole="tbl_Activities" />
+          <NavigationProperty Name="tbl_Claims" Relationship="Self.FK_Claims_ActorID" FromRole="tbl_Users" ToRole="tbl_Claims" />
+          <NavigationProperty Name="tbl_Logins" Relationship="Self.FK_Logins_ActorID" FromRole="tbl_Users" ToRole="tbl_Logins" />
+          <NavigationProperty Name="tbl_QueueEmails" Relationship="Self.FK_QueueEmails_UserID" FromRole="tbl_Users" ToRole="tbl_QueueEmails" />
+          <NavigationProperty Name="tbl_QueueTexts" Relationship="Self.FK_QueueTexts_UserID" FromRole="tbl_Users" ToRole="tbl_QueueTexts" />
+          <NavigationProperty Name="tbl_Refreshes" Relationship="Self.FK_Refreshes_UserID" FromRole="tbl_Users" ToRole="tbl_Refreshes" />
+          <NavigationProperty Name="tbl_Settings" Relationship="Self.FK_Settings_UserID" FromRole="tbl_Users" ToRole="tbl_Settings" />
+          <NavigationProperty Name="tbl_States" Relationship="Self.FK_States_UserID" FromRole="tbl_Users" ToRole="tbl_States" />
+          <NavigationProperty Name="tbl_UserClaims" Relationship="Self.FK_UserClaims_UserID" FromRole="tbl_Users" ToRole="tbl_UserClaims" />
+          <NavigationProperty Name="tbl_UserLogins" Relationship="Self.FK_UserLogins_UserID" FromRole="tbl_Users" ToRole="tbl_UserLogins" />
+          <NavigationProperty Name="tbl_UserRoles" Relationship="Self.FK_UserRoles_UserID" FromRole="tbl_Users" ToRole="tbl_UserRoles" />
+        </EntityType>
+        <Association Name="FK_Activities_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="0..1" />
+          <End Role="tbl_Activities" Type="Self.tbl_Activities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Activities">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Activities_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1" />
+          <End Role="tbl_Activities" Type="Self.tbl_Activities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Activities">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AudienceRoles_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_AudienceRoles" Type="Self.tbl_AudienceRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_AudienceRoles">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AudienceRoles_RoleID">
+          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_AudienceRoles" Type="Self.tbl_AudienceRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Roles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_AudienceRoles">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Audiences_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="1" />
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Audiences">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Refreshes_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="0..1" />
+          <End Role="tbl_Refreshes" Type="Self.tbl_Refreshes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Refreshes">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Roles_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="1" />
+          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Roles">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Settings_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Settings" Type="Self.tbl_Settings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Settings">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_States_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_States" Type="Self.tbl_States" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_States">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Urls_AudienceID">
+          <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Urls" Type="Self.tbl_Urls" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audiences">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Urls">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Claims_ActorID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1" />
+          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Claims">
+              <PropertyRef Name="ActorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Claims_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Claims">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RoleClaims_ClaimID">
+          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_RoleClaims" Type="Self.tbl_RoleClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Claims">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_RoleClaims">
+              <PropertyRef Name="ClaimId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserClaims_ClaimID">
+          <End Role="tbl_Claims" Type="Self.tbl_Claims" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserClaims" Type="Self.tbl_UserClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Claims">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserClaims">
+              <PropertyRef Name="ClaimId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Refreshes_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Refreshes" Type="Self.tbl_Refreshes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Refreshes">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Settings_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Settings" Type="Self.tbl_Settings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Settings">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_States_IssuerID">
+          <End Role="tbl_Issuers" Type="Self.tbl_Issuers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_States" Type="Self.tbl_States" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Issuers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_States">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Logins_ActorID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1" />
+          <End Role="tbl_Logins" Type="Self.tbl_Logins" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Logins">
+              <PropertyRef Name="ActorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserLogins_LoginID">
+          <End Role="tbl_Logins" Type="Self.tbl_Logins" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserLogins" Type="Self.tbl_UserLogins" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Logins">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserLogins">
+              <PropertyRef Name="LoginId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_QueueEmails_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_QueueEmails" Type="Self.tbl_QueueEmails" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_QueueEmails">
+              <PropertyRef Name="FromId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_QueueTexts_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_QueueTexts" Type="Self.tbl_QueueTexts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_QueueTexts">
+              <PropertyRef Name="FromId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Refreshes_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1" />
+          <End Role="tbl_Refreshes" Type="Self.tbl_Refreshes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Refreshes">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RoleClaims_RoleID">
+          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_RoleClaims" Type="Self.tbl_RoleClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Roles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_RoleClaims">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserRoles_RoleID">
+          <End Role="tbl_Roles" Type="Self.tbl_Roles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserRoles" Type="Self.tbl_UserRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Roles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserRoles">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Settings_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_Settings" Type="Self.tbl_Settings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Settings">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_States_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_States" Type="Self.tbl_States" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_States">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserClaims_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserClaims" Type="Self.tbl_UserClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserClaims">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserLogins_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserLogins" Type="Self.tbl_UserLogins" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserLogins">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserRoles_UserID">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tbl_UserRoles" Type="Self.tbl_UserRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_UserRoles">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="IdentityEntities_DIRECT" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="tbl_Activities" EntityType="Self.tbl_Activities" />
+          <EntitySet Name="tbl_AudienceRoles" EntityType="Self.tbl_AudienceRoles" />
+          <EntitySet Name="tbl_Audiences" EntityType="Self.tbl_Audiences" />
+          <EntitySet Name="tbl_Claims" EntityType="Self.tbl_Claims" />
+          <EntitySet Name="tbl_Issuers" EntityType="Self.tbl_Issuers" />
+          <EntitySet Name="tbl_Logins" EntityType="Self.tbl_Logins" />
+          <EntitySet Name="tbl_QueueEmails" EntityType="Self.tbl_QueueEmails" />
+          <EntitySet Name="tbl_QueueTexts" EntityType="Self.tbl_QueueTexts" />
+          <EntitySet Name="tbl_Refreshes" EntityType="Self.tbl_Refreshes" />
+          <EntitySet Name="tbl_RoleClaims" EntityType="Self.tbl_RoleClaims" />
+          <EntitySet Name="tbl_Roles" EntityType="Self.tbl_Roles" />
+          <EntitySet Name="tbl_Settings" EntityType="Self.tbl_Settings" />
+          <EntitySet Name="tbl_States" EntityType="Self.tbl_States" />
+          <EntitySet Name="tbl_Urls" EntityType="Self.tbl_Urls" />
+          <EntitySet Name="tbl_UserClaims" EntityType="Self.tbl_UserClaims" />
+          <EntitySet Name="tbl_UserLogins" EntityType="Self.tbl_UserLogins" />
+          <EntitySet Name="tbl_UserRoles" EntityType="Self.tbl_UserRoles" />
+          <EntitySet Name="tbl_Users" EntityType="Self.tbl_Users" />
+          <AssociationSet Name="FK_Activities_AudienceID" Association="Self.FK_Activities_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Activities" EntitySet="tbl_Activities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Activities_UserID" Association="Self.FK_Activities_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Activities" EntitySet="tbl_Activities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AudienceRoles_AudienceID" Association="Self.FK_AudienceRoles_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_AudienceRoles" EntitySet="tbl_AudienceRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AudienceRoles_RoleID" Association="Self.FK_AudienceRoles_RoleID">
+            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
+            <End Role="tbl_AudienceRoles" EntitySet="tbl_AudienceRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Audiences_IssuerID" Association="Self.FK_Audiences_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Refreshes_AudienceID" Association="Self.FK_Refreshes_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Roles_AudienceID" Association="Self.FK_Roles_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Settings_AudienceID" Association="Self.FK_Settings_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Settings" EntitySet="tbl_Settings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_States_AudienceID" Association="Self.FK_States_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_States" EntitySet="tbl_States" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Urls_AudienceID" Association="Self.FK_Urls_AudienceID">
+            <End Role="tbl_Audiences" EntitySet="tbl_Audiences" />
+            <End Role="tbl_Urls" EntitySet="tbl_Urls" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Claims_ActorID" Association="Self.FK_Claims_ActorID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Claims_IssuerID" Association="Self.FK_Claims_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleClaims_ClaimID" Association="Self.FK_RoleClaims_ClaimID">
+            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
+            <End Role="tbl_RoleClaims" EntitySet="tbl_RoleClaims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserClaims_ClaimID" Association="Self.FK_UserClaims_ClaimID">
+            <End Role="tbl_Claims" EntitySet="tbl_Claims" />
+            <End Role="tbl_UserClaims" EntitySet="tbl_UserClaims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Refreshes_IssuerID" Association="Self.FK_Refreshes_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Settings_IssuerID" Association="Self.FK_Settings_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_Settings" EntitySet="tbl_Settings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_States_IssuerID" Association="Self.FK_States_IssuerID">
+            <End Role="tbl_Issuers" EntitySet="tbl_Issuers" />
+            <End Role="tbl_States" EntitySet="tbl_States" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Logins_ActorID" Association="Self.FK_Logins_ActorID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Logins" EntitySet="tbl_Logins" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserLogins_LoginID" Association="Self.FK_UserLogins_LoginID">
+            <End Role="tbl_Logins" EntitySet="tbl_Logins" />
+            <End Role="tbl_UserLogins" EntitySet="tbl_UserLogins" />
+          </AssociationSet>
+          <AssociationSet Name="FK_QueueEmails_UserID" Association="Self.FK_QueueEmails_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_QueueEmails" EntitySet="tbl_QueueEmails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_QueueTexts_UserID" Association="Self.FK_QueueTexts_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_QueueTexts" EntitySet="tbl_QueueTexts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Refreshes_UserID" Association="Self.FK_Refreshes_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleClaims_RoleID" Association="Self.FK_RoleClaims_RoleID">
+            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
+            <End Role="tbl_RoleClaims" EntitySet="tbl_RoleClaims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserRoles_RoleID" Association="Self.FK_UserRoles_RoleID">
+            <End Role="tbl_Roles" EntitySet="tbl_Roles" />
+            <End Role="tbl_UserRoles" EntitySet="tbl_UserRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Settings_UserID" Association="Self.FK_Settings_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_Settings" EntitySet="tbl_Settings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_States_UserID" Association="Self.FK_States_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_States" EntitySet="tbl_States" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserClaims_UserID" Association="Self.FK_UserClaims_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_UserClaims" EntitySet="tbl_UserClaims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserLogins_UserID" Association="Self.FK_UserLogins_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_UserLogins" EntitySet="tbl_UserLogins" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserRoles_UserID" Association="Self.FK_UserRoles_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_UserRoles" EntitySet="tbl_UserRoles" />
+          </AssociationSet>
+          <EntitySet Name="tbl_MOTDs" EntityType="IdentityEntities.tbl_MOTDs" />
+        </EntityContainer>
+        <EntityType Name="tbl_MOTDs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="Title" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="Author" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="Quote" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Category" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="Date" Type="DateTime" Precision="7" />
+          <Property Name="Tags" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="Length" Type="Int32" />
+          <Property Name="Background" Type="String" MaxLength="512" FixedLength="false" Unicode="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="IdentityEntitiesStoreContainer" CdmEntityContainer="IdentityEntities_DIRECT">
+          <EntitySetMapping Name="tbl_Activities">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Activities">
+              <MappingFragment StoreEntitySet="tbl_Activities">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
+                <ScalarProperty Name="TableName" ColumnName="TableName" />
+                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
+                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
+                <ScalarProperty Name="CurrentValues" ColumnName="CurrentValues" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_AudienceRoles">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_AudienceRoles">
+              <MappingFragment StoreEntitySet="tbl_AudienceRoles">
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Audiences">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Audiences">
+              <MappingFragment StoreEntitySet="tbl_Audiences">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="AudienceType" ColumnName="AudienceType" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
+                <ScalarProperty Name="LockoutEnd" ColumnName="LockoutEnd" />
+                <ScalarProperty Name="LastLoginSuccess" ColumnName="LastLoginSuccess" />
+                <ScalarProperty Name="LastLoginFailure" ColumnName="LastLoginFailure" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Claims">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Claims">
+              <MappingFragment StoreEntitySet="tbl_Claims">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="ValueType" ColumnName="ValueType" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Issuers">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Issuers">
+              <MappingFragment StoreEntitySet="tbl_Issuers">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="IssuerKey" ColumnName="IssuerKey" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Logins">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Logins">
+              <MappingFragment StoreEntitySet="tbl_Logins">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="LoginKey" ColumnName="LoginKey" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_QueueEmails">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_QueueEmails">
+              <MappingFragment StoreEntitySet="tbl_QueueEmails">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="FromId" ColumnName="FromId" />
+                <ScalarProperty Name="FromEmail" ColumnName="FromEmail" />
+                <ScalarProperty Name="FromDisplay" ColumnName="FromDisplay" />
+                <ScalarProperty Name="ToId" ColumnName="ToId" />
+                <ScalarProperty Name="ToEmail" ColumnName="ToEmail" />
+                <ScalarProperty Name="ToDisplay" ColumnName="ToDisplay" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="HtmlContent" ColumnName="HtmlContent" />
+                <ScalarProperty Name="PlaintextContent" ColumnName="PlaintextContent" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="SendAt" ColumnName="SendAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_QueueTexts">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_QueueTexts">
+              <MappingFragment StoreEntitySet="tbl_QueueTexts">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="FromId" ColumnName="FromId" />
+                <ScalarProperty Name="FromPhoneNumber" ColumnName="FromPhoneNumber" />
+                <ScalarProperty Name="ToId" ColumnName="ToId" />
+                <ScalarProperty Name="ToPhoneNumber" ColumnName="ToPhoneNumber" />
+                <ScalarProperty Name="Body" ColumnName="Body" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="SendAt" ColumnName="SendAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Refreshes">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Refreshes">
+              <MappingFragment StoreEntitySet="tbl_Refreshes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="RefreshValue" ColumnName="RefreshValue" />
+                <ScalarProperty Name="RefreshType" ColumnName="RefreshType" />
+                <ScalarProperty Name="ValidFromUtc" ColumnName="ValidFromUtc" />
+                <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
+                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_RoleClaims">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_RoleClaims">
+              <MappingFragment StoreEntitySet="tbl_RoleClaims">
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ClaimId" ColumnName="ClaimId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Roles">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Roles">
+              <MappingFragment StoreEntitySet="tbl_Roles">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Settings">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Settings">
+              <MappingFragment StoreEntitySet="tbl_Settings">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="ConfigKey" ColumnName="ConfigKey" />
+                <ScalarProperty Name="ConfigValue" ColumnName="ConfigValue" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_States">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_States">
+              <MappingFragment StoreEntitySet="tbl_States">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="StateValue" ColumnName="StateValue" />
+                <ScalarProperty Name="StateType" ColumnName="StateType" />
+                <ScalarProperty Name="StateDecision" ColumnName="StateDecision" />
+                <ScalarProperty Name="StateConsume" ColumnName="StateConsume" />
+                <ScalarProperty Name="ValidFromUtc" ColumnName="ValidFromUtc" />
+                <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
+                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
+                <ScalarProperty Name="LastPolling" ColumnName="LastPolling" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Urls">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Urls">
+              <MappingFragment StoreEntitySet="tbl_Urls">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="UrlHost" ColumnName="UrlHost" />
+                <ScalarProperty Name="UrlPath" ColumnName="UrlPath" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_UserClaims">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_UserClaims">
+              <MappingFragment StoreEntitySet="tbl_UserClaims">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="ClaimId" ColumnName="ClaimId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_UserLogins">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_UserLogins">
+              <MappingFragment StoreEntitySet="tbl_UserLogins">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="LoginId" ColumnName="LoginId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_UserRoles">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_UserRoles">
+              <MappingFragment StoreEntitySet="tbl_UserRoles">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Users">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Users">
+              <MappingFragment StoreEntitySet="tbl_Users">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
+                <ScalarProperty Name="LockoutEnd" ColumnName="LockoutEnd" />
+                <ScalarProperty Name="LastLoginSuccess" ColumnName="LastLoginSuccess" />
+                <ScalarProperty Name="LastLoginFailure" ColumnName="LastLoginFailure" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
+                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />
+                <ScalarProperty Name="HumanBeing" ColumnName="HumanBeing" />
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_MOTDs">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_MOTDs">
+              <MappingFragment StoreEntitySet="tbl_MOTDs">
+                <ScalarProperty Name="Background" ColumnName="Background" />
+                <ScalarProperty Name="Length" ColumnName="Length" />
+                <ScalarProperty Name="Tags" ColumnName="Tags" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="Quote" ColumnName="Quote" />
+                <ScalarProperty Name="Author" ColumnName="Author" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

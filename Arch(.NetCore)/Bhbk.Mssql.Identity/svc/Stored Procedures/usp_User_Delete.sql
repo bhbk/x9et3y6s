@@ -2,26 +2,26 @@
 
 
 CREATE PROCEDURE [svc].[usp_User_Delete]
-    @UserID uniqueidentifier
+    @ID uniqueidentifier
 
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Users] WHERE [svc].[uvw_Users].Id = @UserID
+SELECT * FROM [svc].[uvw_Users] WHERE [svc].[uvw_Users].Id = @ID
 
 DELETE [dbo].[tbl_Activities]
-WHERE UserId = @UserID
+WHERE UserId = @ID
 
 DELETE [dbo].[tbl_Refreshes]
-WHERE UserId = @UserID
+WHERE UserId = @ID
 
 DELETE [dbo].[tbl_Settings]
-WHERE UserId = @UserID
+WHERE UserId = @ID
 
 DELETE [dbo].[tbl_States]
-WHERE UserId = @UserID
+WHERE UserId = @ID
 
 DELETE [dbo].[tbl_Users]
-WHERE Id = @UserID
+WHERE Id = @ID
 
 END

@@ -16,18 +16,35 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Logins Create(uvw_Logins entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.NVarChar) { Value = entity.Name });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.NVarChar) { Value = entity.LoginKey });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.Bit) { Value = entity.Enabled });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.DateTime2) { Value = entity.Created });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.DateTime2) { Value = entity.LastUpdated.HasValue ? (object)entity.LastUpdated.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.Bit) { Value = entity.Immutable });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
+                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
+                new SqlParameter("@LoginKey", SqlDbType.NVarChar) { Value = entity.LoginKey },
+                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
 
-            return _context.Database.SqlQuery<uvw_Logins>("[svc].[usp_Login_Insert]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Logins>("[svc].[usp_Login_Insert]"
+                + "@ActorId, @Name, @Description, @LoginKey, @Enabled, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
+
+            /*
+            using (var conn = _context.Database.Connection)
+            {
+                var cmd = conn.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[svc].[usp_Login_Insert]";
+                cmd.Parameters.AddRange(pvalues.ToArray());
+                cmd.Connection = conn;
+                conn.Open();
+
+                var result = cmd.ExecuteReader();
+
+                return result.Cast<uvw_Logins>().AsEnumerable().Single();
+            }
+            */
         }
 
         public override IEnumerable<uvw_Logins> Create(IEnumerable<uvw_Logins> entities)
@@ -46,11 +63,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Logins Delete(uvw_Logins entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
 
-            return _context.Database.SqlQuery<uvw_Logins>("[svc].[usp_Login_Delete]" +
-                "@p0", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Logins>("[svc].[usp_Login_Delete] @Id", pvalues.ToArray())
+                .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_Logins> Delete(IEnumerable<uvw_Logins> entities)
@@ -74,19 +93,19 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Logins Update(uvw_Logins entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.NVarChar) { Value = entity.Name });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.NVarChar) { Value = entity.LoginKey });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.Bit) { Value = entity.Enabled });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.DateTime2) { Value = entity.Created });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.DateTime2) { Value = entity.LastUpdated.HasValue ? (object)entity.LastUpdated.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p8", SqlDbType.Bit) { Value = entity.Immutable });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
+                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
+                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
 
-            return _context.Database.SqlQuery<uvw_Logins>("[svc].[usp_Login_Update]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Logins>("[svc].[usp_Login_Update]"
+                + "@Id, @ActorId, @Name, @Description, @Enabled, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_Logins> Update(IEnumerable<uvw_Logins> entities)

@@ -1,14 +1,14 @@
 ﻿
 
 CREATE PROCEDURE [svc].[usp_Refresh_Delete]
-    @RefreshID uniqueidentifier
+    @ID uniqueidentifier
 
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Refreshes] WHERE [svc].[uvw_Refreshes].Id = @RefreshID
+SELECT * FROM [svc].[uvw_Refreshes] WHERE [svc].[uvw_Refreshes].Id = @ID
 
 DELETE [dbo].[tbl_Refreshes]
-WHERE Id = @RefreshID
+WHERE Id = @ID
 
 END

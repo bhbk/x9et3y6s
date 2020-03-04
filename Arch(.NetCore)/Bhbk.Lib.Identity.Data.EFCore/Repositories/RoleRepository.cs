@@ -1,8 +1,12 @@
 ﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
@@ -13,28 +17,118 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
      */
 
-    public class RoleRepository : GenericRepository<tbl_Roles>
+    public class RoleRepository : GenericRepository<uvw_Roles>
     {
         public RoleRepository(IdentityEntities context)
             : base(context) { }
 
-        public  override tbl_Roles Update(tbl_Roles model)
+        public override uvw_Roles Create(uvw_Roles entity)
         {
-            var entity = _context.Set<tbl_Roles>().Where(x => x.Id == model.Id).Single();
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@AudienceId", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId },
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
+                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
+                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
+
+            return _context.Set<uvw_Roles>().FromSqlRaw("[svc].[usp_Role_Insert]"
+                + "@AudienceId, @ActorId, @Name, @Description, @Enabled, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
 
             /*
-             * only persist certain fields.
-             */
+            using (var conn = _context.Database.GetDbConnection())
+            {
+                var cmd = conn.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[svc].[usp_Role_Insert]";
+                cmd.Parameters.AddRange(pvalues.ToArray());
+                cmd.Connection = conn;
+                conn.Open();
 
-            entity.Name = model.Name;
-            entity.Description = model.Description;
-            entity.Enabled = model.Enabled;
-            entity.LastUpdated = DateTime.Now;
-            entity.Immutable = model.Immutable;
+                var result = cmd.ExecuteReader();
 
-            _context.Entry(entity).State = EntityState.Modified;
+                return result.Cast<uvw_Roles>().AsEnumerable().Single();
+            }
+            */
+        }
 
-            return _context.Update(entity).Entity;
+        public override IEnumerable<uvw_Roles> Create(IEnumerable<uvw_Roles> entities)
+        {
+            var results = new List<uvw_Roles>();
+
+            foreach (var entity in entities)
+            {
+                var result = Create(entity);
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public override uvw_Roles Delete(uvw_Roles entity)
+        {
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
+
+            return _context.Set<uvw_Roles>().FromSqlRaw("[svc].[usp_Role_Delete] @Id", pvalues.ToArray())
+                .AsEnumerable().Single();
+        }
+
+        public override IEnumerable<uvw_Roles> Delete(IEnumerable<uvw_Roles> entities)
+        {
+            var results = new List<uvw_Roles>();
+
+            foreach (var entity in entities)
+            {
+                var result = Delete(entity);
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public override IEnumerable<uvw_Roles> Delete(LambdaExpression lambda)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override uvw_Roles Update(uvw_Roles entity)
+        {
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
+                new SqlParameter("@AudienceId", SqlDbType.UniqueIdentifier) { Value = entity.AudienceId },
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
+                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
+                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
+
+            return _context.Set<uvw_Roles>().FromSqlRaw("[svc].[usp_Role_Update]"
+                + "@Id, @AudienceId, @ActorId, @Name, @Description, @Enabled, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
+        }
+
+        public override IEnumerable<uvw_Roles> Update(IEnumerable<uvw_Roles> entities)
+        {
+            var results = new List<uvw_Roles>();
+
+            foreach (var entity in entities)
+            {
+                var result = Update(entity);
+
+                results.Add(result);
+            }
+
+            return results;
         }
     }
 }

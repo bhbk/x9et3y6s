@@ -7,14 +7,13 @@ CREATE PROCEDURE [svc].[usp_Role_Insert]
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
     ,@Enabled				BIT 
-    ,@Created				DATETIME2 (7) 
-    ,@LastUpdated			DATETIME2 (7)
     ,@Immutable				BIT
 
 AS
 BEGIN
 
 DECLARE @ROLEID UNIQUEIDENTIFIER = NEWID()
+DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
 INSERT INTO [dbo].[tbl_Roles]
 	(
@@ -25,7 +24,6 @@ INSERT INTO [dbo].[tbl_Roles]
     ,Description       
     ,Enabled     
     ,Created           
-    ,LastUpdated      
     ,Immutable        
 	)
 VALUES
@@ -36,8 +34,7 @@ VALUES
     ,@Name           
     ,@Description       
     ,@Enabled     
-    ,@Created           
-    ,@LastUpdated      
+    ,@CREATED         
     ,@Immutable        
 	);
 

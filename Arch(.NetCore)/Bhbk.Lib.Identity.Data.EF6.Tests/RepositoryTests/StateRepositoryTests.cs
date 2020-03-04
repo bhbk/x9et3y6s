@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.DataState.Expressions;
+﻿using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EF6.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using Xunit;
-using Bhbk.Lib.Cryptography.Entropy;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
 {
@@ -97,7 +97,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             });
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_States_UpdateV1_Success()
         {
             new GenerateTestData(UoW, Mapper).Destroy();

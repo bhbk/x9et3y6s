@@ -1,13 +1,13 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_Role_Delete]
-    @RoleID uniqueidentifier
+    @ID uniqueidentifier
 
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Roles] WHERE [svc].[uvw_Roles].Id = @RoleID
+SELECT * FROM [svc].[uvw_Roles] WHERE [svc].[uvw_Roles].Id = @ID
 
 DELETE [dbo].[tbl_Roles]
-WHERE Id = @RoleID
+WHERE Id = @ID
 
 END

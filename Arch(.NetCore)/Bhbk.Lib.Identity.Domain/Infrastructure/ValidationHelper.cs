@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using CryptoHelper;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;

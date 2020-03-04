@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
-using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -346,10 +346,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             _uow.Users.Delete(new QueryExpression<tbl_Users>()
-                .Where(x => x.Email == Constants.ApiDefaultAdminUser).ToLambda());
-
-            _uow.Users.Delete(new QueryExpression<tbl_Users>()
-                .Where(x => x.Email == Constants.ApiDefaultNormalUser).ToLambda());
+                .Where(x => x.Email == Constants.ApiDefaultAdminUser || x.Email == Constants.ApiDefaultNormalUser).ToLambda());
 
             _uow.Commit();
 
@@ -358,10 +355,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             _uow.Roles.Delete(new QueryExpression<tbl_Roles>()
-                .Where(x => x.Name == Constants.ApiDefaultRoleForAdmin).ToLambda());
-
-            _uow.Roles.Delete(new QueryExpression<tbl_Roles>()
-                .Where(x => x.Name == Constants.ApiDefaultRoleForUser).ToLambda());
+                .Where(x => x.Name == Constants.ApiDefaultRoleForAdmin || x.Name == Constants.ApiDefaultRoleForUser).ToLambda());
 
             _uow.Commit();
 
@@ -379,10 +373,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             _uow.Audiences.Delete(new QueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == Constants.ApiDefaultAudienceUi).ToLambda());
-
-            _uow.Audiences.Delete(new QueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == Constants.ApiDefaultAudienceApi).ToLambda());
+                .Where(x => x.Name == Constants.ApiDefaultAudienceUi || x.Name == Constants.ApiDefaultAudienceApi).ToLambda());
 
             _uow.Commit();
 

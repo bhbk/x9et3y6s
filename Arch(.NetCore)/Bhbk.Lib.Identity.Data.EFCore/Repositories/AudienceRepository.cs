@@ -1,18 +1,17 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Primitives;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
+using System.Data;
 using System.Linq;
-using System.Security.Claims;
+using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
-    public class AudienceRepository : GenericRepository<tbl_Audiences>
+    public class AudienceRepository : GenericRepository<uvw_Audiences>
     {
         private IClockService _clock;
 
@@ -28,185 +27,127 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public tbl_Audiences AccessFailed(tbl_Audiences audience)
+        public override uvw_Audiences Create(uvw_Audiences entity)
         {
-            audience.LastLoginFailure = Clock.UtcDateTime;
-            audience.AccessFailedCount++;
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@IssuerId", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId },
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
+                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
+                new SqlParameter("@AudienceType", SqlDbType.NVarChar) { Value = entity.AudienceType },
+                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
+                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
+                new SqlParameter("@LastLoginSuccess", SqlDbType.DateTime2) { Value = entity.LastLoginSuccess.HasValue ? (object)entity.LastLoginSuccess.Value : DBNull.Value },
+                new SqlParameter("@LastLoginFailure", SqlDbType.DateTime2) { Value = entity.LastLoginFailure.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
+                new SqlParameter("@AccessFailedCount", SqlDbType.Int) { Value = entity.AccessFailedCount },
+                new SqlParameter("@AccessSuccessCount", SqlDbType.Int) { Value = entity.AccessSuccessCount },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
 
-            _context.Entry(audience).State = EntityState.Modified;
-
-            return _context.Entry(audience).Entity;
-        }
-
-        public tbl_Audiences AccessSuccess(tbl_Audiences audience)
-        {
-            audience.LastLoginSuccess = Clock.UtcDateTime;
-            audience.AccessSuccessCount++;
-
-            _context.Entry(audience).State = EntityState.Modified;
-
-            return _context.Entry(audience).Entity;
-        }
-
-        public bool AddToRole(tbl_Audiences audience, tbl_Roles role)
-        {
-            _context.Set<tbl_AudienceRoles>().Add(
-                new tbl_AudienceRoles()
-                {
-                    AudienceId = audience.Id,
-                    RoleId = role.Id,
-                    Created = Clock.UtcDateTime,
-                    Immutable = false
-                });
-
-            return true;
-        }
-
-        public override tbl_Audiences Create(tbl_Audiences audience)
-        {
-            audience.ConcurrencyStamp = AlphaNumeric.CreateString(32);
-
-            return _context.Add(audience).Entity;
-        }
-
-        public override tbl_Audiences Delete(tbl_Audiences audience)
-        {
-            var activity = _context.Set<tbl_Activities>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            var refreshes = _context.Set<tbl_Refreshes>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            var settings = _context.Set<tbl_Settings>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            var states = _context.Set<tbl_States>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            _context.RemoveRange(activity);
-            _context.RemoveRange(refreshes);
-            _context.RemoveRange(settings);
-            _context.RemoveRange(states);
-            _context.RemoveRange(roles);
-
-            return _context.Remove(audience).Entity;
-        }
-
-        public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Audiences audience)
-        {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
-
-            var claims = new List<Claim>();
-
-            //add lowest common denominators...
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, audience.Id.ToString()));
-
-            var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.tbl_AudienceRoles.Any(y => y.AudienceId == audience.Id)).ToList();
-
-            foreach (var role in roles.OrderBy(x => x.Name))
-                claims.Add(new Claim(ClaimTypes.Role, role.Name));
-
-            //nonce to enhance entropy
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
-
-            //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, 
-                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
-
-            //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, 
-                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
-
-            //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, 
-                new DateTimeOffset(Clock.UtcDateTime).AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
-
-            return claims;
-        }
-
-        public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Audiences audience)
-        {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
-
-            var claims = new List<Claim>();
-
-            //add lowest common denominators...
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, audience.Id.ToString()));
-
-            //nonce to enhance entropy
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, AlphaNumeric.CreateString(8), ClaimValueTypes.String));
-
-            //not before timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, 
-                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
-
-            //issued at timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, 
-                new DateTimeOffset(Clock.UtcDateTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
-
-            //expire on timestamp
-            claims.Add(new Claim(JwtRegisteredClaimNames.Exp, 
-                new DateTimeOffset(Clock.UtcDateTime).AddSeconds(uint.Parse(expire.ConfigValue)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
-
-            return claims;
-        }
-
-        public bool IsInRole(tbl_Audiences audience, tbl_Roles role)
-        {
-            if (_context.Set<tbl_AudienceRoles>()
-                .Any(x => x.AudienceId == audience.Id && x.RoleId == role.Id))
-                return true;
-
-            return false;
-        }
-
-        public bool RemoveFromRole(tbl_Audiences audience, tbl_Roles role)
-        {
-            var entity = _context.Set<tbl_AudienceRoles>()
-                .Where(x => x.AudienceId == audience.Id && x.RoleId == role.Id).Single();
-
-            _context.Set<tbl_AudienceRoles>().Remove(entity);
-
-            return true;
-        }
-
-        public tbl_Audiences SetPasswordHash(tbl_Audiences audience, string hash)
-        {
-            audience.LastUpdated = Clock.UtcDateTime;
-            audience.PasswordHash = hash;
-            audience.SecurityStamp = AlphaNumeric.CreateString(32);
-
-            _context.Entry(audience).State = EntityState.Modified;
-
-            return _context.Entry(audience).Entity;
-        }
-
-        public override tbl_Audiences Update(tbl_Audiences audience)
-        {
-            var entity = _context.Set<tbl_Audiences>()
-                .Where(x => x.Id == audience.Id).Single();
+            return _context.Set<uvw_Audiences>().FromSqlRaw("[svc].[usp_Audience_Insert]"
+                + "@IssuerId, @ActorId, @Name, @Description, @AudienceType, @LockoutEnabled, @LockoutEnd,"
+                + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
 
             /*
-             * only persist certain fields.
-             */
+            using (var conn = _context.Database.GetDbConnection())
+            {
+                var cmd = conn.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[svc].[usp_Audience_Insert]";
+                cmd.Parameters.AddRange(pvalues.ToArray());
+                cmd.Connection = conn;
+                conn.Open();
 
-            entity.IssuerId = audience.IssuerId;
-            entity.Name = audience.Name;
-            entity.Description = audience.Description;
-            entity.AudienceType = audience.AudienceType;
-            entity.LastUpdated = Clock.UtcDateTime;
-            entity.Enabled = audience.Enabled;
-            entity.Immutable = audience.Immutable;
+                var result = cmd.ExecuteReader();
 
-            _context.Entry(entity).State = EntityState.Modified;
+                return result.Cast<uvw_Audiences>().AsEnumerable().Single();
+            }
+            */
+        }
 
-            return _context.Update(entity).Entity;
+        public override IEnumerable<uvw_Audiences> Create(IEnumerable<uvw_Audiences> entities)
+        {
+            var results = new List<uvw_Audiences>();
+
+            foreach (var entity in entities)
+            {
+                var result = Create(entity);
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public override uvw_Audiences Delete(uvw_Audiences entity)
+        {
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
+
+            return _context.Set<uvw_Audiences>().FromSqlRaw("[svc].[usp_Audience_Delete] @Id", pvalues.ToArray())
+                .AsEnumerable().Single();
+        }
+
+        public override IEnumerable<uvw_Audiences> Delete(IEnumerable<uvw_Audiences> entities)
+        {
+            var results = new List<uvw_Audiences>();
+
+            foreach (var entity in entities)
+            {
+                var result = Delete(entity);
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public override IEnumerable<uvw_Audiences> Delete(LambdaExpression lambda)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override uvw_Audiences Update(uvw_Audiences entity)
+        {
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
+                new SqlParameter("@IssuerId", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId },
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
+                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
+                new SqlParameter("@AudienceType", SqlDbType.NVarChar) { Value = entity.AudienceType },
+                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
+                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
+                new SqlParameter("@LastLoginSuccess", SqlDbType.DateTime2) { Value = entity.LastLoginSuccess.HasValue ? (object)entity.LastLoginSuccess.Value : DBNull.Value },
+                new SqlParameter("@LastLoginFailure", SqlDbType.DateTime2) { Value = entity.LastLoginFailure.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
+                new SqlParameter("@AccessFailedCount", SqlDbType.Int) { Value = entity.AccessFailedCount },
+                new SqlParameter("@AccessSuccessCount", SqlDbType.Int) { Value = entity.AccessSuccessCount },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
+
+            return _context.Set<uvw_Audiences>().FromSqlRaw("[svc].[usp_Audience_Update]"
+                + "@Id, @IssuerId, @ActorId, @Name, @Description, @AudienceType, @LockoutEnabled, @LockoutEnd,"
+                + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
+        }
+
+        public override IEnumerable<uvw_Audiences> Update(IEnumerable<uvw_Audiences> entities)
+        {
+            var results = new List<uvw_Audiences>();
+
+            foreach (var entity in entities)
+            {
+                var result = Update(entity);
+
+                results.Add(result);
+            }
+
+            return results;
         }
     }
 }

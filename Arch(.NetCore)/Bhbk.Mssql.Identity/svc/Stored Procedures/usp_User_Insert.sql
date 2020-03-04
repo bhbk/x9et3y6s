@@ -7,8 +7,6 @@ CREATE PROCEDURE [svc].[usp_User_Insert]
     ,@FirstName            NVARCHAR (MAX)
     ,@LastName             NVARCHAR (MAX) 
     ,@PhoneNumber          NVARCHAR (16)
-    ,@Created              DATETIME2 (7) 
-    ,@LastUpdated          DATETIME2 (7)
     ,@LockoutEnabled       BIT     
     ,@LockoutEnd           DATETIMEOFFSET (7)
     ,@HumanBeing           BIT
@@ -18,6 +16,7 @@ AS
 BEGIN
 
 DECLARE @USERID UNIQUEIDENTIFIER = NEWID()
+DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
 INSERT INTO [dbo].[tbl_Users]
 	(
@@ -30,7 +29,6 @@ INSERT INTO [dbo].[tbl_Users]
     ,PhoneNumber      
     ,PhoneNumberConfirmed  
     ,Created           
-    ,LastUpdated      
     ,LockoutEnabled      
     ,LockoutEnd        
     ,AccessFailedCount  
@@ -50,8 +48,7 @@ VALUES
     ,@LastName     
     ,@PhoneNumber      
     ,'FALSE'     
-    ,@Created           
-    ,@LastUpdated      
+    ,@CREATED        
     ,@LockoutEnabled      
     ,@LockoutEnd        
     ,0

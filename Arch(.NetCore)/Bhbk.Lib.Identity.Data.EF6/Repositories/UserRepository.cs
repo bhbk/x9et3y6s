@@ -10,6 +10,13 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
+    /*
+     * moving away from microsoft constructs for identity implementation because of un-needed additional 
+     * layers of complexity, and limitations, for the simple operations needing to be performed.
+     * 
+     * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
+     */
+
     public class UserRepository : GenericRepository<uvw_Users>
     {
         private IClockService _clock;
@@ -20,23 +27,46 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             _clock = new ClockService(instance);
         }
 
+        public DateTimeOffset Clock
+        {
+            get { return _clock.UtcNow; }
+            set { _clock.UtcNow = value; }
+        }
+
         public override uvw_Users Create(uvw_Users entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.NVarChar) { Value = entity.Email });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.NVarChar) { Value = entity.FirstName });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.NVarChar) { Value = entity.LastName });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.NVarChar) { Value = entity.PhoneNumber });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.DateTime2) { Value = entity.Created });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.DateTime2) { Value = entity.LastUpdated.HasValue ? (object)entity.LastUpdated.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.Bit) { Value = entity.LockoutEnabled });
-            pvalues.Add(new SqlParameter("@p8", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p9", SqlDbType.Bit) { Value = entity.HumanBeing });
-            pvalues.Add(new SqlParameter("@p10", SqlDbType.Bit) { Value = entity.Immutable });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Email", SqlDbType.NVarChar) { Value = entity.Email },
+                new SqlParameter("@FirstName", SqlDbType.NVarChar) { Value = entity.FirstName },
+                new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = entity.LastName },
+                new SqlParameter("@PhoneNumber", SqlDbType.NVarChar) { Value = entity.PhoneNumber },
+                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
+                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
+                new SqlParameter("@HumanBeing", SqlDbType.Bit) { Value = entity.HumanBeing },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
 
-            return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Insert]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Insert]"
+                + "@ActorId, @Email, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
+
+            /*
+            using (var conn = _context.Database.Connection)
+            {
+                var cmd = conn.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[svc].[usp_User_Insert]";
+                cmd.Parameters.AddRange(pvalues.ToArray());
+                cmd.Connection = conn;
+                conn.Open();
+
+                var result = cmd.ExecuteReader();
+
+                return result.Cast<uvw_Users>().AsEnumerable().Single();
+            }
+            */
         }
 
         public override IEnumerable<uvw_Users> Create(IEnumerable<uvw_Users> entities)
@@ -55,11 +85,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Users Delete(uvw_Users entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
 
-            return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Delete]" +
-                "@p0", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Delete] @Id", pvalues.ToArray())
+                .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_Users> Delete(IEnumerable<uvw_Users> entities)
@@ -83,22 +115,23 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
         public override uvw_Users Update(uvw_Users entity)
         {
-            var pvalues = new List<SqlParameter>();
-            pvalues.Add(new SqlParameter("@p0", SqlDbType.UniqueIdentifier) { Value = entity.Id });
-            pvalues.Add(new SqlParameter("@p1", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p2", SqlDbType.NVarChar) { Value = entity.Email });
-            pvalues.Add(new SqlParameter("@p3", SqlDbType.NVarChar) { Value = entity.FirstName });
-            pvalues.Add(new SqlParameter("@p4", SqlDbType.NVarChar) { Value = entity.LastName });
-            pvalues.Add(new SqlParameter("@p5", SqlDbType.NVarChar) { Value = entity.PhoneNumber });
-            pvalues.Add(new SqlParameter("@p6", SqlDbType.DateTime2) { Value = entity.Created });
-            pvalues.Add(new SqlParameter("@p7", SqlDbType.DateTime2) { Value = entity.LastUpdated.HasValue ? (object)entity.LastUpdated.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p8", SqlDbType.Bit) { Value = entity.LockoutEnabled });
-            pvalues.Add(new SqlParameter("@p9", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value });
-            pvalues.Add(new SqlParameter("@p10", SqlDbType.Bit) { Value = entity.HumanBeing });
-            pvalues.Add(new SqlParameter("@p11", SqlDbType.Bit) { Value = entity.Immutable });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Email", SqlDbType.NVarChar) { Value = entity.Email },
+                new SqlParameter("@FirstName", SqlDbType.NVarChar) { Value = entity.FirstName },
+                new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = entity.LastName },
+                new SqlParameter("@PhoneNumber", SqlDbType.NVarChar) { Value = entity.PhoneNumber },
+                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
+                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
+                new SqlParameter("@HumanBeing", SqlDbType.Bit) { Value = entity.HumanBeing },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
 
-            return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Update]" +
-                "@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10,@p11", pvalues.ToArray()).Single();
+            return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Update]"
+                + "@Id, @ActorId, @Email, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
         }
 
         public override IEnumerable<uvw_Users> Update(IEnumerable<uvw_Users> entities)

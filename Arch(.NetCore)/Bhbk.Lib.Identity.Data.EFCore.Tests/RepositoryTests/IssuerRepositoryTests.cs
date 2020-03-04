@@ -1,8 +1,8 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
+﻿using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +13,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
     [Collection("RepositoryTests")]
     public class IssuerRepositoryTests : BaseRepositoryTests
     {
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Issuers_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Issuers.Create(
-                    Mapper.Map<tbl_Issuers>(new IssuerV1()));
-
-                UoW.Commit();
+                UoW.Issuers.Create(new uvw_Issuers());
             });
         }
 
@@ -32,25 +29,22 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Issuers.Create(
-                Mapper.Map<tbl_Issuers>(new IssuerV1()
-                    {
-                        Name = Constants.ApiTestIssuer,
-                        IssuerKey = Constants.ApiTestIssuerKey,
-                        Enabled = true,
-                        Immutable = false,
-                    }));
-            result.Should().BeAssignableTo<tbl_Issuers>();
-
-            UoW.Commit();
+                new uvw_Issuers()
+                {
+                    Name = Constants.ApiTestIssuer,
+                    IssuerKey = Constants.ApiTestIssuerKey,
+                    Enabled = true,
+                    Immutable = false,
+                });
+            result.Should().BeAssignableTo<uvw_Issuers>();
         }
 
         [Fact]
         public void Repo_Issuers_DeleteV1_Fail()
         {
-            Assert.Throws<DbUpdateConcurrencyException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Issuers.Delete(new tbl_Issuers());
-                UoW.Commit();
+                UoW.Issuers.Delete(new uvw_Issuers());
             });
         }
 
@@ -60,10 +54,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+            var issuer = UoW.Issuers.Get(new QueryExpression<uvw_Issuers>()
+                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Single();
 
             UoW.Issuers.Delete(issuer);
-            UoW.Commit();
         }
 
         [Fact]
@@ -73,17 +68,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Issuers.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Issuers>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Issuers>>();
             results.Count().Should().Be(UoW.Issuers.Count());
         }
 
         [Fact]
         public void Repo_Issuers_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Issuers.Update(new tbl_Issuers());
-                UoW.Commit();
+                UoW.Issuers.Update(new uvw_Issuers());
             });
         }
 
@@ -93,13 +87,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
+            var issuer = UoW.Issuers.Get(new QueryExpression<uvw_Issuers>()
+                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Single();
             issuer.Name += "(Updated)";
 
             var result = UoW.Issuers.Update(issuer);
-            result.Should().BeAssignableTo<tbl_Issuers>();
-
-            UoW.Commit();
+            result.Should().BeAssignableTo<uvw_Issuers>();
         }
     }
 }

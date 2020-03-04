@@ -6,14 +6,13 @@ CREATE PROCEDURE [svc].[usp_Issuer_Insert]
     ,@Description			NVARCHAR (MAX)
     ,@IssuerKey				NVARCHAR (MAX) 
     ,@Enabled				BIT 
-    ,@Created				DATETIME2 (7) 
-    ,@LastUpdated			DATETIME2 (7)
     ,@Immutable				BIT
 
 AS
 BEGIN
 
 DECLARE @ISSUERID UNIQUEIDENTIFIER = NEWID()
+DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
 INSERT INTO [dbo].[tbl_Issuers]
 	(
@@ -24,7 +23,6 @@ INSERT INTO [dbo].[tbl_Issuers]
     ,IssuerKey       
     ,Enabled     
     ,Created           
-    ,LastUpdated      
     ,Immutable        
 	)
 VALUES
@@ -35,8 +33,7 @@ VALUES
     ,@Description       
     ,@IssuerKey       
     ,@Enabled     
-    ,@Created           
-    ,@LastUpdated      
+    ,@CREATED          
     ,@Immutable        
 	);
 

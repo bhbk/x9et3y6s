@@ -2,8 +2,8 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Primitives;
@@ -61,7 +61,6 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.End2EndTest, owin);
@@ -96,7 +95,6 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.End2EndTest, owin);
@@ -135,7 +133,6 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var service = new AlertService(conf, InstanceContext.End2EndTest, owin);

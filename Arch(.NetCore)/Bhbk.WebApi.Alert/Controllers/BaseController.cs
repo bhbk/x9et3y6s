@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

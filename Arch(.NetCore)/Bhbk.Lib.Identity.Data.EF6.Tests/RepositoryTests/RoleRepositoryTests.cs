@@ -85,7 +85,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             });
         }
 
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Roles_UpdateV1_Success()
         {
             new GenerateTestData(UoW, Mapper).Destroy();

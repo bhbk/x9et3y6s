@@ -1,11 +1,10 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +15,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
     [Collection("RepositoryTests")]
     public class StateRepositoryTests : BaseRepositoryTests
     {
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_States_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.States.Create(
-                    Mapper.Map<tbl_States>(new StateV1()));
-                UoW.Commit();
+                UoW.States.Create(new uvw_States());
             });
         }
 
@@ -33,34 +30,39 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
-            var audience = UoW.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-            var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+            var issuer = UoW.Issuers.Get(new QueryExpression<uvw_Issuers>()
+                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Single();
+
+            var audience = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
+                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Single();
+
+            var user = UoW.Users.Get(new QueryExpression<uvw_Users>()
+                .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
+                .Single();
 
             var result = UoW.States.Create(
-                Mapper.Map<tbl_States>(
-                    new StateV1()
-                    {
-                        IssuerId = issuer.Id,
-                        AudienceId = audience.Id,
-                        UserId = user.Id,
-                        StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
-                        StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                    }));
-            result.Should().BeAssignableTo<tbl_States>();
-            UoW.Commit();
+                new uvw_States()
+                {
+                    IssuerId = issuer.Id,
+                    AudienceId = audience.Id,
+                    UserId = user.Id,
+                    StateValue = AlphaNumeric.CreateString(32),
+                    StateType = StateType.Device.ToString(),
+                    StateConsume = false,
+                    ValidFromUtc = DateTime.UtcNow,
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                });
+            result.Should().BeAssignableTo<uvw_States>();
         }
 
         [Fact]
         public void Repo_States_DeleteV1_Fail()
         {
-            Assert.Throws<DbUpdateConcurrencyException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.States.Delete(new tbl_States());
-                UoW.Commit();
+                UoW.States.Delete(new uvw_States());
             });
         }
 
@@ -73,7 +75,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var state = UoW.States.Get().First();
 
             UoW.States.Delete(state);
-            UoW.Commit();
         }
 
         [Fact]
@@ -83,17 +84,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.States.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_States>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_States>>();
             results.Count().Should().Be(UoW.States.Count());
         }
 
         [Fact]
         public void Repo_States_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.States.Update(new tbl_States());
-                UoW.Commit();
+                UoW.States.Update(new uvw_States());
             });
         }
 
@@ -103,20 +103,18 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(new QueryExpression<tbl_Users>()
+            var user = UoW.Users.Get(new QueryExpression<uvw_Users>()
                 .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
                 .Single();
 
-            var state = UoW.States.Get(new QueryExpression<tbl_States>()
+            var state = UoW.States.Get(new QueryExpression<uvw_States>()
                 .Where(x => x.UserId == user.Id).ToLambda())
                 .First();
 
             state.StateConsume = true;
 
             var result = UoW.States.Update(state);
-            result.Should().BeAssignableTo<tbl_States>();
-
-            UoW.Commit();
+            result.Should().BeAssignableTo<uvw_States>();
         }
     }
 }

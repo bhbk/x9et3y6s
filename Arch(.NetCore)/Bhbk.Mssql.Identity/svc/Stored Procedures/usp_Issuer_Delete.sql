@@ -4,29 +4,29 @@
 
 
 CREATE PROCEDURE [svc].[usp_Issuer_Delete]
-    @IssuerID uniqueidentifier
+    @ID uniqueidentifier
 
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Issuers] WHERE [svc].[uvw_Issuers].Id = @IssuerID
+SELECT * FROM [svc].[uvw_Issuers] WHERE [svc].[uvw_Issuers].Id = @ID
 
 DELETE [dbo].[tbl_Claims]
-WHERE IssuerId = @IssuerID
+WHERE IssuerId = @ID
 
 DELETE [dbo].[tbl_Refreshes]
-WHERE IssuerId = @IssuerID
+WHERE IssuerId = @ID
 
 DELETE [dbo].[tbl_Settings]
-WHERE IssuerId = @IssuerID
+WHERE IssuerId = @ID
 
 DELETE [dbo].[tbl_States]
-WHERE IssuerId = @IssuerID
+WHERE IssuerId = @ID
 
 DELETE [dbo].[tbl_Audiences]
-WHERE IssuerId = @IssuerID
+WHERE IssuerId = @ID
 
 DELETE [dbo].[tbl_Issuers]
-WHERE Id = @IssuerID
+WHERE Id = @ID
 
 END

@@ -9,11 +9,12 @@ CREATE PROCEDURE [svc].[usp_Issuer_Update]
     ,@Description			NVARCHAR (MAX)
     ,@IssuerKey				NVARCHAR (MAX) 
     ,@Enabled				BIT 
-    ,@LastUpdated			DATETIME2 (7)
     ,@Immutable				BIT
 
 AS
 BEGIN
+
+DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
 
 UPDATE [dbo].[tbl_Issuers]
 SET
@@ -23,7 +24,7 @@ SET
 	,Description			= @Description
 	,IssuerKey				= @IssuerKey
 	,Enabled				= @Enabled
-    ,LastUpdated			= @LastUpdated
+    ,LastUpdated			= @LASTUPDATED
     ,Immutable				= @Immutable
 WHERE Id = @Id
 

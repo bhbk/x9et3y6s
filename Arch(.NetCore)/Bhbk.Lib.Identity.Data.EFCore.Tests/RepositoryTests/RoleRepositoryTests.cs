@@ -1,8 +1,8 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
+﻿using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Models.Admin;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +13,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
     [Collection("RepositoryTests")]
     public class RoleRepositoryTests : BaseRepositoryTests
     {
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Roles_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Roles.Create(
-                    Mapper.Map<tbl_Roles>(new RoleV1()));
-                UoW.Commit();
+                UoW.Roles.Create(new uvw_Roles());
             });
         }
 
@@ -30,27 +28,27 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audience = UoW.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
+            var audience = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
+                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Single();
 
             var result = UoW.Roles.Create(
-                Mapper.Map<tbl_Roles>(new RoleV1()
-                    {
-                        AudienceId = audience.Id,
-                        Name = Constants.ApiTestRole,
-                        Enabled = true,
-                        Immutable = false,
-                    }));
-            result.Should().BeAssignableTo<tbl_Roles>();
-            UoW.Commit();
+                new uvw_Roles()
+                {
+                    AudienceId = audience.Id,
+                    Name = Constants.ApiTestRole,
+                    Enabled = true,
+                    Immutable = false,
+                });
+            result.Should().BeAssignableTo<uvw_Roles>();
         }
 
         [Fact]
         public void Repo_Roles_DeleteV1_Fail()
         {
-            Assert.Throws<DbUpdateConcurrencyException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Roles.Delete(new tbl_Roles());
-                UoW.Commit();
+                UoW.Roles.Delete(new uvw_Roles());
             });
         }
 
@@ -60,10 +58,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var role = UoW.Roles.Get(x => x.Name == Constants.ApiTestRole).Single();
+            var role = UoW.Roles.Get(new QueryExpression<uvw_Roles>()
+                .Where(x => x.Name == Constants.ApiTestRole).ToLambda())
+                .Single();
 
             UoW.Roles.Delete(role);
-            UoW.Commit();
         }
 
         [Fact]
@@ -73,17 +72,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Roles.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Roles>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Roles>>();
             results.Count().Should().Be(UoW.Roles.Count());
         }
 
         [Fact]
         public void Repo_Roles_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Roles.Update(new tbl_Roles());
-                UoW.Commit();
+                UoW.Roles.Update(new uvw_Roles());
             });
         }
 
@@ -93,12 +91,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var role = UoW.Roles.Get(x => x.Name == Constants.ApiTestRole).Single();
+            var role = UoW.Roles.Get(new QueryExpression<uvw_Roles>()
+                .Where(x => x.Name == Constants.ApiTestRole).ToLambda())
+                .Single();
             role.Name += "(Updated)";
 
             var result = UoW.Roles.Update(role);
-            result.Should().BeAssignableTo<tbl_Roles>();
-            UoW.Commit();
+            result.Should().BeAssignableTo<uvw_Roles>();
         }
     }
 }

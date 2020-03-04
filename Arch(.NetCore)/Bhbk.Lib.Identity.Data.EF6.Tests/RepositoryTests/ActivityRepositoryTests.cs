@@ -29,16 +29,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audiences = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
+            var audience = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
                 .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
                 .Single();
 
             var result = UoW.Activities.Create(
                 new uvw_Activities()
                 {
-                    AudienceId = audiences.Id,
+                    AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                    Created = DateTime.Now,
                     Immutable = false,
                 });
             result.Should().BeAssignableTo<uvw_Activities>();

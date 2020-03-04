@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +14,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
     [Collection("RepositoryTests")]
     public class UserRepositoryTests : BaseRepositoryTests
     {
-        [Fact(Skip = "NotImplemented")]
+        [Fact]
         public void Repo_Users_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Users.Create(
-                    Mapper.Map<tbl_Users>(new UserV1()));
-                UoW.Commit();
+                UoW.Users.Create(new uvw_Users());
             });
         }
 
@@ -32,27 +30,25 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Users.Create(
-                Mapper.Map<tbl_Users>(new UserV1()
-                    {
-                        Email = Constants.ApiTestUser,
-                        PhoneNumber = Constants.ApiTestUserPhone,
-                        FirstName = "First-" + Base64.CreateString(4),
-                        LastName = "Last-" + Base64.CreateString(4),
-                        LockoutEnabled = false,
-                        HumanBeing = true,
-                        Immutable = false,
-                    }));
-            result.Should().BeAssignableTo<tbl_Users>();
-            UoW.Commit();
+                new uvw_Users()
+                {
+                    Email = Constants.ApiTestUser,
+                    PhoneNumber = Constants.ApiTestUserPhone,
+                    FirstName = "First-" + Base64.CreateString(4),
+                    LastName = "Last-" + Base64.CreateString(4),
+                    LockoutEnabled = false,
+                    HumanBeing = true,
+                    Immutable = false,
+                });
+            result.Should().BeAssignableTo<uvw_Users>();
         }
 
         [Fact]
         public void Repo_Users_DeleteV1_Fail()
         {
-            Assert.Throws<DbUpdateConcurrencyException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Users.Delete(new tbl_Users());
-                UoW.Commit();
+                UoW.Users.Delete(new uvw_Users());
             });
         }
 
@@ -62,10 +58,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+            var user = UoW.Users.Get(new QueryExpression<uvw_Users>()
+                .Where(x => x.Email == Constants.ApiTestUser).ToLambda()).Single();
 
-            UoW.Users.Delete(issuer);
-            UoW.Commit();
+            UoW.Users.Delete(user);
         }
 
         [Fact]
@@ -75,17 +71,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Users.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Users>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Users>>();
             results.Count().Should().Be(UoW.Users.Count());
         }
 
         [Fact]
         public void Repo_Users_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<SqlException>(() =>
             {
-                UoW.Users.Update(new tbl_Users());
-                UoW.Commit();
+                UoW.Users.Update(new uvw_Users());
             });
         }
 
@@ -95,14 +90,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+            var user = UoW.Users.Get(new QueryExpression<uvw_Users>()
+                .Where(x => x.Email == Constants.ApiTestUser).ToLambda()).Single();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";
 
             var result = UoW.Users.Update(user);
-
-            result.Should().BeAssignableTo<tbl_Users>();
-            UoW.Commit();
+            result.Should().BeAssignableTo<uvw_Users>();
         }
     }
 }

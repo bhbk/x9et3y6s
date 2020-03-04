@@ -9,13 +9,13 @@ CREATE PROCEDURE [svc].[usp_Activity_Insert]
     ,@KeyValues				NVARCHAR (MAX) 
     ,@OriginalValues		NVARCHAR (MAX) 
     ,@CurrentValues			NVARCHAR (MAX) 
-    ,@Created				DATETIME2 (7) 
     ,@Immutable				BIT
 
 AS
 BEGIN
 
 DECLARE @ACTIVITYID UNIQUEIDENTIFIER = NEWID()
+DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
 INSERT INTO [dbo].[tbl_Activities]
 	(
@@ -40,7 +40,7 @@ VALUES
     ,@KeyValues    
     ,@OriginalValues   
     ,@CurrentValues
-    ,@Created           
+    ,@CREATED        
     ,@Immutable        
 	);
 

@@ -6,12 +6,21 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.LibraryTests
 {
     public class AutoMapperTests
     {
-        private IMapper Mapper => new MapperConfiguration(
-                    x => x.AddProfile<AutoMapperProfile_EF6>()).CreateMapper();
-
         [Fact]
         public void Lib_AutoMapper_Profile_Success()
         {
+            var Mapper = new MapperConfiguration(
+                    x => x.AddProfile<AutoMapperProfile_EF6>()).CreateMapper();
+
+            Mapper.ConfigurationProvider.AssertConfigurationIsValid();
+        }
+
+        [Fact]
+        public void Lib_AutoMapper_Profile_Success_Direct()
+        {
+            var Mapper = new MapperConfiguration(
+                    x => x.AddProfile<AutoMapperProfile_EF6_DIRECT>()).CreateMapper();
+
             Mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
     }

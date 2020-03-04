@@ -2,20 +2,18 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Repositories;
+using EntityFrameworkCore.Testing.Moq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
 {
-    public class UnitOfWork : IUnitOfWork, IDisposable, IAsyncDisposable
+    public class UnitOfWork : IUnitOfWork, IDisposable
     {
-#if !RELEASE
-        private readonly ILoggerFactory _logger;
-#endif
         private readonly IdentityEntities _context;
+        private readonly ILoggerFactory _logger;
         public InstanceContext InstanceType { get; private set; }
         public ActivityRepository Activities { get; private set; }
         public AudienceRepository Audiences { get; private set; }
@@ -37,7 +35,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
 
         public UnitOfWork(string connection, IContextService instance)
         {
-#if !RELEASE
             _logger = LoggerFactory.Create(opt =>
             {
                 opt.AddFilter("Microsoft", LogLevel.Warning)
@@ -45,11 +42,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
                     .AddFilter("System", LogLevel.Warning)
                     .AddConsole();
             });
-#endif
 
             switch (instance.InstanceType)
             {
                 case InstanceContext.DeployedOrLocal:
+                case InstanceContext.End2EndTest:
+                case InstanceContext.IntegrationTest:
                     {
 #if !RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
@@ -64,14 +62,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
                     }
                     break;
 
-                case InstanceContext.End2EndTest:
-                case InstanceContext.IntegrationTest:
                 case InstanceContext.UnitTest:
                     {
+#if !RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                            .UseInMemoryDatabase(":InMemory:");
-
+                            .UseSqlServer(connection)
+                            .UseLoggerFactory(_logger)
+                            .EnableSensitiveDataLogging();
+#elif RELEASE
+                        var builder = new DbContextOptionsBuilder<IdentityEntities>()
+                            .UseSqlServer(connection);
+#endif
                         _context = new IdentityEntities(builder.Options);
+                        //_context = Create.MockedDbContextFor<IdentityEntities>();
                     }
                     break;
 
@@ -107,12 +110,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
 
         public void Dispose()
         {
+            _logger.Dispose();
             _context.Dispose();
-        }
-
-        public ValueTask DisposeAsync()
-        {
-            return _context.DisposeAsync();
         }
     }
 }

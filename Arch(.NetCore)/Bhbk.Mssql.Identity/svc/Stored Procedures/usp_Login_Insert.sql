@@ -8,14 +8,13 @@ CREATE PROCEDURE [svc].[usp_Login_Insert]
     ,@Description			NVARCHAR (MAX)
     ,@LoginKey				NVARCHAR (MAX)
     ,@Enabled				BIT 
-    ,@Created				DATETIME2 (7) 
-    ,@LastUpdated			DATETIME2 (7)
     ,@Immutable				BIT
 
 AS
 BEGIN
 
 DECLARE @LOGINID UNIQUEIDENTIFIER = NEWID()
+DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
 INSERT INTO [dbo].[tbl_Logins]
 	(
@@ -26,7 +25,6 @@ INSERT INTO [dbo].[tbl_Logins]
 	,LoginKey
     ,Enabled     
     ,Created           
-    ,LastUpdated      
     ,Immutable        
 	)
 VALUES
@@ -37,8 +35,7 @@ VALUES
     ,@Description       
 	,@LoginKey
     ,@Enabled     
-    ,@Created           
-    ,@LastUpdated      
+    ,@CREATED       
     ,@Immutable        
 	);
 

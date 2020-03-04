@@ -1,115 +1,127 @@
 ﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
-using Bhbk.Lib.Identity.Primitives;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
-    public class IssuerRepository : GenericRepository<tbl_Issuers>
+    public class IssuerRepository : GenericRepository<uvw_Issuers>
     {
         public IssuerRepository(IdentityEntities context)
             : base(context) { }
 
-        public override tbl_Issuers Create(tbl_Issuers issuer)
+        public override uvw_Issuers Create(uvw_Issuers entity)
         {
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
-                {
-                    Id = Guid.NewGuid(),
-                    IssuerId = issuer.Id,
-                    ConfigKey = Constants.ApiSettingAccessExpire,
-                    ConfigValue = 600.ToString(),
-                    Created = DateTime.UtcNow,
-                    Immutable = true,
-                });
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
+                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
+                new SqlParameter("@IssuerKey", SqlDbType.NVarChar) { Value = entity.IssuerKey },
+                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
 
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
-                {
-                    Id = Guid.NewGuid(),
-                    IssuerId = issuer.Id,
-                    ConfigKey = Constants.ApiSettingRefreshExpire,
-                    ConfigValue = 86400.ToString(),
-                    Created = DateTime.UtcNow,
-                    Immutable = true,
-                });
-
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
-                {
-                    Id = Guid.NewGuid(),
-                    IssuerId = issuer.Id,
-                    ConfigKey = Constants.ApiSettingTotpExpire,
-                    ConfigValue = 600.ToString(),
-                    Created = DateTime.UtcNow,
-                    Immutable = true,
-                });
-
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
-                {
-                    Id = Guid.NewGuid(),
-                    IssuerId = issuer.Id,
-                    ConfigKey = Constants.ApiSettingPollingMax,
-                    ConfigValue = 10.ToString(),
-                    Created = DateTime.UtcNow,
-                    Immutable = true,
-                });
-
-            return _context.Add(issuer).Entity;
-        }
-
-        public override tbl_Issuers Delete(tbl_Issuers issuer)
-        {            
-            var claims = _context.Set<tbl_Claims>()
-                .Where(x => x.IssuerId == issuer.Id);
-
-            var refreshes = _context.Set<tbl_Refreshes>()
-                .Where(x => x.IssuerId == issuer.Id);
-
-            var settings = _context.Set<tbl_Settings>()
-                .Where(x => x.IssuerId == issuer.Id);
-
-            var states = _context.Set<tbl_States>()
-                .Where(x => x.IssuerId == issuer.Id);
-
-            var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.Audience.IssuerId == issuer.Id);
-
-            var audiences = _context.Set<tbl_Audiences>()
-                .Where(x => x.IssuerId == issuer.Id);
-
-            _context.RemoveRange(claims);
-            _context.RemoveRange(refreshes);
-            _context.RemoveRange(settings);
-            _context.RemoveRange(states);
-            _context.RemoveRange(roles);
-            _context.RemoveRange(audiences);
-
-            return _context.Remove(issuer).Entity;
-        }
-
-        public override tbl_Issuers Update(tbl_Issuers issuer)
-        {
-            var entity = _context.Set<tbl_Issuers>()
-                .Where(x => x.Id == issuer.Id).Single();
+            return _context.Set<uvw_Issuers>().FromSqlRaw("[svc].[usp_Issuer_Insert]"
+                + "@ActorId, @Name, @Description, @IssuerKey, @Enabled, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
 
             /*
-             * only persist certain fields.
-             */
+            using (var conn = _context.Database.GetDbConnection())
+            {
+                var cmd = conn.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[svc].[usp_Issuer_Insert]";
+                cmd.Parameters.AddRange(pvalues.ToArray());
+                cmd.Connection = conn;
+                conn.Open();
 
-            entity.Name = issuer.Name;
-            entity.Description = issuer.Description;
-            entity.IssuerKey = issuer.IssuerKey;
-            entity.LastUpdated = DateTime.Now;
-            entity.Enabled = issuer.Enabled;
-            entity.Immutable = issuer.Immutable;
+                var reader = cmd.ExecuteReader();
 
-            _context.Entry(entity).State = EntityState.Modified;
+                return reader.Cast<uvw_Issuers>().Single();
+            }
+            */
+        }
 
-            return _context.Update(entity).Entity;
+        public override IEnumerable<uvw_Issuers> Create(IEnumerable<uvw_Issuers> entities)
+        {
+            var results = new List<uvw_Issuers>();
+
+            foreach (var entity in entities)
+            {
+                var result = Create(entity);
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public override uvw_Issuers Delete(uvw_Issuers entity)
+        {
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
+            };
+
+            return _context.Set<uvw_Issuers>().FromSqlRaw("[svc].[usp_Issuer_Delete] @Id", pvalues.ToArray())
+                .AsEnumerable().Single();
+        }
+
+        public override IEnumerable<uvw_Issuers> Delete(IEnumerable<uvw_Issuers> entities)
+        {
+            var results = new List<uvw_Issuers>();
+
+            foreach (var entity in entities)
+            {
+                var result = Delete(entity);
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public override IEnumerable<uvw_Issuers> Delete(LambdaExpression lambda)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override uvw_Issuers Update(uvw_Issuers entity)
+        {
+            var pvalues = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
+                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
+                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
+                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
+                new SqlParameter("@IssuerKey", SqlDbType.NVarChar) { Value = entity.IssuerKey },
+                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
+                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+            };
+
+            return _context.Set<uvw_Issuers>().FromSqlRaw("[svc].[usp_Issuer_Update]"
+                + "@Id, @ActorId, @Name, @Description, @IssuerKey, @Enabled, @Immutable", pvalues.ToArray())
+                    .AsEnumerable().Single();
+        }
+
+        public override IEnumerable<uvw_Issuers> Update(IEnumerable<uvw_Issuers> entities)
+        {
+            var results = new List<uvw_Issuers>();
+
+            foreach (var entity in entities)
+            {
+                var result = Update(entity);
+
+                results.Add(result);
+            }
+
+            return results;
         }
     }
 }

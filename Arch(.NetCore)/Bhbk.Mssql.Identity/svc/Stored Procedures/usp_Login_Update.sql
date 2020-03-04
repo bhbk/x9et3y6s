@@ -6,11 +6,12 @@ CREATE PROCEDURE [svc].[usp_Login_Update]
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
     ,@Enabled				BIT 
-    ,@LastUpdated			DATETIME2 (7)
     ,@Immutable				BIT
 
 AS
 BEGIN
+
+DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
 
 UPDATE [dbo].[tbl_Logins]
 SET
@@ -19,7 +20,7 @@ SET
 	,Name					= @Name
 	,Description			= @Description
 	,Enabled				= @Enabled
-    ,LastUpdated			= @LastUpdated
+    ,LastUpdated			= @LASTUPDATED
     ,Immutable				= @Immutable
 WHERE Id = @Id
 

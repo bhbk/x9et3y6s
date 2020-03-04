@@ -69,7 +69,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
             CreateMap<LoginV1, uvw_Logins>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
-                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created));
+                .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
+                .ForMember(dest => dest.LoginKey, src => src.Ignore());
 
             CreateMap<uvw_Logins, LoginV1>();
 

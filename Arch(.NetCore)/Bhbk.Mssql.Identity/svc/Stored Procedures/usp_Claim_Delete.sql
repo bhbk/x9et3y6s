@@ -2,14 +2,14 @@
 
 
 CREATE PROCEDURE [svc].[usp_Claim_Delete]
-    @ClaimID uniqueidentifier
+    @ID uniqueidentifier
 
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Claims] WHERE [svc].[uvw_Claims].Id = @ClaimID
+SELECT * FROM [svc].[uvw_Claims] WHERE [svc].[uvw_Claims].Id = @ID
 
 DELETE [dbo].[tbl_Claims]
-WHERE Id = @ClaimID
+WHERE Id = @ID
 
 END

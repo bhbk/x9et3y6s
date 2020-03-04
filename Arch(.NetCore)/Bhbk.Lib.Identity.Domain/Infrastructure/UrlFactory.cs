@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Web;
