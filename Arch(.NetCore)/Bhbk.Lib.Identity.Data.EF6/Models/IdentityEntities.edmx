@@ -43,11 +43,12 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Audiences' does not have a pr
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="Description" Type="nvarchar(max)" />
-          <Property Name="ConcurrencyStamp" Type="nvarchar(max)" />
-          <Property Name="PasswordHash" Type="nvarchar(max)" />
-          <Property Name="SecurityStamp" Type="nvarchar(max)" />
+          <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="256" />
+          <Property Name="ConcurrencyStamp" Type="nvarchar" MaxLength="256" />
+          <Property Name="PasswordHashPBKDF2" Type="nvarchar" MaxLength="256" />
+          <Property Name="PasswordHashSHA256" Type="nvarchar" MaxLength="256" />
+          <Property Name="SecurityStamp" Type="nvarchar" MaxLength="256" />
           <Property Name="AudienceType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="Enabled" Type="bit" Nullable="false" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
@@ -315,13 +316,16 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             
             
             
+            
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="EmailAddress" Type="nvarchar" MaxLength="128" />
           <Property Name="EmailConfirmed" Type="bit" Nullable="false" />
-          <Property Name="FirstName" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="LastName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="PhoneNumber" Type="nvarchar" MaxLength="16" />
           <Property Name="PhoneNumberConfirmed" Type="bit" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
@@ -332,10 +336,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="LastLoginFailure" Type="datetime2" Precision="7" />
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="AccessSuccessCount" Type="int" Nullable="false" />
-          <Property Name="ConcurrencyStamp" Type="nvarchar(max)" />
-          <Property Name="PasswordHash" Type="nvarchar(max)" />
+          <Property Name="ConcurrencyStamp" Type="nvarchar" MaxLength="1024" Nullable="false" />
+          <Property Name="PasswordHashPBKDF2" Type="nvarchar" MaxLength="2048" />
+          <Property Name="PasswordHashSHA256" Type="nvarchar" MaxLength="2048" />
           <Property Name="PasswordConfirmed" Type="bit" Nullable="false" />
-          <Property Name="SecurityStamp" Type="nvarchar(max)" />
+          <Property Name="SecurityStamp" Type="nvarchar" MaxLength="1024" Nullable="false" />
           <Property Name="TwoFactorEnabled" Type="bit" Nullable="false" />
           <Property Name="HumanBeing" Type="bit" Nullable="false" />
           <Property Name="Immutable" Type="bit" Nullable="false" />
@@ -363,7 +368,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
     [uvw_Audiences].[Name] AS [Name], 
     [uvw_Audiences].[Description] AS [Description], 
     [uvw_Audiences].[ConcurrencyStamp] AS [ConcurrencyStamp], 
-    [uvw_Audiences].[PasswordHash] AS [PasswordHash], 
+    [uvw_Audiences].[PasswordHashPBKDF2] AS [PasswordHashPBKDF2], 
+    [uvw_Audiences].[PasswordHashSHA256] AS [PasswordHashSHA256], 
     [uvw_Audiences].[SecurityStamp] AS [SecurityStamp], 
     [uvw_Audiences].[AudienceType] AS [AudienceType], 
     [uvw_Audiences].[Enabled] AS [Enabled], 
@@ -533,7 +539,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
             <DefiningQuery>SELECT 
     [uvw_Users].[Id] AS [Id], 
     [uvw_Users].[ActorId] AS [ActorId], 
-    [uvw_Users].[Email] AS [Email], 
+    [uvw_Users].[UserName] AS [UserName], 
+    [uvw_Users].[EmailAddress] AS [EmailAddress], 
     [uvw_Users].[EmailConfirmed] AS [EmailConfirmed], 
     [uvw_Users].[FirstName] AS [FirstName], 
     [uvw_Users].[LastName] AS [LastName], 
@@ -548,7 +555,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
     [uvw_Users].[AccessFailedCount] AS [AccessFailedCount], 
     [uvw_Users].[AccessSuccessCount] AS [AccessSuccessCount], 
     [uvw_Users].[ConcurrencyStamp] AS [ConcurrencyStamp], 
-    [uvw_Users].[PasswordHash] AS [PasswordHash], 
+    [uvw_Users].[PasswordHashPBKDF2] AS [PasswordHashPBKDF2], 
+    [uvw_Users].[PasswordHashSHA256] AS [PasswordHashSHA256], 
     [uvw_Users].[PasswordConfirmed] AS [PasswordConfirmed], 
     [uvw_Users].[SecurityStamp] AS [SecurityStamp], 
     [uvw_Users].[TwoFactorEnabled] AS [TwoFactorEnabled], 
@@ -583,11 +591,12 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="IssuerId" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
-          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="ConcurrencyStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="ConcurrencyStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHashPBKDF2" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHashSHA256" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="AudienceType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Enabled" Type="Boolean" Nullable="false" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
@@ -663,10 +672,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
-          <Property Name="Email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="EmailAddress" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
-          <Property Name="FirstName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="LastName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FirstName" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastName" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="PhoneNumber" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
           <Property Name="PhoneNumberConfirmed" Type="Boolean" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
@@ -677,10 +687,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="LastLoginFailure" Type="DateTime" Precision="7" />
           <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
           <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
-          <Property Name="ConcurrencyStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ConcurrencyStamp" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PasswordHashPBKDF2" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHashSHA256" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" />
           <Property Name="PasswordConfirmed" Type="Boolean" Nullable="false" />
-          <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityStamp" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
           <Property Name="HumanBeing" Type="Boolean" Nullable="false" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
@@ -837,13 +848,14 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <EntitySetMapping Name="uvw_Audiences">
             <EntityTypeMapping TypeName="IdentityModels.uvw_Audiences">
               <MappingFragment StoreEntitySet="uvw_Audiences">
+                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
+                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
                 <ScalarProperty Name="ActorId" ColumnName="ActorId" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
                 <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
                 <ScalarProperty Name="AudienceType" ColumnName="AudienceType" />
                 <ScalarProperty Name="Enabled" ColumnName="Enabled" />
@@ -923,10 +935,13 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <EntitySetMapping Name="uvw_Users">
             <EntityTypeMapping TypeName="IdentityModels.uvw_Users">
               <MappingFragment StoreEntitySet="uvw_Users">
+                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
+                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
                 <ScalarProperty Name="FirstName" ColumnName="FirstName" />
                 <ScalarProperty Name="LastName" ColumnName="LastName" />
                 <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
@@ -940,7 +955,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
                 <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
                 <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
                 <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
                 <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
                 <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
                 <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />

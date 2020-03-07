@@ -6,6 +6,7 @@ using Bhbk.Lib.Identity.Data.EF6.Infrastructure;
 using Bhbk.Lib.Identity.Data.EF6.Tests.Helpers;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using System;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
@@ -15,7 +16,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
     [CollectionDefinition("RepositoryTests")]
     public class BaseRepositoryTestsCollection : ICollectionFixture<BaseRepositoryTests> { }
 
-    public class BaseRepositoryTests
+    public class BaseRepositoryTests : IDisposable
     {
         protected IUnitOfWork UoW;
         protected IMapper Mapper;
@@ -33,6 +34,11 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
 
             UoW = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
             Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>()).CreateMapper();
+        }
+
+        public void Dispose()
+        {
+            new GenerateTestData(UoW, Mapper).Destroy();
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultAdminUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -70,19 +70,19 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultAdminUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var testUser = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_EmailV1(rop.RawData,
                     new EmailV1()
                     {
                         FromId = Guid.NewGuid(),
-                        FromEmail = user.Email,
+                        FromEmail = user.EmailAddress,
                         ToId = testUser.Id,
-                        ToEmail = testUser.Email,
+                        ToEmail = testUser.EmailAddress,
                         Subject = Constants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
                         HtmlContent = Constants.ApiTestEmailContent + "-" + Base64.CreateString(4)
                     });
@@ -104,19 +104,19 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultAdminUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var testUser = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_EmailV1(rop.RawData,
                     new EmailV1()
                     {
                         FromId = user.Id,
-                        FromEmail = testUser.Email,
+                        FromEmail = testUser.EmailAddress,
                         ToId = testUser.Id,
-                        ToEmail = testUser.Email,
+                        ToEmail = testUser.EmailAddress,
                         Subject = Constants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
                         HtmlContent = Constants.ApiTestEmailContent + "-" + Base64.CreateString(4)
                     });
@@ -142,19 +142,19 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultAdminUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultAdminUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var testUser = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
                 var result = await service.Http.Enqueue_EmailV1(rop.RawData,
                     new EmailV1()
                     {
                         FromId = user.Id,
-                        FromEmail = user.Email,
+                        FromEmail = user.EmailAddress,
                         ToId = testUser.Id,
-                        ToEmail = testUser.Email,
+                        ToEmail = testUser.EmailAddress,
                         Subject = Constants.ApiTestEmailSubject + "-" + Base64.CreateString(4),
                         HtmlContent = Constants.ApiTestEmailContent + "-" + Base64.CreateString(4)
                     });

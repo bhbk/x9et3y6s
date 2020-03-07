@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 .Single();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
+                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda())
                 .Single();
 
             var result = UoW.Refreshes.Create(

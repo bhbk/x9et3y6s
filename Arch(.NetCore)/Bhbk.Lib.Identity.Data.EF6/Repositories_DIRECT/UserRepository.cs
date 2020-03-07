@@ -30,6 +30,17 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
             set { _clock.UtcNow = value; }
         }
 
+        public override tbl_Users Create(tbl_Users user)
+        {
+            user.ConcurrencyStamp = Guid.NewGuid().ToString();
+            user.SecurityStamp = Guid.NewGuid().ToString();
+
+            if (!user.HumanBeing)
+                user.EmailConfirmed = true;
+
+            return _context.Set<tbl_Users>().Add(user);
+        }
+
         public override tbl_Users Delete(tbl_Users user)
         {
             var activity = _context.Set<tbl_Activities>()

@@ -1,6 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using CryptoHelper;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -12,16 +10,6 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
         private readonly Regex _lower = new Regex(@"[a-z]+");
         private readonly Regex _upper = new Regex(@"[A-Z]+");
         private readonly Regex _special = new Regex(@"\W+");
-
-        public ValidationHelper()
-        {
-
-        }
-
-        public string PasswordHash(string password)
-        {
-            return Crypto.HashPassword(password);
-        }
 
         public IdentityResult ValidateEmail(string email)
         {
@@ -88,14 +76,6 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 return IdentityResult.Failed(errors.ToArray());
 
             return IdentityResult.Success;
-        }
-
-        public PasswordVerificationResult ValidatePasswordHash(string hashedPassword, string password)
-        {
-            if (Crypto.VerifyHashedPassword(hashedPassword, password))
-                return PasswordVerificationResult.Success;
-
-            return PasswordVerificationResult.Failed;
         }
 
         private bool IsValidEmail(string email)

@@ -41,7 +41,8 @@
           <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Description" Type="nvarchar" MaxLength="256" />
           <Property Name="ConcurrencyStamp" Type="nvarchar" MaxLength="256" />
-          <Property Name="PasswordHash" Type="nvarchar" MaxLength="256" />
+          <Property Name="PasswordHashPBKDF2" Type="nvarchar" MaxLength="256" />
+          <Property Name="PasswordHashSHA256" Type="nvarchar" MaxLength="256" />
           <Property Name="SecurityStamp" Type="nvarchar" MaxLength="256" />
           <Property Name="AudienceType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="Enabled" Type="bit" Nullable="false" />
@@ -78,7 +79,7 @@
           <Property Name="ActorId" Type="uniqueidentifier" />
           <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Description" Type="nvarchar" MaxLength="256" />
-          <Property Name="IssuerKey" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="IssuerKey" Type="nvarchar" MaxLength="1024" Nullable="false" />
           <Property Name="Enabled" Type="bit" Nullable="false" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="LastUpdated" Type="datetime2" Precision="7" />
@@ -103,10 +104,10 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="TssId" Type="varchar" MaxLength="128" />
-          <Property Name="TssTitle" Type="varchar" MaxLength="256" />
           <Property Name="Author" Type="varchar" MaxLength="256" Nullable="false" />
           <Property Name="Quote" Type="varchar" MaxLength="4096" Nullable="false" />
+          <Property Name="TssId" Type="varchar" MaxLength="128" />
+          <Property Name="TssTitle" Type="varchar" MaxLength="256" />
           <Property Name="TssCategory" Type="varchar" MaxLength="256" />
           <Property Name="TssDate" Type="datetime2" Precision="7" />
           <Property Name="TssTags" Type="varchar" MaxLength="256" />
@@ -153,7 +154,7 @@
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="AudienceId" Type="uniqueidentifier" />
           <Property Name="UserId" Type="uniqueidentifier" />
-          <Property Name="RefreshValue" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="RefreshValue" Type="nvarchar" MaxLength="2048" Nullable="false" />
           <Property Name="RefreshType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="ValidFromUtc" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="ValidToUtc" Type="datetime2" Precision="7" Nullable="false" />
@@ -205,7 +206,7 @@
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="AudienceId" Type="uniqueidentifier" />
           <Property Name="UserId" Type="uniqueidentifier" />
-          <Property Name="StateValue" Type="nvarchar" MaxLength="512" />
+          <Property Name="StateValue" Type="nvarchar" MaxLength="1024" />
           <Property Name="StateType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="StateDecision" Type="bit" />
           <Property Name="StateConsume" Type="bit" Nullable="false" />
@@ -221,8 +222,8 @@
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="UrlHost" Type="nvarchar" MaxLength="512" />
-          <Property Name="UrlPath" Type="nvarchar" MaxLength="512" />
+          <Property Name="UrlHost" Type="nvarchar" MaxLength="1024" />
+          <Property Name="UrlPath" Type="nvarchar" MaxLength="1024" />
           <Property Name="Enabled" Type="bit" Nullable="false" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="LastUpdated" Type="datetime2" Precision="7" />
@@ -267,10 +268,11 @@
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="EmailAddress" Type="nvarchar" MaxLength="128" />
           <Property Name="EmailConfirmed" Type="bit" Nullable="false" />
-          <Property Name="FirstName" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="LastName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="PhoneNumber" Type="nvarchar" MaxLength="16" />
           <Property Name="PhoneNumberConfirmed" Type="bit" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
@@ -281,10 +283,11 @@
           <Property Name="LastLoginFailure" Type="datetime2" Precision="7" />
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="AccessSuccessCount" Type="int" Nullable="false" />
-          <Property Name="ConcurrencyStamp" Type="nvarchar(max)" />
-          <Property Name="PasswordHash" Type="nvarchar(max)" />
+          <Property Name="ConcurrencyStamp" Type="nvarchar" MaxLength="1024" Nullable="false" />
+          <Property Name="PasswordHashPBKDF2" Type="nvarchar" MaxLength="2048" />
+          <Property Name="PasswordHashSHA256" Type="nvarchar" MaxLength="2048" />
           <Property Name="PasswordConfirmed" Type="bit" Nullable="false" />
-          <Property Name="SecurityStamp" Type="nvarchar(max)" />
+          <Property Name="SecurityStamp" Type="nvarchar" MaxLength="1024" Nullable="false" />
           <Property Name="TwoFactorEnabled" Type="bit" Nullable="false" />
           <Property Name="HumanBeing" Type="bit" Nullable="false" />
           <Property Name="Immutable" Type="bit" Nullable="false" />
@@ -860,7 +863,8 @@
           <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="ConcurrencyStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="PasswordHash" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHashPBKDF2" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHashSHA256" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="SecurityStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="AudienceType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Enabled" Type="Boolean" Nullable="false" />
@@ -909,7 +913,7 @@
           <Property Name="ActorId" Type="Guid" />
           <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="IssuerKey" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IssuerKey" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Enabled" Type="Boolean" Nullable="false" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
@@ -978,7 +982,7 @@
           <Property Name="IssuerId" Type="Guid" Nullable="false" />
           <Property Name="AudienceId" Type="Guid" />
           <Property Name="UserId" Type="Guid" />
-          <Property Name="RefreshValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="RefreshValue" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="RefreshType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
@@ -1042,7 +1046,7 @@
           <Property Name="IssuerId" Type="Guid" Nullable="false" />
           <Property Name="AudienceId" Type="Guid" />
           <Property Name="UserId" Type="Guid" />
-          <Property Name="StateValue" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="StateValue" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
           <Property Name="StateType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="StateDecision" Type="Boolean" />
           <Property Name="StateConsume" Type="Boolean" Nullable="false" />
@@ -1061,8 +1065,8 @@
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="AudienceId" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
-          <Property Name="UrlHost" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
-          <Property Name="UrlPath" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="UrlHost" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="UrlPath" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
           <Property Name="Enabled" Type="Boolean" Nullable="false" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
@@ -1114,10 +1118,11 @@
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
-          <Property Name="Email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="EmailAddress" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
-          <Property Name="FirstName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="LastName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FirstName" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastName" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="PhoneNumber" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
           <Property Name="PhoneNumberConfirmed" Type="Boolean" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
@@ -1128,10 +1133,11 @@
           <Property Name="LastLoginFailure" Type="DateTime" Precision="7" />
           <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
           <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
-          <Property Name="ConcurrencyStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ConcurrencyStamp" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PasswordHashPBKDF2" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHashSHA256" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" />
           <Property Name="PasswordConfirmed" Type="Boolean" Nullable="false" />
-          <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityStamp" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
           <Property Name="HumanBeing" Type="Boolean" Nullable="false" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
@@ -1725,13 +1731,14 @@
           <EntitySetMapping Name="tbl_Audiences">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_Audiences">
               <MappingFragment StoreEntitySet="tbl_Audiences">
+                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
+                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
                 <ScalarProperty Name="ActorId" ColumnName="ActorId" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
                 <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
                 <ScalarProperty Name="AudienceType" ColumnName="AudienceType" />
                 <ScalarProperty Name="Enabled" ColumnName="Enabled" />
@@ -1951,10 +1958,13 @@
           <EntitySetMapping Name="tbl_Users">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_Users">
               <MappingFragment StoreEntitySet="tbl_Users">
+                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
+                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
                 <ScalarProperty Name="FirstName" ColumnName="FirstName" />
                 <ScalarProperty Name="LastName" ColumnName="LastName" />
                 <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
@@ -1968,7 +1978,6 @@
                 <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
                 <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
                 <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
                 <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
                 <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
                 <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />

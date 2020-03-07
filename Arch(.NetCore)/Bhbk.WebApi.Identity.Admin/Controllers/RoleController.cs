@@ -124,12 +124,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<RoleV1>>(
                         UoW.Roles.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
-                                state.ToExpression<tbl_Roles>()),
+                                QueryExpressionFactory.GetQueryExpression<tbl_Roles>().ApplyState(state)),
                             new List<Expression<Func<tbl_Roles, object>>>() { x => x.tbl_UserRoles })),
 
                     Total = UoW.Roles.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
-                            state.ToPredicateExpression<tbl_Roles>()))
+                            QueryExpressionFactory.GetQueryExpression<tbl_Roles>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);

@@ -38,7 +38,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@Email", SqlDbType.NVarChar) { Value = entity.Email },
+                new SqlParameter("@UserName", SqlDbType.NVarChar) { Value = entity.UserName },
+                new SqlParameter("@EmailAddress", SqlDbType.NVarChar) { Value = (object)entity.EmailAddress ?? DBNull.Value },
                 new SqlParameter("@FirstName", SqlDbType.NVarChar) { Value = entity.FirstName },
                 new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = entity.LastName },
                 new SqlParameter("@PhoneNumber", SqlDbType.NVarChar) { Value = entity.PhoneNumber },
@@ -49,7 +50,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             };
 
             return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Insert]"
-                + "@ActorId, @Email, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
+                + "@ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -119,7 +120,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@Email", SqlDbType.NVarChar) { Value = entity.Email },
+                new SqlParameter("@UserName", SqlDbType.NVarChar) { Value = entity.UserName },
+                new SqlParameter("@EmailAddress", SqlDbType.NVarChar) { Value = (object)entity.EmailAddress ?? DBNull.Value },
                 new SqlParameter("@FirstName", SqlDbType.NVarChar) { Value = entity.FirstName },
                 new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = entity.LastName },
                 new SqlParameter("@PhoneNumber", SqlDbType.NVarChar) { Value = entity.PhoneNumber },
@@ -130,7 +132,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             };
 
             return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Update]"
-                + "@Id, @ActorId, @Email, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
+                + "@Id, @ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

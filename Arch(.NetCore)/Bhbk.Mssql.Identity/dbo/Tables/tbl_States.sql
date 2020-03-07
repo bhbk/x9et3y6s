@@ -3,10 +3,10 @@
     [IssuerId]      UNIQUEIDENTIFIER NOT NULL,
     [AudienceId]    UNIQUEIDENTIFIER NULL,
     [UserId]        UNIQUEIDENTIFIER NULL,
-    [StateValue]    NVARCHAR (512)   NULL,
+    [StateValue]    NVARCHAR (1024)  NULL,
     [StateType]     NVARCHAR (64)    NOT NULL,
     [StateDecision] BIT              NULL,
-    [StateConsume]  BIT              CONSTRAINT [DF_TStates_NonceConsumed] DEFAULT ((0)) NOT NULL,
+    [StateConsume]  BIT              CONSTRAINT [DF_tbl_States_NonceConsumed] DEFAULT ((0)) NOT NULL,
     [ValidFromUtc]  DATETIME2 (7)    NOT NULL,
     [ValidToUtc]    DATETIME2 (7)    NOT NULL,
     [IssuedUtc]     DATETIME2 (7)    NOT NULL,
@@ -16,6 +16,8 @@
     CONSTRAINT [FK_States_IssuerID] FOREIGN KEY ([IssuerId]) REFERENCES [dbo].[tbl_Issuers] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT [FK_States_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[tbl_Users] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 

@@ -186,7 +186,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
              * create test users
              */
             var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
+                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda())
                 .SingleOrDefault();
 
             if (foundUser == null)
@@ -194,6 +194,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                 foundUser = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserV1()
                     {
+                        UserName = Constants.ApiTestUser,
                         Email = Constants.ApiTestUser,
                         PhoneNumber = Constants.ApiTestUserPhone,
                         FirstName = "First-" + AlphaNumeric.CreateString(4),
@@ -265,7 +266,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
              * delete test users
              */
             _uow.Users.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.Email.Contains(Constants.ApiTestUser)).ToLambda());
+                .Where(x => x.UserName.Contains(Constants.ApiTestUser)).ToLambda());
             _uow.Commit();
 
             /*

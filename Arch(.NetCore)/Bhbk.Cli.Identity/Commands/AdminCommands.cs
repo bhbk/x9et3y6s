@@ -306,7 +306,7 @@ namespace Bhbk.Cli.Identity.Commands
                             {
                                 user = _service.User_CreateV1(new UserV1()
                                 {
-                                    Email = userName,
+                                    UserName = userName,
                                     FirstName = Constants.ApiDefaultAdminUserFirstName,
                                     LastName = Constants.ApiDefaultAdminUserLastName,
                                     PhoneNumber = Constants.ApiDefaultAdminUserPhone,

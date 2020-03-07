@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Primitives;
@@ -106,13 +107,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return create;
         }
 
-        public tbl_Users Create(tbl_Users user, string hash)
+        public tbl_Users Create(tbl_Users user, string password)
         {
             var create = InternalCreate(user);
 
             _context.SaveChanges();
 
-            SetPasswordHash(user, hash);
+            SetPasswordHash(user, password);
 
             return create;
         }
@@ -149,8 +150,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
             //add lowest common denominators...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-            claims.Add(new Claim(ClaimTypes.Email, user.Email));
-            claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
+
+            if (!string.IsNullOrEmpty(user.EmailAddress))
+                claims.Add(new Claim(ClaimTypes.Email, user.EmailAddress));
+
+            if (!string.IsNullOrEmpty(user.PhoneNumber))
+                claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
+
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
@@ -202,8 +208,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
             //add lowest common denominators...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-            claims.Add(new Claim(ClaimTypes.Email, user.Email));
-            claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
+
+            if (!string.IsNullOrEmpty(user.EmailAddress))
+                claims.Add(new Claim(ClaimTypes.Email, user.EmailAddress));
+
+            if (!string.IsNullOrEmpty(user.PhoneNumber))
+                claims.Add(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber));
+
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
@@ -273,7 +284,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
         internal tbl_Users InternalCreate(tbl_Users user)
         {
-            user.ConcurrencyStamp = AlphaNumeric.CreateString(32);
+            user.ConcurrencyStamp = Guid.NewGuid().ToString();
+            user.SecurityStamp = Guid.NewGuid().ToString();
 
             if (!user.HumanBeing)
                 user.EmailConfirmed = true;
@@ -345,7 +357,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             var entity = _context.Set<tbl_Users>()
                 .Where(x => x.Id == user.Id).Single();
 
-            if (string.IsNullOrEmpty(entity.PasswordHash))
+            if (string.IsNullOrEmpty(entity.PasswordHashPBKDF2))
                 return false;
 
             return true;
@@ -421,11 +433,23 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public tbl_Users SetPasswordHash(tbl_Users user, string hash)
+        public tbl_Users SetPasswordHash(tbl_Users user, string password)
         {
+            //https://www.google.com/search?q=identity+securitystamp
+            if (!_context.Set<tbl_Users>()
+                .Where(x => x.Id == user.Id && x.SecurityStamp == user.SecurityStamp)
+                .Any())
+                throw new InvalidOperationException();
+
+            user.ConcurrencyStamp = Guid.NewGuid().ToString();
+            user.SecurityStamp = Guid.NewGuid().ToString();
             user.LastUpdated = Clock.UtcDateTime;
-            user.PasswordHash = hash;
-            user.SecurityStamp = AlphaNumeric.CreateString(32);
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                user.PasswordHashPBKDF2 = PBKDF2.Create(password);
+                user.PasswordHashSHA256 = SHA256.Create(password);
+            }
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -447,10 +471,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             var entity = _context.Set<tbl_Users>()
                 .Where(x => x.Id == user.Id).Single();
 
+            //https://www.google.com/search?q=identity+concurrencystamp
+            if (entity.ConcurrencyStamp != user.ConcurrencyStamp)
+                throw new InvalidOperationException();
+
             /*
              * only persist certain fields.
              */
-
             entity.FirstName = user.FirstName;
             entity.LastName = user.LastName;
             entity.LockoutEnabled = user.LockoutEnabled;

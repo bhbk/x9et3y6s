@@ -231,7 +231,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * create test users
              */
             var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
+                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda())
                 .SingleOrDefault();
 
             if (foundUser == null)
@@ -239,6 +239,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 foundUser = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserV1()
                     {
+                        UserName = Constants.ApiTestUser,
                         Email = Constants.ApiTestUser,
                         PhoneNumber = Constants.ApiTestUserPhone,
                         FirstName = "First-" + AlphaNumeric.CreateString(4),
@@ -246,7 +247,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = false,
-                    }), new ValidationHelper().PasswordHash(Constants.ApiTestUserPassCurrent));
+                    }), Constants.ApiTestUserPassCurrent);
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activities>(new ActivityV1()
@@ -305,7 +306,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             /*
              * set password to audiences
              */
-            _uow.Audiences.SetPasswordHash(foundAudience, new ValidationHelper().PasswordHash(Constants.ApiTestAudiencePassCurrent));
+            _uow.Audiences.SetPasswordHash(foundAudience, Constants.ApiTestAudiencePassCurrent);
             _uow.Commit();
 
             /*
@@ -460,14 +461,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 user = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserV1()
                     {
-                        Email = AlphaNumeric.CreateString(4) + "-" + Constants.ApiTestUser,
+                        UserName = AlphaNumeric.CreateString(4) + "-" + Constants.ApiTestUser,
                         PhoneNumber = Constants.ApiTestUserPhone + NumberAs.CreateString(1),
                         FirstName = "First-" + Base64.CreateString(4),
                         LastName = "Last-" + Base64.CreateString(4),
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = false,
-                    }), new ValidationHelper().PasswordHash(Constants.ApiTestUserPassCurrent));
+                    }), Constants.ApiTestUserPassCurrent);
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activities>(new ActivityV1()
@@ -506,7 +507,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 /*
                  * set password for random audiences
                  */
-                _uow.Audiences.SetPasswordHash(audience, new ValidationHelper().PasswordHash(Constants.ApiTestAudiencePassCurrent));
+                _uow.Audiences.SetPasswordHash(audience, Constants.ApiTestAudiencePassCurrent);
                 _uow.Commit();
 
                 /*
@@ -573,7 +574,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * delete test users
              */
             _uow.Users.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.Email.Contains(Constants.ApiTestUser)).ToLambda());
+                .Where(x => x.UserName.Contains(Constants.ApiTestUser)).ToLambda());
             _uow.Commit();
 
             /*

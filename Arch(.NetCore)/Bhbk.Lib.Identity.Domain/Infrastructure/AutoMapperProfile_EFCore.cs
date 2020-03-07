@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Identity.Data.EF6.Models;
+using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
@@ -31,8 +31,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             CreateMap<AudienceV1, uvw_Audiences>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
-                .ForMember(dest => dest.PasswordHash, src => src.Ignore())
-                .ForMember(dest => dest.SecurityStamp, src => src.Ignore());
+                .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
+                .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore());
 
             CreateMap<uvw_Audiences, AudienceV1>();
 
@@ -157,14 +157,20 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
             CreateMap<UserV1, uvw_Users>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.UserName, src => src.MapFrom(val => val.UserName))
+                .ForMember(dest => dest.EmailAddress, src => src.MapFrom(val => val.Email))
+                .ForMember(dest => dest.EmailConfirmed, src => src.MapFrom(val => val.EmailConfirmed))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => (val.AccessFailedCount == default) ? 0 : val.AccessFailedCount))
                 .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => (val.AccessSuccessCount == default) ? 0 : val.AccessSuccessCount))
-                .ForMember(dest => dest.PasswordHash, src => src.Ignore())
-                .ForMember(dest => dest.SecurityStamp, src => src.Ignore());
+                .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
+                .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore());
 
             CreateMap<uvw_Users, UserV1>()
-                .ForMember(dest => dest.IssuerId, src => src.Ignore());
+                .ForMember(dest => dest.IssuerId, src => src.Ignore())
+                .ForMember(dest => dest.UserName, src => src.MapFrom(val => val.UserName))
+                .ForMember(dest => dest.Email, src => src.MapFrom(val => val.EmailAddress))
+                .ForMember(dest => dest.EmailConfirmed, src => src.MapFrom(val => val.EmailConfirmed));
         }
     }
 }

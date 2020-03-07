@@ -151,7 +151,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
              * create test users
              */
             var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
-                .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
+                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda())
                 .SingleOrDefault();
 
             if (foundUser == null)
@@ -159,7 +159,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 foundUser = _uow.Users.Create(
                     new uvw_Users()
                     {
-                        Email = Constants.ApiTestUser,
+                        UserName = Constants.ApiTestUser,
+                        EmailAddress = Constants.ApiTestUser,
                         PhoneNumber = Constants.ApiTestUserPhone,
                         FirstName = "First-" + Base64.CreateString(4),
                         LastName = "Last-" + Base64.CreateString(4),
@@ -227,7 +228,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
              * delete test users
              */
             var users = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
-                .Where(x => x.Email.Contains(Constants.ApiTestUser)).ToLambda());
+                .Where(x => x.UserName.Contains(Constants.ApiTestUser)).ToLambda());
 
             if(users.Count() > 0)
                 _uow.Users.Delete(users);

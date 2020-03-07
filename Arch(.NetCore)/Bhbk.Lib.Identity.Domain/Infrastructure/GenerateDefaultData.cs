@@ -223,7 +223,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             var foundAdminUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.Email == Constants.ApiDefaultAdminUser).ToLambda())
+                .Where(x => x.UserName == Constants.ApiDefaultAdminUser).ToLambda())
                 .SingleOrDefault();
 
             if (foundAdminUser == null)
@@ -231,6 +231,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 foundAdminUser = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserV1()
                     {
+                        UserName = Constants.ApiDefaultAdminUser,
                         Email = Constants.ApiDefaultAdminUser,
                         PhoneNumber = Constants.ApiDefaultAdminUserPhone,
                         FirstName = Constants.ApiDefaultAdminUserFirstName,
@@ -238,7 +239,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = true,
-                    }), new ValidationHelper().PasswordHash(Constants.ApiDefaultAdminUserPassword));
+                    }), Constants.ApiDefaultAdminUserPassword);
 
                 _uow.Users.SetConfirmedEmail(foundAdminUser, true);
                 _uow.Users.SetConfirmedPassword(foundAdminUser, true);
@@ -247,7 +248,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             }
 
             var foundNormalUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.Email == Constants.ApiDefaultNormalUser).ToLambda())
+                .Where(x => x.UserName == Constants.ApiDefaultNormalUser).ToLambda())
                 .SingleOrDefault();
 
             if (foundNormalUser == null)
@@ -255,6 +256,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 foundNormalUser = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserV1()
                     {
+                        UserName = Constants.ApiDefaultNormalUser,
                         Email = Constants.ApiDefaultNormalUser,
                         PhoneNumber = Constants.ApiDefaultNormalUserPhone,
                         FirstName = Constants.ApiDefaultNormalUserFirstName,
@@ -262,7 +264,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = true,
-                    }), new ValidationHelper().PasswordHash(Constants.ApiDefaultNormalUserPassword));
+                    }), Constants.ApiDefaultNormalUserPassword);
 
                 _uow.Users.SetConfirmedEmail(foundNormalUser, true);
                 _uow.Users.SetConfirmedPassword(foundNormalUser, true);
@@ -275,8 +277,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * set password to audiences
              */
 
-            _uow.Audiences.SetPasswordHash(foundAudienceApi, new ValidationHelper().PasswordHash(Constants.ApiDefaultAudienceApiKey));
-            _uow.Audiences.SetPasswordHash(foundAudienceUi, new ValidationHelper().PasswordHash(Constants.ApiDefaultAudienceUiKey));
+            _uow.Audiences.SetPasswordHash(foundAudienceApi, Constants.ApiDefaultAudienceApiKey);
+            _uow.Audiences.SetPasswordHash(foundAudienceUi, Constants.ApiDefaultAudienceUiKey);
 
             _uow.Commit();
 
@@ -315,7 +317,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             _uow.Users.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.Email == Constants.ApiDefaultAdminUser || x.Email == Constants.ApiDefaultNormalUser).ToLambda());
+                .Where(x => x.UserName == Constants.ApiDefaultAdminUser || x.UserName == Constants.ApiDefaultNormalUser).ToLambda());
 
             _uow.Commit();
 

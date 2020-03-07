@@ -140,9 +140,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Users.Get(x => x.Email == model.Email).Any())
+            if (UoW.Users.Get(x => x.UserName == model.UserName).Any())
             {
-                ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.Email}");
+                ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.UserName}");
                 return BadRequest(ModelState);
             }
 
@@ -164,9 +164,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             model.PasswordConfirmed = false;
             model.PhoneNumberConfirmed = false;
 
-            if (!new ValidationHelper().ValidateEmail(model.Email).Succeeded)
+            if (!new ValidationHelper().ValidateEmail(model.UserName).Succeeded)
             {
-                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{model.Email}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{model.UserName}");
                 return BadRequest(ModelState);
             }
 
@@ -179,8 +179,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.ApiSettingTotpExpire).Single();
 
-                var code = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
-                    .Generate(result.Email, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result));
+                var code = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
+                    .Generate(result.UserName, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result));
 
                 var url = UrlFactory.GenerateConfirmEmailV1(Conf, result, code);
                 var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
@@ -188,10 +188,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 alert.Email_EnqueueV1(new EmailV1()
                 {
                     FromId = result.Id,
-                    FromEmail = result.Email,
+                    FromEmail = result.EmailAddress,
                     FromDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
                     ToId = result.Id,
-                    ToEmail = result.Email,
+                    ToEmail = result.EmailAddress,
                     ToDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
                     Subject = string.Format("{0} {1}", issuer.Name, Constants.MsgConfirmNewUserSubject),
                     HtmlContent = EFCoreConstants.TemplateConfirmNewUser(issuer, result, url)
@@ -208,9 +208,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Users.Get(x => x.Email == model.Email).Any())
+            if (UoW.Users.Get(x => x.UserName == model.UserName).Any())
             {
-                ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.Email}");
+                ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.UserName}");
                 return BadRequest(ModelState);
             }
 
@@ -223,9 +223,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             model.PasswordConfirmed = false;
             model.PhoneNumberConfirmed = false;
 
-            if (!new ValidationHelper().ValidateEmail(model.Email).Succeeded)
+            if (!new ValidationHelper().ValidateEmail(model.UserName).Succeeded)
             {
-                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{model.Email}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{model.UserName}");
                 return BadRequest(ModelState);
             }
 
@@ -314,7 +314,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 user = UoW.Users.Get(x => x.Id == userID)
                     .SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.Email == userValue)
+                user = UoW.Users.Get(x => x.UserName == userValue)
                     .SingleOrDefault();
 
             if (user == null)
@@ -339,12 +339,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<UserV1>>(
                         UoW.Users.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Users>, IQueryable<tbl_Users>>>>(
-                                state.ToExpression<tbl_Users>()),
+                                QueryExpressionFactory.GetQueryExpression<tbl_Users>().ApplyState(state)),
                             new List<Expression<Func<tbl_Users, object>>>() { x => x.tbl_UserLogins, x => x.tbl_UserRoles })),
 
                     Total = UoW.Users.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Users>, IQueryable<tbl_Users>>>>(
-                            state.ToPredicateExpression<tbl_Users>()))
+                            QueryExpressionFactory.GetQueryExpression<tbl_Users>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);
@@ -588,7 +588,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetPasswordHash(user, new ValidationHelper().PasswordHash(model.NewPassword));
+            UoW.Users.SetPasswordHash(user, model.NewPassword);
             UoW.Commit();
 
             return NoContent();

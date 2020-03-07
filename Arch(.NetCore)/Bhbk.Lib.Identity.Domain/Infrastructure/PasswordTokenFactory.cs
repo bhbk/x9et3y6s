@@ -13,17 +13,17 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
         public static IdentityBuilder AddPasswordlessTokenProvider(this IdentityBuilder builder)
         {
             var userType = builder.UserType;
-            var providerType = typeof(PasswordlessTokenFactory).MakeGenericType(userType);
+            var providerType = typeof(PasswordTokenFactory).MakeGenericType(userType);
 
-            return builder.AddTokenProvider(typeof(PasswordlessTokenFactory).Name, providerType);
+            return builder.AddTokenProvider(typeof(PasswordTokenFactory).Name, providerType);
         }
     }
 
-    public class PasswordlessTokenFactory
+    public class PasswordTokenFactory
     {
         private IDataProtectionProvider _provider;
 
-        public PasswordlessTokenFactory(string appName)
+        public PasswordTokenFactory(string appName)
         {
             _provider = DataProtectionProvider.Create(appName);
         }

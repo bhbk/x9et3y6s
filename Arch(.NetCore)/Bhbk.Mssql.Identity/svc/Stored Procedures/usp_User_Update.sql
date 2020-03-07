@@ -4,14 +4,15 @@
 CREATE PROCEDURE [svc].[usp_User_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@ActorId				UNIQUEIDENTIFIER
-    ,@Email                NVARCHAR (MAX) 
-    ,@FirstName            NVARCHAR (MAX)
-    ,@LastName             NVARCHAR (MAX) 
-    ,@PhoneNumber          NVARCHAR (16)
-    ,@LockoutEnabled       BIT     
-    ,@LockoutEnd           DATETIMEOFFSET (7)
-    ,@HumanBeing           BIT
-    ,@Immutable            BIT
+    ,@UserName				NVARCHAR (MAX) 
+    ,@EmailAddress			NVARCHAR (MAX)
+    ,@FirstName				NVARCHAR (MAX)
+    ,@LastName				NVARCHAR (MAX) 
+    ,@PhoneNumber			NVARCHAR (16)
+    ,@LockoutEnabled		BIT     
+    ,@LockoutEnd			DATETIMEOFFSET (7)
+    ,@HumanBeing			BIT
+    ,@Immutable				BIT
 
 AS
 BEGIN
@@ -22,7 +23,8 @@ UPDATE [dbo].[tbl_Users]
 SET
      Id						= @Id
     ,ActorId				= @ActorId
-    ,Email					= @Email
+    ,UserName				= @UserName
+	,EmailAddress			= @EmailAddress
     ,FirstName				= @FirstName
     ,LastName				= @LastName
     ,PhoneNumber			= @PhoneNumber

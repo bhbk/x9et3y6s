@@ -33,7 +33,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var result = UoW.Users.Create(
                 new uvw_Users()
                 {
-                    Email = Constants.ApiTestUser,
+                    UserName = Constants.ApiTestUser,
+                    EmailAddress = Constants.ApiTestUser,
                     PhoneNumber = Constants.ApiTestUserPhone,
                     FirstName = "First-" + Base64.CreateString(4),
                     LastName = "Last-" + Base64.CreateString(4),
@@ -60,7 +61,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
-                .Where(x => x.Email == Constants.ApiTestUser).ToLambda()).Single();
+                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda()).Single();
 
             UoW.Users.Delete(user);
         }
@@ -92,7 +93,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
-                .Where(x => x.Email == Constants.ApiTestUser).ToLambda()).Single();
+                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda()).Single();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";
 

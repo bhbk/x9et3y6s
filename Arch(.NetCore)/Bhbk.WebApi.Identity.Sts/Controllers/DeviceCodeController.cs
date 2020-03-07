@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (Guid.TryParse(input.user, out userID))
                 user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.Email == input.user).SingleOrDefault();
+                user = UoW.Users.Get(x => x.UserName == input.user).SingleOrDefault();
 
             if (user == null)
             {
@@ -307,7 +307,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = dc.RawData,
                 refresh_token = rt.RawData,
-                user = user.Email,
+                user = user.UserName,
                 client = new List<string>() { audience.Name },
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(dc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,

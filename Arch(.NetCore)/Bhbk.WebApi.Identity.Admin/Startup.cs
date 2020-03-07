@@ -23,7 +23,6 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -120,8 +119,8 @@ namespace Bhbk.WebApi.Identity.Admin
 #endif
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
-                    AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
-                    ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
+                    //AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
+                    //ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                     ValidAudiences = audiences.ToArray(),

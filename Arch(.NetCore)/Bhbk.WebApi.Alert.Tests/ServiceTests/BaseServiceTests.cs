@@ -23,7 +23,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
@@ -103,8 +102,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                     jwt.IncludeErrorDetails = true;
                     jwt.TokenValidationParameters = new TokenValidationParameters
                     {
-                        AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
-                        ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
+                        //AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
+                        //ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                         ValidIssuers = issuers.ToArray(),
                         IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                         ValidAudiences = audiences.ToArray(),

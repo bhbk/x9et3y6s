@@ -141,12 +141,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<IssuerV1>>(
                         UoW.Issuers.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
-                                state.ToExpression<tbl_Issuers>()),
+                                QueryExpressionFactory.GetQueryExpression<tbl_Issuers>().ApplyState(state)),
                             new List<Expression<Func<tbl_Issuers, object>>>() { x => x.tbl_Audiences })),
 
                     Total = UoW.Issuers.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
-                            state.ToPredicateExpression<tbl_Issuers>()))
+                            QueryExpressionFactory.GetQueryExpression<tbl_Issuers>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);

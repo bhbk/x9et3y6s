@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultNormalUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -87,7 +87,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultNormalUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultNormalUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
@@ -130,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultNormalUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -168,7 +168,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiDefaultNormalUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultNormalUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);

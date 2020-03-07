@@ -2,10 +2,9 @@
 using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
 using ManyConsole;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -40,9 +39,9 @@ namespace Bhbk.Cli.Identity.Commands
                 {
                     Console.WriteLine("Please enter a password...");
                     var clearText = StandardInput.GetHiddenInput();
-                    var hashText = new ValidationHelper().PasswordHash(clearText);
+                    var hashText = PBKDF2.Create(clearText);
 
-                    if (new ValidationHelper().ValidatePasswordHash(hashText, clearText) == PasswordVerificationResult.Failed)
+                    if (!PBKDF2.Validate(hashText, clearText))
                         Console.WriteLine("Failed to generate hash. Please try again.");
                     else
                     {

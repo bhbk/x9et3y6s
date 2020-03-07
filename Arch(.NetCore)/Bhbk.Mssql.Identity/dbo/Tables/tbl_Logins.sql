@@ -4,10 +4,10 @@
     [Name]        NVARCHAR (128)   NOT NULL,
     [Description] NVARCHAR (256)   NULL,
     [LoginKey]    NVARCHAR (256)   NULL,
-    [Enabled]     BIT              CONSTRAINT [DF_TLogins_Enabled] DEFAULT ((0)) NOT NULL,
+    [Enabled]     BIT              CONSTRAINT [DF_tbl_Logins_Enabled] DEFAULT ((0)) NOT NULL,
     [Created]     DATETIME2 (7)    NOT NULL,
     [LastUpdated] DATETIME2 (7)    NULL,
-    [Immutable]   BIT              CONSTRAINT [DF_TLogins_Immutable] DEFAULT ((0)) NOT NULL,
+    [Immutable]   BIT              CONSTRAINT [DF_tbl_Logins_Immutable] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_Logins] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Logins_ActorID] FOREIGN KEY ([ActorId]) REFERENCES [dbo].[tbl_Users] ([Id])
 );

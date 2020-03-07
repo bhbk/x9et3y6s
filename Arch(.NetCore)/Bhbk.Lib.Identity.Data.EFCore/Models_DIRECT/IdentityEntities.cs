@@ -111,7 +111,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .IsRequired()
                     .HasMaxLength(128);
 
-                entity.Property(e => e.PasswordHash).HasMaxLength(256);
+                entity.Property(e => e.PasswordHashPBKDF2).HasMaxLength(256);
+
+                entity.Property(e => e.PasswordHashSHA256).HasMaxLength(256);
 
                 entity.Property(e => e.SecurityStamp).HasMaxLength(256);
 
@@ -167,7 +169,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
 
                 entity.Property(e => e.Description).HasMaxLength(256);
 
-                entity.Property(e => e.IssuerKey).IsRequired();
+                entity.Property(e => e.IssuerKey)
+                    .IsRequired()
+                    .HasMaxLength(1024);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -312,7 +316,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .IsRequired()
                     .HasMaxLength(64);
 
-                entity.Property(e => e.RefreshValue).IsRequired();
+                entity.Property(e => e.RefreshValue)
+                    .IsRequired()
+                    .HasMaxLength(2048);
 
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Refreshes)
@@ -422,7 +428,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .IsRequired()
                     .HasMaxLength(64);
 
-                entity.Property(e => e.StateValue).HasMaxLength(512);
+                entity.Property(e => e.StateValue).HasMaxLength(1024);
 
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_States)
@@ -450,9 +456,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.UrlHost).HasMaxLength(512);
+                entity.Property(e => e.UrlHost).HasMaxLength(1024);
 
-                entity.Property(e => e.UrlPath).HasMaxLength(512);
+                entity.Property(e => e.UrlPath).HasMaxLength(1024);
 
                 entity.HasOne(d => d.Audience)
                     .WithMany(p => p.tbl_Urls)
@@ -528,15 +534,35 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Email).IsRequired();
+                entity.Property(e => e.ConcurrencyStamp)
+                    .IsRequired()
+                    .HasMaxLength(1024);
 
-                entity.Property(e => e.FirstName).IsRequired();
+                entity.Property(e => e.EmailAddress).HasMaxLength(128);
 
-                entity.Property(e => e.LastName).IsRequired();
+                entity.Property(e => e.FirstName)
+                    .IsRequired()
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.LastName)
+                    .IsRequired()
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.PasswordHashPBKDF2).HasMaxLength(2048);
+
+                entity.Property(e => e.PasswordHashSHA256).HasMaxLength(2048);
 
                 entity.Property(e => e.PhoneNumber).HasMaxLength(16);
 
                 entity.Property(e => e.PhoneNumberConfirmed).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.SecurityStamp)
+                    .IsRequired()
+                    .HasMaxLength(1024);
+
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasMaxLength(128);
             });
 
             OnModelCreatingPartial(modelBuilder);

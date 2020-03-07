@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -8,7 +8,6 @@ using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -99,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
             else if (!audience.Enabled
-                || new ValidationHelper().ValidatePasswordHash(audience.PasswordHash, input.client_secret) == PasswordVerificationResult.Failed)
+                || !PBKDF2.Validate(audience.PasswordHashPBKDF2, input.client_secret))
             {
                 //adjust counter(s) for login failure...
                 UoW.Audiences.AccessFailed(audience);

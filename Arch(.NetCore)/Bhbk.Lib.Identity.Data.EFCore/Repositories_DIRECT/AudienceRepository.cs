@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Primitives;
@@ -64,9 +65,22 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
         public override tbl_Audiences Create(tbl_Audiences audience)
         {
-            audience.ConcurrencyStamp = AlphaNumeric.CreateString(32);
+            var create = InternalCreate(audience);
 
-            return _context.Add(audience).Entity;
+            _context.SaveChanges();
+
+            return create;
+        }
+
+        public tbl_Audiences Create(tbl_Audiences audience, string password)
+        {
+            var create = InternalCreate(audience);
+
+            _context.SaveChanges();
+
+            SetPasswordHash(audience, password);
+
+            return create;
         }
 
         public override tbl_Audiences Delete(tbl_Audiences audience)
@@ -157,6 +171,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return claims;
         }
 
+        internal tbl_Audiences InternalCreate(tbl_Audiences audience)
+        {
+            audience.ConcurrencyStamp = Guid.NewGuid().ToString();
+            audience.SecurityStamp = Guid.NewGuid().ToString();
+
+            return _context.Add(audience).Entity;
+        }
+
         public bool IsInRole(tbl_Audiences audience, tbl_Roles role)
         {
             if (_context.Set<tbl_AudienceRoles>()
@@ -176,11 +198,23 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return true;
         }
 
-        public tbl_Audiences SetPasswordHash(tbl_Audiences audience, string hash)
+        public tbl_Audiences SetPasswordHash(tbl_Audiences audience, string password)
         {
+            //https://www.google.com/search?q=identity+securitystamp
+            if (!_context.Set<tbl_Audiences>()
+                .Where(x => x.Id == audience.Id && x.SecurityStamp == audience.SecurityStamp)
+                .Any())
+                throw new InvalidOperationException();
+
+            audience.ConcurrencyStamp = Guid.NewGuid().ToString();
+            audience.SecurityStamp = Guid.NewGuid().ToString();
             audience.LastUpdated = Clock.UtcDateTime;
-            audience.PasswordHash = hash;
-            audience.SecurityStamp = AlphaNumeric.CreateString(32);
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                audience.PasswordHashPBKDF2 = PBKDF2.Create(password);
+                audience.PasswordHashSHA256 = SHA256.Create(password);
+            }
 
             _context.Entry(audience).State = EntityState.Modified;
 
@@ -192,10 +226,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             var entity = _context.Set<tbl_Audiences>()
                 .Where(x => x.Id == audience.Id).Single();
 
+            //https://www.google.com/search?q=identity+concurrencystamp
+            if (entity.ConcurrencyStamp != audience.ConcurrencyStamp)
+                throw new InvalidOperationException();
+
             /*
              * only persist certain fields.
              */
-
             entity.IssuerId = audience.IssuerId;
             entity.Name = audience.Name;
             entity.Description = audience.Description;

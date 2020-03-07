@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new GenerateTestData(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 var url = new Uri(Constants.ApiTestUriLink);
                 var state = Base64.CreateString(8);
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new GenerateTestData(uow, mapper).Create();
 
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 var url = new Uri(Constants.ApiTestUriLink);
                 var state = Base64.CreateString(8);
@@ -139,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 var url = new Uri(Constants.ApiTestUriLink);
                 var state = Base64.CreateString(8);
@@ -176,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 var url = new Uri(Constants.ApiTestUriLink);
                 var state = Base64.CreateString(8);

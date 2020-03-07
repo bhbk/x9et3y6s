@@ -3,7 +3,8 @@
 
 CREATE PROCEDURE [svc].[usp_User_Insert]
     @ActorId              UNIQUEIDENTIFIER
-    ,@Email                NVARCHAR (MAX) 
+    ,@UserName             NVARCHAR (MAX) 
+    ,@EmailAddress         NVARCHAR (MAX)
     ,@FirstName            NVARCHAR (MAX)
     ,@LastName             NVARCHAR (MAX) 
     ,@PhoneNumber          NVARCHAR (16)
@@ -22,7 +23,8 @@ INSERT INTO [dbo].[tbl_Users]
 	(
      Id           
     ,ActorId    
-    ,Email           
+    ,UserName  
+	,EmailAddress
     ,EmailConfirmed       
     ,FirstName       
     ,LastName     
@@ -33,7 +35,9 @@ INSERT INTO [dbo].[tbl_Users]
     ,LockoutEnd        
     ,AccessFailedCount  
     ,AccessSuccessCount  
-    ,PasswordConfirmed 
+	,ConcurrencyStamp
+    ,PasswordConfirmed
+	,SecurityStamp
     ,TwoFactorEnabled 
     ,HumanBeing         
     ,Immutable        
@@ -42,7 +46,8 @@ VALUES
 	(
      @USERID       
     ,@ActorId    
-    ,@Email           
+    ,@UserName         
+	,@EmailAddress
     ,'FALSE'     
     ,@FirstName       
     ,@LastName     
@@ -53,7 +58,9 @@ VALUES
     ,@LockoutEnd        
     ,0
     ,0  
-    ,'FALSE'     
+	,CAST(NEWID() AS nvarchar(36))
+    ,'FALSE'  
+	,CAST(NEWID() AS nvarchar(36))
     ,'FALSE'     
     ,@HumanBeing         
     ,@Immutable        

@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -10,7 +10,6 @@ using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -125,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (Guid.TryParse(input.username, out userID))
                 user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.Email == input.username).SingleOrDefault();
+                user = UoW.Users.Get(x => x.UserName == input.username).SingleOrDefault();
 
             if (user == null)
             {
@@ -156,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (new ValidationHelper().ValidatePasswordHash(user.PasswordHash, input.password) == PasswordVerificationResult.Failed)
+                            if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -187,7 +186,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             || logins.Where(x => x.Name.StartsWith(Constants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (new ValidationHelper().ValidatePasswordHash(user.PasswordHash, input.password) == PasswordVerificationResult.Failed)
+                            if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -283,7 +282,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     token_type = "bearer",
                     access_token = rop.RawData,
                     refresh_token = rt.RawData,
-                    user_id = user.Email,
+                    user_id = user.UserName,
                     client_id = audience.Name,
                     issuer_id = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                     expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
@@ -407,7 +406,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = rop.RawData,
                 refresh_token = rt.RawData,
-                user_id = user.Email,
+                user_id = user.UserName,
                 client_id = audience.Name,
                 issuer_id = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
@@ -449,7 +448,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (Guid.TryParse(input.user, out userID))
                 user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.Email == input.user).SingleOrDefault();
+                user = UoW.Users.Get(x => x.UserName == input.user).SingleOrDefault();
 
             if (user == null)
             {
@@ -517,7 +516,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (new ValidationHelper().ValidatePasswordHash(user.PasswordHash, input.password) == PasswordVerificationResult.Failed)
+                            if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -548,7 +547,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             || logins.Where(x => x.Name.StartsWith(Constants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
-                            if (!new ValidationHelper().ValidatePassword(input.password).Succeeded)
+                            if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
                             {
                                 //adjust counter(s) for login failure...
                                 UoW.Users.AccessFailed(user);
@@ -617,7 +616,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = rop.RawData,
                 refresh_token = rt.RawData,
-                user = user.Email,
+                user = user.UserName,
                 client = audiences.Select(x => x.Name).ToList(),
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
@@ -757,7 +756,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = rop.RawData,
                 refresh_token = rt.RawData,
-                user = user.Email,
+                user = user.UserName,
                 client = audiences.Select(x => x.Name).ToList(),
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(rop.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,

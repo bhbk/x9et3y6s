@@ -118,11 +118,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<ClaimV1>>(
                         UoW.Claims.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
-                                state.ToExpression<tbl_Claims>()))),
+                                QueryExpressionFactory.GetQueryExpression<tbl_Claims>().ApplyState(state)))),
 
                     Total = UoW.Claims.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
-                            state.ToPredicateExpression<tbl_Claims>()))
+                            QueryExpressionFactory.GetQueryExpression<tbl_Claims>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);

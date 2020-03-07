@@ -46,14 +46,14 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                 }, _serializer);
         }
 
-        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 if(!string.IsNullOrEmpty(_key))
-                    await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
                 else
-                    await Task.Delay((TimeSpan.FromSeconds(_delay) * 60), stoppingToken);
+                    await Task.Delay((TimeSpan.FromSeconds(_delay) * 60), cancellationToken);
 
                 try
                 {
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                                     http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                                     http.DefaultRequestHeaders.Add("X-TheySaidSo-Api-Secret", _key);
 
-                                    var response = await http.GetAsync(_url + "/quote/random.json?language=en&limit=10", stoppingToken);
+                                    var response = await http.GetAsync(_url + "/quote/random.json?language=en&limit=10", cancellationToken);
                                     var results = JsonConvert.DeserializeObject<MOTDTssV1Response>(await response.Content.ReadAsStringAsync());
 
                                     if (response.IsSuccessStatusCode)
@@ -95,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                                 {
                                     http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                                    var response = await http.GetAsync(_url + "/qod.json", stoppingToken);
+                                    var response = await http.GetAsync(_url + "/qod.json", cancellationToken);
                                     var results = JsonConvert.DeserializeObject<MOTDTssV1Response>(await response.Content.ReadAsStringAsync());
 
                                     if (response.IsSuccessStatusCode)

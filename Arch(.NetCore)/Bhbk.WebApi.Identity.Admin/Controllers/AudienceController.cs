@@ -167,12 +167,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<AudienceV1>>(
                         UoW.Audiences.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audiences>, IQueryable<tbl_Audiences>>>>(
-                                state.ToExpression<tbl_Audiences>()),
+                                QueryExpressionFactory.GetQueryExpression<tbl_Audiences>().ApplyState(state)),
                             new List<Expression<Func<tbl_Audiences, object>>>() { x => x.tbl_Roles })),
 
                     Total = UoW.Audiences.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audiences>, IQueryable<tbl_Audiences>>>>(
-                            state.ToPredicateExpression<tbl_Audiences>()))
+                            QueryExpressionFactory.GetQueryExpression<tbl_Audiences>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);
@@ -263,7 +263,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Audiences.SetPasswordHash(audience, new ValidationHelper().PasswordHash(model.NewPassword));
+            UoW.Audiences.SetPasswordHash(audience, model.NewPassword);
             UoW.Commit();
 
             return NoContent();

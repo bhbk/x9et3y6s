@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -164,7 +164,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -195,7 +195,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -232,7 +232,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -269,7 +269,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -299,22 +299,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
-                var model = new UserV1()
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    FirstName = user.FirstName + "(Updated)",
-                    LastName = user.LastName + "(Updated)",
-                    HumanBeing = false,
-                    Immutable = false,
-                };
+                user.FirstName += "(Updated)";
+                user.LastName += "(Updated)";
 
-                var result = controller.UpdateV1(model) as OkObjectResult;
+                var result = controller.UpdateV1(mapper.Map<UserV1>(user)) as OkObjectResult;
                 var ok = result.Should().BeAssignableTo<OkObjectResult>().Subject;
                 ok.Value.Should().BeAssignableTo<UserV1>();
             }

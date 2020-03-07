@@ -40,11 +40,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                 }, _serializer);
         }
 
-        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(_delay), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
 
                 try
                 {

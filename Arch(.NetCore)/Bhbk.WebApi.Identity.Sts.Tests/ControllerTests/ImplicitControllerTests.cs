@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();

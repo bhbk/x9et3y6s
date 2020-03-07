@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (Guid.TryParse(input.user, out userID))
                 user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.Email == input.user).SingleOrDefault();
+                user = UoW.Users.Get(x => x.UserName == input.user).SingleOrDefault();
 
             if (user == null)
             {

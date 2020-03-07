@@ -8,6 +8,9 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public Guid? ActorId { get; set; }
 
         [Required]
+        public string UserName { get; set; }
+
+        [Required]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
@@ -25,6 +28,8 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool LockoutEnabled { get; set; }
 
         public string ConcurrencyStamp { get; set; }
+
+        public string SecurityStamp { get; set; }
 
         [Required]
         public bool HumanBeing { get; set; }

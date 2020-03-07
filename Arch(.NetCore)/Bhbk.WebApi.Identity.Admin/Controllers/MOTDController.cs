@@ -107,11 +107,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<MOTDTssV1>>(
                         UoW.MOTDs.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTDs>, IQueryable<tbl_MOTDs>>>>(
-                                state.ToExpression<tbl_MOTDs>()))),
+                                QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>().ApplyState(state)))),
 
                     Total = UoW.MOTDs.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTDs>, IQueryable<tbl_MOTDs>>>>(
-                            state.ToPredicateExpression<tbl_MOTDs>()))
+                            QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);

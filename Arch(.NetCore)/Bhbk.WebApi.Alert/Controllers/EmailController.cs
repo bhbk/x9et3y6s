@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Alert.Controllers
                 return BadRequest(ModelState);
 
             if (!UoW.Users.Get(x => x.Id == model.FromId
-                && x.Email == model.FromEmail).Any())
+                && x.EmailAddress == model.FromEmail).Any())
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"SenderID:{model.FromId} SenderEmail:{model.FromEmail}");
                 return NotFound(ModelState);

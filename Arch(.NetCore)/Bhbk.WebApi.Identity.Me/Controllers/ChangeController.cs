@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Data.EFCore.Primitives;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
@@ -9,7 +10,6 @@ using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
             else if (user.Id != model.EntityId
-                || user.Email != model.CurrentEmail
+                || user.EmailAddress != model.CurrentEmail
                 || model.NewEmail != model.NewEmailConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
-            string token = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
+            string token = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
                 .Generate(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
 
             if (UoW.InstanceType != InstanceContext.DeployedOrLocal)
@@ -68,10 +68,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             alert.Email_EnqueueV1(new EmailV1()
             {
                 FromId = user.Id,
-                FromEmail = user.Email,
+                FromEmail = user.EmailAddress,
                 FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
                 ToId = user.Id,
-                ToEmail = user.Email,
+                ToEmail = user.EmailAddress,
                 ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
                 Subject = string.Format("{0}", Constants.MsgConfirmEmailSubject),
                 HtmlContent = EFCoreConstants.TemplateConfirmEmail(user, url)
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-            else if (new ValidationHelper().ValidatePasswordHash(user.PasswordHash, model.CurrentPassword) == PasswordVerificationResult.Failed
+            else if (!PBKDF2.Validate(user.PasswordHashPBKDF2, model.CurrentPassword)
                 || model.NewPassword != model.NewPasswordConfirm)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
@@ -109,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
 
-            string token = HttpUtility.UrlEncode(new PasswordlessTokenFactory(UoW.InstanceType.ToString())
+            string token = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
                 .Generate(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
 
             if (UoW.InstanceType != InstanceContext.DeployedOrLocal)
@@ -121,10 +121,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             alert.Email_EnqueueV1(new EmailV1()
             {
                 FromId = user.Id,
-                FromEmail = user.Email,
+                FromEmail = user.EmailAddress,
                 FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
                 ToId = user.Id,
-                ToEmail = user.Email,
+                ToEmail = user.EmailAddress,
                 ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
                 Subject = string.Format("{0}", Constants.MsgConfirmPasswordSubject),
                 HtmlContent = EFCoreConstants.TemplateConfirmPassword(user, url)

@@ -39,7 +39,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@Email", SqlDbType.NVarChar) { Value = entity.Email },
+                new SqlParameter("@UserName", SqlDbType.NVarChar) { Value = entity.UserName },
+                new SqlParameter("@EmailAddress", SqlDbType.NVarChar) { Value = (object)entity.EmailAddress ?? DBNull.Value },
                 new SqlParameter("@FirstName", SqlDbType.NVarChar) { Value = entity.FirstName },
                 new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = entity.LastName },
                 new SqlParameter("@PhoneNumber", SqlDbType.NVarChar) { Value = entity.PhoneNumber },
@@ -50,7 +51,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             };
 
             return _context.Set<uvw_Users>().FromSqlRaw("[svc].[usp_User_Insert]"
-                + "@ActorId, @Email, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
+                + "@ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -120,7 +121,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@Email", SqlDbType.NVarChar) { Value = entity.Email },
+                new SqlParameter("@UserName", SqlDbType.NVarChar) { Value = entity.UserName },
+                new SqlParameter("@EmailAddress", SqlDbType.NVarChar) { Value = (object)entity.EmailAddress ?? DBNull.Value },
                 new SqlParameter("@FirstName", SqlDbType.NVarChar) { Value = entity.FirstName },
                 new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = entity.LastName },
                 new SqlParameter("@PhoneNumber", SqlDbType.NVarChar) { Value = entity.PhoneNumber },
@@ -131,7 +133,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             };
 
             return _context.Set<uvw_Users>().FromSqlRaw("[svc].[usp_User_Update]"
-                + "@Id, @ActorId, @Email, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
+                + "@Id, @ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

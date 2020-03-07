@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Sts.Middlewares
         public Task Invoke(HttpContext context)
         {
             //check if correct v1 path, method, content and params...
-            if (context.Request.Path.Equals("/oauth2/v1/ropg-sandbox", StringComparison.OrdinalIgnoreCase)
+            if (context.Request.Path.Equals("/oauth2/v1/sandbox", StringComparison.OrdinalIgnoreCase)
                 && context.Request.Method.Equals("POST")
                 && context.Request.HasFormContentType
                 && (context.Request.Form.ContainsKey(Constants.AttrIssuerIDV1)

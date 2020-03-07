@@ -70,7 +70,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsRequired()
                     .HasMaxLength(64);
 
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.ConcurrencyStamp).HasMaxLength(256);
+
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.PasswordHashPBKDF2).HasMaxLength(256);
+
+                entity.Property(e => e.PasswordHashSHA256).HasMaxLength(256);
+
+                entity.Property(e => e.SecurityStamp).HasMaxLength(256);
             });
 
             modelBuilder.Entity<uvw_Claims>(entity =>
@@ -248,13 +260,33 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.ToView("uvw_Users", "svc");
 
-                entity.Property(e => e.Email).IsRequired();
+                entity.Property(e => e.ConcurrencyStamp)
+                    .IsRequired()
+                    .HasMaxLength(1024);
 
-                entity.Property(e => e.FirstName).IsRequired();
+                entity.Property(e => e.EmailAddress).HasMaxLength(128);
 
-                entity.Property(e => e.LastName).IsRequired();
+                entity.Property(e => e.FirstName)
+                    .IsRequired()
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.LastName)
+                    .IsRequired()
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.PasswordHashPBKDF2).HasMaxLength(2048);
+
+                entity.Property(e => e.PasswordHashSHA256).HasMaxLength(2048);
 
                 entity.Property(e => e.PhoneNumber).HasMaxLength(16);
+
+                entity.Property(e => e.SecurityStamp)
+                    .IsRequired()
+                    .HasMaxLength(1024);
+
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasMaxLength(128);
             });
 
             OnModelCreatingPartial(modelBuilder);

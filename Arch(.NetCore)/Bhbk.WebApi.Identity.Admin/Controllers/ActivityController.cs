@@ -68,11 +68,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<ActivityV1>>(
                         UoW.Activities.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
-                                state.ToExpression<tbl_Activities>()))),
+                                QueryExpressionFactory.GetQueryExpression<tbl_Activities>().ApplyState(state)))),
 
                     Total = UoW.Activities.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
-                            state.ToPredicateExpression<tbl_Activities>()))
+                            QueryExpressionFactory.GetQueryExpression<tbl_Activities>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);

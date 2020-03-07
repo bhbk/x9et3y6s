@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (Guid.TryParse(input.user, out userID))
                 user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.Email == input.user).SingleOrDefault();
+                user = UoW.Users.Get(x => x.UserName == input.user).SingleOrDefault();
 
             if (user == null)
             {
@@ -216,7 +216,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (Guid.TryParse(input.user, out userID))
                 user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.Email == input.user).SingleOrDefault();
+                user = UoW.Users.Get(x => x.UserName == input.user).SingleOrDefault();
 
             if (user == null)
             {
@@ -299,7 +299,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check that payload can be decrypted and validated...
-            if (!new PasswordlessTokenFactory(UoW.InstanceType.ToString()).Validate(user.SecurityStamp, input.code, user))
+            if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(user.SecurityStamp, input.code, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.code}");
                 return BadRequest(ModelState);
@@ -348,7 +348,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 token_type = "bearer",
                 access_token = ac.RawData,
                 refresh_token = rt.RawData,
-                user = user.Email,
+                user = user.UserName,
                 client = audiences.Select(x => x.Name).ToList(),
                 issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
                 expires_in = (int)(new DateTimeOffset(ac.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,

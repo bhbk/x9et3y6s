@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!new PasswordlessTokenFactory(UoW.InstanceType.ToString()).Validate(email, token, user))
+            else if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(email, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!new PasswordlessTokenFactory(UoW.InstanceType.ToString()).Validate(password, token, user))
+            else if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(password, token, user))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);

@@ -32,6 +32,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool Enabled { get; set; }
 
         public string ConcurrencyStamp { get; set; }
+        public string SecurityStamp { get; set; }
 
         [Required]
         [DefaultValue(false)]

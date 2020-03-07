@@ -117,12 +117,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<LoginV1>>(
                         UoW.Logins.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
-                                state.ToExpression<tbl_Logins>()),
+                                QueryExpressionFactory.GetQueryExpression<tbl_Logins>().ApplyState(state)),
                             new List<Expression<Func<tbl_Logins, object>>>() { x => x.tbl_UserLogins })),
 
                     Total = UoW.Logins.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
-                            state.ToPredicateExpression<tbl_Logins>()))
+                            QueryExpressionFactory.GetQueryExpression<tbl_Logins>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);

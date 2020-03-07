@@ -33,7 +33,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             CreateMap<AudienceV1, tbl_Audiences>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
-                .ForMember(dest => dest.PasswordHash, src => src.Ignore())
+                .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
+                .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
                 .ForMember(dest => dest.SecurityStamp, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
@@ -194,11 +195,14 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
             CreateMap<UserV1, tbl_Users>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.UserName, src => src.MapFrom(val => val.UserName))
+                .ForMember(dest => dest.EmailAddress, src => src.MapFrom(val => val.Email))
+                .ForMember(dest => dest.EmailConfirmed, src => src.MapFrom(val => val.EmailConfirmed))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => (val.AccessFailedCount == default) ? 0 : val.AccessFailedCount))
                 .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => (val.AccessSuccessCount == default) ? 0 : val.AccessSuccessCount))
-                .ForMember(dest => dest.PasswordHash, src => src.Ignore())
-                .ForMember(dest => dest.SecurityStamp, src => src.Ignore())
+                .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
+                .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Logins, src => src.Ignore())
@@ -212,7 +216,10 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
 
             CreateMap<tbl_Users, UserV1>()
-                .ForMember(dest => dest.IssuerId, src => src.Ignore());
+                .ForMember(dest => dest.IssuerId, src => src.Ignore())
+                .ForMember(dest => dest.UserName, src => src.MapFrom(val => val.UserName))
+                .ForMember(dest => dest.Email, src => src.MapFrom(val => val.EmailAddress))
+                .ForMember(dest => dest.EmailConfirmed, src => src.MapFrom(val => val.EmailConfirmed));
         }
     }
 }
