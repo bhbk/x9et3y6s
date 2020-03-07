@@ -103,12 +103,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<MOTDV1> Info_GetMOTDV1()
+        public async ValueTask<MOTDTssV1> Info_GetMOTDV1()
         {
             var response = await Http.Info_GetMOTDV1();
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<MOTDV1>().Result;
+                return response.Content.ReadAsAsync<MOTDTssV1>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

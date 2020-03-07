@@ -1,15 +1,16 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -103,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                         }));
                 }
 
-                var refresh = uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                     .Where(x => x.UserId == user.Id).ToLambda()).First();
 
                 var result = controller.DeleteRefreshV1(refresh.Id) as OkObjectResult;

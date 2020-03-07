@@ -1,6 +1,7 @@
-﻿using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -59,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                        var expiredExpr = new QueryExpression<tbl_Activities>()
+                        var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_Activities>()
                             .Where(x => (x.Created.AddSeconds(_transient) < DateTime.Now && x.Immutable == false)
                                 || (x.Created.AddSeconds(_auditable) < DateTime.Now && x.Immutable == true)).ToLambda();
 

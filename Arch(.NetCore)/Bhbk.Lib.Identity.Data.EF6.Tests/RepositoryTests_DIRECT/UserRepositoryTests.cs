@@ -1,8 +1,9 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EF6.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -64,7 +65,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(new QueryExpression<tbl_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
                 .Where(x => x.Email == Constants.ApiTestUser).ToLambda()).Single();
 
             UoW.Users.Delete(user);
@@ -98,7 +99,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(new QueryExpression<tbl_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
                 .Where(x => x.Email == Constants.ApiTestUser).ToLambda()).Single();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";

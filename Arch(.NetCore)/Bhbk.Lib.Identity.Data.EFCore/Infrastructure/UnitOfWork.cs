@@ -61,7 +61,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
                         _context = new IdentityEntities(builder.Options);
                     }
                     break;
-
+                    
                 case InstanceContext.UnitTest:
                     {
 #if !RELEASE

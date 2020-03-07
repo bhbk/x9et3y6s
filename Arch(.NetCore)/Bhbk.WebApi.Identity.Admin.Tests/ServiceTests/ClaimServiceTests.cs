@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
@@ -10,6 +10,8 @@ using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +23,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using static Bhbk.Lib.DataState.Models.PageStateTypeC;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
@@ -112,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<ClaimV1>();
 
-                var check = uow.Claims.Get(new QueryExpression<tbl_Claims>()
+                var check = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                     .Where(x => x.Id == result.Id).ToLambda())
                     .Any();
                 check.Should().BeTrue();
@@ -187,7 +188,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClaim = uow.Claims.Get(new QueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                     .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                     .Single();
                 testClaim.Immutable = true;
@@ -223,14 +224,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClaim = uow.Claims.Get(new QueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                     .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                     .Single();
 
                 var result = await service.Claim_DeleteV1(testClaim.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Claims.Get(new QueryExpression<tbl_Claims>()
+                var check = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                     .Where(x => x.Id == testClaim.Id).ToLambda())
                     .Any();
                 check.Should().BeFalse();
@@ -259,7 +260,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClaim = uow.Claims.Get(new QueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                     .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                     .Single();
 
@@ -287,11 +288,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 int take = 2;
-                var state = new PageStateTypeC()
+                var state = new DataStateV1()
                 {
-                    Sort = new List<PageStateTypeCSort>() 
+                    Sort = new List<IDataStateSort>() 
                     {
-                        new PageStateTypeCSort() { Field = "type", Dir = "asc" }
+                        new DataStateV1Sort() { Field = "type", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take
@@ -378,7 +379,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClaim = uow.Claims.Get(new QueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                     .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                     .Single();
                 testClaim.Value += "(Updated)";

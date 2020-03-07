@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT;
@@ -7,6 +8,7 @@ using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.QueryExpression.Extensions;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +17,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Xunit;
-using static Bhbk.Lib.DataState.Models.PageStateTypeC;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
@@ -73,11 +74,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 int take = 2;
-                var state = new PageStateTypeC()
+                var state = new DataStateV1()
                 {
-                    Sort = new List<PageStateTypeCSort>() 
+                    Sort = new List<IDataStateSort>() 
                     {
-                        new PageStateTypeCSort() { Field = "created", Dir = "asc" }
+                        new DataStateV1Sort() { Field = "created", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take

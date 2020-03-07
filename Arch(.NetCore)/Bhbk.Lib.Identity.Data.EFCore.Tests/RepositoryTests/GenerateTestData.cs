@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using System;
 using System.Data;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * create test issuers
              */
-            var foundIssuer = _uow.Issuers.Get(new QueryExpression<uvw_Issuers>()
+            var foundIssuer = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuers>()
                 .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
                 .SingleOrDefault();
 
@@ -50,7 +51,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * create test audiences
              */
-            var foundAudience = _uow.Audiences.Get(new QueryExpression<uvw_Audiences>()
+            var foundAudience = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audiences>()
                 .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
                 .SingleOrDefault();
 
@@ -90,7 +91,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * create test claims
              */
-            var foundClaim = _uow.Claims.Get(new QueryExpression<uvw_Claims>()
+            var foundClaim = _uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                 .SingleOrDefault();
 
@@ -111,7 +112,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * create test logins
              */
-            var foundLogin = _uow.Logins.Get(new QueryExpression<uvw_Logins>()
+            var foundLogin = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<uvw_Logins>()
                 .Where(x => x.Name == Constants.ApiTestLogin).ToLambda())
                 .SingleOrDefault();
 
@@ -130,7 +131,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * create test roles
              */
-            var foundRole = _uow.Roles.Get(new QueryExpression<uvw_Roles>()
+            var foundRole = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Roles>()
                 .Where(x => x.Name == Constants.ApiTestRole).ToLambda())
                 .SingleOrDefault();
 
@@ -149,7 +150,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * create test users
              */
-            var foundUser = _uow.Users.Get(new QueryExpression<uvw_Users>()
+            var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
                 .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
                 .SingleOrDefault();
 
@@ -225,7 +226,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * delete test users
              */
-            var users = _uow.Users.Get(new QueryExpression<uvw_Users>()
+            var users = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
                 .Where(x => x.Email.Contains(Constants.ApiTestUser)).ToLambda());
 
             if (users.Count() > 0)
@@ -234,7 +235,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * delete test roles
              */
-            var roles = _uow.Roles.Get(new QueryExpression<uvw_Roles>()
+            var roles = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Roles>()
                 .Where(x => x.Name.Contains(Constants.ApiTestRole)).ToLambda());
 
             if (roles.Count() > 0)
@@ -243,7 +244,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * delete test logins
              */
-            var logins = _uow.Logins.Get(new QueryExpression<uvw_Logins>()
+            var logins = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<uvw_Logins>()
                 .Where(x => x.Name.Contains(Constants.ApiTestLogin)).ToLambda());
 
             if (logins.Count() > 0)
@@ -252,7 +253,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * delete test claims
              */
-            var claims = _uow.Claims.Get(new QueryExpression<uvw_Claims>()
+            var claims = _uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claims>()
                 .Where(x => x.Type.Contains(Constants.ApiTestClaim)).ToLambda());
 
             if (claims.Count() > 0)
@@ -261,7 +262,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * delete test audiences
              */
-            var audiences = _uow.Audiences.Get(new QueryExpression<uvw_Audiences>()
+            var audiences = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audiences>()
                 .Where(x => x.Name.Contains(Constants.ApiTestAudience)).ToLambda());
 
             if (audiences.Count() > 0)
@@ -270,7 +271,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             /*
              * delete test issuers
              */
-            var issuers = _uow.Issuers.Get(new QueryExpression<uvw_Issuers>()
+            var issuers = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuers>()
                 .Where(x => x.Name.Contains(Constants.ApiTestIssuer)).ToLambda());
 
             if (issuers.Count() > 0)

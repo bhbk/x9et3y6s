@@ -10,15 +10,15 @@
         <EntityTypeShape EntityType="IdentityModels.uvw_Claims" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="IdentityModels.uvw_Issuers" Width="1.5" PointX="4.75" PointY="4.75" IsExpanded="true" />
         <EntityTypeShape EntityType="IdentityModels.uvw_Logins" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_MOTDs" Width="1.5" PointX="0.75" PointY="6.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Refreshes" Width="1.5" PointX="6.75" PointY="4.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Users" Width="1.5" PointX="8.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Roles" Width="1.5" PointX="2.75" PointY="8.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_QueueEmails" Width="1.5" PointX="4.75" PointY="8.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_QueueTexts" Width="1.5" PointX="6.75" PointY="8.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Settings" Width="1.5" PointX="8.75" PointY="7.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_Refreshes" Width="1.5" PointX="0.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_Users" Width="1.5" PointX="6.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_Roles" Width="1.5" PointX="8.75" PointY="0.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_QueueEmails" Width="1.5" PointX="2.75" PointY="8.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_QueueTexts" Width="1.5" PointX="8.75" PointY="4.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_Settings" Width="1.5" PointX="8.75" PointY="8.75" />
         <EntityTypeShape EntityType="IdentityModels.uvw_States" Width="1.5" PointX="10.75" PointY="0.75" />
         <EntityTypeShape EntityType="IdentityModels.uvw_Urls" Width="1.5" PointX="10.75" PointY="5.75" />
+        <EntityTypeShape EntityType="IdentityModels.uvw_MOTDs" Width="1.5" PointX="10.75" PointY="9.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

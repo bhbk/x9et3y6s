@@ -1,9 +1,10 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EF6.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -33,15 +34,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(new QueryExpression<tbl_Issuers>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
                 .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
                 .Single();
 
-            var audience = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
                 .Single();
 
-            var user = UoW.Users.Get(new QueryExpression<tbl_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
                 .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
                 .Single();
 

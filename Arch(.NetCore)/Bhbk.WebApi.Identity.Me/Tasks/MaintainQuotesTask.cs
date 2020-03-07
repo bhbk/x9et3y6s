@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -79,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                                     http.DefaultRequestHeaders.Add("X-TheySaidSo-Api-Secret", _key);
 
                                     var response = await http.GetAsync(_url + "/quote/random.json?language=en&limit=10", stoppingToken);
-                                    var results = JsonConvert.DeserializeObject<MOTDType1Response>(await response.Content.ReadAsStringAsync());
+                                    var results = JsonConvert.DeserializeObject<MOTDTssV1Response>(await response.Content.ReadAsStringAsync());
 
                                     if (response.IsSuccessStatusCode)
                                         foreach (var quote in results.contents.quotes)
@@ -95,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                                     http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                                     var response = await http.GetAsync(_url + "/qod.json", stoppingToken);
-                                    var results = JsonConvert.DeserializeObject<MOTDType1Response>(await response.Content.ReadAsStringAsync());
+                                    var results = JsonConvert.DeserializeObject<MOTDTssV1Response>(await response.Content.ReadAsStringAsync());
 
                                     if (response.IsSuccessStatusCode)
                                         ProcessMOTDSuccess(uow, mapper, results.contents.quotes[0]);
@@ -136,12 +137,12 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
         }
 
-        private void ProcessMOTDSuccess(IUnitOfWork uow, IMapper mapper, MOTDV1 quote)
+        private void ProcessMOTDSuccess(IUnitOfWork uow, IMapper mapper, MOTDTssV1 quote)
         {
             string msg = string.Empty;
             var model = mapper.Map<tbl_MOTDs>(quote);
 
-            var motds = uow.MOTDs.Get(new QueryExpression<tbl_MOTDs>()
+            var motds = uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>()
                 .Where(x => x.Author == model.Author && x.Quote == model.Quote)
                 .ToLambda());
 
@@ -173,50 +174,40 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                  * parts of model are broken and need be fixed...
                  */
 
-                if (motd.Title != model.Title)
+                if (motd.TssId != model.TssId)
                 {
-                    motd.Title = model.Title;
+                    motd.TssId = model.TssId;
                     dirty = true;
                 }
 
-                if (motd.Category != model.Category)
+                if (motd.TssTitle != model.TssTitle)
                 {
-                    motd.Category = model.Category;
+                    motd.TssTitle = model.TssTitle;
                     dirty = true;
                 }
 
-                if (motd.Date != model.Date)
+                if (motd.TssCategory != model.TssCategory)
                 {
-                    motd.Date = model.Date;
+                    motd.TssCategory = model.TssCategory;
                     dirty = true;
                 }
 
-                if (motd.Tags != model.Tags)
+                if (motd.TssDate != model.TssDate)
                 {
-                    motd.Tags = model.Tags;
+                    motd.TssDate = model.TssDate;
                     dirty = true;
                 }
 
-                if (motd.Background != model.Background)
+                if (motd.TssTags != model.TssTags)
                 {
-                    motd.Background = model.Background;
+                    motd.TssTags = model.TssTags;
                     dirty = true;
                 }
 
-                if (motd.Id != model.Id)
+                if (motd.TssBackground != model.TssBackground)
                 {
-                    /*
-                     * if key changed must delete and create. probably more elegant way to do this.
-                     */
-                    uow.MOTDs.Delete(motd);
-                    uow.Commit();
-
-                    uow.MOTDs.Create(model);
-                    uow.Commit();
-
-                    dirty = false;
-
-                    msg = $"{typeof(MaintainQuotesTask).Name} success updating key. Author:\"{model.Author}\" Quote:\"{model.Quote}\"";
+                    motd.TssBackground = model.TssBackground;
+                    dirty = true;
                 }
 
                 if (dirty)

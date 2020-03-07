@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models.Me
@@ -6,7 +7,7 @@ namespace Bhbk.Lib.Identity.Models.Me
     public abstract class MOTDs
     {
         [Required]
-        public string id { get; set; }
+        public Guid globalId { get; set; }
 
         [Required]
         public string author { get; set; }
@@ -15,8 +16,10 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string quote { get; set; }
     }
 
-    public class MOTDV1 : MOTDs
+    public class MOTDTssV1 : MOTDs
     {
+        public string id { get; set; }
+
         public string length { get; set; }
 
         public List<string> tags { get; set; }
@@ -30,7 +33,7 @@ namespace Bhbk.Lib.Identity.Models.Me
         public string background { get; set; }
     }
 
-    public class MOTDType1Response
+    public class MOTDTssV1Response
     {
         public Success success { get; set; }
 
@@ -38,7 +41,7 @@ namespace Bhbk.Lib.Identity.Models.Me
 
         public class Contents
         {
-            public List<MOTDV1> quotes { get; set; }
+            public List<MOTDTssV1> quotes { get; set; }
         }
 
         public class Success

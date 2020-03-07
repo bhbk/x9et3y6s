@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT;
@@ -19,7 +20,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using static Bhbk.Lib.DataState.Models.PageStateTypeC;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
@@ -275,11 +275,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 int take = 2;
-                var state = new PageStateTypeC()
+                var state = new DataStateV1()
                 {
-                    Sort = new List<PageStateTypeCSort>()
+                    Sort = new List<IDataStateSort>()
                     {
-                        new PageStateTypeCSort() { Field = "name", Dir = "asc" }
+                        new DataStateV1Sort() { Field = "name", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take

@@ -30,7 +30,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public virtual DbSet<uvw_Claims> uvw_Claims { get; set; }
         public virtual DbSet<uvw_Issuers> uvw_Issuers { get; set; }
         public virtual DbSet<uvw_Logins> uvw_Logins { get; set; }
-        public virtual DbSet<uvw_MOTDs> uvw_MOTDs { get; set; }
         public virtual DbSet<uvw_Refreshes> uvw_Refreshes { get; set; }
         public virtual DbSet<uvw_Users> uvw_Users { get; set; }
         public virtual DbSet<uvw_Roles> uvw_Roles { get; set; }
@@ -39,5 +38,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public virtual DbSet<uvw_Settings> uvw_Settings { get; set; }
         public virtual DbSet<uvw_States> uvw_States { get; set; }
         public virtual DbSet<uvw_Urls> uvw_Urls { get; set; }
+        public virtual DbSet<uvw_MOTDs> uvw_MOTDs { get; set; }
     }
 }

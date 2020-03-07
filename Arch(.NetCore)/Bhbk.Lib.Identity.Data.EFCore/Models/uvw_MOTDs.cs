@@ -5,14 +5,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 {
     public partial class uvw_MOTDs
     {
-        public string Id { get; set; }
-        public string Title { get; set; }
+        public Guid Id { get; set; }
         public string Author { get; set; }
         public string Quote { get; set; }
-        public string Category { get; set; }
-        public DateTime? Date { get; set; }
-        public string Tags { get; set; }
-        public int? Length { get; set; }
-        public string Background { get; set; }
+        public string TssId { get; set; }
+        public string TssTitle { get; set; }
+        public string TssCategory { get; set; }
+        public int? TssLength { get; set; }
+        public DateTime? TssDate { get; set; }
+        public string TssTags { get; set; }
+        public string TssBackground { get; set; }
     }
 }

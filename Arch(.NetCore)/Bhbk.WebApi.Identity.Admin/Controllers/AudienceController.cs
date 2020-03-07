@@ -1,6 +1,6 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
@@ -9,6 +9,9 @@ using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Exceptions;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -102,7 +105,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(new QueryExpression<tbl_Refreshes>()
+            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.AudienceId == audienceID).ToLambda());
 
             UoW.Commit();
@@ -114,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteRefreshV1([FromRoute] Guid audienceID, [FromRoute] Guid refreshID)
         {
-            var expr = new QueryExpression<tbl_Refreshes>()
+            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.AudienceId == audienceID && x.Id == refreshID).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
@@ -152,24 +155,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public IActionResult GetV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] DataStateV1 state)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateTypeCResult<AudienceV1>
+                var result = new DataStateV1Result<AudienceV1>
                 {
                     Data = Mapper.Map<IEnumerable<AudienceV1>>(
                         UoW.Audiences.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audiences>, IQueryable<tbl_Audiences>>>>(
-                                model.ToExpression<tbl_Audiences>()),
+                                state.ToExpression<tbl_Audiences>()),
                             new List<Expression<Func<tbl_Audiences, object>>>() { x => x.tbl_Roles })),
 
                     Total = UoW.Audiences.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audiences>, IQueryable<tbl_Audiences>>>>(
-                            model.ToPredicateExpression<tbl_Audiences>()))
+                            state.ToPredicateExpression<tbl_Audiences>()))
                 };
 
                 return Ok(result);
@@ -193,7 +196,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var refreshes = UoW.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+            var refreshes = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<RefreshV1>>(refreshes));
@@ -211,7 +214,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var roles = UoW.Roles.Get(new QueryExpression<tbl_Roles>()
+            var roles = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<RoleV1>>(roles));
@@ -229,7 +232,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var urls = UoW.Urls.Get(new QueryExpression<tbl_Urls>()
+            var urls = UoW.Urls.Get(QueryExpressionFactory.GetQueryExpression<tbl_Urls>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<UrlV1>>(urls));

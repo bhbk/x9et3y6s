@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
@@ -12,6 +12,8 @@ using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +25,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using static Bhbk.Lib.DataState.Models.PageStateTypeC;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
@@ -442,7 +443,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                var refresh = uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                     .Where(x => x.UserId == user.Id && x.RefreshValue == rt.RawData).ToLambda()).Single();
 
                 var result = await service.Http.User_DeleteRefreshV1(rop.RawData, user.Id, refresh.Id);
@@ -499,11 +500,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 int take = 2;
-                var state = new PageStateTypeC()
+                var state = new DataStateV1()
                 {
-                    Sort = new List<PageStateTypeCSort>()
+                    Sort = new List<IDataStateSort>()
                     {
-                        new PageStateTypeCSort() { Field = "email", Dir = "asc" }
+                        new DataStateV1Sort() { Field = "email", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take
@@ -536,7 +537,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetClaimsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<ClaimV1>>();
-                result.Count().Should().Be(uow.Claims.Count(new QueryExpression<tbl_Claims>()
+                result.Count().Should().Be(uow.Claims.Count(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                     .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
@@ -562,7 +563,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetAudiencesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<AudienceV1>>();
-                result.Count().Should().Be(uow.Audiences.Count(new QueryExpression<tbl_Audiences>()
+                result.Count().Should().Be(uow.Audiences.Count(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda()));
             }
         }
@@ -588,7 +589,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetLoginsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<LoginV1>>();
-                result.Count().Should().Be(uow.Logins.Count(new QueryExpression<tbl_Logins>()
+                result.Count().Should().Be(uow.Logins.Count(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
                     .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
@@ -632,7 +633,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetRefreshesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<RefreshV1>>();
-                result.Count().Should().Be(uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+                result.Count().Should().Be(uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                     .Where(x => x.UserId == user.Id).ToLambda()).Count());
             }
         }
@@ -658,7 +659,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetRolesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<RoleV1>>();
-                result.Count().Should().Be(uow.Roles.Count(new QueryExpression<tbl_Roles>()
+                result.Count().Should().Be(uow.Roles.Count(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
                     .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
@@ -686,7 +687,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.Email == Constants.ApiTestUser).Single();
-                var testClaim = uow.Claims.Get(new QueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                     .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                     .Single();
 

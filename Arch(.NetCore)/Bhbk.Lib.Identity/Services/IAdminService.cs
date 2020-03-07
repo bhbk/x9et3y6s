@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Services
         /*
          * activity
          */
-        ValueTask<PageStateTypeCResult<ActivityV1>> Activity_GetV1(PageStateTypeC model);
+        ValueTask<DataStateV1Result<ActivityV1>> Activity_GetV1(DataStateV1 model);
 
         /*
          * audiences
@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<bool> Audience_DeleteRefreshesV1(Guid audienceID);
         ValueTask<bool> Audience_DeleteRefreshV1(Guid audienceID, Guid refreshID);
         ValueTask<AudienceV1> Audience_GetV1(string audienceValue);
-        ValueTask<PageStateTypeCResult<AudienceV1>> Audience_GetV1(PageStateTypeC model);
+        ValueTask<DataStateV1Result<AudienceV1>> Audience_GetV1(DataStateV1 model);
         ValueTask<IEnumerable<RefreshV1>> Audience_GetRefreshesV1(string audienceValue);
         ValueTask<bool> Audience_SetPasswordV1(Guid audienceID, PasswordAddV1 model);
         ValueTask<AudienceV1> Audience_UpdateV1(AudienceV1 model);
@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<ClaimV1> Claim_CreateV1(ClaimV1 model);
         ValueTask<bool> Claim_DeleteV1(Guid claimID);
         ValueTask<ClaimV1> Claim_GetV1(string claimValue);
-        ValueTask<PageStateTypeCResult<ClaimV1>> Claim_GetV1(PageStateTypeC model);
+        ValueTask<DataStateV1Result<ClaimV1>> Claim_GetV1(DataStateV1 model);
         ValueTask<ClaimV1> Claim_UpdateV1(ClaimV1 model);
 
         /*
@@ -48,7 +48,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<bool> Issuer_DeleteV1(Guid issuerID);
         ValueTask<IEnumerable<AudienceV1>> Issuer_GetAudiencesV1(string issuerValue);
         ValueTask<IssuerV1> Issuer_GetV1(string issuerValue);
-        ValueTask<PageStateTypeCResult<IssuerV1>> Issuer_GetV1(PageStateTypeC model);
+        ValueTask<DataStateV1Result<IssuerV1>> Issuer_GetV1(DataStateV1 model);
         ValueTask<Dictionary<Guid, string>> Issuer_GetKeysV1(List<string> model);
         ValueTask<IssuerV1> Issuer_UpdateV1(IssuerV1 model);
 
@@ -58,15 +58,15 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<LoginV1> Login_CreateV1(LoginV1 model);
         ValueTask<bool> Login_DeleteV1(Guid loginID);
         ValueTask<LoginV1> Login_GetV1(string loginValue);
-        ValueTask<PageStateTypeCResult<LoginV1>> Login_GetV1(PageStateTypeC model);
+        ValueTask<DataStateV1Result<LoginV1>> Login_GetV1(DataStateV1 model);
         ValueTask<LoginV1> Login_UpdateV1(LoginV1 model);
 
         /*
          * message of the days
          */
 
-        ValueTask<MOTDV1> MOTD_GetV1(string motdValue);
-        ValueTask<PageStateTypeCResult<MOTDV1>> MOTD_GetV1(PageStateTypeC model);
+        ValueTask<MOTDTssV1> MOTD_GetV1(string motdValue);
+        ValueTask<DataStateV1Result<MOTDTssV1>> MOTD_GetV1(DataStateV1 model);
 
         /*
          * roles
@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<RoleV1> Role_CreateV1(RoleV1 model);
         ValueTask<bool> Role_DeleteV1(Guid roleID);
         ValueTask<RoleV1> Role_GetV1(string roleValue);
-        ValueTask<PageStateTypeCResult<RoleV1>> Role_GetV1(PageStateTypeC model);
+        ValueTask<DataStateV1Result<RoleV1>> Role_GetV1(DataStateV1 model);
         ValueTask<RoleV1> Role_UpdateV1(RoleV1 model);
 
         /*
@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<bool> User_DeleteRefreshesV1(Guid userID);
         ValueTask<bool> User_DeleteRefreshV1(Guid userID, Guid refreshID);
         ValueTask<UserV1> User_GetV1(string userValue);
-        ValueTask<PageStateTypeCResult<UserV1>> User_GetV1(PageStateTypeC model);
+        ValueTask<DataStateV1Result<UserV1>> User_GetV1(DataStateV1 model);
         ValueTask<IEnumerable<AudienceV1>> User_GetAudiencesV1(string userValue);
         ValueTask<IEnumerable<LoginV1>> User_GetLoginsV1(string userValue);
         ValueTask<IEnumerable<RefreshV1>> User_GetRefreshesV1(string userValue);

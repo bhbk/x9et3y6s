@@ -225,7 +225,7 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Init_GetAudiencesV1(string jwt, PageStateTypeC model)
+        public async ValueTask<HttpResponseMessage> Init_GetAudiencesV1(string jwt, DataStateV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 

@@ -1,12 +1,15 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Exceptions;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -102,24 +105,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public IActionResult GetV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] DataStateV1 state)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateTypeCResult<LoginV1>
+                var result = new DataStateV1Result<LoginV1>
                 {
                     Data = Mapper.Map<IEnumerable<LoginV1>>(
                         UoW.Logins.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
-                                model.ToExpression<tbl_Logins>()),
+                                state.ToExpression<tbl_Logins>()),
                             new List<Expression<Func<tbl_Logins, object>>>() { x => x.tbl_UserLogins })),
 
                     Total = UoW.Logins.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
-                            model.ToPredicateExpression<tbl_Logins>()))
+                            state.ToPredicateExpression<tbl_Logins>()))
                 };
 
                 return Ok(result);
@@ -143,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var users = UoW.Users.Get(new QueryExpression<tbl_Users>()
+            var users = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.LoginId == loginID)).ToLambda());
 
             return Ok(Mapper.Map<UserV1>(users));

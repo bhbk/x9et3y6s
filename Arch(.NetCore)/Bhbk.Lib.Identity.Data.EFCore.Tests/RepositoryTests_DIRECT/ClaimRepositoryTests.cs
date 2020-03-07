@@ -1,8 +1,9 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -33,7 +34,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(new QueryExpression<tbl_Issuers>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
                 .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
                 .Single();
 
@@ -68,7 +69,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                 .Single();
 
@@ -103,7 +104,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                 .Single();
             claim.Value += "(Updated)";

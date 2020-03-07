@@ -1,5 +1,4 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
@@ -7,6 +6,8 @@ using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -54,11 +55,11 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (skip == 1)
                 skip = 0;
 
-            var motd = UoW.MOTDs.Get(new QueryExpression<tbl_MOTDs>()
+            var motd = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>()
                 .OrderBy("id").Skip(skip).Take(1).ToLambda())
                 .SingleOrDefault();
 
-            return Ok(Mapper.Map<MOTDV1>(motd));
+            return Ok(Mapper.Map<MOTDTssV1>(motd));
         }
 
         [Route("v1/code"), HttpGet]
@@ -90,7 +91,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.States.Delete(new QueryExpression<tbl_States>()
+            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_States>()
                 .Where(x => x.UserId == user.Id).ToLambda());
             UoW.Commit();
 
@@ -109,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.States.Delete(new QueryExpression<tbl_States>()
+            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_States>()
                 .Where(x => x.Id == code.Id).ToLambda());
             UoW.Commit();
 
@@ -175,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/refresh"), HttpGet]
         public IActionResult GetRefreshesV1()
         {
-            var expr = new QueryExpression<tbl_Refreshes>()
+            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == GetIdentityGUID()).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
@@ -200,7 +201,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(new QueryExpression<tbl_Refreshes>()
+            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == user.Id).ToLambda());
 
             UoW.Commit();
@@ -211,7 +212,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/refresh/{refreshID}/revoke"), HttpDelete]
         public IActionResult DeleteRefreshV1([FromRoute] Guid refreshID)
         {
-            var expr = new QueryExpression<tbl_Refreshes>()
+            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == GetIdentityGUID() && x.Id == refreshID).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))

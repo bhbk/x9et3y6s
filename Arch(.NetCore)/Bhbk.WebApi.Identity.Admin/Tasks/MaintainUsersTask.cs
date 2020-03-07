@@ -1,6 +1,7 @@
-﻿using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -57,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                        var disabledExpr = new QueryExpression<tbl_Users>()
+                        var disabledExpr = QueryExpressionFactory.GetQueryExpression<tbl_Users>()
                                 .Where(x => x.LockoutEnd < DateTime.UtcNow).ToLambda();
 
                         var disabled = uow.Users.Get(disabledExpr);

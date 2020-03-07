@@ -199,35 +199,38 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
             modelBuilder.Entity<tbl_MOTDs>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_tbl_MotDType1")
+                    .HasName("IX_tbl_MOTDs")
                     .IsUnique();
 
-                entity.Property(e => e.Id)
-                    .HasMaxLength(128)
-                    .IsUnicode(false);
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Author)
                     .IsRequired()
-                    .HasMaxLength(128)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Background)
-                    .HasMaxLength(512)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Category)
                     .HasMaxLength(256)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Quote)
                     .IsRequired()
+                    .HasMaxLength(4096)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Tags)
+                entity.Property(e => e.TssBackground)
+                    .HasMaxLength(512)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TssCategory)
+                    .HasMaxLength(256)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TssId)
                     .HasMaxLength(128)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Title)
+                entity.Property(e => e.TssTags)
+                    .HasMaxLength(256)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TssTitle)
                     .HasMaxLength(256)
                     .IsUnicode(false);
             });

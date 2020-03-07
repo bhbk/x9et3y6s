@@ -1,8 +1,9 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EF6.Models;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -30,15 +31,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(new QueryExpression<uvw_Issuers>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuers>()
                 .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
                 .Single();
 
-            var audience = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audiences>()
                 .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
                 .Single();
 
-            var user = UoW.Users.Get(new QueryExpression<uvw_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
                 .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
                 .Single();
 
@@ -103,11 +104,11 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(new QueryExpression<uvw_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
                 .Where(x => x.Email == Constants.ApiTestUser).ToLambda())
                 .Single();
 
-            var state = UoW.States.Get(new QueryExpression<uvw_States>()
+            var state = UoW.States.Get(QueryExpressionFactory.GetQueryExpression<uvw_States>()
                 .Where(x => x.UserId == user.Id).ToLambda())
                 .First();
 

@@ -1,7 +1,8 @@
-﻿using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -58,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var login = UoW.Logins.Get(new QueryExpression<tbl_Logins>()
+            var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
                 .Where(x => x.Name == Constants.ApiTestLogin).ToLambda())
                 .Single();
 
@@ -93,7 +94,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var login = UoW.Logins.Get(new QueryExpression<tbl_Logins>()
+            var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
                 .Where(x => x.Name == Constants.ApiTestLogin).ToLambda())
                 .Single();
             login.Name += "(Updated)";

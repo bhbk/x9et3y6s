@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using System;
 using System.Linq;
 
@@ -71,45 +72,13 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     }));
             }
 
-            /*
-             * create default msg of the day
-             */
-
-            _uow.MOTDs.Create(
-                new tbl_MOTDs()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Date = DateTime.Now,
-                    Author = "Albert Einstein",
-                    Quote = "Logic will get you from A to B. Imagination will take you everywhere.",
-                    Length = 69,
-                    Category = "inspire",
-                    Title = "Inspiring Quote of the day",
-                    Background = "https://theysaidso.com/img/bgs/man_on_the_mountain.jpg",
-                    Tags = "imagination,inspire,t-shirt,tod",
-                });
-
-            _uow.MOTDs.Create(
-                new tbl_MOTDs()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Date = DateTime.Now,
-                    Author = "Vincent Van Gogh",
-                    Quote = "Great things are done by a series of small things brought together.",
-                    Length = 67,
-                    Category = "inspire",
-                    Title = "Inspiring Quote of the day",
-                    Background = "https://theysaidso.com/img/bgs/man_on_the_mountain.jpg",
-                    Tags = "inspire,small-things,tod,tso-art",
-                });
-
             _uow.Commit();
 
             /*
              * create default issuers
              */
 
-            var foundIssuer = _uow.Issuers.Get(new QueryExpression<tbl_Issuers>()
+            var foundIssuer = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
                 .Where(x => x.Name == Constants.ApiDefaultIssuer).ToLambda())
                 .SingleOrDefault();
 
@@ -131,7 +100,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * create default audiences
              */
 
-            var foundAudienceUi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var foundAudienceUi = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == Constants.ApiDefaultAudienceUi).ToLambda())
                 .SingleOrDefault();
 
@@ -150,7 +119,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 _uow.Commit();
             }
 
-            var foundAudienceApi = _uow.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var foundAudienceApi = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == Constants.ApiDefaultAudienceApi).ToLambda())
                 .SingleOrDefault();
 
@@ -173,7 +142,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * create default logins
              */
 
-            var foundLogin = _uow.Logins.Get(new QueryExpression<tbl_Logins>()
+            var foundLogin = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
                 .Where(x => x.Name == Constants.ApiDefaultLogin).ToLambda())
                 .SingleOrDefault();
 
@@ -195,7 +164,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * create default roles
              */
 
-            var foundRoleForAdmin = _uow.Roles.Get(new QueryExpression<tbl_Roles>()
+            var foundRoleForAdmin = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
                 .Where(x => x.Name == Constants.ApiDefaultRoleForAdmin).ToLambda())
                 .SingleOrDefault();
 
@@ -213,7 +182,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 _uow.Commit();
             }
 
-            var foundRoleForUser = _uow.Roles.Get(new QueryExpression<tbl_Roles>()
+            var foundRoleForUser = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
                 .Where(x => x.Name == Constants.ApiDefaultRoleForUser).ToLambda())
                 .SingleOrDefault();
 
@@ -231,7 +200,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 _uow.Commit();
             }
 
-            var foundRoleForService = _uow.Roles.Get(new QueryExpression<tbl_Roles>()
+            var foundRoleForService = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
                 .Where(x => x.Name == Constants.ApiDefaultRoleForService).ToLambda())
                 .SingleOrDefault();
 
@@ -253,7 +222,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * create default users
              */
 
-            var foundAdminUser = _uow.Users.Get(new QueryExpression<tbl_Users>()
+            var foundAdminUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
                 .Where(x => x.Email == Constants.ApiDefaultAdminUser).ToLambda())
                 .SingleOrDefault();
 
@@ -277,7 +246,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 _uow.Commit();
             }
 
-            var foundNormalUser = _uow.Users.Get(new QueryExpression<tbl_Users>()
+            var foundNormalUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
                 .Where(x => x.Email == Constants.ApiDefaultNormalUser).ToLambda())
                 .SingleOrDefault();
 
@@ -345,7 +314,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * delete default users
              */
 
-            _uow.Users.Delete(new QueryExpression<tbl_Users>()
+            _uow.Users.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
                 .Where(x => x.Email == Constants.ApiDefaultAdminUser || x.Email == Constants.ApiDefaultNormalUser).ToLambda());
 
             _uow.Commit();
@@ -354,7 +323,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * delete default roles
              */
 
-            _uow.Roles.Delete(new QueryExpression<tbl_Roles>()
+            _uow.Roles.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
                 .Where(x => x.Name == Constants.ApiDefaultRoleForAdmin || x.Name == Constants.ApiDefaultRoleForUser).ToLambda());
 
             _uow.Commit();
@@ -363,7 +332,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * delete default logins
              */
 
-            _uow.Logins.Delete(new QueryExpression<tbl_Logins>()
+            _uow.Logins.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
                 .Where(x => x.Name == Constants.ApiDefaultLogin).ToLambda());
 
             _uow.Commit();
@@ -372,7 +341,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * delete default audiences
              */
 
-            _uow.Audiences.Delete(new QueryExpression<tbl_Audiences>()
+            _uow.Audiences.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == Constants.ApiDefaultAudienceUi || x.Name == Constants.ApiDefaultAudienceApi).ToLambda());
 
             _uow.Commit();
@@ -381,7 +350,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * delete default issuers
              */
 
-            _uow.Issuers.Delete(new QueryExpression<tbl_Issuers>()
+            _uow.Issuers.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
                 .Where(x => x.Name == Constants.ApiDefaultIssuer).ToLambda());
 
             _uow.Commit();

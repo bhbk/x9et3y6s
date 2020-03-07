@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
@@ -12,6 +12,8 @@ using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +25,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using static Bhbk.Lib.DataState.Models.PageStateTypeC;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 {
@@ -272,7 +273,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.Audience_DeleteRefreshesV1(audience.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+                var check = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                     .Where(x => x.AudienceId == audience.Id).ToLambda()).Any();
                 check.Should().BeFalse();
             }
@@ -308,12 +309,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                var refresh = uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                     .Where(x => x.AudienceId == audience.Id).ToLambda()).Single();
                 var result = await service.Audience_DeleteRefreshV1(audience.Id, refresh.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+                var check = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                     .Where(x => x.Id == refresh.Id).ToLambda()).Any();
                 check.Should().BeFalse();
             }
@@ -367,11 +368,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 int take = 2;
-                var state = new PageStateTypeC()
+                var state = new DataStateV1()
                 {
-                    Sort = new List<PageStateTypeCSort>()
+                    Sort = new List<IDataStateSort>()
                     {
-                        new PageStateTypeCSort() { Field = "name", Dir = "asc" },
+                        new DataStateV1Sort() { Field = "name", Dir = "asc" },
                     },
                     Skip = 0,
                     Take = take

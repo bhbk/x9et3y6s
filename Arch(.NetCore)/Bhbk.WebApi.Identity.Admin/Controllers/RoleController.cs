@@ -1,12 +1,15 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Exceptions;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -109,24 +112,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public IActionResult GetV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] DataStateV1 state)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateTypeCResult<RoleV1>
+                var result = new DataStateV1Result<RoleV1>
                 {
                     Data = Mapper.Map<IEnumerable<RoleV1>>(
                         UoW.Roles.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
-                                model.ToExpression<tbl_Roles>()),
+                                state.ToExpression<tbl_Roles>()),
                             new List<Expression<Func<tbl_Roles, object>>>() { x => x.tbl_UserRoles })),
 
                     Total = UoW.Roles.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
-                            model.ToPredicateExpression<tbl_Roles>()))
+                            state.ToPredicateExpression<tbl_Roles>()))
                 };
 
                 return Ok(result);
@@ -150,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var users = UoW.Users.Get(new QueryExpression<tbl_Users>()
+            var users = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.RoleId == roleID)).ToLambda());
 
             return Ok(Mapper.Map<UserV1>(users));

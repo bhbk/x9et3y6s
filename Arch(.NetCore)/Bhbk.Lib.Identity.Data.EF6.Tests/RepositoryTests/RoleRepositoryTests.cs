@@ -1,6 +1,7 @@
-﻿using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EF6.Models;
+﻿using Bhbk.Lib.Identity.Data.EF6.Models;
 using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audience = UoW.Audiences.Get(new QueryExpression<uvw_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audiences>()
                 .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
                 .Single();
 
@@ -58,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var role = UoW.Roles.Get(new QueryExpression<uvw_Roles>()
+            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Roles>()
                 .Where(x => x.Name == Constants.ApiTestRole).ToLambda())
                 .Single();
 
@@ -91,7 +92,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var role = UoW.Roles.Get(new QueryExpression<uvw_Roles>()
+            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Roles>()
                 .Where(x => x.Name == Constants.ApiTestRole).ToLambda())
                 .Single();
             role.Name += "(Updated)";

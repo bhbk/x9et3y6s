@@ -1,12 +1,15 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Exceptions;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -37,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            if (UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                 .Where(x => x.IssuerId == model.IssuerId && x.Type == model.Type).ToLambda())
                 .Any())
             {
@@ -58,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteV1([FromRoute] Guid claimID)
         {
-            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                 .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 
@@ -89,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_Claims claim = null;
 
             if (Guid.TryParse(claimValue, out claimID))
-                claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+                claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                     .Where(x => x.Id == claimID).ToLambda())
                     .SingleOrDefault();
 
@@ -103,23 +106,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public IActionResult GetV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] DataStateV1 state)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateTypeCResult<ClaimV1>
+                var result = new DataStateV1Result<ClaimV1>
                 {
                     Data = Mapper.Map<IEnumerable<ClaimV1>>(
                         UoW.Claims.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
-                                model.ToExpression<tbl_Claims>()))),
+                                state.ToExpression<tbl_Claims>()))),
 
                     Total = UoW.Claims.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
-                            model.ToPredicateExpression<tbl_Claims>()))
+                            state.ToPredicateExpression<tbl_Claims>()))
                 };
 
                 return Ok(result);
@@ -138,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                 .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 

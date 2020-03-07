@@ -1,11 +1,12 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -168,7 +169,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refresh = UoW.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+            var refresh = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.RefreshValue == input.refresh_token).ToLambda()).SingleOrDefault();
 
             if (refresh == null)

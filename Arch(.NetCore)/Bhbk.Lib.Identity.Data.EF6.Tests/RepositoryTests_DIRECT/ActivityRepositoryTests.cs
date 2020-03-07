@@ -1,8 +1,9 @@
-﻿using Bhbk.Lib.DataState.Expressions;
-using Bhbk.Lib.Identity.Data.EF6.Models_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EF6.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audience = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
                 .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
                 .Single();
 
@@ -65,7 +66,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var activity = UoW.Activities.Get(new QueryExpression<tbl_Activities>()
+            var activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<tbl_Activities>()
                 .Where(x => x.Immutable == false).ToLambda());
 
             UoW.Activities.Delete(activity);

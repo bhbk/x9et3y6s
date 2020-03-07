@@ -1,5 +1,8 @@
 ﻿
+
+
+
 CREATE VIEW [svc].[uvw_MOTDs]
 AS
-SELECT        Id, Title, Author, Quote, Category, Date, Tags, Length, Background
+SELECT        Id, Author, Quote, TssId, TssTitle, TssCategory, TssLength, TssDate, TssTags, TssBackground
 FROM            dbo.tbl_MOTDs

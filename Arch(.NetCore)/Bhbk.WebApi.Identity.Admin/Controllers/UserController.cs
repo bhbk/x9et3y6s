@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.DataState.Expressions;
+using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Primitives;
@@ -13,6 +13,9 @@ using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.QueryExpression.Exceptions;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -52,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                 .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 
@@ -273,7 +276,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(new QueryExpression<tbl_Refreshes>()
+            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == userID).ToLambda());
 
             UoW.Commit();
@@ -285,7 +288,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult DeleteRefreshV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
         {
-            var expr = new QueryExpression<tbl_Refreshes>()
+            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == userID && x.Id == refreshID).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
@@ -324,24 +327,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        public IActionResult GetV1([FromBody] PageStateTypeC model)
+        public IActionResult GetV1([FromBody] DataStateV1 state)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = new PageStateTypeCResult<UserV1>
+                var result = new DataStateV1Result<UserV1>
                 {
                     Data = Mapper.Map<IEnumerable<UserV1>>(
                         UoW.Users.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Users>, IQueryable<tbl_Users>>>>(
-                                model.ToExpression<tbl_Users>()),
+                                state.ToExpression<tbl_Users>()),
                             new List<Expression<Func<tbl_Users, object>>>() { x => x.tbl_UserLogins, x => x.tbl_UserRoles })),
 
                     Total = UoW.Users.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Users>, IQueryable<tbl_Users>>>>(
-                            model.ToPredicateExpression<tbl_Users>()))
+                            state.ToPredicateExpression<tbl_Users>()))
                 };
 
                 return Ok(result);
@@ -365,7 +368,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var claims = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            var claims = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                 .Where(x => x.tbl_UserClaims.Any(y => y.UserId == userID)).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<ClaimV1>>(claims));
@@ -383,7 +386,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var audiences = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var audiences = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
                 .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == userID))).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<AudienceV1>>(audiences));
@@ -401,7 +404,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var logins = UoW.Logins.Get(new QueryExpression<tbl_Logins>()
+            var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.UserId == userID)).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<LoginV1>>(logins));
@@ -410,7 +413,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID:guid}/refreshes"), HttpGet]
         public IActionResult GetRefreshesV1([FromRoute] Guid userID)
         {
-            var expr = new QueryExpression<tbl_Refreshes>()
+            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.UserId == userID).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
@@ -436,7 +439,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var roles = UoW.Roles.Get(new QueryExpression<tbl_Roles>()
+            var roles = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.UserId == userID)).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<RoleV1>>(roles));
@@ -455,7 +458,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var claim = UoW.Claims.Get(new QueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
                 .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 

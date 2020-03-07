@@ -4,7 +4,8 @@ using Xunit;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Tests.LibraryTests
 {
-    public class AutoMapperTests
+    [Collection("LibraryTests")]
+    public class AutoMapperTests : BaseLibraryTests
     {
         [Fact]
         public void Lib_AutoMapper_Profile_Success()

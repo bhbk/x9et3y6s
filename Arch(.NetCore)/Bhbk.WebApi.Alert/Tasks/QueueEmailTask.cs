@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Alert;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Bhbk.WebApi.Alert.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,7 +71,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                        foreach (var entry in uow.QueueEmails.Get(new QueryExpression<tbl_QueueEmails>()
+                        foreach (var entry in uow.QueueEmails.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueEmails>()
                             .Where(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).ToLambda()))
                         {
                             Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
@@ -81,7 +82,7 @@ namespace Bhbk.WebApi.Alert.Tasks
 
                         uow.Commit();
 
-                        foreach (var entry in uow.QueueEmails.Get(new QueryExpression<tbl_QueueEmails>()
+                        foreach (var entry in uow.QueueEmails.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueEmails>()
                             .Where(x => x.SendAt < DateTime.Now).ToLambda()))
                                 queue.Enqueue(entry);
                     }

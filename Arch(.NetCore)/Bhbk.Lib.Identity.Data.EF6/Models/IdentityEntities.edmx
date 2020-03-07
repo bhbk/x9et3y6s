@@ -129,18 +129,19 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_MOTDs' does not have a primar
         <EntityType Name="uvw_MOTDs">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
+            <PropertyRef Name="Author" />
+            <PropertyRef Name="Quote" />
           </Key>
-          <Property Name="Id" Type="varchar" MaxLength="128" Nullable="false" />
-          <Property Name="Title" Type="varchar(max)" />
-          <Property Name="Author" Type="varchar(max)" Nullable="false" />
-          <Property Name="Quote" Type="varchar(max)" Nullable="false" />
-          <Property Name="Category" Type="varchar(max)" />
-          <Property Name="Date" Type="datetime2" Precision="7" />
-          <Property Name="Tags" Type="varchar(max)" />
-          <Property Name="Length" Type="int" />
-          <Property Name="Background" Type="varchar(max)" />
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Author" Type="varchar" MaxLength="256" Nullable="false" />
+          <Property Name="Quote" Type="varchar" MaxLength="4096" Nullable="false" />
+          <Property Name="TssId" Type="varchar" MaxLength="128" />
+          <Property Name="TssTitle" Type="varchar" MaxLength="256" />
+          <Property Name="TssCategory" Type="varchar" MaxLength="256" />
+          <Property Name="TssLength" Type="int" />
+          <Property Name="TssDate" Type="datetime2" Precision="7" />
+          <Property Name="TssTags" Type="varchar" MaxLength="256" />
+          <Property Name="TssBackground" Type="varchar" MaxLength="512" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_QueueEmails' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -420,14 +421,15 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <EntitySet Name="uvw_MOTDs" EntityType="Self.uvw_MOTDs" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
     [uvw_MOTDs].[Id] AS [Id], 
-    [uvw_MOTDs].[Title] AS [Title], 
     [uvw_MOTDs].[Author] AS [Author], 
     [uvw_MOTDs].[Quote] AS [Quote], 
-    [uvw_MOTDs].[Category] AS [Category], 
-    [uvw_MOTDs].[Date] AS [Date], 
-    [uvw_MOTDs].[Tags] AS [Tags], 
-    [uvw_MOTDs].[Length] AS [Length], 
-    [uvw_MOTDs].[Background] AS [Background]
+    [uvw_MOTDs].[TssId] AS [TssId], 
+    [uvw_MOTDs].[TssTitle] AS [TssTitle], 
+    [uvw_MOTDs].[TssCategory] AS [TssCategory], 
+    [uvw_MOTDs].[TssLength] AS [TssLength], 
+    [uvw_MOTDs].[TssDate] AS [TssDate], 
+    [uvw_MOTDs].[TssTags] AS [TssTags], 
+    [uvw_MOTDs].[TssBackground] AS [TssBackground]
     FROM [svc].[uvw_MOTDs] AS [uvw_MOTDs]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_QueueEmails" EntityType="Self.uvw_QueueEmails" store:Type="Views" store:Schema="svc">
@@ -641,20 +643,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
         </EntityType>
-        <EntityType Name="uvw_MOTDs">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Author" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Quote" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Category" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Date" Type="DateTime" Precision="7" />
-          <Property Name="Tags" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Length" Type="Int32" />
-          <Property Name="Background" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-        </EntityType>
         <EntityType Name="uvw_Refreshes">
           <Key>
             <PropertyRef Name="Id" />
@@ -703,7 +691,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <EntitySet Name="uvw_Claims" EntityType="Self.uvw_Claims" />
           <EntitySet Name="uvw_Issuers" EntityType="Self.uvw_Issuers" />
           <EntitySet Name="uvw_Logins" EntityType="Self.uvw_Logins" />
-          <EntitySet Name="uvw_MOTDs" EntityType="Self.uvw_MOTDs" />
           <EntitySet Name="uvw_Refreshes" EntityType="Self.uvw_Refreshes" />
           <EntitySet Name="uvw_Users" EntityType="Self.uvw_Users" />
           <EntitySet Name="uvw_Roles" EntityType="IdentityModels.uvw_Roles" />
@@ -712,6 +699,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <EntitySet Name="uvw_Settings" EntityType="IdentityModels.uvw_Settings" />
           <EntitySet Name="uvw_States" EntityType="IdentityModels.uvw_States" />
           <EntitySet Name="uvw_Urls" EntityType="IdentityModels.uvw_Urls" />
+          <EntitySet Name="uvw_MOTDs" EntityType="IdentityModels.uvw_MOTDs" />
           </EntityContainer>
         <EntityType Name="uvw_Roles">
           <Key>
@@ -807,6 +795,23 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
         </EntityType>
+        <EntityType Name="uvw_MOTDs">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="Author" />
+            <PropertyRef Name="Quote" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="Author" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="Quote" Type="String" Nullable="false" MaxLength="4096" FixedLength="false" Unicode="false" />
+          <Property Name="TssId" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="TssTitle" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="TssCategory" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="TssLength" Type="Int32" />
+          <Property Name="TssDate" Type="DateTime" Precision="7" />
+          <Property Name="TssTags" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="TssBackground" Type="String" MaxLength="512" FixedLength="false" Unicode="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -897,21 +902,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
                 <ScalarProperty Name="Created" ColumnName="Created" />
                 <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_MOTDs">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_MOTDs">
-              <MappingFragment StoreEntitySet="uvw_MOTDs">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Title" ColumnName="Title" />
-                <ScalarProperty Name="Author" ColumnName="Author" />
-                <ScalarProperty Name="Quote" ColumnName="Quote" />
-                <ScalarProperty Name="Category" ColumnName="Category" />
-                <ScalarProperty Name="Date" ColumnName="Date" />
-                <ScalarProperty Name="Tags" ColumnName="Tags" />
-                <ScalarProperty Name="Length" ColumnName="Length" />
-                <ScalarProperty Name="Background" ColumnName="Background" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1051,6 +1041,22 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
                 <ScalarProperty Name="UrlHost" ColumnName="UrlHost" />
                 <ScalarProperty Name="ActorId" ColumnName="ActorId" />
                 <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_MOTDs">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_MOTDs">
+              <MappingFragment StoreEntitySet="uvw_MOTDs">
+                <ScalarProperty Name="TssBackground" ColumnName="TssBackground" />
+                <ScalarProperty Name="TssTags" ColumnName="TssTags" />
+                <ScalarProperty Name="TssDate" ColumnName="TssDate" />
+                <ScalarProperty Name="TssLength" ColumnName="TssLength" />
+                <ScalarProperty Name="TssCategory" ColumnName="TssCategory" />
+                <ScalarProperty Name="TssTitle" ColumnName="TssTitle" />
+                <ScalarProperty Name="TssId" ColumnName="TssId" />
+                <ScalarProperty Name="Quote" ColumnName="Quote" />
+                <ScalarProperty Name="Author" ColumnName="Author" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

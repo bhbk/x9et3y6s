@@ -49,12 +49,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<PageStateTypeCResult<ActivityV1>> Activity_GetV1(PageStateTypeC model)
+        public async ValueTask<DataStateV1Result<ActivityV1>> Activity_GetV1(DataStateV1 model)
         {
             var response = await Http.Activity_GetV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<PageStateTypeCResult<ActivityV1>>().Result;
+                return response.Content.ReadAsAsync<DataStateV1Result<ActivityV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -104,12 +104,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<PageStateTypeCResult<AudienceV1>> Audience_GetV1(PageStateTypeC model)
+        public async ValueTask<DataStateV1Result<AudienceV1>> Audience_GetV1(DataStateV1 model)
         {
             var response = await Http.Audience_GetV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<PageStateTypeCResult<AudienceV1>>().Result;
+                return response.Content.ReadAsAsync<DataStateV1Result<AudienceV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -192,12 +192,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<PageStateTypeCResult<ClaimV1>> Claim_GetV1(PageStateTypeC model)
+        public async ValueTask<DataStateV1Result<ClaimV1>> Claim_GetV1(DataStateV1 model)
         {
             var response = await Http.Claim_GetV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<PageStateTypeCResult<ClaimV1>>().Result;
+                return response.Content.ReadAsAsync<DataStateV1Result<ClaimV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -258,12 +258,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<PageStateTypeCResult<IssuerV1>> Issuer_GetV1(PageStateTypeC model)
+        public async ValueTask<DataStateV1Result<IssuerV1>> Issuer_GetV1(DataStateV1 model)
         {
             var response = await Http.Issuer_GetV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<PageStateTypeCResult<IssuerV1>>().Result;
+                return response.Content.ReadAsAsync<DataStateV1Result<IssuerV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -324,12 +324,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<PageStateTypeCResult<LoginV1>> Login_GetV1(PageStateTypeC model)
+        public async ValueTask<DataStateV1Result<LoginV1>> Login_GetV1(DataStateV1 model)
         {
             var response = await Http.Login_GetV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<PageStateTypeCResult<LoginV1>>().Result;
+                return response.Content.ReadAsAsync<DataStateV1Result<LoginV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -346,23 +346,23 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<MOTDV1> MOTD_GetV1(string motdValue)
+        public async ValueTask<MOTDTssV1> MOTD_GetV1(string motdValue)
         {
             var response = await Http.MOTD_GetV1(_ropg.AccessToken.RawData, motdValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<MOTDV1>().Result;
+                return response.Content.ReadAsAsync<MOTDTssV1>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<PageStateTypeCResult<MOTDV1>> MOTD_GetV1(PageStateTypeC model)
+        public async ValueTask<DataStateV1Result<MOTDTssV1>> MOTD_GetV1(DataStateV1 model)
         {
             var response = await Http.MOTD_GetV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<PageStateTypeCResult<MOTDV1>>().Result;
+                return response.Content.ReadAsAsync<DataStateV1Result<MOTDTssV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -401,12 +401,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<PageStateTypeCResult<RoleV1>> Role_GetV1(PageStateTypeC model)
+        public async ValueTask<DataStateV1Result<RoleV1>> Role_GetV1(DataStateV1 model)
         {
             var response = await Http.Role_GetV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<PageStateTypeCResult<RoleV1>>().Result;
+                return response.Content.ReadAsAsync<DataStateV1Result<RoleV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -577,12 +577,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.RequestMessage.ToString()));
         }
 
-        public async ValueTask<PageStateTypeCResult<UserV1>> User_GetV1(PageStateTypeC model)
+        public async ValueTask<DataStateV1Result<UserV1>> User_GetV1(DataStateV1 model)
         {
             var response = await Http.User_GetV1(_ropg.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<PageStateTypeCResult<UserV1>>().Result;
+                return response.Content.ReadAsAsync<DataStateV1Result<UserV1>>().Result;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

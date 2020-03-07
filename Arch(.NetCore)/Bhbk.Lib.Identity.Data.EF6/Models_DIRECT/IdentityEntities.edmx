@@ -102,15 +102,16 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="varchar" MaxLength="128" Nullable="false" />
-          <Property Name="Title" Type="varchar" MaxLength="256" />
-          <Property Name="Author" Type="varchar" MaxLength="128" Nullable="false" />
-          <Property Name="Quote" Type="varchar(max)" Nullable="false" />
-          <Property Name="Category" Type="varchar" MaxLength="256" />
-          <Property Name="Date" Type="datetime2" Precision="7" />
-          <Property Name="Tags" Type="varchar" MaxLength="128" />
-          <Property Name="Length" Type="int" />
-          <Property Name="Background" Type="varchar" MaxLength="512" />
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="TssId" Type="varchar" MaxLength="128" />
+          <Property Name="TssTitle" Type="varchar" MaxLength="256" />
+          <Property Name="Author" Type="varchar" MaxLength="256" Nullable="false" />
+          <Property Name="Quote" Type="varchar" MaxLength="4096" Nullable="false" />
+          <Property Name="TssCategory" Type="varchar" MaxLength="256" />
+          <Property Name="TssDate" Type="datetime2" Precision="7" />
+          <Property Name="TssTags" Type="varchar" MaxLength="256" />
+          <Property Name="TssLength" Type="int" />
+          <Property Name="TssBackground" Type="varchar" MaxLength="512" />
         </EntityType>
         <EntityType Name="tbl_QueueEmails">
           <Key>
@@ -1677,15 +1678,16 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="Title" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
-          <Property Name="Author" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="Quote" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Category" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
-          <Property Name="Date" Type="DateTime" Precision="7" />
-          <Property Name="Tags" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="Length" Type="Int32" />
-          <Property Name="Background" Type="String" MaxLength="512" FixedLength="false" Unicode="false" />
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="TssId" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="TssTitle" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="Author" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="Quote" Type="String" Nullable="false" MaxLength="4096" FixedLength="false" Unicode="false" />
+          <Property Name="TssCategory" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="TssDate" Type="DateTime" Precision="7" />
+          <Property Name="TssTags" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="TssLength" Type="Int32" />
+          <Property Name="TssBackground" Type="String" MaxLength="512" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -1978,14 +1980,15 @@
           <EntitySetMapping Name="tbl_MOTDs">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_MOTDs">
               <MappingFragment StoreEntitySet="tbl_MOTDs">
-                <ScalarProperty Name="Background" ColumnName="Background" />
-                <ScalarProperty Name="Length" ColumnName="Length" />
-                <ScalarProperty Name="Tags" ColumnName="Tags" />
-                <ScalarProperty Name="Date" ColumnName="Date" />
-                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="TssBackground" ColumnName="TssBackground" />
+                <ScalarProperty Name="TssLength" ColumnName="TssLength" />
+                <ScalarProperty Name="TssTags" ColumnName="TssTags" />
+                <ScalarProperty Name="TssDate" ColumnName="TssDate" />
+                <ScalarProperty Name="TssCategory" ColumnName="TssCategory" />
                 <ScalarProperty Name="Quote" ColumnName="Quote" />
                 <ScalarProperty Name="Author" ColumnName="Author" />
-                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="TssTitle" ColumnName="TssTitle" />
+                <ScalarProperty Name="TssId" ColumnName="TssId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

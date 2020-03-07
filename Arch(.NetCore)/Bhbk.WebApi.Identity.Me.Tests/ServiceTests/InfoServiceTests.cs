@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 new GenerateTestData(uow, mapper).CreateMOTD(3);
 
                 var result = await service.Info_GetMOTDV1();
-                result.Should().BeAssignableTo<MOTDV1>();
+                result.Should().BeAssignableTo<MOTDTssV1>();
             }
         }
 

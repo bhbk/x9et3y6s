@@ -1,6 +1,5 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
@@ -8,6 +7,8 @@ using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -144,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var logins = UoW.Logins.Get(new QueryExpression<tbl_Logins>()
+            var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
 
             switch (UoW.InstanceType)
@@ -298,7 +299,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refresh = UoW.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+            var refresh = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.RefreshValue == input.refresh_token).ToLambda()).SingleOrDefault();
 
             if (refresh == null)
@@ -468,7 +469,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var audienceList = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var audienceList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
             var audiences = new List<tbl_Audiences>();
 
@@ -505,7 +506,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
-            var logins = UoW.Logins.Get(new QueryExpression<tbl_Logins>()
+            var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
 
             switch (UoW.InstanceType)
@@ -631,7 +632,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refresh = UoW.Refreshes.Get(new QueryExpression<tbl_Refreshes>()
+            var refresh = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
                 .Where(x => x.RefreshValue == input.refresh_token).ToLambda()).SingleOrDefault();
 
             if (refresh == null)
@@ -686,7 +687,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var clientList = UoW.Audiences.Get(new QueryExpression<tbl_Audiences>()
+            var clientList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
             var audiences = new List<tbl_Audiences>();
 

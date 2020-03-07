@@ -99,27 +99,29 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             /*
              * message of the day models
              */
-            CreateMap<MOTDV1, tbl_MOTDs>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.id == default || val.id == null) ? Guid.NewGuid().ToString() : val.id))
-                .ForMember(dest => dest.Title, src => src.MapFrom(val => val.title))
+            CreateMap<MOTDTssV1, tbl_MOTDs>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.globalId == default || val.globalId == null) ? Guid.NewGuid() : val.globalId))
                 .ForMember(dest => dest.Author, src => src.MapFrom(val => val.author))
                 .ForMember(dest => dest.Quote, src => src.MapFrom(val => val.quote))
-                .ForMember(dest => dest.Category, src => src.MapFrom(val => val.category))
-                .ForMember(dest => dest.Date, src => src.MapFrom(val => val.date))
-                .ForMember(dest => dest.Tags, src => src.MapFrom(val => string.Join(",", val.tags.Select(x => x))))
-                .ForMember(dest => dest.Length, src => src.MapFrom(val => val.length))
-                .ForMember(dest => dest.Background, src => src.MapFrom(val => val.background));
+                .ForMember(dest => dest.TssId, src => src.MapFrom(val => val.id))
+                .ForMember(dest => dest.TssTitle, src => src.MapFrom(val => val.title))
+                .ForMember(dest => dest.TssCategory, src => src.MapFrom(val => val.category))
+                .ForMember(dest => dest.TssLength, src => src.MapFrom(val => val.length))
+                .ForMember(dest => dest.TssDate, src => src.MapFrom(val => val.date))
+                .ForMember(dest => dest.TssTags, src => src.MapFrom(val => string.Join(",", val.tags.Select(x => x))))
+                .ForMember(dest => dest.TssBackground, src => src.MapFrom(val => val.background));
 
-            CreateMap<tbl_MOTDs, MOTDV1>()
-                .ForMember(dest => dest.id, src => src.MapFrom(val => val.Id))
-                .ForMember(dest => dest.title, src => src.MapFrom(val => val.Title))
+            CreateMap<tbl_MOTDs, MOTDTssV1>()
+                .ForMember(dest => dest.globalId, src => src.MapFrom(val => val.Id))
                 .ForMember(dest => dest.author, src => src.MapFrom(val => val.Author))
                 .ForMember(dest => dest.quote, src => src.MapFrom(val => val.Quote))
-                .ForMember(dest => dest.category, src => src.MapFrom(val => val.Category))
-                .ForMember(dest => dest.date, src => src.MapFrom(val => val.Date))
-                .ForMember(dest => dest.tags, src => src.MapFrom(val => val.Tags.Split(',', StringSplitOptions.None).ToList()))
-                .ForMember(dest => dest.length, src => src.MapFrom(val => val.Length))
-                .ForMember(dest => dest.background, src => src.MapFrom(val => val.Background));
+                .ForMember(dest => dest.id, src => src.MapFrom(val => val.TssId))
+                .ForMember(dest => dest.title, src => src.MapFrom(val => val.TssTitle))
+                .ForMember(dest => dest.category, src => src.MapFrom(val => val.TssCategory))
+                .ForMember(dest => dest.length, src => src.MapFrom(val => val.TssLength))
+                .ForMember(dest => dest.date, src => src.MapFrom(val => val.TssDate))
+                .ForMember(dest => dest.tags, src => src.MapFrom(val => val.TssTags.Split(',', StringSplitOptions.None).ToList()))
+                .ForMember(dest => dest.background, src => src.MapFrom(val => val.TssBackground));
 
             /*
              * refresh models

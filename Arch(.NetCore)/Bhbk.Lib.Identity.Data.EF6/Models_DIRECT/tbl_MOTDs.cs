@@ -14,14 +14,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
     
     public partial class tbl_MOTDs
     {
-        public string Id { get; set; }
-        public string Title { get; set; }
+        public System.Guid Id { get; set; }
+        public string TssId { get; set; }
+        public string TssTitle { get; set; }
         public string Author { get; set; }
         public string Quote { get; set; }
-        public string Category { get; set; }
-        public Nullable<System.DateTime> Date { get; set; }
-        public string Tags { get; set; }
-        public Nullable<int> Length { get; set; }
-        public string Background { get; set; }
+        public string TssCategory { get; set; }
+        public Nullable<System.DateTime> TssDate { get; set; }
+        public string TssTags { get; set; }
+        public Nullable<int> TssLength { get; set; }
+        public string TssBackground { get; set; }
     }
 }

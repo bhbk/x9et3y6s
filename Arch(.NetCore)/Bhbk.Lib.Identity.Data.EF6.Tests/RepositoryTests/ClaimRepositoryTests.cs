@@ -1,7 +1,8 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.DataState.Expressions;
 using Bhbk.Lib.Identity.Data.EF6.Models;
 using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(new QueryExpression<uvw_Issuers>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuers>()
                 .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
                 .Single();
 
@@ -37,10 +38,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 new uvw_Claims()
                 {
                     IssuerId = issuer.Id,
-                    Subject = "Subject-" + AlphaNumeric.CreateString(4),
+                    Subject = Constants.ApiTestClaimSubject,
                     Type = Constants.ApiTestClaim,
                     Value = AlphaNumeric.CreateString(8),
-                    ValueType = "ValueType-" + AlphaNumeric.CreateString(4),
+                    ValueType = Constants.ApiTestClaimValueType,
                     Immutable = false,
                 });
             result.Should().BeAssignableTo<uvw_Claims>();
@@ -61,7 +62,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(new QueryExpression<uvw_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                 .Single();
 
@@ -94,7 +95,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(new QueryExpression<uvw_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claims>()
                 .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
                 .Single();
             claim.Value += "(Updated)";
