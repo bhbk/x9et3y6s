@@ -206,7 +206,7 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
             else
                 throw new NotImplementedException();
 
-            if(!string.IsNullOrEmpty(msg))
+            if (!string.IsNullOrEmpty(msg))
             {
                 Status = JsonConvert.SerializeObject(
                     new
