@@ -10,6 +10,7 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,6 +25,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
 
         public MaintainActivityTask(IServiceScopeFactory factory, IConfiguration conf)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+
             _factory = factory;
             _delay = int.Parse(conf["Tasks:MaintainActivity:PollingDelay"]);
             _auditable = int.Parse(conf["Tasks:MaintainActivity:HoldAuditable"]);
@@ -36,26 +39,25 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
             Status = JsonConvert.SerializeObject(
                 new
                 {
-                    status = typeof(MaintainActivityTask).Name + " not run yet."
+                    status = callPath + " not run yet."
                 }, _serializer);
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+
             while (!cancellationToken.IsCancellationRequested)
             {
+#if DEBUG
+                Log.Information($"'{callPath}' sleeping for {TimeSpan.FromSeconds(_delay)}");
+#endif
                 await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
-
+#if DEBUG
+                Log.Information($"'{callPath}' running");
+#endif
                 try
                 {
-                    /*
-                     * async database calls from background services should be
-                     * avoided so threading issues do not occur.
-                     * 
-                     * when calling scoped service (unit of work) from a singleton
-                     * service (background task) wrap in using block to mimic transient.
-                     */
-
                     using (var scope = _factory.CreateScope())
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -72,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tasks
                             uow.Activities.Delete(expired);
                             uow.Commit();
 
-                            var msg = typeof(MaintainActivityTask).Name + " success on " + DateTime.Now.ToString() + ". Delete "
+                            var msg = callPath + " success on " + DateTime.Now.ToString() + ". Delete "
                                     + expiredCount.ToString() + " expired activity entries.";
 
                             Status = JsonConvert.SerializeObject(

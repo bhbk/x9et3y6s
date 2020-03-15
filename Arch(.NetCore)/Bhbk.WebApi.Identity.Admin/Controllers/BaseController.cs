@@ -19,7 +19,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         protected IUnitOfWork UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>(); }
         protected IConfiguration Conf { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfiguration>(); }
         protected IHostedService[] Tasks { get => (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>(); }
-        protected LoggingLevel Logs { get => (LoggingLevel)Enum.Parse(typeof(LoggingLevel), Conf["Logging:LogLevel:Default"], true); }
 
         [NonAction]
         protected Guid GetIdentityGUID()

@@ -69,16 +69,16 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                  * only for owin authentication configuration.
                  */
 
-                var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                new GenerateDefaultData(owin, mapper).Create();
+                var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                new GenerateDefaultData(seeds, mapper).Create();
 
-                var issuers = owin.Issuers.Get()
+                var issuers = seeds.Issuers.Get()
                     .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
 
-                var issuerKeys = owin.Issuers.Get()
+                var issuerKeys = seeds.Issuers.Get()
                     .Select(x => x.IssuerKey);
 
-                var audiences = owin.Audiences.Get()
+                var audiences = seeds.Audiences.Get()
                     .Select(x => x.Name);
 
                 sc.AddControllers()

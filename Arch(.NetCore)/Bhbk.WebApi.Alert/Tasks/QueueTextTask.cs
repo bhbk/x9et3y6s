@@ -15,6 +15,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,6 +33,8 @@ namespace Bhbk.WebApi.Alert.Tasks
 
         public QueueTextTask(IServiceScopeFactory factory, IConfiguration conf)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+
             _factory = factory;
             _delay = int.Parse(conf["Tasks:QueueText:PollingDelay"]);
             _expire = int.Parse(conf["Tasks:QueueText:ExpireDelay"]);
@@ -46,27 +49,26 @@ namespace Bhbk.WebApi.Alert.Tasks
             Status = JsonConvert.SerializeObject(
                 new
                 {
-                    status = typeof(QueueTextTask).Name + " not run yet."
+                    status = callPath + " not run yet."
                 }, _serializer);
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+
             while (!cancellationToken.IsCancellationRequested)
             {
+#if DEBUG
+                Log.Information($"'{callPath}' sleeping for {TimeSpan.FromSeconds(_delay)}");
+#endif
                 await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
-
+#if DEBUG
+                Log.Information($"'{callPath}' running");
+#endif
                 try
                 {
                     var queue = new ConcurrentQueue<tbl_QueueTexts>();
-
-                    /*
-                     * async database calls from background services should be
-                     * avoided so threading issues do not occur.
-                     * 
-                     * when calling scoped service (unit of work) from a singleton
-                     * service (background task) wrap in using block to mimic transient.
-                     */
 
                     using (var scope = _factory.CreateScope())
                     {
@@ -91,7 +93,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                     Status = JsonConvert.SerializeObject(
                         new
                         {
-                            status = typeof(QueueTextTask).Name + " contains " + queue.Count() + " text messages queued for hand-off.",
+                            status = callPath + " contains " + queue.Count() + " text messages queued for hand-off.",
                             queue = queue.Select(x => new {
                                 Id = x.Id.ToString(),
                                 Created = x.Created,
@@ -118,10 +120,10 @@ namespace Bhbk.WebApi.Alert.Tasks
                                         await provider.TryTextHandoff(_providerSid, _providerToken, msg);
 
                                         uow.QueueTexts.Delete(msg);
-                                        Log.Information(typeof(QueueTextTask).Name + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
+                                        Log.Information(callPath + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
 #elif !RELEASE
                                         uow.QueueTexts.Delete(msg);
-                                        Log.Information(typeof(QueueTextTask).Name + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
+                                        Log.Information(callPath + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                     }
                                     break;
@@ -130,7 +132,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                                 case InstanceContext.IntegrationTest:
                                     {
                                         uow.QueueTexts.Delete(msg);
-                                        Log.Information(typeof(QueueTextTask).Name + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
+                                        Log.Information(callPath + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
                                     }
                                     break;
 

@@ -23,7 +23,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
@@ -70,16 +69,16 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 * only for owin authentication configuration.
                 */
 
-                var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                new GenerateDefaultData(owin, mapper).Create();
+                var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                new GenerateDefaultData(seeds, mapper).Create();
 
-                var issuers = owin.Issuers.Get()
+                var issuers = seeds.Issuers.Get()
                     .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
 
-                var issuerKeys = owin.Issuers.Get()
+                var issuerKeys = seeds.Issuers.Get()
                     .Select(x => x.IssuerKey);
 
-                var audiences = owin.Audiences.Get()
+                var audiences = seeds.Audiences.Get()
                     .Select(x => x.Name);
 
                 sc.AddControllers()

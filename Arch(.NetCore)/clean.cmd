@@ -2,7 +2,7 @@
 powershell -command "& { Remove-Item *.nupkg }"
 powershell -command "& { Remove-Item *.tmp }"
 
-powershell -command "& { if (Test-Path .\Packages) { Remove-Item .\Packages -Recurse -Force } }"
+rem powershell -command "& { if (Test-Path .\Packages) { Remove-Item .\Packages -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\TestResults) { Remove-Item .\TestResults -Recurse -Force } }"
 
 cd Bhbk.Cli.Identity

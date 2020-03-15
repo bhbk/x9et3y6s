@@ -15,6 +15,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,6 +33,8 @@ namespace Bhbk.WebApi.Alert.Tasks
 
         public QueueEmailTask(IServiceScopeFactory factory, IConfiguration conf)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+
             _factory = factory;
             _delay = int.Parse(conf["Tasks:QueueEmail:PollingDelay"]);
             _expire = int.Parse(conf["Tasks:QueueEmail:ExpireDelay"]);
@@ -45,27 +48,26 @@ namespace Bhbk.WebApi.Alert.Tasks
             Status = JsonConvert.SerializeObject(
                 new
                 {
-                    status = typeof(QueueEmailTask).Name + " not run yet."
+                    status = callPath + " not run yet."
                 }, _serializer);
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+
             while (!cancellationToken.IsCancellationRequested)
             {
+#if DEBUG
+                Log.Information($"'{callPath}' sleeping for {TimeSpan.FromSeconds(_delay)}");
+#endif
                 await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
-
+#if DEBUG
+                Log.Information($"'{callPath}' running");
+#endif
                 try
                 {
                     var queue = new ConcurrentQueue<tbl_QueueEmails>();
-
-                    /*
-                     * async database calls from background services should be
-                     * avoided so threading issues do not occur.
-                     * 
-                     * when calling scoped service (unit of work) from a singleton
-                     * service (background task) wrap in using block to mimic transient.
-                     */
 
                     using (var scope = _factory.CreateScope())
                     {
@@ -74,7 +76,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                         foreach (var entry in uow.QueueEmails.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueEmails>()
                             .Where(x => x.Created < DateTime.Now.AddSeconds(-(_expire))).ToLambda()))
                         {
-                            Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
+                            Log.Warning(callPath + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
                                 "The email was created on " + entry.Created + " and is being deleted now.");
 
                             uow.QueueEmails.Delete(entry);
@@ -90,7 +92,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                     Status = JsonConvert.SerializeObject(
                         new
                         {
-                            status = typeof(QueueEmailTask).Name + " contains " + queue.Count() + " email messages queued for hand-off.",
+                            status = callPath + " contains " + queue.Count() + " email messages queued for hand-off.",
                             queue = queue.Select(x => new {
                                 Id = x.Id.ToString(),
                                 Created = x.Created,
@@ -120,14 +122,14 @@ namespace Bhbk.WebApi.Alert.Tasks
                                         if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
                                         {
                                             uow.QueueEmails.Delete(msg);
-                                            Log.Information(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
+                                            Log.Information(callPath + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
                                         }
                                         else
-                                            Log.Warning(typeof(QueueEmailTask).Name + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
+                                            Log.Warning(callPath + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
                                                 "Error=" + response.StatusCode);
 #elif !RELEASE
                                         uow.QueueEmails.Delete(msg);
-                                        Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
+                                        Log.Information(callPath + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                     }
                                     break;
@@ -136,7 +138,7 @@ namespace Bhbk.WebApi.Alert.Tasks
                                 case InstanceContext.IntegrationTest:
                                     {
                                         uow.QueueEmails.Delete(msg);
-                                        Log.Information(typeof(QueueEmailTask).Name + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
+                                        Log.Information(callPath + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
                                     }
                                     break;
 

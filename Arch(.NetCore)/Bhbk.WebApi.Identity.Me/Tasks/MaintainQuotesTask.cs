@@ -3,6 +3,7 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,16 +26,15 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
     {
         private readonly IServiceScopeFactory _factory;
         private readonly JsonSerializerSettings _serializer;
-        private readonly string _key = string.Empty, _url = string.Empty;
         private readonly int _delay;
         public string Status { get; private set; }
 
         public MaintainQuotesTask(IServiceScopeFactory factory, IConfiguration conf)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+
             _factory = factory;
             _delay = int.Parse(conf["Tasks:MaintainQuotes:PollingDelay"]);
-            _key = conf["Tasks:MaintainQuotes:TheySaidSoApiKey"];
-            _url = conf["Tasks:MaintainQuotes:TheySaidSoApiUrl"];
             _serializer = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
@@ -42,29 +43,25 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
             Status = JsonConvert.SerializeObject(
                 new
                 {
-                    status = typeof(MaintainQuotesTask).Name + " not run yet."
+                    status = callPath + " not run yet."
                 }, _serializer);
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+
             while (!cancellationToken.IsCancellationRequested)
             {
-                if(!string.IsNullOrEmpty(_key))
-                    await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
-                else
-                    await Task.Delay((TimeSpan.FromSeconds(_delay) * 60), cancellationToken);
-
+#if DEBUG
+                Log.Information($"'{callPath}' sleeping for {TimeSpan.FromSeconds(_delay)}");
+#endif
+                await Task.Delay(TimeSpan.FromSeconds(_delay), cancellationToken);
+#if DEBUG
+                Log.Information($"'{callPath}' running");
+#endif
                 try
                 {
-                    /*
-                     * async database calls from background services should be
-                     * avoided so threading issues do not occur.
-                     * 
-                     * when calling scoped service (unit of work) from a singleton
-                     * service (background task) wrap in using block to mimic transient.
-                     */
-
                     using (var scope = _factory.CreateScope())
                     {
                         var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -72,37 +69,25 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
 
                         if (uow.InstanceType == InstanceContext.DeployedOrLocal)
                         {
-                            if (!string.IsNullOrEmpty(_key))
+                            var url = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
+                                && x.ConfigKey == Constants.ApiSettingTheySaidSoUrl).Single();
+
+                            var key = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
+                                && x.ConfigKey == Constants.ApiSettingTheySaidSoLicense).Single();
+
+                            using (var http = new HttpClient())
                             {
-                                using (var http = new HttpClient())
-                                {
-                                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                                    http.DefaultRequestHeaders.Add("X-TheySaidSo-Api-Secret", _key);
+                                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                http.DefaultRequestHeaders.Add("X-TheySaidSo-Api-Secret", key.ConfigValue);
 
-                                    var response = await http.GetAsync(_url + "/quote/random.json?language=en&limit=10", cancellationToken);
-                                    var results = JsonConvert.DeserializeObject<MOTDTssV1Response>(await response.Content.ReadAsStringAsync());
+                                var response = await http.GetAsync(url.ConfigValue + "/quote/random.json?language=en", cancellationToken);
+                                var results = JsonConvert.DeserializeObject<MOTDTssV1Response>(await response.Content.ReadAsStringAsync());
 
-                                    if (response.IsSuccessStatusCode)
-                                        foreach (var quote in results.contents.quotes)
-                                            ProcessMOTDSuccess(uow, mapper, quote);
-                                    else
-                                        ProcessMOTDFail(response);
-                                }
-                            }
-                            else
-                            {
-                                using (var http = new HttpClient())
-                                {
-                                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                                    var response = await http.GetAsync(_url + "/qod.json", cancellationToken);
-                                    var results = JsonConvert.DeserializeObject<MOTDTssV1Response>(await response.Content.ReadAsStringAsync());
-
-                                    if (response.IsSuccessStatusCode)
-                                        ProcessMOTDSuccess(uow, mapper, results.contents.quotes[0]);
-                                    else
-                                        ProcessMOTDFail(response);
-                                }
+                                if (response.IsSuccessStatusCode)
+                                    foreach (var quote in results.contents.quotes)
+                                        ProcessMOTDSuccess(uow, mapper, quote);
+                                else
+                                    ProcessMOTDFail(response);
                             }
                         }
                     }

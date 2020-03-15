@@ -58,6 +58,8 @@ namespace Bhbk.Lib.Identity.Primitives
         public const string ApiSettingGlobalLegacyClaims = "GlobalLegacyClaims";
         public const string ApiSettingGlobalLegacyIssuer = "GlobalLegacyIssuer";
         public const string ApiSettingGlobalTotpExpire = "GlobalTotpExpire";
+        public const string ApiSettingTheySaidSoLicense = "TheySaidSoLicense";
+        public const string ApiSettingTheySaidSoUrl = "TheySaidSoUrl";
 
         #endregion
 

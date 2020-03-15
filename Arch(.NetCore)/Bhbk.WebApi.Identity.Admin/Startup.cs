@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Admin
              * only for owin authentication configuration.
              */
 
-            var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+            var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
             var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                 .Select(x => x.Value);
@@ -72,24 +72,24 @@ namespace Bhbk.WebApi.Identity.Admin
             var allowedAudiences = conf.GetSection("IdentityTenants:AllowedAudiences").GetChildren()
                 .Select(x => x.Value);
 
-            var issuers = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
+            var issuers = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
                 .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
 
-            var issuerKeys = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
+            var issuerKeys = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
                 .Select(x => x.IssuerKey);
 
-            var audiences = owin.Audiences.Get(x => allowedAudiences.Any(y => y == x.Name))
+            var audiences = seeds.Audiences.Get(x => allowedAudiences.Any(y => y == x.Name))
                 .Select(x => x.Name);
 
             /*
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
+            var legacyIssuer = seeds.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
-                issuers = owin.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
+                issuers = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
                     .Select(x => x.Name).Concat(issuers);
 
             sc.AddLogging(opt =>
