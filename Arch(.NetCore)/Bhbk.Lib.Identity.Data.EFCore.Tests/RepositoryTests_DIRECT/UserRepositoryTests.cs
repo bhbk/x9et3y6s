@@ -36,9 +36,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             var result = UoW.Users.Create(
                 Mapper.Map<tbl_Users>(new UserV1()
                 {
-                    UserName = Constants.ApiTestUser,
-                    Email = Constants.ApiTestUser,
-                    PhoneNumber = Constants.ApiTestUserPhone,
+                    UserName = Constants.TestUser,
+                    Email = Constants.TestUser,
+                    PhoneNumber = NumberAs.CreateString(9),
                     FirstName = "First-" + Base64.CreateString(4),
                     LastName = "Last-" + Base64.CreateString(4),
                     LockoutEnabled = false,
@@ -67,7 +67,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda()).Single();
+                .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
 
             UoW.Users.Delete(user);
             UoW.Commit();
@@ -101,7 +101,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda()).Single();
+                .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";
 

@@ -32,15 +32,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuers>()
-                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audiences>()
-                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
-                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda())
+                .Where(x => x.UserName == Constants.TestUser).ToLambda())
                 .Single();
 
             var result = UoW.States.Create(
@@ -105,7 +105,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
-                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda())
+                .Where(x => x.UserName == Constants.TestUser).ToLambda())
                 .Single();
 
             var state = UoW.States.Get(QueryExpressionFactory.GetQueryExpression<uvw_States>()

@@ -5,12 +5,10 @@ using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Exceptions;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -23,7 +21,6 @@ using System.Linq.Expressions;
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("activity")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
     public class ActivityController : BaseController
     {
         private ActivityProvider _provider;
@@ -34,7 +31,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{activityValue}"), HttpGet]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult GetV1([FromRoute] string activityValue)
         {
             Guid activityID;
@@ -55,7 +51,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult GetV1([FromBody] DataStateV1 state)
         {
             if (!ModelState.IsValid)

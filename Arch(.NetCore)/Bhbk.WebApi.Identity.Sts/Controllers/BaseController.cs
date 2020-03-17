@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Factories;
+using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +13,7 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Constants.DefaultRoleForUser_Identity + ", " + Constants.DefaultRoleForAdmin_Identity)]
     public class BaseController : Controller
     {
         protected IOAuth2JwtFactory Auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IOAuth2JwtFactory>(); }

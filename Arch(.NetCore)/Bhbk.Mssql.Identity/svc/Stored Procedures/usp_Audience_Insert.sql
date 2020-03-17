@@ -1,12 +1,9 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_Audience_Insert]
      @IssuerId				UNIQUEIDENTIFIER
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
-    ,@AudienceType			NVARCHAR (MAX) 
     ,@LockoutEnabled		BIT     
     ,@LockoutEnd			DATETIMEOFFSET (7)
     ,@LastLoginSuccess		DATETIME2 (7)
@@ -28,7 +25,6 @@ INSERT INTO [dbo].[tbl_Audiences]
     ,ActorId    
     ,Name           
     ,Description   
-	,AudienceType
     ,Created           
     ,LockoutEnabled      
     ,LockoutEnd        
@@ -45,7 +41,6 @@ VALUES
     ,@ActorId   
     ,@Name           
     ,@Description       
-	,@AudienceType
     ,@CREATED         
     ,@LockoutEnabled      
     ,@LockoutEnd        

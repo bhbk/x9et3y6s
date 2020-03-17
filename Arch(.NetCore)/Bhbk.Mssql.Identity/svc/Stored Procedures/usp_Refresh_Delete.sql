@@ -1,5 +1,4 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_Refresh_Delete]
     @ID uniqueidentifier
 

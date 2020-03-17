@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.DataState.Models;
+using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
@@ -11,7 +12,8 @@ namespace Bhbk.Lib.Identity.Services
 {
     public interface IAdminService
     {
-        JwtSecurityToken AccessToken { get; set; }
+        IOAuth2JwtGrant Grant { get; set; }
+        JwtSecurityToken Jwt { get; set; }
         AdminRepository Http { get; }
 
         /*
@@ -29,6 +31,7 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<AudienceV1> Audience_GetV1(string audienceValue);
         ValueTask<DataStateV1Result<AudienceV1>> Audience_GetV1(DataStateV1 model);
         ValueTask<IEnumerable<RefreshV1>> Audience_GetRefreshesV1(string audienceValue);
+        ValueTask<IEnumerable<RoleV1>> Audience_GetRolesV1(string audienceValue);
         ValueTask<bool> Audience_SetPasswordV1(Guid audienceID, PasswordAddV1 model);
         ValueTask<AudienceV1> Audience_UpdateV1(AudienceV1 model);
 

@@ -43,11 +43,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                var url = new Uri(Constants.ApiTestUriLink);
+                var url = new Uri(Constants.TestUriLink);
 
                 var ask = controller.AuthCodeV2_Ask(
                     new AuthCodeAskV2()
@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                 var ask_url = new Uri(ask.Url);
 
-                HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri").Should().BeEquivalentTo(Constants.ApiTestUriLink);
+                HttpUtility.ParseQueryString(ask_url.Query).Get("redirect_uri").Should().BeEquivalentTo(Constants.TestUriLink);
                 HttpUtility.ParseQueryString(ask_url.Query).Get("state").Should().NotBeNullOrEmpty();
             }
         }

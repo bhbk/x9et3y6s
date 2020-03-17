@@ -99,10 +99,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.AudienceType)
-                    .IsRequired()
-                    .HasMaxLength(64);
-
                 entity.Property(e => e.ConcurrencyStamp).HasMaxLength(256);
 
                 entity.Property(e => e.Description).HasMaxLength(256);

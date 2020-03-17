@@ -32,15 +32,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
-                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
             var result = UoW.Audiences.Create(
                 new tbl_Audiences()
                 {
                     IssuerId = issuer.Id,
-                    Name = Constants.ApiTestAudience,
-                    AudienceType = AudienceType.user_agent.ToString(),
+                    Name = Constants.TestAudience,
                     Enabled = true,
                     Immutable = false,
                 });
@@ -66,7 +65,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
             UoW.Audiences.Delete(audience);
@@ -101,7 +100,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
             audience.Name += "(Updated)";
 

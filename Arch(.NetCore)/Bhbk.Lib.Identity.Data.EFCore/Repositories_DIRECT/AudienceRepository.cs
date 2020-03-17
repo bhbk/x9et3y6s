@@ -112,7 +112,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
         public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Audiences audience)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
+                && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
             var claims = new List<Claim>();
 
@@ -146,7 +146,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
         public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Audiences audience)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
+                && x.ConfigKey == Constants.SettingRefreshExpire).Single();
 
             var claims = new List<Claim>();
 
@@ -236,7 +236,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             entity.IssuerId = audience.IssuerId;
             entity.Name = audience.Name;
             entity.Description = audience.Description;
-            entity.AudienceType = audience.AudienceType;
             entity.LastUpdated = Clock.UtcDateTime;
             entity.Enabled = audience.Enabled;
             entity.Immutable = audience.Immutable;

@@ -44,7 +44,6 @@
           <Property Name="PasswordHashPBKDF2" Type="nvarchar" MaxLength="256" />
           <Property Name="PasswordHashSHA256" Type="nvarchar" MaxLength="256" />
           <Property Name="SecurityStamp" Type="nvarchar" MaxLength="256" />
-          <Property Name="AudienceType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="Enabled" Type="bit" Nullable="false" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
@@ -866,7 +865,6 @@
           <Property Name="PasswordHashPBKDF2" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="PasswordHashSHA256" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="SecurityStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="AudienceType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Enabled" Type="Boolean" Nullable="false" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
@@ -1740,7 +1738,6 @@
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
                 <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
-                <ScalarProperty Name="AudienceType" ColumnName="AudienceType" />
                 <ScalarProperty Name="Enabled" ColumnName="Enabled" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
                 <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />

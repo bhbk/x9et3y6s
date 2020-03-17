@@ -27,7 +27,6 @@ using System.Web;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
-    [AllowAnonymous]
     public class ImplicitController : BaseController
     {
         private ImplicitProvider _provider;
@@ -38,6 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ig"), HttpGet]
+        [AllowAnonymous]
         public IActionResult ImplicitV1_Grant([FromQuery] ImplicitV1 input)
         {
             if (!ModelState.IsValid)
@@ -47,6 +47,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ig"), HttpGet]
+        [AllowAnonymous]
         public IActionResult ImplicitV2_Grant([FromQuery] ImplicitV2 input)
         {
             if (!ModelState.IsValid)

@@ -47,14 +47,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
+                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
-                var url = new Uri(Constants.ApiTestUriLink);
+                var url = new Uri(Constants.TestUriLink);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 var jwt = auth.Parse(result);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                iss.Value.Split(':')[0].Should().Be(Constants.ApiTestIssuer);
+                iss.Value.Split(':')[0].Should().Be(Constants.TestIssuer);
                 iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))

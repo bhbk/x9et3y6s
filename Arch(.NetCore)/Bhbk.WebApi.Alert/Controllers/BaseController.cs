@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +10,7 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Alert.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Constants.DefaultRoleForUser_Alert + ", " + Constants.DefaultRoleForAdmin_Alert)]
     public class BaseController : Controller
     {
         protected IUnitOfWork UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>(); }

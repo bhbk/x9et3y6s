@@ -104,8 +104,10 @@ namespace Bhbk.Lib.Identity.Repositories
             throw new NotSupportedException();
         }
 
-        public async ValueTask<HttpResponseMessage> Info_GetMOTDV1()
+        public async ValueTask<HttpResponseMessage> Info_GetMOTDV1(string jwt)
         {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
             var endpoint = "/info/v1/msg-of-the-day";
 
             if (_instance == InstanceContext.DeployedOrLocal)

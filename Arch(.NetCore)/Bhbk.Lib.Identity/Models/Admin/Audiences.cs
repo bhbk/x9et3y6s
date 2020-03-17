@@ -20,9 +20,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public string Description { get; set; }
 
-        [Required]
-        public string AudienceType { get; set; }
-
         public DateTime Created { get; set; }
 
         public bool LockoutEnabled { get; set; }

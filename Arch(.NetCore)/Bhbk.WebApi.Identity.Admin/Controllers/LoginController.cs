@@ -23,7 +23,6 @@ using System.Linq.Expressions;
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("login")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
     public class LoginController : BaseController
     {
         private LoginProvider _provider;
@@ -34,7 +33,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult CreateV1([FromBody] LoginV1 model)
         {
             if (!ModelState.IsValid)
@@ -56,7 +56,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid loginID)
         {
             var login = UoW.Logins.Get(x => x.Id == loginID)
@@ -153,7 +154,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult UpdateV1([FromBody] LoginV1 model)
         {
             if (!ModelState.IsValid)

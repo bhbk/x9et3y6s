@@ -12,5 +12,21 @@
     "AudienceName": "",
     "UserName": "identity@system.ochap.local",
     "UserPass": "pa$$word01!"
+  },
+  "AlertUrls": {
+    "BaseApiUrl": "https://localhost:44374",
+    "BaseApiPath": "/api/alert"
+  },
+  "IdentityAdminUrls": {
+    "BaseApiUrl": "https://localhost:44359",
+    "BaseApiPath": "/api/identity/admin",
+  },
+  "IdentityMeUrls": {
+    "BaseApiUrl": "https://localhost:44348",
+    "BaseApiPath": "/api/identity/me",
+  },
+  "IdentityStsUrls": {
+    "BaseApiUrl": "https://localhost:44375",
+    "BaseApiPath": "/api/identity/sts"
   }
 }

@@ -51,6 +51,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                 entity.Property(e => e.ActivityType)
                     .IsRequired()
                     .HasMaxLength(64);
+
+                entity.Property(e => e.TableName).HasMaxLength(256);
             });
 
             modelBuilder.Entity<uvw_AudienceRoles>(entity =>
@@ -65,10 +67,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                 entity.HasNoKey();
 
                 entity.ToView("uvw_Audiences", "svc");
-
-                entity.Property(e => e.AudienceType)
-                    .IsRequired()
-                    .HasMaxLength(64);
 
                 entity.Property(e => e.ConcurrencyStamp).HasMaxLength(256);
 
@@ -91,9 +89,17 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.ToView("uvw_Claims", "svc");
 
-                entity.Property(e => e.Type).IsRequired();
+                entity.Property(e => e.Subject)
+                    .IsRequired()
+                    .HasMaxLength(128);
 
-                entity.Property(e => e.Value).IsRequired();
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.Value)
+                    .IsRequired()
+                    .HasMaxLength(256);
 
                 entity.Property(e => e.ValueType)
                     .IsRequired()
@@ -106,9 +112,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.ToView("uvw_Issuers", "svc");
 
-                entity.Property(e => e.IssuerKey).IsRequired();
+                entity.Property(e => e.Description).HasMaxLength(256);
 
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.IssuerKey)
+                    .IsRequired()
+                    .HasMaxLength(1024);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128);
             });
 
             modelBuilder.Entity<uvw_Logins>(entity =>
@@ -117,7 +129,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.ToView("uvw_Logins", "svc");
 
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.LoginKey).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128);
             });
 
             modelBuilder.Entity<uvw_MOTDs>(entity =>
@@ -163,9 +181,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.ToView("uvw_QueueEmails", "svc");
 
-                entity.Property(e => e.FromDisplay).IsUnicode(false);
+                entity.Property(e => e.FromDisplay)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.FromEmail).IsUnicode(false);
+                entity.Property(e => e.FromEmail)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.HtmlContent).IsUnicode(false);
 
@@ -173,11 +195,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.Subject)
                     .IsRequired()
+                    .HasMaxLength(256)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ToDisplay).IsUnicode(false);
+                entity.Property(e => e.ToDisplay)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.ToEmail).IsUnicode(false);
+                entity.Property(e => e.ToEmail)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<uvw_QueueTexts>(entity =>
@@ -209,7 +236,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsRequired()
                     .HasMaxLength(64);
 
-                entity.Property(e => e.RefreshValue).IsRequired();
+                entity.Property(e => e.RefreshValue)
+                    .IsRequired()
+                    .HasMaxLength(2048);
             });
 
             modelBuilder.Entity<uvw_Roles>(entity =>
@@ -218,7 +247,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.ToView("uvw_Roles", "svc");
 
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128);
             });
 
             modelBuilder.Entity<uvw_Settings>(entity =>
@@ -229,10 +262,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.Property(e => e.ConfigKey)
                     .IsRequired()
+                    .HasMaxLength(128)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ConfigValue)
                     .IsRequired()
+                    .HasMaxLength(256)
                     .IsUnicode(false);
             });
 
@@ -245,6 +280,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                 entity.Property(e => e.StateType)
                     .IsRequired()
                     .HasMaxLength(64);
+
+                entity.Property(e => e.StateValue).HasMaxLength(1024);
             });
 
             modelBuilder.Entity<uvw_Urls>(entity =>
@@ -252,6 +289,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                 entity.HasNoKey();
 
                 entity.ToView("uvw_Urls", "svc");
+
+                entity.Property(e => e.UrlHost).HasMaxLength(1024);
+
+                entity.Property(e => e.UrlPath).HasMaxLength(1024);
             });
 
             modelBuilder.Entity<uvw_Users>(entity =>

@@ -1,7 +1,4 @@
 ﻿
-
-
-
 CREATE PROCEDURE [svc].[usp_Claim_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@IssuerId				UNIQUEIDENTIFIER

@@ -19,7 +19,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
-                    ConfigKey = Constants.ApiSettingAccessExpire,
+                    ConfigKey = Constants.SettingAccessExpire,
                     ConfigValue = 600.ToString(),
                     Created = DateTime.UtcNow,
                     Immutable = true,
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
-                    ConfigKey = Constants.ApiSettingRefreshExpire,
+                    ConfigKey = Constants.SettingRefreshExpire,
                     ConfigValue = 86400.ToString(),
                     Created = DateTime.UtcNow,
                     Immutable = true,
@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
-                    ConfigKey = Constants.ApiSettingTotpExpire,
+                    ConfigKey = Constants.SettingTotpExpire,
                     ConfigValue = 600.ToString(),
                     Created = DateTime.UtcNow,
                     Immutable = true,
@@ -52,7 +52,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
-                    ConfigKey = Constants.ApiSettingPollingMax,
+                    ConfigKey = Constants.SettingPollingMax,
                     ConfigValue = 10.ToString(),
                     Created = DateTime.UtcNow,
                     Immutable = true,

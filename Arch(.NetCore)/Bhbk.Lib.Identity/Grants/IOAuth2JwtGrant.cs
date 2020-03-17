@@ -4,6 +4,6 @@ namespace Bhbk.Lib.Identity.Grants
 {
     public interface IOAuth2JwtGrant
     {
-        JwtSecurityToken AccessToken { get; set; }
+        JwtSecurityToken Jwt { get; set; }
     }
 }

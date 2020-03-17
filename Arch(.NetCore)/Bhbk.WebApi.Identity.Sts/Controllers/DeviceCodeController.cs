@@ -28,7 +28,6 @@ using System.Net;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
-    [AllowAnonymous]
     public class DeviceCodeController : BaseController
     {
         private DeviceCodeProvider _provider;
@@ -39,6 +38,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/dcg-ask"), HttpPost]
+        [AllowAnonymous]
         public IActionResult DeviceCodeV1_Ask([FromForm] DeviceCodeAskV1 input)
         {
             if (!ModelState.IsValid)
@@ -48,6 +48,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/dcg"), HttpPost]
+        [AllowAnonymous]
         public IActionResult DeviceCodeV1_Grant([FromForm] DeviceCodeV1 input)
         {
             if (!ModelState.IsValid)
@@ -57,6 +58,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/dcg-ask"), HttpPost]
+        [AllowAnonymous]
         public IActionResult DeviceCodeV2_Ask([FromForm] DeviceCodeAskV2 input)
         {
             if (!ModelState.IsValid)
@@ -108,9 +110,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingTotpExpire).Single();
+                && x.ConfigKey == Constants.SettingTotpExpire).Single();
             var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingPollingMax).Single();
+                && x.ConfigKey == Constants.SettingPollingMax).Single();
 
             var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
             var nonce = Base64.CreateString(32);
@@ -145,6 +147,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/dcg"), HttpPost]
+        [AllowAnonymous]
         public IActionResult DeviceCodeV2_Grant([FromForm] DeviceCodeV2 input)
         {
             if (!ModelState.IsValid)
@@ -191,7 +194,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingPollingMax).Single();
+                && x.ConfigKey == Constants.SettingPollingMax).Single();
 
             //check if state is valid...
             var state = UoW.States.Get(x => x.StateValue == input.device_code

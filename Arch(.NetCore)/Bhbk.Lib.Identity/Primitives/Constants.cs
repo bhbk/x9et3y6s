@@ -29,71 +29,63 @@ namespace Bhbk.Lib.Identity.Primitives
 
         #region Configuration Constants
 
-        public const string ApiDefaultAudienceUi = "Local.Ui";
-        public const string ApiDefaultAudienceUiKey = "eBr3r3N1L6JV9jewYJOS6fjZ7EJGeGcb9HUAw6n2ZwY";
-        public const string ApiDefaultAudienceApi = "Local.Api";
-        public const string ApiDefaultAudienceApiKey = "4Boj4NIFCEZd0D2tyinPVlJ9yzHBl3fV6euTTDO0Xvo";
-        public const string ApiDefaultIssuer = "Local";
-        public const string ApiDefaultIssuerKey = "8G3zyoTJB4HpL5n3V-htSaN1KFWZGeFgWcUenGZofmw";
-        public const string ApiDefaultLogin = "Local";
-        public const string ApiDefaultLoginKey = "yUrOgQ1RZefUZ5DnC153sLDy23hmSOwnJ1KHDX61K48";
-        public const string ApiDefaultLoginName = "Local";
-        public const string ApiDefaultRoleForAdmin = "(Built-In) Admins";
-        public const string ApiDefaultRoleForUser = "(Built-In) Users";
-        public const string ApiDefaultRoleForService = "(Built-In) Services";
-        public const string ApiDefaultAdminUser = "admin@local";
-        public const string ApiDefaultAdminUserPassword = "pa$$word01!";
-        public const string ApiDefaultAdminUserFirstName = "Administrator";
-        public const string ApiDefaultAdminUserLastName = "User";
-        public const string ApiDefaultAdminUserPhone = "+00000000000";
-        public const string ApiDefaultNormalUser = "user@local";
-        public const string ApiDefaultNormalUserPassword = "pa$$word02!";
-        public const string ApiDefaultNormalUserFirstName = "Normal";
-        public const string ApiDefaultNormalUserLastName = "User";
-        public const string ApiDefaultNormalUserPhone = "+00000000000";
-        public const string ApiSettingAccessExpire = "AccessExpire";
-        public const string ApiSettingRefreshExpire = "RefreshExpire";
-        public const string ApiSettingTotpExpire = "TotpExpire";
-        public const string ApiSettingPollingMax = "PollingMax";
-        public const string ApiSettingGlobalLegacyClaims = "GlobalLegacyClaims";
-        public const string ApiSettingGlobalLegacyIssuer = "GlobalLegacyIssuer";
-        public const string ApiSettingGlobalTotpExpire = "GlobalTotpExpire";
-        public const string ApiSettingTheySaidSoLicense = "TheySaidSoLicense";
-        public const string ApiSettingTheySaidSoUrl = "TheySaidSoUrl";
-
-        #endregion
-
-        #region Policy Constants
-
-        public const string PolicyForAdmins = "AdminsPolicy";
-        public const string PolicyForServices = "ServicesPolicy";
-        public const string PolicyForUsers = "UsersPolicy";
+        public const string DefaultAudience_Alert = "Alert";
+        public const string DefaultAudienceKey_Alert = "4Boj4NIFCEZd0D2tyinPVlJ9yzHBl3fV6euTTDO0Xvo";
+        public const string DefaultAudience_Identity = "Identity";
+        public const string DefaultAudienceKey_Identity = "eBr3r3N1L6JV9jewYJOS6fjZ7EJGeGcb9HUAw6n2ZwY";
+        public const string DefaultIssuer = "Local";
+        public const string DefaultIssuerKey = "8G3zyoTJB4HpL5n3V-htSaN1KFWZGeFgWcUenGZofmw";
+        public const string DefaultLogin = "Local";
+        public const string DefaultLoginKey = "yUrOgQ1RZefUZ5DnC153sLDy23hmSOwnJ1KHDX61K48";
+        public const string DefaultLoginName = "Local";
+        public const string DefaultPolicyForHumans = "HumansPolicy";
+        public const string DefaultPolicyForServices = "ServicesPolicy";
+        public const string DefaultRoleForAdmin_Alert = "Alert.Admins";
+        public const string DefaultRoleForUser_Alert = "Alert.Users";
+        public const string DefaultRoleForAdmin_Identity = "Identity.Admins";
+        public const string DefaultRoleForUser_Identity = "Identity.Users";
+        public const string DefaultUser_Admin = "admin@local";
+        public const string DefaultUserPass_Admin = "pa$$word01!";
+        public const string DefaultUserFirstName_Admin = "Administrator";
+        public const string DefaultUserLastName_Admin = "User";
+        public const string DefaultUser_Normal = "user@local";
+        public const string DefaultUserPass_Normal = "pa$$word02!";
+        public const string DefaultUserFirstName_Normal = "Normal";
+        public const string DefaultUserLastName_Normal = "User";
+        public const string SettingAccessExpire = "AccessExpire";
+        public const string SettingRefreshExpire = "RefreshExpire";
+        public const string SettingTotpExpire = "TotpExpire";
+        public const string SettingPollingMax = "PollingMax";
+        public const string SettingGlobalLegacyClaims = "GlobalLegacyClaims";
+        public const string SettingGlobalLegacyIssuer = "GlobalLegacyIssuer";
+        public const string SettingGlobalTotpExpire = "GlobalTotpExpire";
+        public const string SettingTheySaidSoLicense = "TheySaidSoLicense";
+        public const string SettingTheySaidSoUrl = "TheySaidSoUrl";
 
         #endregion
 
         #region Test Constants
 
-        public const string ApiTestAudience = "AudienceUnitTests";
-        public const string ApiTestAudiencePassCurrent = "te$tAudiencePa$$word01!";
-        public const string ApiTestAudiencePassNew = "te$tAudiencePa$$word01!new";
-        public const string ApiTestClaim = "ClaimUnitTests";
-        public const string ApiTestClaimSubject = "ClaimUnitTestsSubject";
-        public const string ApiTestClaimValueType = "ClaimUnitTestsValueType";
-        public const string ApiTestEmailContent = "EmailUnitTestsContent";
-        public const string ApiTestEmailSubject = "EmailUnitTestsSubject";
-        public const string ApiTestIssuer = "IssuerUnitTests";
-        public const string ApiTestIssuerKey = "IssuerUnitTestsKey";
-        public const string ApiTestLogin = "LoginUnitTests";
-        public const string ApiTestLoginKey = "LoginUnitTestsKey";
-        public const string ApiTestMOTD = "MOTDUnitTests";
-        public const string ApiTestRole = "RoleUnitTests";
-        public const string ApiTestTextContent = "TextUnitTestsContent";
-        public const string ApiTestUser = "unittestuser1@local";
-        public const string ApiTestUserPhone = "+11111111111";
-        public const string ApiTestUserPassCurrent = "te$tUserPa$$word01!";
-        public const string ApiTestUserPassNew = "te$tUserPa$$word01!new";
-        public const string ApiTestUri = "UrlUnitTests";
-        public const string ApiTestUriLink = "https://app.test.net/1/callback";
+        public const string TestAudience = "AudienceTests";
+        public const string TestAudiencePassCurrent = "te$tAudiencePa$$word01!";
+        public const string TestAudiencePassNew = "te$tAudiencePa$$word01!new";
+        public const string TestClaim = "ClaimTests";
+        public const string TestClaimSubject = "ClaimTestsSubject";
+        public const string TestClaimValueType = "ClaimTestsValueType";
+        public const string TestEmailContent = "EmailTestsContent";
+        public const string TestEmailSubject = "EmailTestsSubject";
+        public const string TestIssuer = "IssuerTests";
+        public const string TestIssuerKey = "IssuerTestsKey";
+        public const string TestLogin = "LoginTests";
+        public const string TestLoginKey = "LoginTestsKey";
+        public const string TestMOTD = "MOTDTests";
+        public const string TestRole = "RoleTests";
+        public const string TestTextContent = "TextTestsContent";
+        public const string TestUser = "testuser1@local";
+        public const string TestUserPassCurrent = "te$tUserPa$$word01!";
+        public const string TestUserPassNew = "te$tUserPa$$word01!new";
+        public const string TestUri = "UrlTests";
+        public const string TestUriLink = "https://app.test.net/1/callback";
 
         #endregion
 

@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT;
 using Bhbk.Lib.Identity.Factories;
+using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
@@ -36,17 +38,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var service = new AdminService(conf, InstanceContext.End2EndTest, owin);
+                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).CreateMOTD(3);
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultNormalUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testMOTD = uow.MOTDs.Get().First();
 
@@ -61,17 +66,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var service = new AdminService(conf, InstanceContext.End2EndTest, owin);
+                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).CreateMOTD(3);
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiDefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiDefaultAudienceUi).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.ApiDefaultAdminUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 int take = 2;
                 var state = new DataStateV1()

@@ -33,14 +33,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
             var result = UoW.Roles.Create(
                 Mapper.Map<tbl_Roles>(new RoleV1()
                 {
                     AudienceId = audience.Id,
-                    Name = Constants.ApiTestRole,
+                    Name = Constants.TestRole,
                     Enabled = true,
                     Immutable = false,
                 }));
@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
-                .Where(x => x.Name == Constants.ApiTestRole).ToLambda())
+                .Where(x => x.Name == Constants.TestRole).ToLambda())
                 .Single();
 
             UoW.Roles.Delete(role);
@@ -101,7 +101,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
-                .Where(x => x.Name == Constants.ApiTestRole).ToLambda())
+                .Where(x => x.Name == Constants.TestRole).ToLambda())
                 .Single();
             role.Name += "(Updated)";
 

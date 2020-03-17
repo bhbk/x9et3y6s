@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_State_Insert]
      @IssuerId				UNIQUEIDENTIFIER
     ,@AudienceId			UNIQUEIDENTIFIER

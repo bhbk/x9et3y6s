@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_Activity_Insert]
      @AudienceId			UNIQUEIDENTIFIER
     ,@UserId				UNIQUEIDENTIFIER

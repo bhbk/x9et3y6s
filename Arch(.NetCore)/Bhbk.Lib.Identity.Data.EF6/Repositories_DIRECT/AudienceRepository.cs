@@ -60,7 +60,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
             entity.IssuerId = audience.IssuerId;
             entity.Name = audience.Name;
             entity.Description = audience.Description;
-            entity.AudienceType = audience.AudienceType;
             entity.LastUpdated = Clock.UtcDateTime;
             entity.Enabled = audience.Enabled;
             entity.Immutable = audience.Immutable;

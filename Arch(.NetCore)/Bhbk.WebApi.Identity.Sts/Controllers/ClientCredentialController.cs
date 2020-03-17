@@ -29,7 +29,6 @@ using System.Net;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
-    [AllowAnonymous]
     public class ClientCredentialController : BaseController
     {
         private ClientCredentialProvider _provider;
@@ -40,6 +39,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ccg"), HttpPost]
+        [AllowAnonymous]
         public IActionResult ClientCredentialV1_Grant([FromForm] ClientCredentialV1 input)
         {
             if (!ModelState.IsValid)
@@ -49,6 +49,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ccg-rt"), HttpPost]
+        [AllowAnonymous]
         public IActionResult ClientCredentialV1_Refresh([FromForm] RefreshTokenV1 input)
         {
             if (!ModelState.IsValid)
@@ -58,6 +59,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ccg"), HttpPost]
+        [AllowAnonymous]
         public IActionResult ClientCredentialV2_Grant([FromForm] ClientCredentialV2 input)
         {
             if (!ModelState.IsValid)
@@ -163,6 +165,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ccg-rt"), HttpPost]
+        [AllowAnonymous]
         public IActionResult ClientCredentialV2_Refresh([FromForm] RefreshTokenV2 input)
         {
             if (!ModelState.IsValid)

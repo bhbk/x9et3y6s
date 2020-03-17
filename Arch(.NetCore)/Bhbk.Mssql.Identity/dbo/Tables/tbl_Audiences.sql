@@ -8,7 +8,6 @@
     [PasswordHashPBKDF2] NVARCHAR (256)     NULL,
     [PasswordHashSHA256] NVARCHAR (256)     NULL,
     [SecurityStamp]      NVARCHAR (256)     NULL,
-    [AudienceType]       NVARCHAR (64)      NOT NULL,
     [Enabled]            BIT                CONSTRAINT [DF_tbl_Audience_Enabled] DEFAULT ((0)) NOT NULL,
     [Created]            DATETIME2 (7)      NOT NULL,
     [LockoutEnabled]     BIT                NOT NULL,
@@ -22,6 +21,8 @@
     CONSTRAINT [PK_Audiences] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Audiences_IssuerID] FOREIGN KEY ([IssuerId]) REFERENCES [dbo].[tbl_Issuers] ([Id])
 );
+
+
 
 
 

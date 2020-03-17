@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
-    [Authorize]
+    [Authorize(Roles =  Constants.DefaultRoleForUser_Identity + ", " + Constants.DefaultRoleForAdmin_Identity)]
     public class BaseController : Controller
     {
         protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }

@@ -31,42 +31,42 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             var foundGlobalLegacyClaims = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims).SingleOrDefault();
+                && x.ConfigKey == Constants.SettingGlobalLegacyClaims).SingleOrDefault();
 
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = _uow.Settings.Create(
                     _mapper.Map<tbl_Settings>(new SettingV1()
                     {
-                        ConfigKey = Constants.ApiSettingGlobalLegacyClaims,
+                        ConfigKey = Constants.SettingGlobalLegacyClaims,
                         ConfigValue = "true",
                         Immutable = true,
                     }));
             }
 
             var foundGlobalLegacyIssuer = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).SingleOrDefault();
+                && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).SingleOrDefault();
 
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = _uow.Settings.Create(
                     _mapper.Map<tbl_Settings>(new SettingV1()
                     {
-                        ConfigKey = Constants.ApiSettingGlobalLegacyIssuer,
+                        ConfigKey = Constants.SettingGlobalLegacyIssuer,
                         ConfigValue = "true",
                         Immutable = true,
                     }));
             }
 
             var foundGlobalTotpExpire = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).SingleOrDefault();
+                && x.ConfigKey == Constants.SettingGlobalTotpExpire).SingleOrDefault();
 
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = _uow.Settings.Create(
                     _mapper.Map<tbl_Settings>(new SettingV1()
                     {
-                        ConfigKey = Constants.ApiSettingGlobalTotpExpire,
+                        ConfigKey = Constants.SettingGlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
                         Immutable = true,
                     }));
@@ -79,7 +79,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             var foundIssuer = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
-                .Where(x => x.Name == Constants.ApiDefaultIssuer).ToLambda())
+                .Where(x => x.Name == Constants.DefaultIssuer).ToLambda())
                 .SingleOrDefault();
 
             if (foundIssuer == null)
@@ -87,8 +87,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 foundIssuer = _uow.Issuers.Create(
                     _mapper.Map<tbl_Issuers>(new IssuerV1()
                     {
-                        Name = Constants.ApiDefaultIssuer,
-                        IssuerKey = Constants.ApiDefaultIssuerKey,
+                        Name = Constants.DefaultIssuer,
+                        IssuerKey = Constants.DefaultIssuerKey,
                         Enabled = true,
                         Immutable = true,
                     }));
@@ -100,18 +100,17 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * create default audiences
              */
 
-            var foundAudienceUi = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == Constants.ApiDefaultAudienceUi).ToLambda())
+            var foundAudience_Alert = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
+                .Where(x => x.Name == Constants.DefaultAudience_Alert).ToLambda())
                 .SingleOrDefault();
 
-            if (foundAudienceUi == null)
+            if (foundAudience_Alert == null)
             {
-                foundAudienceUi = _uow.Audiences.Create(
+                foundAudience_Alert = _uow.Audiences.Create(
                     _mapper.Map<tbl_Audiences>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        Name = Constants.ApiDefaultAudienceUi,
-                        AudienceType = AudienceType.user_agent.ToString(),
+                        Name = Constants.DefaultAudience_Alert,
                         Enabled = true,
                         Immutable = true,
                     }));
@@ -119,21 +118,20 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 _uow.Commit();
             }
 
-            var foundAudienceApi = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == Constants.ApiDefaultAudienceApi).ToLambda())
+            var foundAudience_Identity = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
+                .Where(x => x.Name == Constants.DefaultAudience_Identity).ToLambda())
                 .SingleOrDefault();
 
-            if (foundAudienceApi == null)
+            if (foundAudience_Identity == null)
             {
-                foundAudienceApi = _uow.Audiences.Create(
-                     _mapper.Map<tbl_Audiences>(new AudienceV1()
-                     {
-                         IssuerId = foundIssuer.Id,
-                         Name = Constants.ApiDefaultAudienceApi,
-                         AudienceType = AudienceType.server.ToString(),
-                         Enabled = true,
-                         Immutable = true,
-                     }));
+                foundAudience_Identity = _uow.Audiences.Create(
+                    _mapper.Map<tbl_Audiences>(new AudienceV1()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        Name = Constants.DefaultAudience_Identity,
+                        Enabled = true,
+                        Immutable = true,
+                    }));
 
                 _uow.Commit();
             }
@@ -143,7 +141,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             var foundLogin = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
-                .Where(x => x.Name == Constants.ApiDefaultLogin).ToLambda())
+                .Where(x => x.Name == Constants.DefaultLogin).ToLambda())
                 .SingleOrDefault();
 
             if (foundLogin == null)
@@ -151,8 +149,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 foundLogin = _uow.Logins.Create(
                     _mapper.Map<tbl_Logins>(new LoginV1()
                     {
-                        Name = Constants.ApiDefaultLogin,
-                        LoginKey = Constants.ApiDefaultLoginKey,
+                        Name = Constants.DefaultLogin,
+                        LoginKey = Constants.DefaultLoginKey,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -164,17 +162,17 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * create default roles
              */
 
-            var foundRoleForAdmin = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
-                .Where(x => x.Name == Constants.ApiDefaultRoleForAdmin).ToLambda())
+            var foundRoleForAdmin_Alert = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
+                .Where(x => x.Name == Constants.DefaultRoleForAdmin_Alert).ToLambda())
                 .SingleOrDefault();
 
-            if (foundRoleForAdmin == null)
+            if (foundRoleForAdmin_Alert == null)
             {
-                foundRoleForAdmin = _uow.Roles.Create(
+                foundRoleForAdmin_Alert = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleV1()
                     {
-                        AudienceId = foundAudienceUi.Id,
-                        Name = Constants.ApiDefaultRoleForAdmin,
+                        AudienceId = foundAudience_Alert.Id,
+                        Name = Constants.DefaultRoleForAdmin_Alert,
                         Enabled = true,
                         Immutable = true,
                     }));
@@ -182,17 +180,17 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 _uow.Commit();
             }
 
-            var foundRoleForUser = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
-                .Where(x => x.Name == Constants.ApiDefaultRoleForUser).ToLambda())
+            var foundRoleForUser_Alert = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
+                .Where(x => x.Name == Constants.DefaultRoleForUser_Alert).ToLambda())
                 .SingleOrDefault();
 
-            if (foundRoleForUser == null)
+            if (foundRoleForUser_Alert == null)
             {
-                foundRoleForUser = _uow.Roles.Create(
+                foundRoleForUser_Alert = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleV1()
                     {
-                        AudienceId = foundAudienceUi.Id,
-                        Name = Constants.ApiDefaultRoleForUser,
+                        AudienceId = foundAudience_Alert.Id,
+                        Name = Constants.DefaultRoleForUser_Alert,
                         Enabled = true,
                         Immutable = true,
                     }));
@@ -200,17 +198,35 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 _uow.Commit();
             }
 
-            var foundRoleForService = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
-                .Where(x => x.Name == Constants.ApiDefaultRoleForService).ToLambda())
+            var foundRoleForAdmin_Identity = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
+                .Where(x => x.Name == Constants.DefaultRoleForAdmin_Identity).ToLambda())
                 .SingleOrDefault();
 
-            if (foundRoleForService == null)
+            if (foundRoleForAdmin_Identity == null)
             {
-                foundRoleForService = _uow.Roles.Create(
+                foundRoleForAdmin_Identity = _uow.Roles.Create(
                     _mapper.Map<tbl_Roles>(new RoleV1()
                     {
-                        AudienceId = foundAudienceApi.Id,
-                        Name = Constants.ApiDefaultRoleForService,
+                        AudienceId = foundAudience_Identity.Id,
+                        Name = Constants.DefaultRoleForAdmin_Identity,
+                        Enabled = true,
+                        Immutable = true,
+                    }));
+
+                _uow.Commit();
+            }
+
+            var foundRoleForUser_Identity = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
+                .Where(x => x.Name == Constants.DefaultRoleForUser_Identity).ToLambda())
+                .SingleOrDefault();
+
+            if (foundRoleForUser_Identity == null)
+            {
+                foundRoleForUser_Identity = _uow.Roles.Create(
+                    _mapper.Map<tbl_Roles>(new RoleV1()
+                    {
+                        AudienceId = foundAudience_Identity.Id,
+                        Name = Constants.DefaultRoleForUser_Identity,
                         Enabled = true,
                         Immutable = true,
                     }));
@@ -222,53 +238,51 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * create default users
              */
 
-            var foundAdminUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.UserName == Constants.ApiDefaultAdminUser).ToLambda())
+            var foundAdmin = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
+                .Where(x => x.UserName == Constants.DefaultUser_Admin).ToLambda())
                 .SingleOrDefault();
 
-            if (foundAdminUser == null)
+            if (foundAdmin == null)
             {
-                foundAdminUser = _uow.Users.Create(
+                foundAdmin = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserV1()
                     {
-                        UserName = Constants.ApiDefaultAdminUser,
-                        Email = Constants.ApiDefaultAdminUser,
-                        PhoneNumber = Constants.ApiDefaultAdminUserPhone,
-                        FirstName = Constants.ApiDefaultAdminUserFirstName,
-                        LastName = Constants.ApiDefaultAdminUserLastName,
+                        UserName = Constants.DefaultUser_Admin,
+                        Email = Constants.DefaultUser_Admin,
+                        FirstName = Constants.DefaultUserFirstName_Admin,
+                        LastName = Constants.DefaultUserLastName_Admin,
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = true,
-                    }), Constants.ApiDefaultAdminUserPassword);
+                    }), Constants.DefaultUserPass_Admin);
 
-                _uow.Users.SetConfirmedEmail(foundAdminUser, true);
-                _uow.Users.SetConfirmedPassword(foundAdminUser, true);
-                _uow.Users.SetConfirmedPhoneNumber(foundAdminUser, true);
+                _uow.Users.SetConfirmedEmail(foundAdmin, true);
+                _uow.Users.SetConfirmedPassword(foundAdmin, true);
+                _uow.Users.SetConfirmedPhoneNumber(foundAdmin, true);
                 _uow.Commit();
             }
 
-            var foundNormalUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.UserName == Constants.ApiDefaultNormalUser).ToLambda())
+            var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
+                .Where(x => x.UserName == Constants.DefaultUser_Normal).ToLambda())
                 .SingleOrDefault();
 
-            if (foundNormalUser == null)
+            if (foundUser == null)
             {
-                foundNormalUser = _uow.Users.Create(
+                foundUser = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserV1()
                     {
-                        UserName = Constants.ApiDefaultNormalUser,
-                        Email = Constants.ApiDefaultNormalUser,
-                        PhoneNumber = Constants.ApiDefaultNormalUserPhone,
-                        FirstName = Constants.ApiDefaultNormalUserFirstName,
-                        LastName = Constants.ApiDefaultNormalUserLastName,
+                        UserName = Constants.DefaultUser_Normal,
+                        Email = Constants.DefaultUser_Normal,
+                        FirstName = Constants.DefaultUserFirstName_Normal,
+                        LastName = Constants.DefaultUserLastName_Normal,
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = true,
-                    }), Constants.ApiDefaultNormalUserPassword);
+                    }), Constants.DefaultUserPass_Normal);
 
-                _uow.Users.SetConfirmedEmail(foundNormalUser, true);
-                _uow.Users.SetConfirmedPassword(foundNormalUser, true);
-                _uow.Users.SetConfirmedPhoneNumber(foundNormalUser, true);
+                _uow.Users.SetConfirmedEmail(foundUser, true);
+                _uow.Users.SetConfirmedPassword(foundUser, true);
+                _uow.Users.SetConfirmedPhoneNumber(foundUser, true);
 
                 _uow.Commit();
             }
@@ -277,8 +291,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * set password to audiences
              */
 
-            _uow.Audiences.SetPasswordHash(foundAudienceApi, Constants.ApiDefaultAudienceApiKey);
-            _uow.Audiences.SetPasswordHash(foundAudienceUi, Constants.ApiDefaultAudienceUiKey);
+            _uow.Audiences.SetPasswordHash(foundAudience_Alert, Constants.DefaultAudienceKey_Alert);
+            _uow.Audiences.SetPasswordHash(foundAudience_Identity, Constants.DefaultAudienceKey_Identity);
 
             _uow.Commit();
 
@@ -286,8 +300,11 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * assign roles to audiences
              */
 
-            if (!_uow.Audiences.IsInRole(foundAudienceApi, foundRoleForService))
-                _uow.Audiences.AddToRole(foundAudienceApi, foundRoleForService);
+            if (!_uow.Audiences.IsInRole(foundAudience_Alert, foundRoleForAdmin_Alert))
+                _uow.Audiences.AddToRole(foundAudience_Alert, foundRoleForAdmin_Alert);
+
+            if (!_uow.Audiences.IsInRole(foundAudience_Identity, foundRoleForAdmin_Identity))
+                _uow.Audiences.AddToRole(foundAudience_Identity, foundRoleForAdmin_Identity);
 
             _uow.Commit();
 
@@ -295,17 +312,23 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              * assign roles, claims & logins to users
              */
 
-            if (!_uow.Users.IsInLogin(foundAdminUser, foundLogin))
-                _uow.Users.AddToLogin(foundAdminUser, foundLogin);
+            if (!_uow.Users.IsInLogin(foundAdmin, foundLogin))
+                _uow.Users.AddToLogin(foundAdmin, foundLogin);
 
-            if (!_uow.Users.IsInLogin(foundNormalUser, foundLogin))
-                _uow.Users.AddToLogin(foundNormalUser, foundLogin);
+            if (!_uow.Users.IsInLogin(foundUser, foundLogin))
+                _uow.Users.AddToLogin(foundUser, foundLogin);
 
-            if (!_uow.Users.IsInRole(foundAdminUser, foundRoleForAdmin))
-                _uow.Users.AddToRole(foundAdminUser, foundRoleForAdmin);
+            if (!_uow.Users.IsInRole(foundAdmin, foundRoleForAdmin_Alert))
+                _uow.Users.AddToRole(foundAdmin, foundRoleForAdmin_Alert);
 
-            if (!_uow.Users.IsInRole(foundNormalUser, foundRoleForUser))
-                _uow.Users.AddToRole(foundNormalUser, foundRoleForUser);
+            if (!_uow.Users.IsInRole(foundUser, foundRoleForUser_Alert))
+                _uow.Users.AddToRole(foundUser, foundRoleForUser_Alert);
+
+            if (!_uow.Users.IsInRole(foundAdmin, foundRoleForAdmin_Identity))
+                _uow.Users.AddToRole(foundAdmin, foundRoleForAdmin_Identity);
+
+            if (!_uow.Users.IsInRole(foundUser, foundRoleForUser_Identity))
+                _uow.Users.AddToRole(foundUser, foundRoleForUser_Identity);
 
             _uow.Commit();
         }
@@ -317,7 +340,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             _uow.Users.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.UserName == Constants.ApiDefaultAdminUser || x.UserName == Constants.ApiDefaultNormalUser).ToLambda());
+                .Where(x => x.UserName == Constants.DefaultUser_Admin || x.UserName == Constants.DefaultUser_Normal).ToLambda());
 
             _uow.Commit();
 
@@ -326,7 +349,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             _uow.Roles.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
-                .Where(x => x.Name == Constants.ApiDefaultRoleForAdmin || x.Name == Constants.ApiDefaultRoleForUser).ToLambda());
+                .Where(x => x.Name == Constants.DefaultRoleForAdmin_Alert || x.Name == Constants.DefaultRoleForUser_Alert
+                    || x.Name == Constants.DefaultRoleForAdmin_Identity || x.Name == Constants.DefaultRoleForUser_Identity).ToLambda());
 
             _uow.Commit();
 
@@ -335,7 +359,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             _uow.Logins.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
-                .Where(x => x.Name == Constants.ApiDefaultLogin).ToLambda());
+                .Where(x => x.Name == Constants.DefaultLogin).ToLambda());
 
             _uow.Commit();
 
@@ -344,7 +368,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             _uow.Audiences.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == Constants.ApiDefaultAudienceUi || x.Name == Constants.ApiDefaultAudienceApi).ToLambda());
+                .Where(x => x.Name == Constants.DefaultAudience_Alert || x.Name == Constants.DefaultAudience_Identity).ToLambda());
 
             _uow.Commit();
 
@@ -353,7 +377,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
              */
 
             _uow.Issuers.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
-                .Where(x => x.Name == Constants.ApiDefaultIssuer).ToLambda());
+                .Where(x => x.Name == Constants.DefaultIssuer).ToLambda());
 
             _uow.Commit();
         }

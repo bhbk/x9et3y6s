@@ -32,7 +32,6 @@ using System.Linq.Dynamic.Core;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
-    [AllowAnonymous]
     public class ResourceOwnerController : BaseController
     {
         private ResourceOwnerProvider _provider;
@@ -43,6 +42,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ropg"), HttpPost]
+        [AllowAnonymous]
         public IActionResult ResourceOwnerV1_Grant([FromForm] ResourceOwnerV1 input)
         {
             if (!ModelState.IsValid)
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if issuer compatibility mode enabled.
             var legacyIssuer = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
+                && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).Single();
 
             if (!bool.Parse(legacyIssuer.ConfigValue)
                 && string.IsNullOrEmpty(input.issuer_id))
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                 else if (UoW.InstanceType == InstanceContext.End2EndTest
                     || UoW.InstanceType == InstanceContext.IntegrationTest)
-                    issuer = UoW.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).SingleOrDefault();
+                    issuer = UoW.Issuers.Get(x => x.Name == Constants.TestIssuer).SingleOrDefault();
 
                 else
                     throw new NotImplementedException();
@@ -152,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.DeployedOrLocal:
                     {
                         //check if login provider is local...
-                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -182,8 +182,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.IntegrationTest:
                     {
                         //check if login provider is local or test...
-                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(Constants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(Constants.TestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -293,6 +293,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/ropg-rt"), HttpPost]
+        [AllowAnonymous]
         public IActionResult ResourceOwnerV1_Refresh([FromForm] RefreshTokenV1 input)
         {
             if (!ModelState.IsValid)
@@ -416,6 +417,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ropg"), HttpPost]
+        [AllowAnonymous]
         public IActionResult ResourceOwnerV2_Grant([FromForm] ResourceOwnerV2 input)
         {
             if (!ModelState.IsValid)
@@ -513,7 +515,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.DeployedOrLocal:
                     {
                         //check if login provider is local...
-                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -543,8 +545,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.IntegrationTest:
                     {
                         //check if login provider is local or test...
-                        if (logins.Where(x => x.Name.Equals(Constants.ApiDefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(Constants.ApiTestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(Constants.TestLogin, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -626,6 +628,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/ropg-rt"), HttpPost]
+        [AllowAnonymous]
         public IActionResult ResourceOwnerV2_Refresh([FromForm] RefreshTokenV2 input)
         {
             if (!ModelState.IsValid)

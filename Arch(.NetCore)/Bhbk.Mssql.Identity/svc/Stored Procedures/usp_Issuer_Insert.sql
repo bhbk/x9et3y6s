@@ -1,5 +1,4 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_Issuer_Insert]
      @ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 

@@ -1,5 +1,4 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_Login_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@ActorId				UNIQUEIDENTIFIER

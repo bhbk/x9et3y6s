@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_Role_Insert]
 	 @AudienceId			UNIQUEIDENTIFIER
     ,@ActorId				UNIQUEIDENTIFIER

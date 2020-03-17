@@ -1,5 +1,8 @@
 ﻿using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.FileSystem;
+using Bhbk.Lib.DataState.Interfaces;
+using Bhbk.Lib.DataState.Models;
+using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
@@ -8,7 +11,8 @@ using Bhbk.Lib.Identity.Services;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.IdentityModel.Tokens.Jwt;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Bhbk.Cli.Identity.Commands
 {
@@ -16,9 +20,8 @@ namespace Bhbk.Cli.Identity.Commands
     {
         private static CommandTypes _cmdType;
         private static IAdminService _service;
-        private static JwtSecurityToken _jwt;
         private static string _cmdTypeList = string.Join(", ", Enum.GetNames(typeof(CommandTypes)));
-        private static bool _create = false, _destroy = false;
+        private static bool _create = false, _destroy = false, _list = false;
 
         public AdminCommands()
         {
@@ -35,6 +38,14 @@ namespace Bhbk.Cli.Identity.Commands
             HasOption("d=|delete", "Delete an entity", arg =>
             {
                 _destroy = true;
+
+                if (!Enum.TryParse<CommandTypes>(arg, out _cmdType))
+                    throw new ConsoleHelpAsException("Invalid entity type. Possible are " + _cmdTypeList);
+            });
+
+            HasOption("l=|list", "List entities", arg =>
+            {
+                _list = true;
 
                 if (!Enum.TryParse<CommandTypes>(arg, out _cmdType))
                     throw new ConsoleHelpAsException("Invalid entity type. Possible are " + _cmdTypeList);
@@ -64,20 +75,19 @@ namespace Bhbk.Cli.Identity.Commands
                     .Build();
 
                 _service = new AdminService(conf);
-                _jwt = _service.AccessToken;
+                _service.Grant = new ResourceOwnerGrantV2(conf);
 
-                if (_create == false && _destroy == false)
+                if (_create == false && _destroy == false && _list == false)
                     throw new ConsoleHelpAsException("Invalid action type.");
 
                 switch (_cmdType)
                 {
                     case CommandTypes.issuer:
 
-                        issuerName = PromptForInput(CommandTypes.issuer);
-                        issuer = _service.Issuer_GetV1(issuerName).Result;
-
                         if (_create)
                         {
+                            issuerName = PromptForInput(CommandTypes.issuer);
+                            issuer = _service.Issuer_GetV1(issuerName).Result;
 
                             if (issuer != null)
                                 Console.WriteLine(Environment.NewLine + "FOUND issuer \"" + issuer.Name + "\""
@@ -99,6 +109,9 @@ namespace Bhbk.Cli.Identity.Commands
                         }
                         else if (_destroy)
                         {
+                            issuerName = PromptForInput(CommandTypes.issuer);
+                            issuer = _service.Issuer_GetV1(issuerName).Result;
+
                             if (issuer == null)
                                 throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
                             else
@@ -111,22 +124,41 @@ namespace Bhbk.Cli.Identity.Commands
                                         + Environment.NewLine + "\tID is " + issuer.Id.ToString());
                             }
                         }
+                        else if (_list)
+                        {
+                            var issuers = _service.Issuer_GetV1(new DataStateV1()
+                            {
+                                Sort = new List<IDataStateSort>()
+                                {
+                                    new DataStateV1Sort() { Field = "name", Dir = "asc" }
+                                },
+                                Skip = 0,
+                                Take = 100
+                            }).Result;
+
+                            foreach (var issuerEntry in issuers.Data.OrderBy(x => x.Name))
+                                Console.WriteLine($"\t{issuerEntry.Name} [{issuerEntry.Id}]");
+                        }
 
                         break;
 
                     case CommandTypes.audience:
 
-                        issuerName = PromptForInput(CommandTypes.issuer);
-                        issuer = _service.Issuer_GetV1(issuerName).Result;
-
-                        if (issuer == null)
-                            throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
-
-                        audienceName = PromptForInput(CommandTypes.audience);
-                        audience = _service.Audience_GetV1(audienceName).Result;
-
                         if (_create)
                         {
+                            issuerName = PromptForInput(CommandTypes.issuer);
+                            issuer = _service.Issuer_GetV1(issuerName).Result;
+
+                            if (issuer == null)
+                                throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
+
+                            try
+                            {
+                                audienceName = PromptForInput(CommandTypes.audience);
+                                audience = _service.Audience_GetV1(audienceName).Result;
+                            }
+                            catch (Exception) { }
+
                             if (audience != null)
                                 Console.WriteLine(Environment.NewLine + "FOUND audience \"" + audienceName
                                     + Environment.NewLine + "\tID is " + audience.Id.ToString());
@@ -136,7 +168,6 @@ namespace Bhbk.Cli.Identity.Commands
                                 {
                                     IssuerId = issuer.Id,
                                     Name = audienceName,
-                                    AudienceType = AudienceType.user_agent.ToString(),
                                     Enabled = true,
                                 }).Result;
 
@@ -149,6 +180,19 @@ namespace Bhbk.Cli.Identity.Commands
                         }
                         else if (_destroy)
                         {
+                            issuerName = PromptForInput(CommandTypes.issuer);
+                            issuer = _service.Issuer_GetV1(issuerName).Result;
+
+                            if (issuer == null)
+                                throw new ConsoleHelpAsException("FAILED find issuer \"" + issuerName + "\"");
+
+                            try
+                            {
+                                audienceName = PromptForInput(CommandTypes.audience);
+                                audience = _service.Audience_GetV1(audienceName).Result;
+                            }
+                            catch (Exception) { }
+
                             if (audience == null)
                                 Console.WriteLine(Environment.NewLine + "FAILED find audience \"" + audienceName + "\"");
                             else
@@ -161,16 +205,35 @@ namespace Bhbk.Cli.Identity.Commands
                                         + Environment.NewLine + "\tID is " + audience.Id.ToString());
                             }
                         }
+                        else if (_list)
+                        {
+                            var audiences = _service.Audience_GetV1(new DataStateV1()
+                            {
+                                Sort = new List<IDataStateSort>()
+                                {
+                                    new DataStateV1Sort() { Field = "name", Dir = "asc" }
+                                },
+                                Skip = 0,
+                                Take = 100
+                            }).Result;
+
+                            foreach (var audienceEntry in audiences.Data.OrderBy(x => x.Name))
+                                Console.WriteLine($"\t{audienceEntry.Name} [{audienceEntry.Id}]");
+                        }
 
                         break;
 
                     case CommandTypes.login:
 
-                        loginName = PromptForInput(CommandTypes.login);
-                        login = _service.Login_GetV1(loginName).Result;
-
                         if (_create)
                         {
+                            try
+                            {
+                                loginName = PromptForInput(CommandTypes.login);
+                                login = _service.Login_GetV1(loginName).Result;
+                            }
+                            catch (Exception) { }
+
                             if (login != null)
                                 Console.WriteLine(Environment.NewLine + "FOUND login \"" + loginName
                                     + Environment.NewLine + "\tID is " + login.Id.ToString());
@@ -191,6 +254,13 @@ namespace Bhbk.Cli.Identity.Commands
                         }
                         else if (_destroy)
                         {
+                            try
+                            {
+                                loginName = PromptForInput(CommandTypes.login);
+                                login = _service.Login_GetV1(loginName).Result;
+                            }
+                            catch (Exception) { }
+
                             if (login == null)
                                 Console.WriteLine(Environment.NewLine + "FAILED find login \"" + loginName + "\"");
                             else
@@ -203,22 +273,41 @@ namespace Bhbk.Cli.Identity.Commands
                                         + Environment.NewLine + "\tID is " + login.Id.ToString());
                             }
                         }
+                        else if (_list)
+                        {
+                            var logins = _service.Login_GetV1(new DataStateV1()
+                            {
+                                Sort = new List<IDataStateSort>()
+                                {
+                                    new DataStateV1Sort() { Field = "name", Dir = "asc" }
+                                },
+                                Skip = 0,
+                                Take = 100
+                            }).Result;
+
+                            foreach (var loginEntry in logins.Data.OrderBy(x => x.Name))
+                                Console.WriteLine($"\t{loginEntry.Name} [{loginEntry.Id}]");
+                        }
 
                         break;
 
                     case CommandTypes.role:
 
-                        audienceName = PromptForInput(CommandTypes.audience);
-                        audience = _service.Audience_GetV1(audienceName).Result;
-
-                        if (audience == null)
-                            throw new ConsoleHelpAsException("FAILED find audience \"" + audienceName + "\"");
-
-                        roleName = PromptForInput(CommandTypes.role);
-                        role = _service.Role_GetV1(roleName).Result;
-
                         if (_create)
                         {
+                            audienceName = PromptForInput(CommandTypes.audience);
+                            audience = _service.Audience_GetV1(audienceName).Result;
+
+                            if (audience == null)
+                                throw new ConsoleHelpAsException("FAILED find audience \"" + audienceName + "\"");
+
+                            try
+                            {
+                                roleName = PromptForInput(CommandTypes.role);
+                                role = _service.Role_GetV1(roleName).Result;
+                            }
+                            catch (Exception) { }
+
                             if (role != null)
                                 Console.WriteLine(Environment.NewLine + "FOUND role \"" + roleName + "\""
                                     + Environment.NewLine + "\tID is " + role.Id.ToString());
@@ -240,6 +329,19 @@ namespace Bhbk.Cli.Identity.Commands
                         }
                         else if (_destroy)
                         {
+                            audienceName = PromptForInput(CommandTypes.audience);
+                            audience = _service.Audience_GetV1(audienceName).Result;
+
+                            if (audience == null)
+                                throw new ConsoleHelpAsException("FAILED find audience \"" + audienceName + "\"");
+
+                            try
+                            {
+                                roleName = PromptForInput(CommandTypes.role);
+                                role = _service.Role_GetV1(roleName).Result;
+                            }
+                            catch (Exception) { }
+
                             if (role == null)
                                 Console.WriteLine(Environment.NewLine + "FAILED find role \"" + roleName + "\"");
                             else
@@ -251,6 +353,21 @@ namespace Bhbk.Cli.Identity.Commands
                                     throw new ConsoleHelpAsException("FAILED destroy role \"" + roleName + "\""
                                         + Environment.NewLine + "\tID is " + role.Id.ToString());
                             }
+                        }
+                        else if (_list)
+                        {
+                            var roles = _service.Role_GetV1(new DataStateV1()
+                            {
+                                Sort = new List<IDataStateSort>()
+                                {
+                                    new DataStateV1Sort() { Field = "name", Dir = "asc" }
+                                },
+                                Skip = 0,
+                                Take = 100
+                            }).Result;
+
+                            foreach (var roleEntry in roles.Data.OrderBy(x => x.Name))
+                                Console.WriteLine($"\t{roleEntry.Name} [{roleEntry.Id}]");
                         }
 
                         break;
@@ -266,17 +383,17 @@ namespace Bhbk.Cli.Identity.Commands
                         else
                             throw new ConsoleHelpAsException("FAILED find user \"" + userName + "\"");
 
-                        roleName = PromptForInput(CommandTypes.role);
-                        role = _service.Role_GetV1(roleName).Result;
-
-                        if (role != null)
-                            Console.WriteLine(Environment.NewLine + "FOUND role \"" + roleName + "\""
-                                + Environment.NewLine + "\tID is " + role.Id.ToString());
-                        else
-                            throw new ConsoleHelpAsException("FAILED find role \"" + roleName + "\"");
-
                         if (_create)
                         {
+                            roleName = PromptForInput(CommandTypes.role);
+                            role = _service.Role_GetV1(roleName).Result;
+
+                            if (role != null)
+                                Console.WriteLine(Environment.NewLine + "FOUND role \"" + roleName + "\""
+                                    + Environment.NewLine + "\tID is " + role.Id.ToString());
+                            else
+                                throw new ConsoleHelpAsException("FAILED find role \"" + roleName + "\"");
+
                             if (_service.User_AddToRoleV1(user.Id, role.Id).Result)
                                 Console.WriteLine(Environment.NewLine + "SUCCESS add role \"" + roleName + "\" to user \"" + userName + "\"");
                             else
@@ -284,32 +401,58 @@ namespace Bhbk.Cli.Identity.Commands
                         }
                         else if (_destroy)
                         {
+                            roleName = PromptForInput(CommandTypes.role);
+                            role = _service.Role_GetV1(roleName).Result;
+
+                            if (role != null)
+                                Console.WriteLine(Environment.NewLine + "FOUND role \"" + roleName + "\""
+                                    + Environment.NewLine + "\tID is " + role.Id.ToString());
+                            else
+                                throw new ConsoleHelpAsException("FAILED find role \"" + roleName + "\"");
+
                             if (_service.User_RemoveFromRoleV1(user.Id, role.Id).Result)
                                 Console.WriteLine(Environment.NewLine + "SUCCESS remove role \"" + roleName + "\" from user \"" + userName + "\"");
                             else
                                 Console.WriteLine(Environment.NewLine + "FAILED remove role \"" + roleName + "\" from user \"" + userName + "\"");
+                        }
+                        else if (_list)
+                        {
+                            var roles = _service.User_GetRolesV1(user.UserName).Result;
+
+                            foreach (var roleEntry in roles.OrderBy(x => x.Name))
+                                Console.WriteLine($"\t{roleEntry.Name} [{roleEntry.Id}]");
                         }
 
                         break;
 
                     case CommandTypes.user:
 
-                        userName = PromptForInput(CommandTypes.user);
-                        user = _service.User_GetV1(userName).Result;
-
                         if (_create)
                         {
+                            try
+                            {
+                                userName = PromptForInput(CommandTypes.user);
+                                user = _service.User_GetV1(userName).Result;
+                            }
+                            catch (Exception) { }
+
                             if (user != null)
                                 Console.WriteLine(Environment.NewLine + "FOUND user \"" + userName + "\""
                                     + Environment.NewLine + "\tID is " + user.Id.ToString());
                             else
                             {
-                                user = _service.User_CreateV1(new UserV1()
+                                Console.Write(Environment.NewLine + "ENTER first name : ");
+                                var firstName = StandardInput.GetInput();
+
+                                Console.Write(Environment.NewLine + "ENTER last name : ");
+                                var lastName = StandardInput.GetInput();
+
+                                user = _service.User_CreateV1NoConfirm(new UserV1()
                                 {
                                     UserName = userName,
-                                    FirstName = Constants.ApiDefaultAdminUserFirstName,
-                                    LastName = Constants.ApiDefaultAdminUserLastName,
-                                    PhoneNumber = Constants.ApiDefaultAdminUserPhone,
+                                    Email = userName,
+                                    FirstName = firstName,
+                                    LastName = lastName,
                                     LockoutEnabled = false,
                                     HumanBeing = false,
                                     Immutable = false,
@@ -322,7 +465,7 @@ namespace Bhbk.Cli.Identity.Commands
                                     throw new ConsoleHelpAsException("FAILED create user \"" + userName + "\"");
                             }
 
-                            loginName = Constants.ApiDefaultLogin;
+                            loginName = Constants.DefaultLogin;
                             login = _service.Login_GetV1(loginName).Result;
 
                             if (login != null)
@@ -338,6 +481,13 @@ namespace Bhbk.Cli.Identity.Commands
                         }
                         else if (_destroy)
                         {
+                            try
+                            {
+                                userName = PromptForInput(CommandTypes.user);
+                                user = _service.User_GetV1(userName).Result;
+                            }
+                            catch (Exception) { }
+
                             if (user != null)
                                 Console.WriteLine(Environment.NewLine + "FAILED find user \"" + userName + "\"");
                             else
@@ -348,6 +498,30 @@ namespace Bhbk.Cli.Identity.Commands
                                 else
                                     throw new ConsoleHelpAsException("FAILED destroy user \"" + userName + "\""
                                         + Environment.NewLine + "\tID is \"" + user.Id.ToString() + "\"");
+                            }
+                        }
+                        else if (_list)
+                        {
+                            var users = _service.User_GetV1(new DataStateV1() 
+                            {
+                                Sort = new List<IDataStateSort>()
+                                {
+                                    new DataStateV1Sort() { Field = "userName", Dir = "asc" }
+                                },
+                                Skip = 0,
+                                Take = 100
+                            }).Result;
+
+                            foreach (var userEntry in users.Data.OrderBy(x => x.UserName))
+                            {
+                                Console.WriteLine($"  {userEntry.UserName} [{userEntry.Id}]");
+
+                                var roles = _service.User_GetRolesV1(userEntry.Id.ToString()).Result;
+
+                                foreach(var roleEntry in roles.OrderBy(x => x.Name))
+                                    Console.WriteLine($"    {roleEntry.Name} [{roleEntry.Id}]");
+
+                                Console.WriteLine();
                             }
                         }
 
@@ -379,6 +553,11 @@ namespace Bhbk.Cli.Identity.Commands
                             else
                                 throw new ConsoleHelpAsException("FAILED set password for user \"" + userName + "\"");
                         }
+                        else if (_list)
+                        {
+                            throw new ConsoleHelpAsException("NO SUPPORT to list password for \"" + userName + "\""
+                                + Environment.NewLine + "\tID is \"" + user.Id.ToString() + "\"");
+                        }
 
                         break;
 
@@ -400,26 +579,26 @@ namespace Bhbk.Cli.Identity.Commands
             {
                 case CommandTypes.issuer:
                     Console.Write(Environment.NewLine + "ENTER issuer name : ");
-                    break;
+                    return StandardInput.GetInput();
 
                 case CommandTypes.audience:
                     Console.Write(Environment.NewLine + "ENTER audience name : ");
-                    break;
+                    return StandardInput.GetInput();
 
                 case CommandTypes.role:
                     Console.Write(Environment.NewLine + "ENTER role name : ");
-                    break;
+                    return StandardInput.GetInput();
 
                 case CommandTypes.user:
                     Console.Write(Environment.NewLine + "ENTER user name : ");
-                    break;
+                    return StandardInput.GetInput();
 
                 case CommandTypes.userpass:
                     Console.Write(Environment.NewLine + "ENTER user password : ");
                     return StandardInput.GetHiddenInput();
             }
 
-            return StandardInput.GetInput();
+            throw new InvalidOperationException();
         }
     }
 }

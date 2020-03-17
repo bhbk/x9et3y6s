@@ -1,13 +1,10 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_Audience_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@IssuerId				UNIQUEIDENTIFIER
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
-    ,@AudienceType			NVARCHAR (MAX) 
     ,@LockoutEnabled		BIT     
     ,@LockoutEnd			DATETIMEOFFSET (7)
     ,@LastLoginSuccess		DATETIME2 (7)
@@ -28,7 +25,6 @@ SET
     ,IssuerId				= @IssuerId
 	,Name					= @Name
 	,Description			= @Description
-	,AudienceType			= @AudienceType
     ,LastUpdated			= @LASTUPDATED
     ,LockoutEnabled			= @LockoutEnabled
     ,LockoutEnd				= @LockoutEnd

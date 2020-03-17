@@ -1,7 +1,4 @@
 ﻿
-
-
-
 CREATE PROCEDURE [svc].[usp_Claim_Insert]
      @IssuerId				UNIQUEIDENTIFIER
     ,@ActorId				UNIQUEIDENTIFIER

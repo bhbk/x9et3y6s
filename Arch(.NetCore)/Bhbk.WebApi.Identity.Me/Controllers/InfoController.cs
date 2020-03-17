@@ -22,7 +22,7 @@ using System.Linq.Dynamic.Core;
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("info")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
+    [Authorize(Policy = Constants.DefaultPolicyForHumans)]
     public class InfoController : BaseController
     {
         private InfoProvider _provider;
@@ -47,7 +47,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/msg-of-the-day"), HttpGet]
-        [AllowAnonymous]
         public IActionResult GetMOTDV1()
         {
             var random = new Random();

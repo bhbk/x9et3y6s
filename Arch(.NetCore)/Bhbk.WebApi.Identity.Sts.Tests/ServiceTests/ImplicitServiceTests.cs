@@ -65,10 +65,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                var url = new Uri(Constants.ApiTestUriLink);
+                var url = new Uri(Constants.TestUriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Http.Implicit_AuthV2(
                     new ImplicitV2()
@@ -101,10 +101,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
 
-                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                var url = new Uri(Constants.ApiTestUriLink);
+                var url = new Uri(Constants.TestUriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Http.Implicit_AuthV2(
                     new ImplicitV2()
@@ -137,11 +137,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                var url = new Uri(Constants.ApiTestUriLink);
+                var url = new Uri(Constants.TestUriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Http.Implicit_AuthV2(
                     new ImplicitV2()
@@ -174,11 +174,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.ApiTestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.ApiTestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.ApiTestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                var url = new Uri(Constants.ApiTestUriLink);
+                var url = new Uri(Constants.TestUriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Http.Implicit_AuthV2(
                     new ImplicitV2()

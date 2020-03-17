@@ -144,7 +144,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
         public List<Claim> GenerateAccessClaims(tbl_Users user)
         {
             var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims).Single();
+                && x.ConfigKey == Constants.SettingGlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
 
@@ -199,10 +199,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
         public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Users user)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingAccessExpire).Single();
+                && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
             var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims).Single();
+                && x.ConfigKey == Constants.SettingGlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
 
@@ -257,7 +257,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
         public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Users user)
         {
             var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingRefreshExpire).Single();
+                && x.ConfigKey == Constants.SettingRefreshExpire).Single();
 
             var claims = new List<Claim>();
 

@@ -22,7 +22,7 @@ using System.Web;
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("change")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
+    [Authorize(Policy = Constants.DefaultPolicyForHumans)]
     public class ChangeController : BaseController
     {
         private ChangeProvider _provider;
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
+                && x.ConfigKey == Constants.SettingGlobalTotpExpire).Single();
 
             string token = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
                 .Generate(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).Single();
+                && x.ConfigKey == Constants.SettingGlobalTotpExpire).Single();
 
             string token = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
                 .Generate(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user));

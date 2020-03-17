@@ -23,7 +23,6 @@ using System.Linq.Expressions;
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("motd")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
     public class MOTDController : BaseController
     {
         private MOTDProvider _provider;
@@ -34,7 +33,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult CreateV1([FromBody] MOTDTssV1 model)
         {
             if (!ModelState.IsValid)
@@ -55,7 +55,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{motdID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid motdID)
         {
             var motd = UoW.MOTDs.Get(x => x.Id == motdID)
@@ -94,7 +95,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
         public IActionResult GetV1([FromBody] DataStateV1 state)
         {
             if (!ModelState.IsValid)
@@ -124,7 +124,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult UpdateV1([FromBody] MOTDTssV1 model)
         {
             if (!ModelState.IsValid)

@@ -5,6 +5,7 @@ using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
+using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.Identity.Validators;
@@ -44,16 +45,21 @@ namespace Bhbk.WebApi.Alert
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);
             sc.AddSingleton<IMapper>(mapper);
-            sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityHumansAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
-            sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
             sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
             {
                 return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
             });
             sc.AddSingleton<IHostedService, QueueEmailTask>();
             sc.AddSingleton<IHostedService, QueueTextTask>();
-            sc.AddSingleton<IAlertService, AlertService>();
+            sc.AddSingleton<IAlertService, AlertService>(_ =>
+            {
+                var alert = new AlertService(conf);
+                alert.Grant = new ClientCredentialGrantV2(conf);
+
+                return alert;
+            });
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
             if (instance.InstanceType != InstanceContext.DeployedOrLocal)
@@ -86,7 +92,7 @@ namespace Bhbk.WebApi.Alert
              */
 
             var legacyIssuer = seeds.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).Single();
+                && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
                 issuers = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
@@ -137,17 +143,13 @@ namespace Bhbk.WebApi.Alert
             });
             sc.AddAuthorization(opt =>
             {
-                opt.AddPolicy(Constants.PolicyForAdmins, admins =>
+                opt.AddPolicy(Constants.DefaultPolicyForHumans, humans =>
                 {
-                    admins.Requirements.Add(new AlertAdminsAuthorizeRequirement());
+                    humans.Requirements.Add(new IdentityHumansAuthorizeRequirement());
                 });
-                opt.AddPolicy(Constants.PolicyForServices, services =>
+                opt.AddPolicy(Constants.DefaultPolicyForServices, servers =>
                 {
-                    services.Requirements.Add(new AlertServicesAuthorizeRequirement());
-                });
-                opt.AddPolicy(Constants.PolicyForUsers, users =>
-                {
-                    users.Requirements.Add(new AlertUsersAuthorizeRequirement());
+                    servers.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                 });
             });
             sc.AddSwaggerGen(opt =>

@@ -36,8 +36,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             var result = UoW.Issuers.Create(
                 Mapper.Map<tbl_Issuers>(new IssuerV1()
                 {
-                    Name = Constants.ApiTestIssuer,
-                    IssuerKey = Constants.ApiTestIssuerKey,
+                    Name = Constants.TestIssuer,
+                    IssuerKey = Constants.TestIssuerKey,
                     Enabled = true,
                     Immutable = false,
                 }));
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
-                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
             UoW.Issuers.Delete(issuer);
@@ -98,7 +98,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
-                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
             issuer.Name += "(Updated)";
 

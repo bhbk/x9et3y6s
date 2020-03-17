@@ -33,7 +33,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult CreateV1([FromBody] IssuerV1 model)
         {
             if (!ModelState.IsValid)
@@ -55,7 +56,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid issuerID)
         {
             var issuer = UoW.Issuers.Get(x => x.Id == issuerID)
@@ -81,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/keys"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForServices)]
+        [Authorize(Policy = Constants.DefaultPolicyForServices)]
         public IActionResult GetKeysV1([FromBody] List<string> model)
         {
             var current = GetIdentityGUID();
@@ -105,7 +107,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerValue}"), HttpGet]
-        [Authorize(Policy = Constants.PolicyForUsers)]
         public IActionResult GetV1([FromRoute] string issuerValue)
         {
             Guid issuerID;
@@ -128,7 +129,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/page"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForUsers)]
         public IActionResult GetV1([FromBody] DataStateV1 state)
         {
             if (!ModelState.IsValid)
@@ -159,7 +159,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerID:guid}/audiences"), HttpGet]
-        [Authorize(Policy = Constants.PolicyForUsers)]
         public IActionResult GetAudiencesV1([FromRoute] Guid issuerID)
         {
             var issuer = UoW.Issuers.Get(x => x.Id == issuerID)
@@ -178,7 +177,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult UpdateV1([FromBody] IssuerV1 model)
         {
             if (!ModelState.IsValid)

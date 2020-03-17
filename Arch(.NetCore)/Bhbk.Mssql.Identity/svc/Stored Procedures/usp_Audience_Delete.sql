@@ -1,9 +1,4 @@
 ﻿
-
-
-
-
-
 CREATE PROCEDURE [svc].[usp_Audience_Delete]
     @ID uniqueidentifier
 

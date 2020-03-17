@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Grants
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public JwtSecurityToken AccessToken
+        public JwtSecurityToken Jwt
         {
             get { return GetAsync().Result; }
             set { _access = value; }

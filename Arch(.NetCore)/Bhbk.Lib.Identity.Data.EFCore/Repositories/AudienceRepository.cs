@@ -35,7 +35,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
-                new SqlParameter("@AudienceType", SqlDbType.NVarChar) { Value = entity.AudienceType },
                 new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
                 new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
                 new SqlParameter("@LastLoginSuccess", SqlDbType.DateTime2) { Value = entity.LastLoginSuccess.HasValue ? (object)entity.LastLoginSuccess.Value : DBNull.Value },
@@ -46,7 +45,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             };
 
             return _context.Set<uvw_Audiences>().FromSqlRaw("[svc].[usp_Audience_Insert]"
-                + "@IssuerId, @ActorId, @Name, @Description, @AudienceType, @LockoutEnabled, @LockoutEnd,"
+                + "@IssuerId, @ActorId, @Name, @Description, @LockoutEnabled, @LockoutEnd,"
                 + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
@@ -120,7 +119,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
-                new SqlParameter("@AudienceType", SqlDbType.NVarChar) { Value = entity.AudienceType },
                 new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
                 new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
                 new SqlParameter("@LastLoginSuccess", SqlDbType.DateTime2) { Value = entity.LastLoginSuccess.HasValue ? (object)entity.LastLoginSuccess.Value : DBNull.Value },
@@ -131,7 +129,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             };
 
             return _context.Set<uvw_Audiences>().FromSqlRaw("[svc].[usp_Audience_Update]"
-                + "@Id, @IssuerId, @ActorId, @Name, @Description, @AudienceType, @LockoutEnabled, @LockoutEnd,"
+                + "@Id, @IssuerId, @ActorId, @Name, @Description, @LockoutEnabled, @LockoutEnd,"
                 + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }

@@ -37,17 +37,19 @@ deploy:
   only:
     - dummy
   script:
-    - set VERSION=2020.03.14.2130
+    - set VERSION=2020.03.16.2230
     - cd ..\Arch(.NetCore)
     - nuget restore Bhbk.Lib.Identity.Data.EF6\Bhbk.Lib.Identity.Data.EF6.csproj -SolutionDirectory . -Verbosity quiet
     - dotnet restore Bhbk.WebApi.Identity.sln --no-cache --verbosity quiet
     - dotnet build Bhbk.WebApi.Identity.sln --configuration Release --verbosity quiet /p:platform=x64
     - dotnet pack Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj -p:PackageVersion=%VERSION% --output . --configuration Release /p:platform=x64
+    - dotnet publish Bhbk.Cli.Alert\Bhbk.Cli.Alert.csproj --output Bhbk.Cli.Alert\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
     - dotnet publish Bhbk.Cli.Identity\Bhbk.Cli.Identity.csproj --output Bhbk.Cli.Identity\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
     - dotnet publish Bhbk.WebApi.Alert\Bhbk.WebApi.Alert.csproj --output Bhbk.WebApi.Alert\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
     - dotnet publish Bhbk.WebApi.Identity.Admin\Bhbk.WebApi.Identity.Admin.csproj --output Bhbk.WebApi.Identity.Admin\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
     - dotnet publish Bhbk.WebApi.Identity.Me\Bhbk.WebApi.Identity.Me.csproj --output Bhbk.WebApi.Identity.Me\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
     - dotnet publish Bhbk.WebApi.Identity.Sts\Bhbk.WebApi.Identity.Sts.csproj --output Bhbk.WebApi.Identity.Sts\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
+    - dotnet octo pack --id=Bhbk.Cli.Alert --version=%VERSION% --basePath=Bhbk.Cli.Alert\bin\Release\netcoreapp3.1\publish --outFolder=.
     - dotnet octo pack --id=Bhbk.Cli.Identity --version=%VERSION% --basePath=Bhbk.Cli.Identity\bin\Release\netcoreapp3.1\publish --outFolder=.
     - dotnet octo pack --id=Bhbk.WebApi.Alert --version=%VERSION% --basePath=Bhbk.WebApi.Alert\bin\Release\netcoreapp3.1\publish --outFolder=.
     - dotnet octo pack --id=Bhbk.WebApi.Identity.Admin --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Admin\bin\Release\netcoreapp3.1\publish --outFolder=.

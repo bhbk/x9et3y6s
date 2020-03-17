@@ -70,10 +70,10 @@ namespace Bhbk.WebApi.Identity.Me.Tasks
                         if (uow.InstanceType == InstanceContext.DeployedOrLocal)
                         {
                             var url = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                                && x.ConfigKey == Constants.ApiSettingTheySaidSoUrl).Single();
+                                && x.ConfigKey == Constants.SettingTheySaidSoUrl).Single();
 
                             var key = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                                && x.ConfigKey == Constants.ApiSettingTheySaidSoLicense).Single();
+                                && x.ConfigKey == Constants.SettingTheySaidSoLicense).Single();
 
                             using (var http = new HttpClient())
                             {

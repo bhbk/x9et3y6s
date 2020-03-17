@@ -23,7 +23,6 @@ using System.Linq.Expressions;
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("claim")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
     public class ClaimController : BaseController
     {
         private ClaimProvider _provider;
@@ -34,7 +33,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult CreateV1([FromBody] ClaimV1 model)
         {
             if (!ModelState.IsValid)
@@ -58,7 +58,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{claimID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid claimID)
         {
             var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
@@ -135,7 +136,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult UpdateV1([FromBody] ClaimV1 model)
         {
             if (!ModelState.IsValid)

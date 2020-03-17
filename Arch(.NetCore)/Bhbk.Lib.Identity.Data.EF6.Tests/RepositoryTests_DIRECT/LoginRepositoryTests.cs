@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             var result = UoW.Logins.Create(
                 Mapper.Map<tbl_Logins>(new LoginV1()
                 {
-                    Name = Constants.ApiTestLogin,
+                    Name = Constants.TestLogin,
                     Immutable = false,
                 }));
             result.Should().BeAssignableTo<tbl_Logins>();
@@ -60,7 +60,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
-                .Where(x => x.Name == Constants.ApiTestLogin).ToLambda())
+                .Where(x => x.Name == Constants.TestLogin).ToLambda())
                 .Single();
 
             UoW.Logins.Delete(login);
@@ -95,7 +95,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
-                .Where(x => x.Name == Constants.ApiTestLogin).ToLambda())
+                .Where(x => x.Name == Constants.TestLogin).ToLambda())
                 .Single();
             login.Name += "(Updated)";
 

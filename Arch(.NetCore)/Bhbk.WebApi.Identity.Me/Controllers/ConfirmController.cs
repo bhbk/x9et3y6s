@@ -14,7 +14,7 @@ using System.Linq.Dynamic.Core;
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("confirm")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
+    [Authorize(Policy = Constants.DefaultPolicyForHumans)]
     public class ConfirmController : BaseController
     {
         private ConfirmProvider _provider;
@@ -25,7 +25,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/email/{userID:guid}"), HttpPut]
-        [AllowAnonymous]
         public IActionResult ConfirmEmailV1([FromRoute] Guid userID, [FromBody] string email, [FromBody] string token)
         {
             if (!ModelState.IsValid)
@@ -51,7 +50,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/password/{userID:guid}"), HttpPut]
-        [AllowAnonymous]
         public IActionResult ConfirmPasswordV1([FromRoute] Guid userID, [FromBody] string password, [FromBody] string token)
         {
             if (!ModelState.IsValid)
@@ -77,7 +75,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         }
 
         [Route("v1/phone/{userID:guid}"), HttpPut]
-        [AllowAnonymous]
         public IActionResult ConfirmPhoneV1([FromRoute] Guid userID, [FromBody] string phoneNumber, [FromBody] string token)
         {
             if (!ModelState.IsValid)

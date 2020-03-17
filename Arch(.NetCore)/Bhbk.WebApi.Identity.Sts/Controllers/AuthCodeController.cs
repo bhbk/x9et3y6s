@@ -32,7 +32,6 @@ using System.Web;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("oauth2")]
-    [AllowAnonymous]
     public class AuthCodeController : BaseController
     {
         private AuthCodeProvider _provider;
@@ -43,6 +42,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/acg-ask"), HttpGet]
+        [AllowAnonymous]
         public IActionResult AuthCodeV1_Ask([FromQuery] AuthCodeAskV1 input)
         {
             if (!ModelState.IsValid)
@@ -52,6 +52,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v1/acg"), HttpGet]
+        [AllowAnonymous]
         public IActionResult AuthCodeV1_Grant([FromQuery] AuthCodeV1 input)
         {
             if (!ModelState.IsValid)
@@ -61,6 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/acg-ask"), HttpGet]
+        [AllowAnonymous]
         public IActionResult AuthCodeV2_Ask([FromQuery] AuthCodeAskV2 input)
         {
             if (!ModelState.IsValid)
@@ -149,7 +151,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingTotpExpire).Single();
+                && x.ConfigKey == Constants.SettingTotpExpire).Single();
 
             var state = UoW.States.Create(
                 Mapper.Map<tbl_States>(new StateV1()
@@ -170,6 +172,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         }
 
         [Route("v2/acg"), HttpGet]
+        [AllowAnonymous]
         public IActionResult AuthCodeV2_Grant([FromQuery] AuthCodeV2 input)
         {
             if (!ModelState.IsValid)

@@ -15,7 +15,6 @@ using System.Reflection;
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
     [Route("diagnostic")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
     public class DiagnosticController : BaseController
     {
         private DiagnosticProvider _provider;

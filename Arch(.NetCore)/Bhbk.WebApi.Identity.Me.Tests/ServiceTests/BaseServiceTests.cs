@@ -23,7 +23,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
@@ -51,9 +50,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 sc.AddSingleton<IConfiguration>(conf);
                 sc.AddSingleton<IContextService>(instance);
                 sc.AddSingleton<IMapper>(mapper);
-                sc.AddSingleton<IAuthorizationHandler, IdentityAdminsAuthorize>();
+                sc.AddSingleton<IAuthorizationHandler, IdentityHumansAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
-                sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
                     var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
@@ -120,17 +118,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 });
                 sc.AddAuthorization(opt =>
                 {
-                    opt.AddPolicy(Constants.PolicyForAdmins, admins =>
+                    opt.AddPolicy(Constants.DefaultPolicyForHumans, humans =>
                     {
-                        admins.Requirements.Add(new IdentityAdminsAuthorizeRequirement());
+                        humans.Requirements.Add(new IdentityHumansAuthorizeRequirement());
                     });
-                    opt.AddPolicy(Constants.PolicyForServices, services =>
+                    opt.AddPolicy(Constants.DefaultPolicyForServices, servers =>
                     {
-                        services.Requirements.Add(new IdentityServicesAuthorizeRequirement());
-                    });
-                    opt.AddPolicy(Constants.PolicyForUsers, users =>
-                    {
-                        users.Requirements.Add(new IdentityUsersAuthorizeRequirement());
+                        servers.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                     });
                 });
                 sc.AddSwaggerGen(opt =>

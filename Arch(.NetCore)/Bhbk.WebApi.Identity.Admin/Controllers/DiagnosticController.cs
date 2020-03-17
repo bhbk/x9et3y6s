@@ -1,9 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
-using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.WebApi.Identity.Admin.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +13,6 @@ using System.Reflection;
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("diagnostic")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
     public class DiagnosticController : BaseController
     {
         private DiagnosticProvider _provider;

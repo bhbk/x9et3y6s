@@ -32,7 +32,6 @@ using System.Web;
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("user")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
     public class UserController : BaseController
     {
         private UserProvider _provider;
@@ -43,7 +42,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/add-to-claim/{claimID:guid}"), HttpGet]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -74,7 +74,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/add-to-login/{loginID:guid}"), HttpGet]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -104,7 +105,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/add-to-role/{roleID:guid}"), HttpGet]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult AddToRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -134,7 +136,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult CreateV1([FromBody] UserV1 model)
         {
             if (!ModelState.IsValid)
@@ -177,7 +180,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (UoW.InstanceType == InstanceContext.DeployedOrLocal)
             {
                 var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.ApiSettingTotpExpire).Single();
+                    && x.ConfigKey == Constants.SettingTotpExpire).Single();
 
                 var code = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
                     .Generate(result.UserName, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result));
@@ -202,7 +205,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/no-confirm"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult CreateV1NoConfirm([FromBody] UserV1 model)
         {
             if (!ModelState.IsValid)
@@ -237,7 +241,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid userID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -264,7 +269,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/refresh"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid userID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -285,7 +291,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/refresh/{refreshID}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteRefreshV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)
         {
             var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
@@ -446,7 +453,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-from-claim/{claimID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult RemoveFromClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -476,7 +484,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-from-login/{loginID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -505,7 +514,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-from-role/{roleID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult RemoveFromRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
             var user = UoW.Users.Get(x => x.Id == userID)
@@ -534,7 +544,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/remove-password"), HttpGet]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult RemovePasswordV1([FromRoute] Guid userID)
         {
             if (!ModelState.IsValid)
@@ -564,7 +575,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{userID:guid}/set-password"), HttpPut]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult SetPasswordV1([FromRoute] Guid userID, [FromBody] PasswordAddV1 model)
         {
             if (!ModelState.IsValid)
@@ -595,7 +607,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult UpdateV1([FromBody] UserV1 model)
         {
             if (!ModelState.IsValid)

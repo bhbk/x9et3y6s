@@ -36,42 +36,42 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * create test settings
              */
             var foundGlobalLegacyClaims = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyClaims).SingleOrDefault();
+                && x.ConfigKey == Constants.SettingGlobalLegacyClaims).SingleOrDefault();
 
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = _uow.Settings.Create(
                     _mapper.Map<tbl_Settings>(new SettingV1()
                     {
-                        ConfigKey = Constants.ApiSettingGlobalLegacyClaims,
+                        ConfigKey = Constants.SettingGlobalLegacyClaims,
                         ConfigValue = "true",
                         Immutable = true,
                     }));
             }
 
             var foundGlobalLegacyIssuer = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalLegacyIssuer).SingleOrDefault();
+                && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).SingleOrDefault();
 
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = _uow.Settings.Create(
                     _mapper.Map<tbl_Settings>(new SettingV1()
                     {
-                        ConfigKey = Constants.ApiSettingGlobalLegacyIssuer,
+                        ConfigKey = Constants.SettingGlobalLegacyIssuer,
                         ConfigValue = "true",
                         Immutable = true,
                     }));
             }
 
             var foundGlobalTotpExpire = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.ApiSettingGlobalTotpExpire).SingleOrDefault();
+                && x.ConfigKey == Constants.SettingGlobalTotpExpire).SingleOrDefault();
 
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = _uow.Settings.Create(
                     _mapper.Map<tbl_Settings>(new SettingV1()
                     {
-                        ConfigKey = Constants.ApiSettingGlobalTotpExpire,
+                        ConfigKey = Constants.SettingGlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
                         Immutable = true,
                     }));
@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * create test issuers
              */
             var foundIssuer = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
-                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .SingleOrDefault();
 
             if (foundIssuer == null)
@@ -89,8 +89,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 foundIssuer = _uow.Issuers.Create(
                     _mapper.Map<tbl_Issuers>(new IssuerV1()
                     {
-                        Name = Constants.ApiTestIssuer,
-                        IssuerKey = Constants.ApiTestIssuerKey,
+                        Name = Constants.TestIssuer,
+                        IssuerKey = Constants.TestIssuerKey,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -102,7 +102,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * create test audiences
              */
             var foundAudience = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                .Where(x => x.Name == Constants.ApiTestAudience).ToLambda())
+                .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .SingleOrDefault();
 
             if (foundAudience == null)
@@ -111,8 +111,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     _mapper.Map<tbl_Audiences>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        Name = Constants.ApiTestAudience,
-                        AudienceType = AudienceType.user_agent.ToString(),
+                        Name = Constants.TestAudience,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -142,7 +141,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             /*
              * create test client urls
              */
-            var url = new Uri(Constants.ApiTestUriLink);
+            var url = new Uri(Constants.TestUriLink);
 
             var foundAudienceUrl = _uow.Urls.Get(QueryExpressionFactory.GetQueryExpression<tbl_Urls>()
                 .Where(x => x.AudienceId == foundAudience.Id
@@ -168,7 +167,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * create test claims
              */
             var foundClaim = _uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
-                .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
+                .Where(x => x.Type == Constants.TestClaim).ToLambda())
                 .SingleOrDefault();
 
             if (foundClaim == null)
@@ -177,10 +176,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     _mapper.Map<tbl_Claims>(new ClaimV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        Subject = Constants.ApiTestClaimSubject,
-                        Type = Constants.ApiTestClaim,
+                        Subject = Constants.TestClaimSubject,
+                        Type = Constants.TestClaim,
                         Value = AlphaNumeric.CreateString(8),
-                        ValueType = Constants.ApiTestClaimValueType,
+                        ValueType = Constants.TestClaimValueType,
                         Immutable = false,
                     }));
 
@@ -191,7 +190,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * create test logins
              */
             var foundLogin = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
-                .Where(x => x.Name == Constants.ApiTestLogin).ToLambda())
+                .Where(x => x.Name == Constants.TestLogin).ToLambda())
                 .SingleOrDefault();
 
             if (foundLogin == null)
@@ -199,7 +198,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 foundLogin = _uow.Logins.Create(
                     _mapper.Map<tbl_Logins>(new LoginV1()
                     {
-                        Name = Constants.ApiTestLogin,
+                        Name = Constants.TestLogin,
                         Immutable = false,
                     }));
 
@@ -210,7 +209,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * create test roles
              */
             var foundRole = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
-                .Where(x => x.Name == Constants.ApiTestRole).ToLambda())
+                .Where(x => x.Name == Constants.TestRole).ToLambda())
                 .SingleOrDefault();
 
             if (foundRole == null)
@@ -219,7 +218,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     _mapper.Map<tbl_Roles>(new RoleV1()
                     {
                         AudienceId = foundAudience.Id,
-                        Name = Constants.ApiTestRole,
+                        Name = Constants.TestRole,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -231,7 +230,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * create test users
              */
             var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.UserName == Constants.ApiTestUser).ToLambda())
+                .Where(x => x.UserName == Constants.TestUser).ToLambda())
                 .SingleOrDefault();
 
             if (foundUser == null)
@@ -239,15 +238,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 foundUser = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserV1()
                     {
-                        UserName = Constants.ApiTestUser,
-                        Email = Constants.ApiTestUser,
-                        PhoneNumber = Constants.ApiTestUserPhone,
+                        UserName = Constants.TestUser,
+                        Email = Constants.TestUser,
+                        PhoneNumber = NumberAs.CreateString(9),
                         FirstName = "First-" + AlphaNumeric.CreateString(4),
                         LastName = "Last-" + AlphaNumeric.CreateString(4),
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = false,
-                    }), Constants.ApiTestUserPassCurrent);
+                    }), Constants.TestUserPassCurrent);
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activities>(new ActivityV1()
@@ -306,7 +305,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             /*
              * set password to audiences
              */
-            _uow.Audiences.SetPasswordHash(foundAudience, Constants.ApiTestAudiencePassCurrent);
+            _uow.Audiences.SetPasswordHash(foundAudience, Constants.TestAudiencePassCurrent);
             _uow.Commit();
 
             /*
@@ -353,8 +352,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 issuer = _uow.Issuers.Create(
                     _mapper.Map<tbl_Issuers>(new IssuerV1()
                     {
-                        Name = Constants.ApiTestIssuer + "-" + Base64.CreateString(4),
-                        IssuerKey = Constants.ApiTestIssuerKey,
+                        Name = Constants.TestIssuer + "-" + Base64.CreateString(4),
+                        IssuerKey = Constants.TestIssuerKey,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -368,8 +367,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     _mapper.Map<tbl_Audiences>(new AudienceV1()
                     {
                         IssuerId = issuer.Id,
-                        Name = Constants.ApiTestAudience + "-" + Base64.CreateString(4),
-                        AudienceType = AudienceType.user_agent.ToString(),
+                        Name = Constants.TestAudience + "-" + Base64.CreateString(4),
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -398,7 +396,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 /*
                  * create random audience urls
                  */
-                var audienceUrl = new Uri(Constants.ApiTestUriLink);
+                var audienceUrl = new Uri(Constants.TestUriLink);
 
                 url = _uow.Urls.Create(
                     _mapper.Map<tbl_Urls>(new UrlV1()
@@ -418,10 +416,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     _mapper.Map<tbl_Claims>(new ClaimV1()
                     {
                         IssuerId = issuer.Id,
-                        Subject = Constants.ApiTestClaimSubject + "-" + AlphaNumeric.CreateString(4),
-                        Type = Constants.ApiTestClaim + "-" + AlphaNumeric.CreateString(4),
+                        Subject = Constants.TestClaimSubject + "-" + AlphaNumeric.CreateString(4),
+                        Type = Constants.TestClaim + "-" + AlphaNumeric.CreateString(4),
                         Value = AlphaNumeric.CreateString(8),
-                        ValueType = Constants.ApiTestClaimValueType + "-" + AlphaNumeric.CreateString(4),
+                        ValueType = Constants.TestClaimValueType + "-" + AlphaNumeric.CreateString(4),
                         Immutable = false,
                     }));
 
@@ -433,8 +431,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 login = _uow.Logins.Create(
                     _mapper.Map<tbl_Logins>(new LoginV1()
                     {
-                        Name = Constants.ApiTestLogin + "-" + AlphaNumeric.CreateString(4),
-                        LoginKey = Constants.ApiTestLoginKey,
+                        Name = Constants.TestLogin + "-" + AlphaNumeric.CreateString(4),
+                        LoginKey = Constants.TestLoginKey,
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -448,7 +446,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     _mapper.Map<tbl_Roles>(new RoleV1()
                     {
                         AudienceId = audience.Id,
-                        Name = Constants.ApiTestRole + "-" + AlphaNumeric.CreateString(4),
+                        Name = Constants.TestRole + "-" + AlphaNumeric.CreateString(4),
                         Enabled = true,
                         Immutable = false,
                     }));
@@ -461,14 +459,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 user = _uow.Users.Create(
                     _mapper.Map<tbl_Users>(new UserV1()
                     {
-                        UserName = AlphaNumeric.CreateString(4) + "-" + Constants.ApiTestUser,
-                        PhoneNumber = Constants.ApiTestUserPhone + NumberAs.CreateString(1),
+                        UserName = AlphaNumeric.CreateString(4) + "-" + Constants.TestUser,
+                        PhoneNumber = NumberAs.CreateString(9),
                         FirstName = "First-" + Base64.CreateString(4),
                         LastName = "Last-" + Base64.CreateString(4),
                         LockoutEnabled = false,
                         HumanBeing = true,
                         Immutable = false,
-                    }), Constants.ApiTestUserPassCurrent);
+                    }), Constants.TestUserPassCurrent);
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activities>(new ActivityV1()
@@ -507,7 +505,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 /*
                  * set password for random audiences
                  */
-                _uow.Audiences.SetPasswordHash(audience, Constants.ApiTestAudiencePassCurrent);
+                _uow.Audiences.SetPasswordHash(audience, Constants.TestAudiencePassCurrent);
                 _uow.Commit();
 
                 /*
@@ -550,7 +548,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     new tbl_MOTDs()
                     {
                         Id = Guid.NewGuid(),
-                        Author = Constants.ApiTestMOTD,
+                        Author = Constants.TestMOTD,
                         Quote = "Test Quote",
                         TssLength = 666,
                         TssId = AlphaNumeric.CreateString(8),
@@ -574,49 +572,49 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * delete test users
              */
             _uow.Users.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.UserName.Contains(Constants.ApiTestUser)).ToLambda());
+                .Where(x => x.UserName.Contains(Constants.TestUser)).ToLambda());
             _uow.Commit();
 
             /*
              * delete test roles
              */
             _uow.Roles.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
-                .Where(x => x.Name.Contains(Constants.ApiTestRole)).ToLambda());
+                .Where(x => x.Name.Contains(Constants.TestRole)).ToLambda());
             _uow.Commit();
 
             /*
              * delete test logins
              */
             _uow.Logins.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
-                .Where(x => x.Name.Contains(Constants.ApiTestLogin)).ToLambda());
+                .Where(x => x.Name.Contains(Constants.TestLogin)).ToLambda());
             _uow.Commit();
 
             /*
              * delete test claims
              */
             _uow.Claims.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
-                .Where(x => x.Type.Contains(Constants.ApiTestClaim)).ToLambda());
+                .Where(x => x.Type.Contains(Constants.TestClaim)).ToLambda());
             _uow.Commit();
 
             /*
              * delete test audiences
              */
             _uow.Audiences.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                .Where(x => x.Name.Contains(Constants.ApiTestAudience)).ToLambda());
+                .Where(x => x.Name.Contains(Constants.TestAudience)).ToLambda());
             _uow.Commit();
 
             /*
              * delete test issuers
              */
             _uow.Issuers.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
-                .Where(x => x.Name.Contains(Constants.ApiTestIssuer)).ToLambda());
+                .Where(x => x.Name.Contains(Constants.TestIssuer)).ToLambda());
             _uow.Commit();
 
             /*
              * delete test msg of the day
              */
             _uow.MOTDs.Delete(QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>()
-                .Where(x => x.Author.Contains(Constants.ApiTestMOTD)).ToLambda());
+                .Where(x => x.Author.Contains(Constants.TestMOTD)).ToLambda());
             _uow.Commit();
         }
     }

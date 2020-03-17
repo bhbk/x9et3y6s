@@ -25,7 +25,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
         public string PasswordHashPBKDF2 { get; set; }
         public string PasswordHashSHA256 { get; set; }
         public string SecurityStamp { get; set; }
-        public string AudienceType { get; set; }
         public bool Enabled { get; set; }
         public DateTime Created { get; set; }
         public bool LockoutEnabled { get; set; }

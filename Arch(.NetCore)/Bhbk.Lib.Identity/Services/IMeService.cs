@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Identity.Models.Admin;
+﻿using Bhbk.Lib.Identity.Grants;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
 using System;
@@ -10,6 +11,7 @@ namespace Bhbk.Lib.Identity.Services
 {
     public interface IMeService
     {
+        IOAuth2JwtGrant Grant { get; set; }
         JwtSecurityToken Jwt { get; set; }
         MeRepository Http { get; }
 

@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuers>()
-                .Where(x => x.Name == Constants.ApiTestIssuer).ToLambda())
+                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
             var result = UoW.Claims.Create(
@@ -39,7 +39,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 {
                     IssuerId = issuer.Id,
                     Subject = "Subject-" + AlphaNumeric.CreateString(4),
-                    Type = Constants.ApiTestClaim,
+                    Type = Constants.TestClaim,
                     Value = AlphaNumeric.CreateString(8),
                     ValueType = "ValueType-" + AlphaNumeric.CreateString(4),
                     Immutable = false,
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claims>()
-                .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
+                .Where(x => x.Type == Constants.TestClaim).ToLambda())
                 .Single();
 
             UoW.Claims.Delete(claim);
@@ -96,7 +96,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claims>()
-                .Where(x => x.Type == Constants.ApiTestClaim).ToLambda())
+                .Where(x => x.Type == Constants.TestClaim).ToLambda())
                 .Single();
             claim.Value += "(Updated)";
 

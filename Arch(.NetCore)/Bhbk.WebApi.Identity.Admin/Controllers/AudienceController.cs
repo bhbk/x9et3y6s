@@ -25,7 +25,6 @@ using System.Linq.Expressions;
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("audience")]
-    [Authorize(Policy = Constants.PolicyForUsers)]
     public class AudienceController : BaseController
     {
         private AudienceProvider _provider;
@@ -36,7 +35,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPost]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult CreateV1([FromBody] AudienceV1 model)
         {
             if (!ModelState.IsValid)
@@ -46,14 +46,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 && x.Name == model.Name).Any())
             {
                 ModelState.AddModelError(MessageType.AudienceAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Audience:{model.Name}");
-                return BadRequest(ModelState);
-            }
-
-            AudienceType audienceType;
-
-            if (!Enum.TryParse<AudienceType>(model.AudienceType, true, out audienceType))
-            {
-                ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Issuer:{model.IssuerId} Audience:{model.Name}");
                 return BadRequest(ModelState);
             }
 
@@ -67,7 +59,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid audienceID)
         {
             var audience = UoW.Audiences.Get(x => x.Id == audienceID)
@@ -93,7 +86,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}/refresh"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid audienceID)
         {
             var audience = UoW.Audiences.Get(x => x.Id == audienceID)
@@ -114,7 +108,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}/refresh/{refreshID}"), HttpDelete]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteRefreshV1([FromRoute] Guid audienceID, [FromRoute] Guid refreshID)
         {
             var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
@@ -239,7 +234,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{audienceID:guid}/set-password"), HttpPut]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult SetPasswordV1([FromRoute] Guid audienceID, [FromBody] PasswordAddV1 model)
         {
             if (!ModelState.IsValid)
@@ -270,7 +266,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = Constants.PolicyForAdmins)]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult UpdateV1([FromBody] AudienceV1 model)
         {
             if (!ModelState.IsValid)
