@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                     var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    var enabled = bool.Parse(conf["Jobs:QueueEmails:Enable"]);
+                    var enable = bool.Parse(conf["Jobs:QueueEmails:Enable"]);
                     var expire = int.Parse(conf["Jobs:QueueEmails:ExpireDelay"]);
                     var providerApiKey = conf["Jobs:QueueEmails:ProviderApiKey"];
 

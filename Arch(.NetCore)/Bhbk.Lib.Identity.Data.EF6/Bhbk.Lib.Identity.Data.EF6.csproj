@@ -78,14 +78,14 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bhbk.Lib.Common, Version=2020.3.15.2130, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Bhbk.Lib.Common.2020.3.15.2130\lib\netstandard2.0\Bhbk.Lib.Common.dll</HintPath>
+    <Reference Include="Bhbk.Lib.Common, Version=2020.8.11.1945, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\Bhbk.Lib.Common.2020.8.11.1945\lib\netstandard2.0\Bhbk.Lib.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Bhbk.Lib.Cryptography, Version=2020.3.15.2130, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Bhbk.Lib.Cryptography.2020.3.15.2130\lib\netstandard2.0\Bhbk.Lib.Cryptography.dll</HintPath>
+    <Reference Include="Bhbk.Lib.Cryptography, Version=2020.8.11.1945, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\Bhbk.Lib.Cryptography.2020.8.11.1945\lib\netstandard2.0\Bhbk.Lib.Cryptography.dll</HintPath>
     </Reference>
     <Reference Include="Bhbk.Lib.DataAccess.EF, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Bhbk.Lib.DataAccess.EF.2020.3.15.2130\lib\net48\Bhbk.Lib.DataAccess.EF.dll</HintPath>
+      <HintPath>..\packages\Bhbk.Lib.DataAccess.EF.2020.8.11.1945\lib\net48\Bhbk.Lib.DataAccess.EF.dll</HintPath>
     </Reference>
     <Reference Include="BouncyCastle.Crypto, Version=1.8.6.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.BouncyCastle.1.8.6.7\lib\net40\BouncyCastle.Crypto.dll</HintPath>

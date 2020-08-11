@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                     var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    var enabled = bool.Parse(conf["Jobs:QueueTexts:Enable"]);
+                    var enable = bool.Parse(conf["Jobs:QueueTexts:Enable"]);
                     var expire = int.Parse(conf["Jobs:QueueTexts:ExpireDelay"]);
                     var providerSid = conf["Jobs:QueueTexts:ProviderSid"];
                     var providerToken = conf["Jobs:QueueTexts:ProviderToken"];
