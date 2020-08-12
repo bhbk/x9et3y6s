@@ -15,8 +15,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
     public partial class tbl_QueueTexts
     {
         public System.Guid Id { get; set; }
-        public System.Guid ActorId { get; set; }
-        public System.Guid FromId { get; set; }
+        public Nullable<System.Guid> ActorId { get; set; }
+        public Nullable<System.Guid> FromId { get; set; }
         public string FromPhoneNumber { get; set; }
         public System.Guid ToId { get; set; }
         public string ToPhoneNumber { get; set; }

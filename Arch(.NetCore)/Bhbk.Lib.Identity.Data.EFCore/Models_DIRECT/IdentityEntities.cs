@@ -265,12 +265,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .IsUnicode(false);
 
                 entity.Property(e => e.ToEmail)
+                    .IsRequired()
                     .HasMaxLength(128)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.From)
                     .WithMany(p => p.tbl_QueueEmails)
                     .HasForeignKey(d => d.FromId)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_QueueEmails_UserID");
             });
 
@@ -291,12 +293,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .IsUnicode(false);
 
                 entity.Property(e => e.ToPhoneNumber)
+                    .IsRequired()
                     .HasMaxLength(15)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.From)
                     .WithMany(p => p.tbl_QueueTexts)
                     .HasForeignKey(d => d.FromId)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_QueueTexts_UserID");
             });
 

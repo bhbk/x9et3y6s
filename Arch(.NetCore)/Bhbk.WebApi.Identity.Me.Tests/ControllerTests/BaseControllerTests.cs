@@ -6,12 +6,10 @@ using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.WebApi.Identity.Me.Controllers;
-using Bhbk.WebApi.Identity.Me.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Serialization;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
@@ -42,7 +40,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 
                     return uow;
                 });
-                sc.AddSingleton<IHostedService, MaintainQuotesTask>();
                 sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 sc.AddControllers()

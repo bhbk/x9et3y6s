@@ -1,15 +1,8 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Domain.Providers.Sts;
-using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Primitives.Enums;
-using Bhbk.WebApi.Identity.Sts.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Reflection;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
@@ -22,23 +15,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
         public DiagnosticController(IConfiguration conf, IContextService instance)
         {
             _provider = new DiagnosticProvider(conf, instance);
-        }
-
-        [Route("v1/status/{name}"), HttpGet]
-        public IActionResult GetStatusV1([FromRoute] string name)
-        {
-            TaskType taskType;
-
-            if (!Enum.TryParse<TaskType>(name, true, out taskType))
-                return BadRequest();
-
-            if (string.Equals(name, TaskType.MaintainRefreshes.ToString(), StringComparison.OrdinalIgnoreCase))
-                return Ok(((MaintainRefreshesTask)Tasks.Single(x => x.GetType() == typeof(MaintainRefreshesTask))).Status);
-
-            else if (string.Equals(name, TaskType.MaintainStates.ToString(), StringComparison.OrdinalIgnoreCase))
-                return Ok(((MaintainStatesTask)Tasks.Single(x => x.GetType() == typeof(MaintainStatesTask))).Status);
-
-            return BadRequest();
         }
 
         [Route("v1/version"), HttpGet]

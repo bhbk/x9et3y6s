@@ -119,11 +119,11 @@
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="FromId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FromId" Type="uniqueidentifier" />
           <Property Name="FromEmail" Type="varchar" MaxLength="128" />
           <Property Name="FromDisplay" Type="varchar" MaxLength="128" />
           <Property Name="ToId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ToEmail" Type="varchar" MaxLength="128" />
+          <Property Name="ToEmail" Type="varchar" MaxLength="128" Nullable="false" />
           <Property Name="ToDisplay" Type="varchar" MaxLength="128" />
           <Property Name="Subject" Type="varchar" MaxLength="256" Nullable="false" />
           <Property Name="HtmlContent" Type="varchar(max)" />
@@ -136,11 +136,11 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ActorId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="FromId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="FromId" Type="uniqueidentifier" />
           <Property Name="FromPhoneNumber" Type="varchar" MaxLength="15" />
           <Property Name="ToId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ToPhoneNumber" Type="varchar" MaxLength="15" />
+          <Property Name="ToPhoneNumber" Type="varchar" MaxLength="15" Nullable="false" />
           <Property Name="Body" Type="varchar(max)" Nullable="false" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="SendAt" Type="datetime2" Precision="7" Nullable="false" />
@@ -394,7 +394,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_QueueEmails_UserID">
-          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="tbl_QueueEmails" Type="Self.tbl_QueueEmails" Multiplicity="*" />
@@ -408,7 +408,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_QueueTexts_UserID">
-          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
+          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="tbl_QueueTexts" Type="Self.tbl_QueueTexts" Multiplicity="*" />
@@ -938,40 +938,6 @@
           <NavigationProperty Name="tbl_Users" Relationship="Self.FK_Logins_ActorID" FromRole="tbl_Logins" ToRole="tbl_Users" />
           <NavigationProperty Name="tbl_UserLogins" Relationship="Self.FK_UserLogins_LoginID" FromRole="tbl_Logins" ToRole="tbl_UserLogins" />
         </EntityType>
-        <EntityType Name="tbl_QueueEmails">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="FromId" Type="Guid" Nullable="false" />
-          <Property Name="FromEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="FromDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="ToId" Type="Guid" Nullable="false" />
-          <Property Name="ToEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="ToDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="Subject" Type="String" MaxLength="256" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="HtmlContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="PlaintextContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_QueueEmails_UserID" FromRole="tbl_QueueEmails" ToRole="tbl_Users" />
-        </EntityType>
-        <EntityType Name="tbl_QueueTexts">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" Nullable="false" />
-          <Property Name="FromId" Type="Guid" Nullable="false" />
-          <Property Name="FromPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="ToId" Type="Guid" Nullable="false" />
-          <Property Name="ToPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="Body" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Users" Relationship="Self.FK_QueueTexts_UserID" FromRole="tbl_QueueTexts" ToRole="tbl_Users" />
-        </EntityType>
         <EntityType Name="tbl_Refreshes">
           <Key>
             <PropertyRef Name="Id" />
@@ -1142,14 +1108,14 @@
           <NavigationProperty Name="tbl_Activities" Relationship="Self.FK_Activities_UserID" FromRole="tbl_Users" ToRole="tbl_Activities" />
           <NavigationProperty Name="tbl_Claims" Relationship="Self.FK_Claims_ActorID" FromRole="tbl_Users" ToRole="tbl_Claims" />
           <NavigationProperty Name="tbl_Logins" Relationship="Self.FK_Logins_ActorID" FromRole="tbl_Users" ToRole="tbl_Logins" />
-          <NavigationProperty Name="tbl_QueueEmails" Relationship="Self.FK_QueueEmails_UserID" FromRole="tbl_Users" ToRole="tbl_QueueEmails" />
-          <NavigationProperty Name="tbl_QueueTexts" Relationship="Self.FK_QueueTexts_UserID" FromRole="tbl_Users" ToRole="tbl_QueueTexts" />
           <NavigationProperty Name="tbl_Refreshes" Relationship="Self.FK_Refreshes_UserID" FromRole="tbl_Users" ToRole="tbl_Refreshes" />
           <NavigationProperty Name="tbl_Settings" Relationship="Self.FK_Settings_UserID" FromRole="tbl_Users" ToRole="tbl_Settings" />
           <NavigationProperty Name="tbl_States" Relationship="Self.FK_States_UserID" FromRole="tbl_Users" ToRole="tbl_States" />
           <NavigationProperty Name="tbl_UserClaims" Relationship="Self.FK_UserClaims_UserID" FromRole="tbl_Users" ToRole="tbl_UserClaims" />
           <NavigationProperty Name="tbl_UserLogins" Relationship="Self.FK_UserLogins_UserID" FromRole="tbl_Users" ToRole="tbl_UserLogins" />
           <NavigationProperty Name="tbl_UserRoles" Relationship="Self.FK_UserRoles_UserID" FromRole="tbl_Users" ToRole="tbl_UserRoles" />
+          <NavigationProperty Name="tbl_QueueEmails" Relationship="IdentityEntities.FK_QueueEmails_UserID" FromRole="tbl_Users" ToRole="tbl_QueueEmails" />
+          <NavigationProperty Name="tbl_QueueTexts" Relationship="IdentityEntities.FK_QueueTexts_UserID" FromRole="tbl_Users" ToRole="tbl_QueueTexts" />
         </EntityType>
         <Association Name="FK_Activities_AudienceID">
           <End Role="tbl_Audiences" Type="Self.tbl_Audiences" Multiplicity="0..1" />
@@ -1403,34 +1369,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_QueueEmails_UserID">
-          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_QueueEmails" Type="Self.tbl_QueueEmails" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Users">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_QueueEmails">
-              <PropertyRef Name="FromId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_QueueTexts_UserID">
-          <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="tbl_QueueTexts" Type="Self.tbl_QueueTexts" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Users">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_QueueTexts">
-              <PropertyRef Name="FromId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Refreshes_UserID">
           <End Role="tbl_Users" Type="Self.tbl_Users" Multiplicity="0..1" />
           <End Role="tbl_Refreshes" Type="Self.tbl_Refreshes" Multiplicity="*" />
@@ -1548,8 +1486,6 @@
           <EntitySet Name="tbl_Claims" EntityType="Self.tbl_Claims" />
           <EntitySet Name="tbl_Issuers" EntityType="Self.tbl_Issuers" />
           <EntitySet Name="tbl_Logins" EntityType="Self.tbl_Logins" />
-          <EntitySet Name="tbl_QueueEmails" EntityType="Self.tbl_QueueEmails" />
-          <EntitySet Name="tbl_QueueTexts" EntityType="Self.tbl_QueueTexts" />
           <EntitySet Name="tbl_Refreshes" EntityType="Self.tbl_Refreshes" />
           <EntitySet Name="tbl_RoleClaims" EntityType="Self.tbl_RoleClaims" />
           <EntitySet Name="tbl_Roles" EntityType="Self.tbl_Roles" />
@@ -1636,14 +1572,6 @@
             <End Role="tbl_Logins" EntitySet="tbl_Logins" />
             <End Role="tbl_UserLogins" EntitySet="tbl_UserLogins" />
           </AssociationSet>
-          <AssociationSet Name="FK_QueueEmails_UserID" Association="Self.FK_QueueEmails_UserID">
-            <End Role="tbl_Users" EntitySet="tbl_Users" />
-            <End Role="tbl_QueueEmails" EntitySet="tbl_QueueEmails" />
-          </AssociationSet>
-          <AssociationSet Name="FK_QueueTexts_UserID" Association="Self.FK_QueueTexts_UserID">
-            <End Role="tbl_Users" EntitySet="tbl_Users" />
-            <End Role="tbl_QueueTexts" EntitySet="tbl_QueueTexts" />
-          </AssociationSet>
           <AssociationSet Name="FK_Refreshes_UserID" Association="Self.FK_Refreshes_UserID">
             <End Role="tbl_Users" EntitySet="tbl_Users" />
             <End Role="tbl_Refreshes" EntitySet="tbl_Refreshes" />
@@ -1677,6 +1605,16 @@
             <End Role="tbl_UserRoles" EntitySet="tbl_UserRoles" />
           </AssociationSet>
           <EntitySet Name="tbl_MOTDs" EntityType="IdentityEntities.tbl_MOTDs" />
+          <EntitySet Name="tbl_QueueEmails" EntityType="IdentityEntities.tbl_QueueEmails" />
+          <EntitySet Name="tbl_QueueTexts" EntityType="IdentityEntities.tbl_QueueTexts" />
+          <AssociationSet Name="FK_QueueEmails_UserID" Association="IdentityEntities.FK_QueueEmails_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_QueueEmails" EntitySet="tbl_QueueEmails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_QueueTexts_UserID" Association="IdentityEntities.FK_QueueTexts_UserID">
+            <End Role="tbl_Users" EntitySet="tbl_Users" />
+            <End Role="tbl_QueueTexts" EntitySet="tbl_QueueTexts" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="tbl_MOTDs">
           <Key>
@@ -1693,6 +1631,68 @@
           <Property Name="TssLength" Type="Int32" />
           <Property Name="TssBackground" Type="String" MaxLength="512" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="tbl_QueueEmails">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="FromId" Type="Guid" />
+          <Property Name="FromEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="FromDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="ToId" Type="Guid" Nullable="false" />
+          <Property Name="ToEmail" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="ToDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="Subject" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="HtmlContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="PlaintextContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_QueueEmails_UserID" FromRole="tbl_QueueEmails" ToRole="tbl_Users" />
+        </EntityType>
+        <EntityType Name="tbl_QueueTexts">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="FromId" Type="Guid" />
+          <Property Name="FromPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="ToId" Type="Guid" Nullable="false" />
+          <Property Name="ToPhoneNumber" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="Body" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="tbl_Users" Relationship="IdentityEntities.FK_QueueTexts_UserID" FromRole="tbl_QueueTexts" ToRole="tbl_Users" />
+        </EntityType>
+        <Association Name="FK_QueueEmails_UserID">
+          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="IdentityEntities.tbl_QueueEmails" Role="tbl_QueueEmails" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_QueueEmails">
+              <PropertyRef Name="FromId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_QueueTexts_UserID">
+          <End Type="IdentityEntities.tbl_Users" Role="tbl_Users" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="IdentityEntities.tbl_QueueTexts" Role="tbl_QueueTexts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_QueueTexts">
+              <PropertyRef Name="FromId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1794,40 +1794,6 @@
                 <ScalarProperty Name="Created" ColumnName="Created" />
                 <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="tbl_QueueEmails">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_QueueEmails">
-              <MappingFragment StoreEntitySet="tbl_QueueEmails">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="FromId" ColumnName="FromId" />
-                <ScalarProperty Name="FromEmail" ColumnName="FromEmail" />
-                <ScalarProperty Name="FromDisplay" ColumnName="FromDisplay" />
-                <ScalarProperty Name="ToId" ColumnName="ToId" />
-                <ScalarProperty Name="ToEmail" ColumnName="ToEmail" />
-                <ScalarProperty Name="ToDisplay" ColumnName="ToDisplay" />
-                <ScalarProperty Name="Subject" ColumnName="Subject" />
-                <ScalarProperty Name="HtmlContent" ColumnName="HtmlContent" />
-                <ScalarProperty Name="PlaintextContent" ColumnName="PlaintextContent" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="SendAt" ColumnName="SendAt" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="tbl_QueueTexts">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_QueueTexts">
-              <MappingFragment StoreEntitySet="tbl_QueueTexts">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="FromId" ColumnName="FromId" />
-                <ScalarProperty Name="FromPhoneNumber" ColumnName="FromPhoneNumber" />
-                <ScalarProperty Name="ToId" ColumnName="ToId" />
-                <ScalarProperty Name="ToPhoneNumber" ColumnName="ToPhoneNumber" />
-                <ScalarProperty Name="Body" ColumnName="Body" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="SendAt" ColumnName="SendAt" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1995,6 +1961,40 @@
                 <ScalarProperty Name="Author" ColumnName="Author" />
                 <ScalarProperty Name="TssTitle" ColumnName="TssTitle" />
                 <ScalarProperty Name="TssId" ColumnName="TssId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_QueueEmails">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_QueueEmails">
+              <MappingFragment StoreEntitySet="tbl_QueueEmails">
+                <ScalarProperty Name="SendAt" ColumnName="SendAt" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="PlaintextContent" ColumnName="PlaintextContent" />
+                <ScalarProperty Name="HtmlContent" ColumnName="HtmlContent" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="ToDisplay" ColumnName="ToDisplay" />
+                <ScalarProperty Name="ToEmail" ColumnName="ToEmail" />
+                <ScalarProperty Name="ToId" ColumnName="ToId" />
+                <ScalarProperty Name="FromDisplay" ColumnName="FromDisplay" />
+                <ScalarProperty Name="FromEmail" ColumnName="FromEmail" />
+                <ScalarProperty Name="FromId" ColumnName="FromId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_QueueTexts">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_QueueTexts">
+              <MappingFragment StoreEntitySet="tbl_QueueTexts">
+                <ScalarProperty Name="SendAt" ColumnName="SendAt" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Body" ColumnName="Body" />
+                <ScalarProperty Name="ToPhoneNumber" ColumnName="ToPhoneNumber" />
+                <ScalarProperty Name="ToId" ColumnName="ToId" />
+                <ScalarProperty Name="FromPhoneNumber" ColumnName="FromPhoneNumber" />
+                <ScalarProperty Name="FromId" ColumnName="FromId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

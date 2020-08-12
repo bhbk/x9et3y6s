@@ -99,4 +99,23 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
         QueueEmails,
         QueueTexts
     }
+
+    public enum GroupType
+    {
+        AdminJobs,
+        AlertJobs,
+        MeJobs,
+        StsJobs
+    }
+
+    public enum JobType
+    {
+        AlertEmailJob,
+        AlertTextJob,
+        AdminActivityJob,
+        AdminUsersJob,
+        MeQuotesJob,
+        StsStatesJob,
+        StsRefreshesJob
+    }
 }

@@ -1,18 +1,23 @@
-﻿using Bhbk.Lib.Identity.Data.EF6.Models;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using System;
 
-namespace Bhbk.Lib.Identity.Data.EF6.Primitives
+namespace Bhbk.Lib.Identity.Data.EFCore.Primitives
 {
-    public class EF6Constants
+    public class Templates
     {
         #region Templates
 
-        //https://htmlformatter.com/, https://www.freeformatter.com/java-dotnet-escape.html
+        /*
+         * https://htmlformatter.com
+         * https://www.freeformatter.com/java-dotnet-escape.html
+         */
 
-        public static string TemplateConfirmEmail(uvw_Users user, Uri link)
+        public static string ConfirmEmail(tbl_Users user, Uri link)
         {
-            //use http://rendera.herokuapp.com/ to test template before format...
-            //use https://www.buildmystring.com to format template into string that compiles...
+            /*
+             * use http://rendera.herokuapp.com/ to test template before format...
+             * use https://www.buildmystring.com to format template into string that compiles...
+             */
 
             return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">" +
             "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
@@ -59,10 +64,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Primitives
             "</html>";
         }
 
-        public static string TemplateConfirmPassword(uvw_Users user, Uri link)
+        public static string ConfirmPassword(tbl_Users user, Uri link)
         {
-            //use http://rendera.herokuapp.com/ to test template before format...
-            //use https://www.buildmystring.com to format template into string that compiles...
+            /*
+             * use http://rendera.herokuapp.com/ to test template before format...
+             * use https://www.buildmystring.com to format template into string that compiles...
+             */
 
             return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">" +
             "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
@@ -109,10 +116,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Primitives
             "</html>";
         }
 
-        public static string TemplateConfirmNewUser(uvw_Issuers issuer, uvw_Users user, Uri link)
+        public static string ConfirmNewUser(tbl_Issuers issuer, tbl_Users user, Uri link)
         {
-            //use http://rendera.herokuapp.com/ to test template before format...
-            //use https://www.buildmystring.com to format template into string that compiles...
+            /*
+             * use http://rendera.herokuapp.com/ to test template before format...
+             * use https://www.buildmystring.com to format template into string that compiles...
+             */
 
             return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">" +
             "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
@@ -156,10 +165,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Primitives
             "</html>";
         }
 
-        public static string TemplateImplicit(uvw_Issuers issuer, uvw_Audiences audience, uvw_Users user, Uri link)
+        public static string Implicit(tbl_Issuers issuer, tbl_Audiences audience, tbl_Users user, Uri link)
         {
-            //use http://rendera.herokuapp.com/ to test template before format...
-            //use https://www.buildmystring.com to format template into string that compiles...
+            /*
+             * use http://rendera.herokuapp.com/ to test template before format...
+             * use https://www.buildmystring.com to format template into string that compiles...
+             */
 
             return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">" +
             "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +

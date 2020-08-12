@@ -7,9 +7,10 @@ using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.Identity.Validators;
-using Bhbk.WebApi.Identity.Admin.Tasks;
+using Bhbk.WebApi.Identity.Admin.Jobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -22,6 +23,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using Quartz;
 using Serilog;
 using System;
 using System.IO;
@@ -51,8 +53,6 @@ namespace Bhbk.WebApi.Identity.Admin
             {
                 return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
             });
-            sc.AddSingleton<IHostedService, MaintainActivityTask>();
-            sc.AddSingleton<IHostedService, MaintainUsersTask>();
             sc.AddSingleton<IAlertService, AlertService>(_ =>
             {
                 var alert = new AlertService(conf);
@@ -61,6 +61,59 @@ namespace Bhbk.WebApi.Identity.Admin
                 return alert;
             });
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
+            sc.AddQuartz(jobs =>
+            {
+                jobs.SchedulerId = Guid.NewGuid().ToString();
+
+                //jobs.UseMicrosoftDependencyInjectionScopedJobFactory();
+                jobs.UseMicrosoftDependencyInjectionJobFactory(options =>
+                {
+                    options.AllowDefaultConstructor = false;
+                });
+
+                jobs.UseSimpleTypeLoader();
+                jobs.UseInMemoryStore();
+                jobs.UseDefaultThreadPool(threads =>
+                {
+                    threads.MaxConcurrency = 2;
+                });
+
+                var activityJobKey = new JobKey(JobType.AdminActivityJob.ToString(), GroupType.AdminJobs.ToString());
+                jobs.AddJob<MaintainActivityJob>(opt => opt
+                    .StoreDurably()
+                    .WithIdentity(activityJobKey)
+                );
+
+                foreach (var cron in conf.GetSection("Jobs:MaintainActivity:Schedules").GetChildren()
+                    .Select(x => x.Value).ToList())
+                {
+                    jobs.AddTrigger(opt => opt
+                        .ForJob(activityJobKey)
+                        .StartNow()
+                        .WithCronSchedule(cron)
+                    );
+                }
+
+                var usersJobKey = new JobKey(JobType.AdminUsersJob.ToString(), GroupType.AdminJobs.ToString());
+                jobs.AddJob<MaintainUsersJob>(opt => opt
+                    .StoreDurably()
+                    .WithIdentity(usersJobKey)
+                );
+
+                foreach (var cron in conf.GetSection("Jobs:MaintainUsers:Schedules").GetChildren()
+                    .Select(x => x.Value).ToList())
+                {
+                    jobs.AddTrigger(opt => opt
+                        .ForJob(usersJobKey)
+                        .StartNow()
+                        .WithCronSchedule(cron)
+                    );
+                }
+            });
+            sc.AddQuartzServer(options =>
+            {
+                options.WaitForJobsToComplete = true;
+            });
 
             if (instance.InstanceType != InstanceContext.DeployedOrLocal)
                 throw new NotSupportedException();

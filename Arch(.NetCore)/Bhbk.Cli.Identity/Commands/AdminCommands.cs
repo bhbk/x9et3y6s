@@ -488,7 +488,7 @@ namespace Bhbk.Cli.Identity.Commands
                             }
                             catch (Exception) { }
 
-                            if (user != null)
+                            if (user == null)
                                 Console.WriteLine(Environment.NewLine + "FAILED find user \"" + userName + "\"");
                             else
                             {
@@ -552,6 +552,19 @@ namespace Bhbk.Cli.Identity.Commands
                                 Console.WriteLine(Environment.NewLine + "SUCCESS set password for user \"" + userName + "\"");
                             else
                                 throw new ConsoleHelpAsException("FAILED set password for user \"" + userName + "\"");
+                        }
+                        if (_destroy)
+                        {
+                            if (user != null)
+                                Console.WriteLine(Environment.NewLine + "FOUND user \"" + userName + "\""
+                                    + Environment.NewLine + "\tID is " + user.Id.ToString());
+                            else
+                                throw new ConsoleHelpAsException("FAILED find user \"" + userName + "\"");
+
+                            if (_service.User_RemovePasswordV1(user.Id).Result)
+                                Console.WriteLine(Environment.NewLine + "SUCCESS remove password for user \"" + userName + "\"");
+                            else
+                                throw new ConsoleHelpAsException("FAILED remove password for user \"" + userName + "\"");
                         }
                         else if (_list)
                         {

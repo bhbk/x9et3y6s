@@ -5,19 +5,19 @@ namespace Bhbk.Lib.Identity.Models.Alert
 {
     public abstract class Texts
     {
-        public Guid ActorId { get; set; }
+        public Guid? ActorId { get; set; }
 
-        [Required]
-        public Guid FromId { get; set; }
+        public Guid? FromId { get; set; }
 
-        [Required]
         [DataType(DataType.PhoneNumber)]
+        //[RegularExpression("^\\+[1-9]\\d{1,14}$")]
         public string FromPhoneNumber { get; set; }
 
-        public Guid ToId { get; set; }
+        public Guid? ToId { get; set; }
 
         [Required]
         [DataType(DataType.PhoneNumber)]
+        //[RegularExpression("^\\+[1-9]\\d{1,14}$")]
         public string ToPhoneNumber { get; set; }
 
         [Required]

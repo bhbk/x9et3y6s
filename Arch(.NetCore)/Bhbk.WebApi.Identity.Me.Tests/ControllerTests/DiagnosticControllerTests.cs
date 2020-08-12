@@ -1,6 +1,4 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -17,45 +15,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         private readonly BaseControllerTests _factory;
 
         public DiagnosticControllerTests(BaseControllerTests factory) => _factory = factory;
-
-        [Fact]
-        public void Me_DiagV1_GetStatus_Fail()
-        {
-            using (var owin = _factory.CreateClient())
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-
-                var controller = new DiagnosticController(conf, instance);
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
-
-                var result = controller.GetStatusV1(AlphaNumeric.CreateString(8)) as BadRequestResult;
-                result.Should().BeOfType<BadRequestResult>();
-            }
-        }
-
-        [Fact]
-        public void Me_DiagV1_GetStatus_Success()
-        {
-            using (var owin = _factory.CreateClient())
-            using (var scope = _factory.Server.Host.Services.CreateScope())
-            {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-
-                var controller = new DiagnosticController(conf, instance);
-                controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
-
-                var result = controller.GetStatusV1(TaskType.MaintainQuotes.ToString()) as OkObjectResult;
-                var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-                ok.Value.Should().BeAssignableTo<string>();
-            }
-        }
 
         [Fact]
         public void Me_DiagV1_GetVersion_Success()

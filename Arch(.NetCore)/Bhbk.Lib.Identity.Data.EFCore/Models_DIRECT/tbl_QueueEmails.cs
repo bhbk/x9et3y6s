@@ -7,7 +7,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
     {
         public Guid Id { get; set; }
         public Guid? ActorId { get; set; }
-        public Guid FromId { get; set; }
+        public Guid? FromId { get; set; }
         public string FromEmail { get; set; }
         public string FromDisplay { get; set; }
         public Guid ToId { get; set; }

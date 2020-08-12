@@ -9,8 +9,6 @@ using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Sts.Controllers;
-using Bhbk.WebApi.Identity.Sts.Middlewares;
-using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -19,7 +17,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
@@ -60,8 +57,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                     return uow;
                 });
-                sc.AddSingleton<IHostedService, MaintainRefreshesTask>();
-                sc.AddSingleton<IHostedService, MaintainStatesTask>();
                 sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 /*
@@ -159,8 +154,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     .AllowAnyMethod());
                 app.UseAuthentication();
                 app.UseAuthorization();
-
-                app.UseMiddleware<SandboxMiddleware>();
 
                 app.UseEndpoints(opt =>
                 {

@@ -5,24 +5,22 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="12c2f84599cc42d59b57a78df90f3057" Name="Diagram1" ZoomLevel="100">
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Activities" Width="1.5" PointX="3" PointY="19.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_AudienceRoles" Width="1.5" PointX="6" PointY="8.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Audiences" Width="1.5" PointX="3.75" PointY="8.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Claims" Width="1.5" PointX="6" PointY="24.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Issuers" Width="1.5" PointX="1.5" PointY="9.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Logins" Width="1.5" PointX="3" PointY="40" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_QueueEmails" Width="1.5" PointX="3" PointY="43.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_QueueTexts" Width="1.5" PointX="3" PointY="48.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Refreshes" Width="1.5" PointX="6" PointY="15.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_RoleClaims" Width="1.5" PointX="8.25" PointY="25.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Roles" Width="1.5" PointX="0.75" PointY="4.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Settings" Width="1.5" PointX="6" PointY="19.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_States" Width="1.5" PointX="3" PointY="24.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Urls" Width="1.5" PointX="6" PointY="12" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_UserClaims" Width="1.5" PointX="8.25" PointY="21.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_UserLogins" Width="1.5" PointX="5.25" PointY="29.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_UserRoles" Width="1.5" PointX="3" PointY="16.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_Users" Width="1.5" PointX="0.75" PointY="17.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Activities" Width="1.5" PointX="6" PointY="19.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_AudienceRoles" Width="1.5" PointX="6" PointY="2.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Audiences" Width="1.5" PointX="3.75" PointY="4.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Claims" Width="1.5" PointX="3" PointY="20.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Issuers" Width="1.5" PointX="1.5" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Logins" Width="1.5" PointX="3" PointY="40.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Refreshes" Width="1.5" PointX="6" PointY="11.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_RoleClaims" Width="1.5" PointX="8.25" PointY="21.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Roles" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Settings" Width="1.5" PointX="6" PointY="16" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_States" Width="1.5" PointX="3" PointY="15.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Urls" Width="1.5" PointX="6" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_UserClaims" Width="1.5" PointX="8.25" PointY="17.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_UserLogins" Width="1.5" PointX="5.25" PointY="27.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_UserRoles" Width="1.5" PointX="3" PointY="12.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_Users" Width="1.5" PointX="0.75" PointY="13.75" IsExpanded="true" />
         <AssociationConnector Association="IdentityEntities.FK_Activities_AudienceID" ManuallyRouted="false" />
         <AssociationConnector Association="IdentityEntities.FK_Activities_UserID" ManuallyRouted="false" />
         <AssociationConnector Association="IdentityEntities.FK_AudienceRoles_AudienceID" ManuallyRouted="false" />
@@ -42,8 +40,6 @@
         <AssociationConnector Association="IdentityEntities.FK_States_IssuerID" ManuallyRouted="false" />
         <AssociationConnector Association="IdentityEntities.FK_Logins_ActorID" ManuallyRouted="false" />
         <AssociationConnector Association="IdentityEntities.FK_UserLogins_LoginID" ManuallyRouted="false" />
-        <AssociationConnector Association="IdentityEntities.FK_QueueEmails_UserID" ManuallyRouted="false" />
-        <AssociationConnector Association="IdentityEntities.FK_QueueTexts_UserID" ManuallyRouted="false" />
         <AssociationConnector Association="IdentityEntities.FK_Refreshes_UserID" ManuallyRouted="false" />
         <AssociationConnector Association="IdentityEntities.FK_RoleClaims_RoleID" ManuallyRouted="false" />
         <AssociationConnector Association="IdentityEntities.FK_UserRoles_RoleID" ManuallyRouted="false" />
@@ -52,7 +48,11 @@
         <AssociationConnector Association="IdentityEntities.FK_UserClaims_UserID" ManuallyRouted="false" />
         <AssociationConnector Association="IdentityEntities.FK_UserLogins_UserID" ManuallyRouted="false" />
         <AssociationConnector Association="IdentityEntities.FK_UserRoles_UserID" ManuallyRouted="false" />
-        <EntityTypeShape EntityType="IdentityEntities.tbl_MOTDs" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_MOTDs" Width="1.5" PointX="8.75" PointY="1.375" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_QueueEmails" Width="1.5" PointX="3" PointY="29.75" />
+        <EntityTypeShape EntityType="IdentityEntities.tbl_QueueTexts" Width="1.5" PointX="3" PointY="26" />
+        <AssociationConnector Association="IdentityEntities.FK_QueueEmails_UserID" />
+        <AssociationConnector Association="IdentityEntities.FK_QueueTexts_UserID" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

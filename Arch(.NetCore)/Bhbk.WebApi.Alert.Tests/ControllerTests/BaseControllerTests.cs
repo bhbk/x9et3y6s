@@ -6,12 +6,10 @@ using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.WebApi.Alert.Controllers;
-using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Serialization;
 
 namespace Bhbk.WebApi.Alert.Tests.ControllerTests
@@ -42,8 +40,6 @@ namespace Bhbk.WebApi.Alert.Tests.ControllerTests
 
                     return uow;
                 });
-                sc.AddSingleton<IHostedService, QueueEmailTask>();
-                sc.AddSingleton<IHostedService, QueueTextTask>();
                 sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 sc.AddControllers()

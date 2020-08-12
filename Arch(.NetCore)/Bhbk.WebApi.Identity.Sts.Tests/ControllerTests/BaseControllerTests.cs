@@ -6,12 +6,10 @@ using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.WebApi.Identity.Sts.Controllers;
-using Bhbk.WebApi.Identity.Sts.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Serialization;
 
 namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
@@ -42,8 +40,6 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
 
                     return uow;
                 });
-                sc.AddSingleton<IHostedService, MaintainRefreshesTask>();
-                sc.AddSingleton<IHostedService, MaintainStatesTask>();
                 sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 sc.AddCors();

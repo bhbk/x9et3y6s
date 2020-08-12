@@ -1,9 +1,9 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+﻿using AutoMapper;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Primitives;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -13,8 +13,8 @@ namespace Bhbk.WebApi.Alert.Controllers
     [Authorize(Roles = Constants.DefaultRoleForUser_Alert + ", " + Constants.DefaultRoleForAdmin_Alert)]
     public class BaseController : Controller
     {
+        protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
         protected IUnitOfWork UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>(); }
-        protected IHostedService[] Tasks { get => (IHostedService[])ControllerContext.HttpContext.RequestServices.GetServices<IHostedService>(); }
 
         [NonAction]
         protected Guid GetIdentityGUID()

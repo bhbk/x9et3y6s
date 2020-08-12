@@ -31,8 +31,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public virtual DbSet<tbl_Claims> tbl_Claims { get; set; }
         public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
         public virtual DbSet<tbl_Logins> tbl_Logins { get; set; }
-        public virtual DbSet<tbl_QueueEmails> tbl_QueueEmails { get; set; }
-        public virtual DbSet<tbl_QueueTexts> tbl_QueueTexts { get; set; }
         public virtual DbSet<tbl_Refreshes> tbl_Refreshes { get; set; }
         public virtual DbSet<tbl_RoleClaims> tbl_RoleClaims { get; set; }
         public virtual DbSet<tbl_Roles> tbl_Roles { get; set; }
@@ -44,5 +42,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public virtual DbSet<tbl_UserRoles> tbl_UserRoles { get; set; }
         public virtual DbSet<tbl_Users> tbl_Users { get; set; }
         public virtual DbSet<tbl_MOTDs> tbl_MOTDs { get; set; }
+        public virtual DbSet<tbl_QueueEmails> tbl_QueueEmails { get; set; }
+        public virtual DbSet<tbl_QueueTexts> tbl_QueueTexts { get; set; }
     }
 }

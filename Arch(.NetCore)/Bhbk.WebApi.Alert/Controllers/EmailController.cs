@@ -1,13 +1,10 @@
 ﻿using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Providers.Alert;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Primitives.Enums;
-using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
-using System.Linq;
-using System.Linq.Dynamic.Core;
 
 namespace Bhbk.WebApi.Alert.Controllers
 {
@@ -27,20 +24,13 @@ namespace Bhbk.WebApi.Alert.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!UoW.Users.Get(x => x.Id == model.FromId
-                && x.EmailAddress == model.FromEmail).Any())
-            {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"SenderID:{model.FromId} SenderEmail:{model.FromEmail}");
-                return NotFound(ModelState);
-            }
+            model.ActorId = null;
+            model.FromId = null;
 
-            var queue = (QueueEmailTask)Tasks.Single(x => x.GetType() == typeof(QueueEmailTask));
+            var email = Mapper.Map<tbl_QueueEmails>(model);
 
-            if (!queue.TryEnqueueEmail(model))
-            {
-                ModelState.AddModelError(MessageType.EmailEnueueError.ToString(), $"SenderID:{model.FromId} SenderEmail:{model.FromEmail}");
-                return BadRequest(ModelState);
-            }
+            UoW.QueueEmails.Create(email);
+            UoW.Commit();
 
             return NoContent();
         }

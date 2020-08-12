@@ -1,13 +1,10 @@
 ﻿using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Providers.Alert;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Primitives.Enums;
-using Bhbk.WebApi.Alert.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
-using System.Linq;
-using System.Linq.Dynamic.Core;
 
 namespace Bhbk.WebApi.Alert.Controllers
 {
@@ -27,20 +24,13 @@ namespace Bhbk.WebApi.Alert.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!UoW.Users.Get(x => x.Id == model.FromId
-                && x.PhoneNumber == model.FromPhoneNumber).Any())
-            {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"SenderID:{model.FromId} SenderPhone:{model.FromPhoneNumber}");
-                return NotFound(ModelState);
-            }
+            model.ActorId = null;
+            model.FromId = null;
 
-            var queue = (QueueTextTask)Tasks.Single(x => x.GetType() == typeof(QueueTextTask));
+            var text = Mapper.Map<tbl_QueueTexts>(model);
 
-            if (!queue.TryEnqueueText(model))
-            {
-                ModelState.AddModelError(MessageType.TextEnqueueError.ToString(), $"SenderID:{model.FromId} SenderPhone:{model.FromPhoneNumber}");
-                return BadRequest(ModelState);
-            }
+            UoW.QueueTexts.Create(text);
+            UoW.Commit();
 
             return NoContent();
         }

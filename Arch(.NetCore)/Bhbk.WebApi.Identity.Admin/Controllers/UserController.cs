@@ -192,12 +192,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 {
                     FromId = result.Id,
                     FromEmail = result.EmailAddress,
-                    FromDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
+                    FromDisplay = $"{result.FirstName} {result.LastName}",
                     ToId = result.Id,
                     ToEmail = result.EmailAddress,
-                    ToDisplay = string.Format("{0} {1}", result.FirstName, result.LastName),
-                    Subject = string.Format("{0} {1}", issuer.Name, Constants.MsgConfirmNewUserSubject),
-                    HtmlContent = EFCoreConstants.TemplateConfirmNewUser(issuer, result, url)
+                    ToDisplay = $"{result.FirstName} {result.LastName}",
+                    Subject = $"{issuer.Name} {Constants.MsgConfirmNewUserSubject}",
+                    HtmlContent = Templates.ConfirmNewUser(issuer, result, url)
                 });
             }
 
@@ -290,7 +290,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{userID:guid}/refresh/{refreshID}"), HttpDelete]
+        [Route("v1/{userID:guid}/refresh/{refreshID:guid}"), HttpDelete]
         [Authorize(Policy = Constants.DefaultPolicyForHumans)]
         [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteRefreshV1([FromRoute] Guid userID, [FromRoute] Guid refreshID)

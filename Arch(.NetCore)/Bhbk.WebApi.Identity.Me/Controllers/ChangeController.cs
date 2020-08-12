@@ -22,7 +22,7 @@ using System.Web;
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("change")]
-    [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+    [Authorize(Policy = Lib.Identity.Primitives.Constants.DefaultPolicyForHumans)]
     public class ChangeController : BaseController
     {
         private ChangeProvider _provider;
@@ -69,12 +69,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             {
                 FromId = user.Id,
                 FromEmail = user.EmailAddress,
-                FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
+                FromDisplay = $"{user.FirstName} {user.LastName}",
                 ToId = user.Id,
                 ToEmail = user.EmailAddress,
-                ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                Subject = string.Format("{0}", Constants.MsgConfirmEmailSubject),
-                HtmlContent = EFCoreConstants.TemplateConfirmEmail(user, url)
+                ToDisplay = $"{user.FirstName} {user.LastName}",
+                Subject = Constants.MsgConfirmEmailSubject,
+                HtmlContent = Templates.ConfirmEmail(user, url)
             });
 
             return NoContent();
@@ -122,12 +122,12 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             {
                 FromId = user.Id,
                 FromEmail = user.EmailAddress,
-                FromDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
+                FromDisplay = $"{user.FirstName} {user.LastName}",
                 ToId = user.Id,
                 ToEmail = user.EmailAddress,
-                ToDisplay = string.Format("{0} {1}", user.FirstName, user.LastName),
-                Subject = string.Format("{0}", Constants.MsgConfirmPasswordSubject),
-                HtmlContent = EFCoreConstants.TemplateConfirmPassword(user, url)
+                ToDisplay = $"{user.FirstName} {user.LastName}",
+                Subject = Constants.MsgConfirmPasswordSubject,
+                HtmlContent = Templates.ConfirmPassword(user, url)
             });
 
             return NoContent();

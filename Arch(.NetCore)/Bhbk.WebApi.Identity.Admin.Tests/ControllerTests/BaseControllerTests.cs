@@ -4,14 +4,11 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Domain.Infrastructure;
-using Bhbk.Lib.Identity.Factories;
 using Bhbk.WebApi.Identity.Admin.Controllers;
-using Bhbk.WebApi.Identity.Admin.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Serialization;
 
 namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
@@ -42,9 +39,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
 
                     return uow;
                 });
-                sc.AddSingleton<IHostedService, MaintainActivityTask>();
-                sc.AddSingleton<IHostedService, MaintainUsersTask>();
-                sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 sc.AddControllers()
                      .AddNewtonsoftJson(opt =>
