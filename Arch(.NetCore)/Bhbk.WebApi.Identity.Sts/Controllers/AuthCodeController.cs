@@ -276,6 +276,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
+            if (audiences.Count() == 0)
+            {
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:None");
+                return BadRequest(ModelState);
+            }
+
             //check if client uri is valid...
             var redirect = new Uri(input.redirect_uri);
 

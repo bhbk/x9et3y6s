@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.0.0" />
     <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="4.0.0" />
     <PackageReference Include="Bhbk.Lib.Common" Version="2020.8.11.1945" />

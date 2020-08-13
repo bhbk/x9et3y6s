@@ -26,7 +26,6 @@ using Newtonsoft.Json.Serialization;
 using Quartz;
 using Serilog;
 using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -37,7 +36,6 @@ namespace Bhbk.WebApi.Alert
         public virtual void ConfigureServices(IServiceCollection sc)
         {
             var conf = (IConfiguration)new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
@@ -65,7 +63,6 @@ namespace Bhbk.WebApi.Alert
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
 
-                //jobs.UseMicrosoftDependencyInjectionScopedJobFactory();
                 jobs.UseMicrosoftDependencyInjectionJobFactory(options =>
                 {
                     options.AllowDefaultConstructor = false;
@@ -73,41 +70,44 @@ namespace Bhbk.WebApi.Alert
 
                 jobs.UseSimpleTypeLoader();
                 jobs.UseInMemoryStore();
-                jobs.UseDefaultThreadPool(threads =>
-                {
-                    threads.MaxConcurrency = 2;
-                });
+                jobs.UseDefaultThreadPool();
 
-                var emailsJobKey = new JobKey(JobType.AlertEmailJob.ToString(), GroupType.AlertJobs.ToString());
-                jobs.AddJob<QueueEmailJob>(opt => opt
-                    .StoreDurably()
-                    .WithIdentity(emailsJobKey)
-                );
-
-                foreach (var cron in conf.GetSection("Jobs:QueueEmails:Schedules").GetChildren()
-                    .Select(x => x.Value).ToList())
+                if (bool.Parse(conf["Jobs:QueueEmails:Enable"]))
                 {
-                    jobs.AddTrigger(opt => opt
-                        .ForJob(emailsJobKey)
-                        .StartNow()
-                        .WithCronSchedule(cron)
+                    var emailsJobKey = new JobKey(JobType.AlertEmailJob.ToString(), GroupType.AlertJobs.ToString());
+                    jobs.AddJob<QueueEmailJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(emailsJobKey)
                     );
+
+                    foreach (var cron in conf.GetSection("Jobs:QueueEmails:Schedules").GetChildren()
+                        .Select(x => x.Value).ToList())
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(emailsJobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+                    }
                 }
 
-                var textsJobKey = new JobKey(JobType.AlertTextJob.ToString(), GroupType.AlertJobs.ToString());
-                jobs.AddJob<QueueTextJob>(opt => opt
-                    .StoreDurably()
-                    .WithIdentity(textsJobKey)
-                );
-
-                foreach (var cron in conf.GetSection("Jobs:QueueTexts:Schedules").GetChildren()
-                    .Select(x => x.Value).ToList())
+                if (bool.Parse(conf["Jobs:QueueTexts:Enable"]))
                 {
-                    jobs.AddTrigger(opt => opt
-                        .ForJob(textsJobKey)
-                        .StartNow()
-                        .WithCronSchedule(cron)
+                    var textsJobKey = new JobKey(JobType.AlertTextJob.ToString(), GroupType.AlertJobs.ToString());
+                    jobs.AddJob<QueueTextJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(textsJobKey)
                     );
+
+                    foreach (var cron in conf.GetSection("Jobs:QueueTexts:Schedules").GetChildren()
+                        .Select(x => x.Value).ToList())
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(textsJobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+                    }
                 }
             });
             sc.AddQuartzServer(options =>

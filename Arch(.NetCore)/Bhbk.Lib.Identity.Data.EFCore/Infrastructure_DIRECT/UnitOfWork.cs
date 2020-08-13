@@ -47,10 +47,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT
                 case InstanceContext.DeployedOrLocal:
                     {
 #if !RELEASE
+                        //var builder = new DbContextOptionsBuilder<IdentityEntities>()
+                        //    .UseSqlServer(connection)
+                        //    .UseLoggerFactory(_logger)
+                        //    .EnableSensitiveDataLogging();
+
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                            .UseSqlServer(connection)
-                            .UseLoggerFactory(_logger)
-                            .EnableSensitiveDataLogging();
+                            .UseSqlServer(connection);
 #elif RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .UseSqlServer(connection);
@@ -64,10 +67,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT
                 case InstanceContext.UnitTest:
                     {
 #if !RELEASE
+                        //var builder = new DbContextOptionsBuilder<IdentityEntities>()
+                        //    .UseInMemoryDatabase(":InMemory:")
+                        //    .UseLoggerFactory(_logger)
+                        //    .EnableSensitiveDataLogging();
+
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                            .UseInMemoryDatabase(":InMemory:")
-                            .UseLoggerFactory(_logger)
-                            .EnableSensitiveDataLogging();
+                            .UseInMemoryDatabase(":InMemory:");
 #elif RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .UseInMemoryDatabase(":InMemory:");

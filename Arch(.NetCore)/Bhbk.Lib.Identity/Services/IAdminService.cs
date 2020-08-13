@@ -103,5 +103,6 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<bool> User_RemovePasswordV1(Guid userID);
         ValueTask<bool> User_SetPasswordV1(Guid userID, PasswordAddV1 model);
         ValueTask<UserV1> User_UpdateV1(UserV1 model);
+        ValueTask<bool> User_VerifyV1(Guid userID);
     }
 }

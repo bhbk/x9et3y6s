@@ -26,7 +26,6 @@ using Newtonsoft.Json.Serialization;
 using Quartz;
 using Serilog;
 using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -37,7 +36,6 @@ namespace Bhbk.WebApi.Identity.Me
         public virtual void ConfigureServices(IServiceCollection sc)
         {
             var conf = (IConfiguration)new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
@@ -65,7 +63,6 @@ namespace Bhbk.WebApi.Identity.Me
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
 
-                //jobs.UseMicrosoftDependencyInjectionScopedJobFactory();
                 jobs.UseMicrosoftDependencyInjectionJobFactory(options =>
                 {
                     options.AllowDefaultConstructor = false;
@@ -73,25 +70,25 @@ namespace Bhbk.WebApi.Identity.Me
 
                 jobs.UseSimpleTypeLoader();
                 jobs.UseInMemoryStore();
-                jobs.UseDefaultThreadPool(threads =>
-                {
-                    threads.MaxConcurrency = 1;
-                });
+                jobs.UseDefaultThreadPool();
 
-                var quotesJobKey = new JobKey(JobType.MeQuotesJob.ToString(), GroupType.MeJobs.ToString());
-                jobs.AddJob<MaintainQuotesJob>(opt => opt
-                    .StoreDurably()
-                    .WithIdentity(quotesJobKey)
-                );
-
-                foreach (var cron in conf.GetSection("Jobs:MaintainQuotes:Schedules").GetChildren()
-                    .Select(x => x.Value).ToList())
+                if (bool.Parse(conf["Jobs:MaintainQuotes:Enable"]))
                 {
-                    jobs.AddTrigger(opt => opt
-                        .ForJob(quotesJobKey)
-                        .StartNow()
-                        .WithCronSchedule(cron)
+                    var quotesJobKey = new JobKey(JobType.MeQuotesJob.ToString(), GroupType.MeJobs.ToString());
+                    jobs.AddJob<MaintainQuotesJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(quotesJobKey)
                     );
+
+                    foreach (var cron in conf.GetSection("Jobs:MaintainQuotes:Schedules").GetChildren()
+                        .Select(x => x.Value).ToList())
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(quotesJobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+                    }
                 }
             });
             sc.AddQuartzServer(options =>

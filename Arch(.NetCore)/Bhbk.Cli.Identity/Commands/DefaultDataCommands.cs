@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.CommandLine.IO;
-using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
@@ -11,28 +10,34 @@ using System;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class DataCommands : ConsoleCommand
+    public class DefaultDataCommands : ConsoleCommand
     {
-        private static bool CreateDefault = false, DestroyDefault = false, DestroyAll = false;
+        private static bool _create = false, _destroy = false, _destroyAll = false;
 
-        public DataCommands()
+        public DefaultDataCommands()
         {
-            IsCommand("data", "Do things with data...");
+            IsCommand("default-data", "Default data");
 
-            HasOption("c|create-defaults", "Create default data.", arg => { CreateDefault = true; });
-            HasOption("d|destroy-defaults", "Destroy default data.", arg => { DestroyDefault = true; });
-            HasOption("a|destroy-all", "Destroy all data.", arg => { DestroyAll = true; });
+            HasOption("c|create", "Create default data", arg => 
+            { 
+                _create = true; 
+            });
+            HasOption("d|destroy", "Destroy default data", arg => 
+            { 
+                _destroy = true; 
+            });
+            HasOption("a|destroy-all", "Destroy all data", arg => 
+            { 
+                _destroyAll = true; 
+            });
         }
 
         public override int Run(string[] remainingArguments)
         {
             try
             {
-                var file = SearchRoots.ByAssemblyContext("clisettings.json");
-
                 var conf = (IConfiguration)new ConfigurationBuilder()
-                    .SetBasePath(file.DirectoryName)
-                    .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
+                    .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);
@@ -40,7 +45,7 @@ namespace Bhbk.Cli.Identity.Commands
                 var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
                 var data = new GenerateDefaultData(uow, mapper);
 
-                if (CreateDefault)
+                if (_create)
                 {
                     Console.WriteLine();
                     Console.WriteLine("\tPress key to create default data...");
@@ -51,7 +56,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
                 }
-                else if (DestroyDefault)
+                else if (_destroy)
                 {
                     Console.WriteLine();
                     Console.WriteLine("\tPress key to destroy default data...");
@@ -62,7 +67,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tCompleted destroy default data...");
                     Console.WriteLine();
                 }
-                else if (DestroyAll)
+                else if (_destroyAll)
                 {
                     Console.WriteLine();
                     Console.WriteLine("\tPress key to destroy all data...");

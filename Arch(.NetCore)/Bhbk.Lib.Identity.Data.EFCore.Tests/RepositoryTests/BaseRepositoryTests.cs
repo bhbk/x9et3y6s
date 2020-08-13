@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
         public BaseRepositoryTests()
         {
-            var file = SearchRoots.ByAssemblyContext("appsettings.json");
+            var file = Search.ByAssemblyInvocation("appsettings.json");
 
             var conf = (IConfiguration)new ConfigurationBuilder()
                 .SetBasePath(file.DirectoryName)

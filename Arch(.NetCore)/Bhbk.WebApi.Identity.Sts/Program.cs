@@ -1,4 +1,5 @@
-﻿using Bhbk.Lib.Hosting.Options;
+﻿using Bhbk.Lib.Common.FileSystem;
+using Bhbk.Lib.Hosting.Options;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -31,20 +32,22 @@ namespace Bhbk.WebApi.Identity.Sts
 
         public static void Main(string[] args)
         {
-            var conf = (IConfiguration)new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            var where = Search.ByAssemblyInvocation("appsettings.json");
+
+            var conf = new ConfigurationBuilder()
+                .AddJsonFile(where.Name, optional: false, reloadOnChange: true)
                 .Build();
+
+            var process = Process.GetCurrentProcess();
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(conf)
-                .WriteTo.Console()
-                .WriteTo.RollingFile(Directory.GetCurrentDirectory()
-                    + Path.DirectorySeparatorChar + "appdebug.log", retainedFileCountLimit: 7, fileSizeLimitBytes: 10485760)
                 .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.RollingFile(where.DirectoryName + Path.DirectorySeparatorChar + "appdebug.log",
+                    retainedFileCountLimit: int.Parse(conf["Serilog:RollingFile:RetainedFileCountLimit"]),
+                    fileSizeLimitBytes: int.Parse(conf["Serilog:RollingFile:FileSizeLimitBytes"]))
                 .CreateLogger();
-
-            var process = Process.GetCurrentProcess();
 
             if (process.ProcessName.ToLower().Contains("iis")
                 || process.ProcessName.ToLower().Contains("w3wp"))

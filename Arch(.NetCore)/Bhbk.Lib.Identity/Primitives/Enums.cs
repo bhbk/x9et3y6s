@@ -27,6 +27,8 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
         CreateUserAccessTokenV2,
         CreateUserRefreshTokenV1,
         CreateUserRefreshTokenV2,
+        BasicAuthV1,
+        BasicAuthV2,
     }
 
     public enum MessageType

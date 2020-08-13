@@ -26,7 +26,6 @@ using Newtonsoft.Json.Serialization;
 using Quartz;
 using Serilog;
 using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -37,7 +36,6 @@ namespace Bhbk.WebApi.Identity.Sts
         public virtual void ConfigureServices(IServiceCollection sc)
         {
             var conf = (IConfiguration)new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
@@ -65,7 +63,6 @@ namespace Bhbk.WebApi.Identity.Sts
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
 
-                //jobs.UseMicrosoftDependencyInjectionScopedJobFactory();
                 jobs.UseMicrosoftDependencyInjectionJobFactory(options =>
                 {
                     options.AllowDefaultConstructor = false;
@@ -73,41 +70,44 @@ namespace Bhbk.WebApi.Identity.Sts
 
                 jobs.UseSimpleTypeLoader();
                 jobs.UseInMemoryStore();
-                jobs.UseDefaultThreadPool(threads =>
-                {
-                    threads.MaxConcurrency = 2;
-                });
+                jobs.UseDefaultThreadPool();
 
-                var refreshesJobKey = new JobKey(JobType.StsRefreshesJob.ToString(), GroupType.StsJobs.ToString());
-                jobs.AddJob<MaintainRefreshesJob>(opt => opt
-                    .StoreDurably()
-                    .WithIdentity(refreshesJobKey)
-                );
-
-                foreach (var cron in conf.GetSection("Jobs:MaintainRefreshes:Schedules").GetChildren()
-                    .Select(x => x.Value).ToList())
+                if (bool.Parse(conf["Jobs:MaintainRefreshes:Enable"]))
                 {
-                    jobs.AddTrigger(opt => opt
-                        .ForJob(refreshesJobKey)
-                        .StartNow()
-                        .WithCronSchedule(cron)
+                    var refreshesJobKey = new JobKey(JobType.StsRefreshesJob.ToString(), GroupType.StsJobs.ToString());
+                    jobs.AddJob<MaintainRefreshesJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(refreshesJobKey)
                     );
+
+                    foreach (var cron in conf.GetSection("Jobs:MaintainRefreshes:Schedules").GetChildren()
+                        .Select(x => x.Value).ToList())
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(refreshesJobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+                    }
                 }
 
-                var statesJobKey = new JobKey(JobType.StsStatesJob.ToString(), GroupType.StsJobs.ToString());
-                jobs.AddJob<MaintainStatesJob>(opt => opt
-                    .StoreDurably()
-                    .WithIdentity(statesJobKey)
-                );
-
-                foreach (var cron in conf.GetSection("Jobs:MaintainStates:Schedules").GetChildren()
-                    .Select(x => x.Value).ToList())
+                if (bool.Parse(conf["Jobs:MaintainStates:Enable"]))
                 {
-                    jobs.AddTrigger(opt => opt
-                        .ForJob(refreshesJobKey)
-                        .StartNow()
-                        .WithCronSchedule(cron)
+                    var refreshesJobKey = new JobKey(JobType.StsStatesJob.ToString(), GroupType.StsJobs.ToString());
+                    jobs.AddJob<MaintainStatesJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(refreshesJobKey)
                     );
+
+                    foreach (var cron in conf.GetSection("Jobs:MaintainStates:Schedules").GetChildren()
+                        .Select(x => x.Value).ToList())
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(refreshesJobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+                    }
                 }
             });
             sc.AddQuartzServer(options =>

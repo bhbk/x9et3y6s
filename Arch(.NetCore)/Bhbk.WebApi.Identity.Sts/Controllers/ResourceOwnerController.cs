@@ -507,6 +507,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
+            if (audiences.Count() == 0)
+            {
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:None");
+                return BadRequest(ModelState);
+            }
+
             var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
 
@@ -724,6 +730,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                     audiences.Add(audience);
                 }
+            }
+
+            if (audiences.Count() == 0)
+            {
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:None");
+                return BadRequest(ModelState);
             }
 
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);

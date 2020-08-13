@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            var file = SearchRoots.ByAssemblyContext("appsettings.json");
+            var file = Search.ByAssemblyInvocation("appsettings.json");
 
             var conf = (IConfiguration)new ConfigurationBuilder()
                 .SetBasePath(file.DirectoryName)

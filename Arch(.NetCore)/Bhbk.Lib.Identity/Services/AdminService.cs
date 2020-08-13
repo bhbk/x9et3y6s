@@ -658,5 +658,16 @@ namespace Bhbk.Lib.Identity.Services
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
         }
+
+        public async ValueTask<bool> User_VerifyV1(Guid userID)
+        {
+            var response = await Http.User_VerifyV1(Grant.Jwt.RawData, userID);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
     }
 }

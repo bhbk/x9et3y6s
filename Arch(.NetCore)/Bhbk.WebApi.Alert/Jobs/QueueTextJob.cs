@@ -102,12 +102,10 @@ namespace Bhbk.WebApi.Alert.Jobs
                 Log.Error(ex.ToString());
             }
 
-            /*
-             * https://docs.microsoft.com/en-us/aspnet/core/performance/memory?view=aspnetcore-3.1
-             */
             GC.Collect();
 #if DEBUG
             Log.Information($"'{callPath}' completed");
+            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
 #endif
             return Task.CompletedTask;
         }

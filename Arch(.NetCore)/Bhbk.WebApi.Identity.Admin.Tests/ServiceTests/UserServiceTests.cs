@@ -1000,5 +1000,102 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 result.FirstName.Should().Be(testUser.FirstName);
             }
         }
+
+        [Fact]
+        public async Task Admin_UserV1_Verify_Fail()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+
+                var result = await service.Http.User_VerifyV1(Base64.CreateString(8), Guid.NewGuid());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
+
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                result = await service.Http.User_VerifyV1(rop.RawData, Guid.NewGuid());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            }
+
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
+
+                new GenerateTestData(uow, mapper).Destroy();
+                new GenerateTestData(uow, mapper).Create();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+
+                testUser.LockoutEnabled = true;
+                testUser.LockoutEnd = DateTime.UtcNow.AddDays(1);
+
+                uow.Users.Update(testUser);
+                uow.Commit();
+
+                var result = await service.Http.User_VerifyV1(rop.RawData, testUser.Id);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+        }
+
+        [Fact]
+        public async Task Admin_UserV1_Verify_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var result = await service.User_VerifyV1(user.Id);
+                result.Should().BeTrue();
+            }
+        }
     }
 }

@@ -923,5 +923,20 @@ namespace Bhbk.Lib.Identity.Repositories
 
             throw new NotSupportedException();
         }
+
+        public async ValueTask<HttpResponseMessage> User_VerifyV1(string jwt, Guid userID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/user/v1/" + userID.ToString() + "/verify";
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.End2EndTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
     }
 }

@@ -637,5 +637,62 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             return Ok(Mapper.Map<UserV1>(result));
         }
+
+        [Route("v1/{userID:guid}/verify"), HttpGet]
+        public IActionResult VerifyV1([FromRoute] Guid userID)
+        {
+            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+
+            if (user == null)
+            {
+                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
+                return NotFound(ModelState);
+            }
+            //check that user is confirmed...
+            //check that user is not locked...
+            else if (UoW.Users.IsLockedOut(user)
+                || !user.EmailConfirmed
+                || !user.PasswordConfirmed)
+            {
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
+                return BadRequest(ModelState);
+            }
+
+            var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
+                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
+
+            switch (UoW.InstanceType)
+            {
+                case InstanceContext.DeployedOrLocal:
+                    {
+                        //check if login provider is local...
+                        if (!logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        {
+                            ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
+                            return BadRequest(ModelState);
+                        }
+                    }
+                    break;
+
+                case InstanceContext.End2EndTest:
+                case InstanceContext.IntegrationTest:
+                    {
+                        //check if login provider is local or test...
+                        if (!logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
+                            && !logins.Where(x => x.Name.StartsWith(Constants.TestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        {
+                            ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
+                            return BadRequest(ModelState);
+                        }
+
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            return NoContent();
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bhbk.Cli.Identity.Commands
+namespace Bhbk.Cli.Identity.Primiitives.Enums
 {
     internal enum CommandTypes
     {
@@ -11,5 +11,10 @@ namespace Bhbk.Cli.Identity.Commands
         rolemap,
         user,
         userpass
+    }
+
+    internal enum HashTypes
+    {
+        PBKDF2,
     }
 }
