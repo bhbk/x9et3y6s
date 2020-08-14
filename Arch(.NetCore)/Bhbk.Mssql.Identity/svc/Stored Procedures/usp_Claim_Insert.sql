@@ -14,7 +14,7 @@ BEGIN
 DECLARE @CLAIMID UNIQUEIDENTIFIER = NEWID()
 DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
-INSERT INTO [dbo].[tbl_Claims]
+INSERT INTO [dbo].[tbl_Claim]
 	(
      Id           
     ,IssuerId    
@@ -39,6 +39,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [svc].[uvw_Claims] WHERE [svc].[uvw_Claims].Id = @CLAIMID
+SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @CLAIMID
 
 END

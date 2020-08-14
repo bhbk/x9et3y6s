@@ -13,14 +13,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.rolemanager-1
      */
 
-    public class RoleRepository : GenericRepository<tbl_Roles>
+    public class RoleRepository : GenericRepository<tbl_Role>
     {
         public RoleRepository(IdentityEntities context)
             : base(context) { }
 
-        public  override tbl_Roles Update(tbl_Roles model)
+        public  override tbl_Role Update(tbl_Role model)
         {
-            var entity = _context.Set<tbl_Roles>().Where(x => x.Id == model.Id).Single();
+            var entity = _context.Set<tbl_Role>().Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.

@@ -28,7 +28,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             _provider = DataProtectionProvider.Create(appName);
         }
 
-        public string Generate(string purpose, TimeSpan expire, tbl_Issuers issuer)
+        public string Generate(string purpose, TimeSpan expire, tbl_Issuer issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             return ciphertext;
         }
 
-        public string Generate(string purpose, TimeSpan expire, tbl_Users user)
+        public string Generate(string purpose, TimeSpan expire, tbl_User user)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", user.Id.ToString(), user.SecurityStamp, purpose);
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             return ciphertext;
         }
 
-        public bool Validate(string purpose, string token, tbl_Issuers issuer)
+        public bool Validate(string purpose, string token, tbl_Issuer issuer)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", issuer.Id.ToString(), issuer.IssuerKey, purpose);
@@ -68,7 +68,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             return false;
         }
 
-        public bool Validate(string purpose, string token, tbl_Users user)
+        public bool Validate(string purpose, string token, tbl_User user)
         {
             var create = _provider.CreateProtector(purpose).ToTimeLimitedDataProtector();
             var secret = string.Format("{0}/{1}/{2}", user.Id.ToString(), user.SecurityStamp, purpose);

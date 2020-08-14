@@ -15,7 +15,7 @@ BEGIN
 DECLARE @ACTIVITYID UNIQUEIDENTIFIER = NEWID()
 DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
-INSERT INTO [dbo].[tbl_Activities]
+INSERT INTO [dbo].[tbl_Activity]
 	(
      Id           
     ,AudienceId    
@@ -42,6 +42,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [svc].[uvw_Activities] WHERE [svc].[uvw_Activities].Id = @ACTIVITYID
+SELECT * FROM [svc].[uvw_Activity] WHERE [svc].[uvw_Activity].Id = @ACTIVITYID
 
 END

@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
      */
 
-    public class UserRepository : GenericRepository<uvw_Users>
+    public class UserRepository : GenericRepository<uvw_User>
     {
         private IClockService _clock;
 
@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public override uvw_Users Create(uvw_Users entity)
+        public override uvw_User Create(uvw_User entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
                 new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
             };
 
-            return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Insert]"
+            return _context.Database.SqlQuery<uvw_User>("[svc].[usp_User_Insert]"
                 + "@ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
@@ -65,14 +65,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
                 var result = cmd.ExecuteReader();
 
-                return result.Cast<uvw_Users>().AsEnumerable().Single();
+                return result.Cast<uvw_User>().AsEnumerable().Single();
             }
             */
         }
 
-        public override IEnumerable<uvw_Users> Create(IEnumerable<uvw_Users> entities)
+        public override IEnumerable<uvw_User> Create(IEnumerable<uvw_User> entities)
         {
-            var results = new List<uvw_Users>();
+            var results = new List<uvw_User>();
 
             foreach (var entity in entities)
             {
@@ -84,20 +84,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override uvw_Users Delete(uvw_Users entity)
+        public override uvw_User Delete(uvw_User entity)
         {
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
             };
 
-            return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Delete] @Id", pvalues.ToArray())
+            return _context.Database.SqlQuery<uvw_User>("[svc].[usp_User_Delete] @Id", pvalues.ToArray())
                 .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Users> Delete(IEnumerable<uvw_Users> entities)
+        public override IEnumerable<uvw_User> Delete(IEnumerable<uvw_User> entities)
         {
-            var results = new List<uvw_Users>();
+            var results = new List<uvw_User>();
 
             foreach (var entity in entities)
             {
@@ -109,12 +109,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Users> Delete(LambdaExpression lambda)
+        public override IEnumerable<uvw_User> Delete(LambdaExpression lambda)
         {
             throw new NotImplementedException();
         }
 
-        public override uvw_Users Update(uvw_Users entity)
+        public override uvw_User Update(uvw_User entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -131,14 +131,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
                 new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
             };
 
-            return _context.Database.SqlQuery<uvw_Users>("[svc].[usp_User_Update]"
+            return _context.Database.SqlQuery<uvw_User>("[svc].[usp_User_Update]"
                 + "@Id, @ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Users> Update(IEnumerable<uvw_Users> entities)
+        public override IEnumerable<uvw_User> Update(IEnumerable<uvw_User> entities)
         {
-            var results = new List<uvw_Users>();
+            var results = new List<uvw_User>();
 
             foreach (var entity in entities)
             {

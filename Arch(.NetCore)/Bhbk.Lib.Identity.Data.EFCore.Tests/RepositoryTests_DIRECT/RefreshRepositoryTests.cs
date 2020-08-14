@@ -23,7 +23,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Refreshes.Create(
-                    Mapper.Map<tbl_Refreshes>(new RefreshV1()));
+                    Mapper.Map<tbl_Refresh>(new RefreshV1()));
                 UoW.Commit();
             });
         }
@@ -34,20 +34,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
                 .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda())
                 .Single();
 
             var result = UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshV1()
+                Mapper.Map<tbl_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -57,7 +57,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                 }));
-            result.Should().BeAssignableTo<tbl_Refreshes>();
+            result.Should().BeAssignableTo<tbl_Refresh>();
 
             UoW.Commit();
         }
@@ -67,7 +67,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Refreshes.Delete(new tbl_Refreshes());
+                UoW.Refreshes.Delete(new tbl_Refresh());
                 UoW.Commit();
             });
         }
@@ -91,7 +91,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Refreshes.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Refreshes>>();
+            results.Should().BeAssignableTo<IEnumerable<tbl_Refresh>>();
             results.Count().Should().Be(UoW.Refreshes.Count());
         }
 
@@ -100,7 +100,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<NotImplementedException>(() =>
             {
-                UoW.Refreshes.Update(new tbl_Refreshes());
+                UoW.Refreshes.Update(new tbl_Refresh());
                 UoW.Commit();
             });
         }

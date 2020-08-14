@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Users.Create(
-                    Mapper.Map<tbl_Users>(new UserV1()));
+                    Mapper.Map<tbl_User>(new UserV1()));
                 UoW.Commit();
             });
         }
@@ -34,7 +34,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Users.Create(
-                Mapper.Map<tbl_Users>(new UserV1()
+                Mapper.Map<tbl_User>(new UserV1()
                 {
                     UserName = Constants.TestUser,
                     Email = Constants.TestUser,
@@ -45,7 +45,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     HumanBeing = true,
                     Immutable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_Users>();
+            result.Should().BeAssignableTo<tbl_User>();
 
             UoW.Commit();
         }
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Users.Delete(new tbl_Users());
+                UoW.Users.Delete(new tbl_User());
                 UoW.Commit();
             });
         }
@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
 
             UoW.Users.Delete(user);
@@ -80,7 +80,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Users.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Users>>();
+            results.Should().BeAssignableTo<IEnumerable<tbl_User>>();
             results.Count().Should().Be(UoW.Users.Count());
         }
 
@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Users.Update(new tbl_Users());
+                UoW.Users.Update(new tbl_User());
                 UoW.Commit();
             });
         }
@@ -100,13 +100,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";
 
             var result = UoW.Users.Update(user);
-            result.Should().BeAssignableTo<tbl_Users>();
+            result.Should().BeAssignableTo<tbl_User>();
 
             UoW.Commit();
         }

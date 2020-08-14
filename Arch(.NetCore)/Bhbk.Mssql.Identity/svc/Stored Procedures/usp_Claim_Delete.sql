@@ -5,9 +5,9 @@ CREATE PROCEDURE [svc].[usp_Claim_Delete]
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Claims] WHERE [svc].[uvw_Claims].Id = @ID
+SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @ID
 
-DELETE [dbo].[tbl_Claims]
+DELETE [dbo].[tbl_Claim]
 WHERE Id = @ID
 
 END

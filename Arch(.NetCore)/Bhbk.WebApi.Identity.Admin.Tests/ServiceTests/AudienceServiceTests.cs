@@ -282,7 +282,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                     uow.Refreshes.Create(
-                        mapper.Map<tbl_Refreshes>(new RefreshV1()
+                        mapper.Map<tbl_Refresh>(new RefreshV1()
                         {
                             IssuerId = issuer.Id,
                             AudienceId = audience.Id,
@@ -297,7 +297,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.Audience_DeleteRefreshesV1(audience.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+                var check = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                     .Where(x => x.AudienceId == audience.Id).ToLambda()).Any();
                 check.Should().BeFalse();
             }
@@ -325,7 +325,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -336,12 +336,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                     .Where(x => x.AudienceId == audience.Id).ToLambda()).Single();
                 var result = await service.Audience_DeleteRefreshV1(audience.Id, refresh.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+                var check = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                     .Where(x => x.Id == refresh.Id).ToLambda()).Any();
                 check.Should().BeFalse();
             }
@@ -448,7 +448,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
 
                     uow.Refreshes.Create(
-                        mapper.Map<tbl_Refreshes>(new RefreshV1()
+                        mapper.Map<tbl_Refresh>(new RefreshV1()
                         {
                             IssuerId = issuer.Id,
                             AudienceId = audience.Id,

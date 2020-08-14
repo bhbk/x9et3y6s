@@ -9,12 +9,12 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
-    public class StateRepository : GenericRepository<uvw_States>
+    public class StateRepository : GenericRepository<uvw_State>
     {
         public StateRepository(IdentityEntities context)
             : base(context) { }
 
-        public override uvw_States Create(uvw_States entity)
+        public override uvw_State Create(uvw_State entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
                 new SqlParameter("@LastPolling", SqlDbType.DateTime2) { Value = entity.LastPolling }
             };
 
-            return _context.Database.SqlQuery<uvw_States>("[svc].[usp_State_Insert]" 
+            return _context.Database.SqlQuery<uvw_State>("[svc].[usp_State_Insert]" 
                 + "@IssuerId, @AudienceId, @UserId, @StateValue, @StateType, @StateDecision, @StateConsume, @IssuerUtc, @ValidFromUtc, @ValidToUtc, @LastPolling", pvalues.ToArray())
                     .AsEnumerable().Single();
 
@@ -47,14 +47,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
                 var result = cmd.ExecuteReader();
 
-                return result.Cast<uvw_States>().AsEnumerable().Single();
+                return result.Cast<uvw_State>().AsEnumerable().Single();
             }
             */
         }
 
-        public override IEnumerable<uvw_States> Create(IEnumerable<uvw_States> entities)
+        public override IEnumerable<uvw_State> Create(IEnumerable<uvw_State> entities)
         {
-            var results = new List<uvw_States>();
+            var results = new List<uvw_State>();
 
             foreach (var entity in entities)
             {
@@ -66,20 +66,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override uvw_States Delete(uvw_States entity)
+        public override uvw_State Delete(uvw_State entity)
         {
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
             };
 
-            return _context.Database.SqlQuery<uvw_States>("[svc].[usp_State_Delete] @Id", pvalues.ToArray())
+            return _context.Database.SqlQuery<uvw_State>("[svc].[usp_State_Delete] @Id", pvalues.ToArray())
                 .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_States> Delete(IEnumerable<uvw_States> entities)
+        public override IEnumerable<uvw_State> Delete(IEnumerable<uvw_State> entities)
         {
-            var results = new List<uvw_States>();
+            var results = new List<uvw_State>();
 
             foreach (var entity in entities)
             {
@@ -91,12 +91,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_States> Delete(LambdaExpression lambda)
+        public override IEnumerable<uvw_State> Delete(LambdaExpression lambda)
         {
             throw new NotImplementedException();
         }
 
-        public override uvw_States Update(uvw_States entity)
+        public override uvw_State Update(uvw_State entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -114,14 +114,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
                 new SqlParameter("@LastPolling", SqlDbType.DateTime2) { Value = entity.LastPolling }
             };
 
-            return _context.Database.SqlQuery<uvw_States>("[svc].[usp_State_Update]"
+            return _context.Database.SqlQuery<uvw_State>("[svc].[usp_State_Update]"
                 + "@Id, @IssuerId, @AudienceId, @UserId, @StateValue, @StateType, @StateDecision, @StateConsume, @IssuerUtc, @ValidFromUtc, @ValidToUtc, @LastPolling", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_States> Update(IEnumerable<uvw_States> entities)
+        public override IEnumerable<uvw_State> Update(IEnumerable<uvw_State> entities)
         {
-            var results = new List<uvw_States>();
+            var results = new List<uvw_State>();
 
             foreach (var entity in entities)
             {

@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var create = UoW.Roles.Create(Mapper.Map<tbl_Roles>(model));
+            var create = UoW.Roles.Create(Mapper.Map<tbl_Role>(model));
 
             UoW.Commit();
 
@@ -94,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IActionResult GetV1([FromRoute] string roleValue)
         {
             Guid roleID;
-            tbl_Roles role = null;
+            tbl_Role role = null;
 
             if (Guid.TryParse(roleValue, out roleID))
                 role = UoW.Roles.Get(x => x.Id == roleID)
@@ -124,13 +124,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 {
                     Data = Mapper.Map<IEnumerable<RoleV1>>(
                         UoW.Roles.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
-                                QueryExpressionFactory.GetQueryExpression<tbl_Roles>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Roles, object>>>() { x => x.tbl_UserRoles })),
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Role>, IQueryable<tbl_Role>>>>(
+                                QueryExpressionFactory.GetQueryExpression<tbl_Role>().ApplyState(state)),
+                            new List<Expression<Func<tbl_Role, object>>>() { x => x.tbl_UserRole })),
 
                     Total = UoW.Roles.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Roles>, IQueryable<tbl_Roles>>>>(
-                            QueryExpressionFactory.GetQueryExpression<tbl_Roles>().ApplyPredicate(state)))
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Role>, IQueryable<tbl_Role>>>>(
+                            QueryExpressionFactory.GetQueryExpression<tbl_Role>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);
@@ -154,8 +154,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var users = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.tbl_UserRoles.Any(y => y.RoleId == roleID)).ToLambda());
+            var users = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
+                .Where(x => x.tbl_UserRole.Any(y => y.RoleId == roleID)).ToLambda());
 
             return Ok(Mapper.Map<UserV1>(users));
         }
@@ -185,7 +185,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var result = UoW.Roles.Update(Mapper.Map<tbl_Roles>(model));
+            var result = UoW.Roles.Update(Mapper.Map<tbl_Role>(model));
 
             UoW.Commit();
 

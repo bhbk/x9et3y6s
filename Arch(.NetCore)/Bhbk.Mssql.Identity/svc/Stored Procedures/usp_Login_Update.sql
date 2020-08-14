@@ -12,7 +12,7 @@ BEGIN
 
 DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
 
-UPDATE [dbo].[tbl_Logins]
+UPDATE [dbo].[tbl_Login]
 SET
      Id						= @Id
     ,ActorId				= @ActorId
@@ -23,6 +23,6 @@ SET
     ,Immutable				= @Immutable
 WHERE Id = @Id
 
-SELECT * FROM [svc].[uvw_Logins] WHERE [svc].[uvw_Logins].Id = @Id
+SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @Id
 
 END

@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Primitives
          * https://www.freeformatter.com/java-dotnet-escape.html
          */
 
-        public static string ConfirmEmail(tbl_Users user, Uri link)
+        public static string ConfirmEmail(tbl_User user, Uri link)
         {
             /*
              * use http://rendera.herokuapp.com/ to test template before format...
@@ -64,7 +64,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Primitives
             "</html>";
         }
 
-        public static string ConfirmPassword(tbl_Users user, Uri link)
+        public static string ConfirmPassword(tbl_User user, Uri link)
         {
             /*
              * use http://rendera.herokuapp.com/ to test template before format...
@@ -116,7 +116,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Primitives
             "</html>";
         }
 
-        public static string ConfirmNewUser(tbl_Issuers issuer, tbl_Users user, Uri link)
+        public static string ConfirmNewUser(tbl_Issuer issuer, tbl_User user, Uri link)
         {
             /*
              * use http://rendera.herokuapp.com/ to test template before format...
@@ -165,7 +165,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Primitives
             "</html>";
         }
 
-        public static string Implicit(tbl_Issuers issuer, tbl_Audiences audience, tbl_Users user, Uri link)
+        public static string Implicit(tbl_Issuer issuer, tbl_Audience audience, tbl_User user, Uri link)
         {
             /*
              * use http://rendera.herokuapp.com/ to test template before format...

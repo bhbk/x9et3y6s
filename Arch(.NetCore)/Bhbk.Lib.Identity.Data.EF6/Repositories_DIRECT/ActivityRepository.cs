@@ -4,12 +4,12 @@ using System;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
 {
-    public class ActivityRepository : GenericRepository<tbl_Activities>
+    public class ActivityRepository : GenericRepository<tbl_Activity>
     {
         public ActivityRepository(IdentityEntities context)
             : base(context) { }
 
-        public override tbl_Activities Update(tbl_Activities entity)
+        public override tbl_Activity Update(tbl_Activity entity)
         {
             throw new NotImplementedException();
         }        

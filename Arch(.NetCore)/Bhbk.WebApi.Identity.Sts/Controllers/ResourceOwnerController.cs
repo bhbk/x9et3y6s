@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid issuerID;
-            tbl_Issuers issuer;
+            tbl_Issuer issuer;
 
             if (bool.Parse(legacyIssuer.ConfigValue)
                 && string.IsNullOrEmpty(input.issuer_id))
@@ -98,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid audienceID;
-            tbl_Audiences audience;
+            tbl_Audience audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client_id, out audienceID))
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid userID;
-            tbl_Users user;
+            tbl_User user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.username, out userID))
@@ -144,8 +144,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
-                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
+            var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
+                .Where(x => x.tbl_UserLogin.Any(y => y.UserId == user.Id)).ToLambda());
 
             switch (UoW.InstanceType)
             {
@@ -221,7 +221,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, null, new List<string> { audience.Name }, rop_claims);
 
                 UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityV1()
+                    Mapper.Map<tbl_Activity>(new ActivityV1()
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),
@@ -245,7 +245,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityV1()
+                    Mapper.Map<tbl_Activity>(new ActivityV1()
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
@@ -256,7 +256,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 UoW.Refreshes.Create(
-                    Mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    Mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -268,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     }));
 
                 UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityV1()
+                    Mapper.Map<tbl_Activity>(new ActivityV1()
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
@@ -299,7 +299,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refresh = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+            var refresh = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.RefreshValue == input.refresh_token).ToLambda()).SingleOrDefault();
 
             if (refresh == null)
@@ -315,7 +315,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid issuerID;
-            tbl_Issuers issuer;
+            tbl_Issuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer_id, out issuerID))
@@ -335,7 +335,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid audienceID;
-            tbl_Audiences audience;
+            tbl_Audience audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client_id, out audienceID))
@@ -381,7 +381,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
             UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshV1()
+                Mapper.Map<tbl_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -393,7 +393,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityV1()
+                Mapper.Map<tbl_Activity>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
@@ -424,7 +424,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
 
             Guid issuerID;
-            tbl_Issuers issuer;
+            tbl_Issuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -444,7 +444,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid userID;
-            tbl_Users user;
+            tbl_User user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
@@ -470,9 +470,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var audienceList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                    .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
-            var audiences = new List<tbl_Audiences>();
+            var audienceList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+                    .Where(x => x.tbl_Role.Any(y => y.tbl_UserRole.Any(z => z.UserId == user.Id))).ToLambda());
+            var audiences = new List<tbl_Audience>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
@@ -483,7 +483,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in input.client.Split(","))
                 {
                     Guid audienceID;
-                    tbl_Audiences audience;
+                    tbl_Audience audience;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out audienceID))
@@ -513,8 +513,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
-                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
+            var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
+                .Where(x => x.tbl_UserLogin.Any(y => y.UserId == user.Id)).ToLambda());
 
             switch (UoW.InstanceType)
             {
@@ -587,7 +587,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rop_claims);
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityV1()
+                Mapper.Map<tbl_Activity>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
@@ -598,7 +598,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshV1()
+                Mapper.Map<tbl_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -610,7 +610,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityV1()
+                Mapper.Map<tbl_Activity>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
@@ -640,7 +640,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refresh = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+            var refresh = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.RefreshValue == input.refresh_token).ToLambda()).SingleOrDefault();
 
             if (refresh == null)
@@ -656,7 +656,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid issuerID;
-            tbl_Issuers issuer;
+            tbl_Issuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -695,9 +695,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var clientList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                    .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
-            var audiences = new List<tbl_Audiences>();
+            var clientList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+                    .Where(x => x.tbl_Role.Any(y => y.tbl_UserRole.Any(z => z.UserId == user.Id))).ToLambda());
+            var audiences = new List<tbl_Audience>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
@@ -708,7 +708,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 foreach (string entry in input.client.Split(","))
                 {
                     Guid audienceID;
-                    tbl_Audiences audience;
+                    tbl_Audience audience;
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out audienceID))
@@ -745,7 +745,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshV1()
+                Mapper.Map<tbl_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -757,7 +757,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityV1()
+                Mapper.Map<tbl_Activity>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),

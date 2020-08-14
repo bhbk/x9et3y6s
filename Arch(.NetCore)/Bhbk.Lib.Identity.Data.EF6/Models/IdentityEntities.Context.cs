@@ -25,19 +25,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<uvw_Activities> uvw_Activities { get; set; }
-        public virtual DbSet<uvw_Audiences> uvw_Audiences { get; set; }
-        public virtual DbSet<uvw_Claims> uvw_Claims { get; set; }
-        public virtual DbSet<uvw_Issuers> uvw_Issuers { get; set; }
-        public virtual DbSet<uvw_Logins> uvw_Logins { get; set; }
-        public virtual DbSet<uvw_Refreshes> uvw_Refreshes { get; set; }
-        public virtual DbSet<uvw_Users> uvw_Users { get; set; }
-        public virtual DbSet<uvw_Roles> uvw_Roles { get; set; }
-        public virtual DbSet<uvw_QueueEmails> uvw_QueueEmails { get; set; }
-        public virtual DbSet<uvw_QueueTexts> uvw_QueueTexts { get; set; }
-        public virtual DbSet<uvw_Settings> uvw_Settings { get; set; }
-        public virtual DbSet<uvw_States> uvw_States { get; set; }
-        public virtual DbSet<uvw_Urls> uvw_Urls { get; set; }
-        public virtual DbSet<uvw_MOTDs> uvw_MOTDs { get; set; }
+        public virtual DbSet<uvw_Activity> uvw_Activity { get; set; }
+        public virtual DbSet<uvw_Audience> uvw_Audience { get; set; }
+        public virtual DbSet<uvw_AudienceRole> uvw_AudienceRole { get; set; }
+        public virtual DbSet<uvw_Claim> uvw_Claim { get; set; }
+        public virtual DbSet<uvw_Issuer> uvw_Issuer { get; set; }
+        public virtual DbSet<uvw_Login> uvw_Login { get; set; }
+        public virtual DbSet<uvw_MOTD> uvw_MOTD { get; set; }
+        public virtual DbSet<uvw_QueueEmail> uvw_QueueEmail { get; set; }
+        public virtual DbSet<uvw_QueueText> uvw_QueueText { get; set; }
+        public virtual DbSet<uvw_Refresh> uvw_Refresh { get; set; }
+        public virtual DbSet<uvw_Role> uvw_Role { get; set; }
+        public virtual DbSet<uvw_Setting> uvw_Setting { get; set; }
+        public virtual DbSet<uvw_State> uvw_State { get; set; }
+        public virtual DbSet<uvw_Url> uvw_Url { get; set; }
+        public virtual DbSet<uvw_User> uvw_User { get; set; }
     }
 }

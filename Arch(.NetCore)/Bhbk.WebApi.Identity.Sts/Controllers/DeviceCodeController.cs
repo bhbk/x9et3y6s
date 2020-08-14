@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
 
             Guid issuerID;
-            tbl_Issuers issuer;
+            tbl_Issuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid audienceID;
-            tbl_Audiences audience;
+            tbl_Audience audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
@@ -95,7 +95,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid userID;
-            tbl_Users user;
+            tbl_User user;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
@@ -129,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             };
 
             var state = UoW.States.Create(
-                Mapper.Map<tbl_States>(new StateV1()
+                Mapper.Map<tbl_State>(new StateV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -154,7 +154,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
 
             Guid issuerID;
-            tbl_Issuers issuer;
+            tbl_Issuer issuer;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
@@ -174,7 +174,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             Guid audienceID;
-            tbl_Audiences audience;
+            tbl_Audience audience;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
@@ -274,7 +274,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var dc = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, dc_claims);
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityV1()
+                Mapper.Map<tbl_Activity>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
@@ -285,7 +285,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
             UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refreshes>(new RefreshV1()
+                Mapper.Map<tbl_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -296,7 +296,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityV1()
+                Mapper.Map<tbl_Activity>(new ActivityV1()
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),

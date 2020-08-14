@@ -23,7 +23,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.States.Create(
-                    Mapper.Map<tbl_States>(new StateV1()));
+                    Mapper.Map<tbl_State>(new StateV1()));
                 UoW.Commit();
             });
         }
@@ -34,20 +34,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
                 .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda())
                 .Single();
 
             var result = UoW.States.Create(
-                Mapper.Map<tbl_States>(
+                Mapper.Map<tbl_State>(
                     new StateV1()
                     {
                         IssuerId = issuer.Id,
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     }));
-            result.Should().BeAssignableTo<tbl_States>();
+            result.Should().BeAssignableTo<tbl_State>();
 
             UoW.Commit();
         }
@@ -69,7 +69,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.States.Delete(new tbl_States());
+                UoW.States.Delete(new tbl_State());
                 UoW.Commit();
             });
         }
@@ -93,7 +93,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.States.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_States>>();
+            results.Should().BeAssignableTo<IEnumerable<tbl_State>>();
             results.Count().Should().Be(UoW.States.Count());
         }
 
@@ -102,7 +102,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.States.Update(new tbl_States());
+                UoW.States.Update(new tbl_State());
                 UoW.Commit();
             });
         }
@@ -113,18 +113,18 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda())
                 .Single();
 
-            var state = UoW.States.Get(QueryExpressionFactory.GetQueryExpression<tbl_States>()
+            var state = UoW.States.Get(QueryExpressionFactory.GetQueryExpression<tbl_State>()
                 .Where(x => x.UserId == user.Id).ToLambda())
                 .First();
 
             state.StateConsume = true;
 
             var result = UoW.States.Update(state);
-            result.Should().BeAssignableTo<tbl_States>();
+            result.Should().BeAssignableTo<tbl_State>();
 
             UoW.Commit();
         }

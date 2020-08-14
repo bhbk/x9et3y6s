@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Alert.Controllers
             model.ActorId = null;
             model.FromId = null;
 
-            var text = Mapper.Map<tbl_QueueTexts>(model);
+            var text = Mapper.Map<tbl_QueueText>(model);
 
             UoW.QueueTexts.Create(text);
             UoW.Commit();

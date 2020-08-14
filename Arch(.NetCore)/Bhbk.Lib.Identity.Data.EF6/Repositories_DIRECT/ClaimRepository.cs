@@ -6,14 +6,14 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
 {
-    public class ClaimRepository : GenericRepository<tbl_Claims>
+    public class ClaimRepository : GenericRepository<tbl_Claim>
     {
         public ClaimRepository(IdentityEntities context)
             : base(context) { }
 
-        public override tbl_Claims Update(tbl_Claims model)
+        public override tbl_Claim Update(tbl_Claim model)
         {
-            var entity = _context.Set<tbl_Claims>()
+            var entity = _context.Set<tbl_Claim>()
                 .Where(x => x.Id == model.Id).Single();
 
             /*

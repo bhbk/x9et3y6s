@@ -88,9 +88,9 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
         private void ProcessMOTDSuccess(IUnitOfWork uow, IMapper mapper, MOTDTssV1 quote)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var model = mapper.Map<tbl_MOTDs>(quote);
+            var model = mapper.Map<tbl_MOTD>(quote);
 
-            var motds = uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>()
+            var motds = uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
                 .Where(x => x.Author == model.Author && x.Quote == model.Quote)
                 .ToLambda());
 

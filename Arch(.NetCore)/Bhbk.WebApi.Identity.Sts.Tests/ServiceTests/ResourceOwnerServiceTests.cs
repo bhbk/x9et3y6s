@@ -434,7 +434,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -482,7 +482,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -529,7 +529,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -577,7 +577,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -624,7 +624,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -673,7 +673,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -725,7 +725,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -772,7 +772,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -821,7 +821,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1265,7 +1265,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1313,7 +1313,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1360,7 +1360,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1408,7 +1408,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1457,7 +1457,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1504,7 +1504,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1561,7 +1561,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1618,7 +1618,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1673,7 +1673,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1746,7 +1746,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -1811,7 +1811,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,

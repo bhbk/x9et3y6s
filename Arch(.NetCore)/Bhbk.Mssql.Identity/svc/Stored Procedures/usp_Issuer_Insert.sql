@@ -13,7 +13,7 @@ BEGIN
 DECLARE @ISSUERID UNIQUEIDENTIFIER = NEWID()
 DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
-INSERT INTO [dbo].[tbl_Issuers]
+INSERT INTO [dbo].[tbl_Issuer]
 	(
      Id           
     ,ActorId    
@@ -36,6 +36,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [svc].[uvw_Issuers] WHERE [svc].[uvw_Issuers].Id = @ISSUERID
+SELECT * FROM [svc].[uvw_Issuer] WHERE [svc].[uvw_Issuer].Id = @ISSUERID
 
 END

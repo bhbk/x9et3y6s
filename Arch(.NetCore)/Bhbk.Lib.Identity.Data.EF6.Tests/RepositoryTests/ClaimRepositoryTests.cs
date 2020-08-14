@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         {
             Assert.Throws<SqlException>(() =>
             {
-                UoW.Claims.Create(new uvw_Claims());
+                UoW.Claims.Create(new uvw_Claim());
             });
         }
 
@@ -30,12 +30,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuers>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
                 .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
             var result = UoW.Claims.Create(
-                new uvw_Claims()
+                new uvw_Claim()
                 {
                     IssuerId = issuer.Id,
                     Subject = Constants.TestClaimSubject,
@@ -44,7 +44,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                     ValueType = Constants.TestClaimValueType,
                     Immutable = false,
                 });
-            result.Should().BeAssignableTo<uvw_Claims>();
+            result.Should().BeAssignableTo<uvw_Claim>();
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Claims.Delete(new uvw_Claims());
+                UoW.Claims.Delete(new uvw_Claim());
             });
         }
 
@@ -62,7 +62,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claim>()
                 .Where(x => x.Type == Constants.TestClaim).ToLambda())
                 .Single();
 
@@ -76,7 +76,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Claims.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Claims>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Claim>>();
             results.Count().Should().Be(UoW.Claims.Count());
         }
 
@@ -85,7 +85,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         {
             Assert.Throws<SqlException>(() =>
             {
-                UoW.Claims.Update(new uvw_Claims());
+                UoW.Claims.Update(new uvw_Claim());
             });
         }
 
@@ -95,13 +95,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claim>()
                 .Where(x => x.Type == Constants.TestClaim).ToLambda())
                 .Single();
             claim.Value += "(Updated)";
 
             var result = UoW.Claims.Update(claim);
-            result.Should().BeAssignableTo<uvw_Claims>();
+            result.Should().BeAssignableTo<uvw_Claim>();
         }
     }
 }

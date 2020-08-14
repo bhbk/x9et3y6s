@@ -9,19 +9,19 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
-    public class UrlRepository : GenericRepository<uvw_Urls>
+    public class UrlRepository : GenericRepository<uvw_Url>
     {
         public UrlRepository(IdentityEntities context)
             : base(context) { }
 
-        public override uvw_Urls Create(uvw_Urls entity)
+        public override uvw_Url Create(uvw_Url entity)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<uvw_Urls> Create(IEnumerable<uvw_Urls> entities)
+        public override IEnumerable<uvw_Url> Create(IEnumerable<uvw_Url> entities)
         {
-            var results = new List<uvw_Urls>();
+            var results = new List<uvw_Url>();
 
             foreach (var entity in entities)
             {
@@ -33,20 +33,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override uvw_Urls Delete(uvw_Urls entity)
+        public override uvw_Url Delete(uvw_Url entity)
         {
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
             };
 
-            return _context.Database.SqlQuery<uvw_Urls>("[svc].[usp_Url_Delete] @Id", pvalues.ToArray())
+            return _context.Database.SqlQuery<uvw_Url>("[svc].[usp_Url_Delete] @Id", pvalues.ToArray())
                 .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Urls> Delete(IEnumerable<uvw_Urls> entities)
+        public override IEnumerable<uvw_Url> Delete(IEnumerable<uvw_Url> entities)
         {
-            var results = new List<uvw_Urls>();
+            var results = new List<uvw_Url>();
 
             foreach (var entity in entities)
             {
@@ -58,19 +58,19 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Urls> Delete(LambdaExpression lambda)
+        public override IEnumerable<uvw_Url> Delete(LambdaExpression lambda)
         {
             throw new NotImplementedException();
         }
 
-        public override uvw_Urls Update(uvw_Urls entity)
+        public override uvw_Url Update(uvw_Url entity)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<uvw_Urls> Update(IEnumerable<uvw_Urls> entities)
+        public override IEnumerable<uvw_Url> Update(IEnumerable<uvw_Url> entities)
         {
-            var results = new List<uvw_Urls>();
+            var results = new List<uvw_Url>();
 
             foreach (var entity in entities)
             {

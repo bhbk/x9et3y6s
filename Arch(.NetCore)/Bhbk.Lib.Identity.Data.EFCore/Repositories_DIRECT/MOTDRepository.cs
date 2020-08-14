@@ -3,7 +3,7 @@ using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 {
-    public class MOTDRepository : GenericRepository<tbl_MOTDs>
+    public class MOTDRepository : GenericRepository<tbl_MOTD>
     {
         public MOTDRepository(IdentityEntities context)
             : base(context) { }

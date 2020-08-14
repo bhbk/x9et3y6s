@@ -17,7 +17,7 @@ BEGIN
 
 DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
 
-UPDATE [dbo].[tbl_Users]
+UPDATE [dbo].[tbl_User]
 SET
      Id						= @Id
     ,ActorId				= @ActorId
@@ -33,5 +33,5 @@ SET
     ,Immutable				= @Immutable
 WHERE Id = @Id
 
-SELECT * FROM [svc].[uvw_Users] WHERE [svc].[uvw_Users].Id = @Id
+SELECT * FROM [svc].[uvw_User] WHERE [svc].[uvw_User].Id = @Id
 END

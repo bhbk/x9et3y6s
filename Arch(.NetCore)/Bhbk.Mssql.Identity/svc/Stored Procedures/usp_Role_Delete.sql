@@ -5,9 +5,9 @@ CREATE PROCEDURE [svc].[usp_Role_Delete]
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Roles] WHERE [svc].[uvw_Roles].Id = @ID
+SELECT * FROM [svc].[uvw_Role] WHERE [svc].[uvw_Role].Id = @ID
 
-DELETE [dbo].[tbl_Roles]
+DELETE [dbo].[tbl_Role]
 WHERE Id = @ID
 
 END

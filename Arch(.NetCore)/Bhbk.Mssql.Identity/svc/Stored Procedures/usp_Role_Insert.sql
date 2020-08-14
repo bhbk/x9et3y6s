@@ -13,7 +13,7 @@ BEGIN
 DECLARE @ROLEID UNIQUEIDENTIFIER = NEWID()
 DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
-INSERT INTO [dbo].[tbl_Roles]
+INSERT INTO [dbo].[tbl_Role]
 	(
      Id           
 	,AudienceId
@@ -36,6 +36,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [svc].[uvw_Roles] WHERE [svc].[uvw_Roles].Id = @ROLEID
+SELECT * FROM [svc].[uvw_Role] WHERE [svc].[uvw_Role].Id = @ROLEID
 
 END

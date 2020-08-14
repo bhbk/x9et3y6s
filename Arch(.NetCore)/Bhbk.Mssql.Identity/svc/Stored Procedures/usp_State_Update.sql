@@ -16,7 +16,7 @@ CREATE PROCEDURE [svc].[usp_State_Update]
 AS
 BEGIN
 
-UPDATE [dbo].[tbl_States]
+UPDATE [dbo].[tbl_State]
 SET
      IssuerId				= @IssuerId
     ,AudienceId				= @AudienceId
@@ -31,6 +31,6 @@ SET
     ,LastPolling			= @LastPolling
 WHERE Id = @Id
 
-SELECT * FROM [svc].[uvw_States] WHERE [svc].[uvw_States].Id = @Id
+SELECT * FROM [svc].[uvw_State] WHERE [svc].[uvw_State].Id = @Id
 
 END

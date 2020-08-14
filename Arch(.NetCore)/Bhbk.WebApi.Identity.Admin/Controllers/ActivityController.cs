@@ -34,10 +34,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IActionResult GetV1([FromRoute] string activityValue)
         {
             Guid activityID;
-            tbl_Activities activity = null;
+            tbl_Activity activity = null;
 
             if (Guid.TryParse(activityValue, out activityID))
-                activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<tbl_Activities>()
+                activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<tbl_Activity>()
                     .Where(x => x.Id == activityID).ToLambda())
                     .SingleOrDefault();
 
@@ -62,12 +62,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 {
                     Data = Mapper.Map<IEnumerable<ActivityV1>>(
                         UoW.Activities.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
-                                QueryExpressionFactory.GetQueryExpression<tbl_Activities>().ApplyState(state)))),
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activity>, IQueryable<tbl_Activity>>>>(
+                                QueryExpressionFactory.GetQueryExpression<tbl_Activity>().ApplyState(state)))),
 
                     Total = UoW.Activities.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activities>, IQueryable<tbl_Activities>>>>(
-                            QueryExpressionFactory.GetQueryExpression<tbl_Activities>().ApplyPredicate(state)))
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Activity>, IQueryable<tbl_Activity>>>>(
+                            QueryExpressionFactory.GetQueryExpression<tbl_Activity>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);

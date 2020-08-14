@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Activities.Create(
-                    Mapper.Map<tbl_Activities>(new ActivityV1()));
+                    Mapper.Map<tbl_Activity>(new ActivityV1()));
 
                 UoW.Commit();
             });
@@ -34,18 +34,18 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
             var result = UoW.Activities.Create(
-                Mapper.Map<tbl_Activities>(new ActivityV1()
+                Mapper.Map<tbl_Activity>(new ActivityV1()
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
                     Immutable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_Activities>();
+            result.Should().BeAssignableTo<tbl_Activity>();
 
             UoW.Commit();
         }
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Activities.Delete(new tbl_Activities());
+                UoW.Activities.Delete(new tbl_Activity());
                 UoW.Commit();
             });
         }
@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<tbl_Activities>()
+            var activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<tbl_Activity>()
                 .Where(x => x.Immutable == false).ToLambda());
 
             UoW.Activities.Delete(activity);
@@ -80,7 +80,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Activities.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Activities>>();
+            results.Should().BeAssignableTo<IEnumerable<tbl_Activity>>();
             results.Count().Should().Be(UoW.Activities.Count());
         }
 
@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<NotImplementedException>(() =>
             {
-                UoW.Activities.Update(new tbl_Activities());
+                UoW.Activities.Update(new tbl_Activity());
                 UoW.Commit();
             });
         }

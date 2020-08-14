@@ -10,12 +10,12 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
-    public class ClaimRepository : GenericRepository<uvw_Claims>
+    public class ClaimRepository : GenericRepository<uvw_Claim>
     {
         public ClaimRepository(IdentityEntities context)
             : base(context) { }
 
-        public override uvw_Claims Create(uvw_Claims entity)
+        public override uvw_Claim Create(uvw_Claim entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -28,7 +28,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
             };
 
-            return _context.Set<uvw_Claims>().FromSqlRaw("[svc].[usp_Claim_Insert]"
+            return _context.Set<uvw_Claim>().FromSqlRaw("[svc].[usp_Claim_Insert]"
                 + "@IssuerId, @ActorId, @Subject, @Type, @Value, @ValueType, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
@@ -44,14 +44,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 
                 var result = cmd.ExecuteReader();
 
-                return result.Cast<uvw_Claims>().AsEnumerable().Single();
+                return result.Cast<uvw_Claim>().AsEnumerable().Single();
             }
             */
         }
 
-        public override IEnumerable<uvw_Claims> Create(IEnumerable<uvw_Claims> entities)
+        public override IEnumerable<uvw_Claim> Create(IEnumerable<uvw_Claim> entities)
         {
-            var results = new List<uvw_Claims>();
+            var results = new List<uvw_Claim>();
 
             foreach (var entity in entities)
             {
@@ -63,20 +63,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override uvw_Claims Delete(uvw_Claims entity)
+        public override uvw_Claim Delete(uvw_Claim entity)
         {
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
             };
 
-            return _context.Set<uvw_Claims>().FromSqlRaw("[svc].[usp_Claim_Delete] @Id", pvalues.ToArray())
+            return _context.Set<uvw_Claim>().FromSqlRaw("[svc].[usp_Claim_Delete] @Id", pvalues.ToArray())
                 .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Claims> Delete(IEnumerable<uvw_Claims> entities)
+        public override IEnumerable<uvw_Claim> Delete(IEnumerable<uvw_Claim> entities)
         {
-            var results = new List<uvw_Claims>();
+            var results = new List<uvw_Claim>();
 
             foreach (var entity in entities)
             {
@@ -88,12 +88,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Claims> Delete(LambdaExpression lambda)
+        public override IEnumerable<uvw_Claim> Delete(LambdaExpression lambda)
         {
             throw new NotImplementedException();
         }
 
-        public override uvw_Claims Update(uvw_Claims entity)
+        public override uvw_Claim Update(uvw_Claim entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -107,14 +107,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
             };
 
-            return _context.Set<uvw_Claims>().FromSqlRaw("[svc].[usp_Claim_Update]"
+            return _context.Set<uvw_Claim>().FromSqlRaw("[svc].[usp_Claim_Update]"
                 + "@Id, @IssuerId, @ActorId, @Subject, @Type, @Value, @ValueType, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Claims> Update(IEnumerable<uvw_Claims> entities)
+        public override IEnumerable<uvw_Claim> Update(IEnumerable<uvw_Claim> entities)
         {
-            var results = new List<uvw_Claims>();
+            var results = new List<uvw_Claim>();
 
             foreach (var entity in entities)
             {

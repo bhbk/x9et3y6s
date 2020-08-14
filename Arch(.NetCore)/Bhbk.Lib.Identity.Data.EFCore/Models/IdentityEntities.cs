@@ -15,21 +15,21 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         {
         }
 
-        public virtual DbSet<uvw_Activities> uvw_Activities { get; set; }
-        public virtual DbSet<uvw_AudienceRoles> uvw_AudienceRoles { get; set; }
-        public virtual DbSet<uvw_Audiences> uvw_Audiences { get; set; }
-        public virtual DbSet<uvw_Claims> uvw_Claims { get; set; }
-        public virtual DbSet<uvw_Issuers> uvw_Issuers { get; set; }
-        public virtual DbSet<uvw_Logins> uvw_Logins { get; set; }
-        public virtual DbSet<uvw_MOTDs> uvw_MOTDs { get; set; }
-        public virtual DbSet<uvw_QueueEmails> uvw_QueueEmails { get; set; }
-        public virtual DbSet<uvw_QueueTexts> uvw_QueueTexts { get; set; }
-        public virtual DbSet<uvw_Refreshes> uvw_Refreshes { get; set; }
-        public virtual DbSet<uvw_Roles> uvw_Roles { get; set; }
-        public virtual DbSet<uvw_Settings> uvw_Settings { get; set; }
-        public virtual DbSet<uvw_States> uvw_States { get; set; }
-        public virtual DbSet<uvw_Urls> uvw_Urls { get; set; }
-        public virtual DbSet<uvw_Users> uvw_Users { get; set; }
+        public virtual DbSet<uvw_Activity> uvw_Activity { get; set; }
+        public virtual DbSet<uvw_Audience> uvw_Audience { get; set; }
+        public virtual DbSet<uvw_AudienceRole> uvw_AudienceRole { get; set; }
+        public virtual DbSet<uvw_Claim> uvw_Claim { get; set; }
+        public virtual DbSet<uvw_Issuer> uvw_Issuer { get; set; }
+        public virtual DbSet<uvw_Login> uvw_Login { get; set; }
+        public virtual DbSet<uvw_MOTD> uvw_MOTD { get; set; }
+        public virtual DbSet<uvw_QueueEmail> uvw_QueueEmail { get; set; }
+        public virtual DbSet<uvw_QueueText> uvw_QueueText { get; set; }
+        public virtual DbSet<uvw_Refresh> uvw_Refresh { get; set; }
+        public virtual DbSet<uvw_Role> uvw_Role { get; set; }
+        public virtual DbSet<uvw_Setting> uvw_Setting { get; set; }
+        public virtual DbSet<uvw_State> uvw_State { get; set; }
+        public virtual DbSet<uvw_Url> uvw_Url { get; set; }
+        public virtual DbSet<uvw_User> uvw_User { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -42,11 +42,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<uvw_Activities>(entity =>
+            modelBuilder.Entity<uvw_Activity>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_Activities", "svc");
+                entity.ToView("uvw_Activity", "svc");
 
                 entity.Property(e => e.ActivityType)
                     .IsRequired()
@@ -55,18 +55,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                 entity.Property(e => e.TableName).HasMaxLength(256);
             });
 
-            modelBuilder.Entity<uvw_AudienceRoles>(entity =>
+            modelBuilder.Entity<uvw_Audience>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_AudienceRoles", "svc");
-            });
-
-            modelBuilder.Entity<uvw_Audiences>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToView("uvw_Audiences", "svc");
+                entity.ToView("uvw_Audience", "svc");
 
                 entity.Property(e => e.ConcurrencyStamp).HasMaxLength(256);
 
@@ -83,11 +76,18 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                 entity.Property(e => e.SecurityStamp).HasMaxLength(256);
             });
 
-            modelBuilder.Entity<uvw_Claims>(entity =>
+            modelBuilder.Entity<uvw_AudienceRole>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_Claims", "svc");
+                entity.ToView("uvw_AudienceRole", "svc");
+            });
+
+            modelBuilder.Entity<uvw_Claim>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("uvw_Claim", "svc");
 
                 entity.Property(e => e.Subject)
                     .IsRequired()
@@ -106,11 +106,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .HasMaxLength(64);
             });
 
-            modelBuilder.Entity<uvw_Issuers>(entity =>
+            modelBuilder.Entity<uvw_Issuer>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_Issuers", "svc");
+                entity.ToView("uvw_Issuer", "svc");
 
                 entity.Property(e => e.Description).HasMaxLength(256);
 
@@ -123,11 +123,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .HasMaxLength(128);
             });
 
-            modelBuilder.Entity<uvw_Logins>(entity =>
+            modelBuilder.Entity<uvw_Login>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_Logins", "svc");
+                entity.ToView("uvw_Login", "svc");
 
                 entity.Property(e => e.Description).HasMaxLength(256);
 
@@ -138,11 +138,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .HasMaxLength(128);
             });
 
-            modelBuilder.Entity<uvw_MOTDs>(entity =>
+            modelBuilder.Entity<uvw_MOTD>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_MOTDs", "svc");
+                entity.ToView("uvw_MOTD", "svc");
 
                 entity.Property(e => e.Author)
                     .IsRequired()
@@ -175,11 +175,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<uvw_QueueEmails>(entity =>
+            modelBuilder.Entity<uvw_QueueEmail>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_QueueEmails", "svc");
+                entity.ToView("uvw_QueueEmail", "svc");
 
                 entity.Property(e => e.FromDisplay)
                     .HasMaxLength(128)
@@ -203,15 +203,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ToEmail)
+                    .IsRequired()
                     .HasMaxLength(128)
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<uvw_QueueTexts>(entity =>
+            modelBuilder.Entity<uvw_QueueText>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_QueueTexts", "svc");
+                entity.ToView("uvw_QueueText", "svc");
 
                 entity.Property(e => e.Body)
                     .IsRequired()
@@ -222,15 +223,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ToPhoneNumber)
+                    .IsRequired()
                     .HasMaxLength(15)
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<uvw_Refreshes>(entity =>
+            modelBuilder.Entity<uvw_Refresh>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_Refreshes", "svc");
+                entity.ToView("uvw_Refresh", "svc");
 
                 entity.Property(e => e.RefreshType)
                     .IsRequired()
@@ -241,11 +243,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .HasMaxLength(2048);
             });
 
-            modelBuilder.Entity<uvw_Roles>(entity =>
+            modelBuilder.Entity<uvw_Role>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_Roles", "svc");
+                entity.ToView("uvw_Role", "svc");
 
                 entity.Property(e => e.Description).HasMaxLength(256);
 
@@ -254,11 +256,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .HasMaxLength(128);
             });
 
-            modelBuilder.Entity<uvw_Settings>(entity =>
+            modelBuilder.Entity<uvw_Setting>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_Settings", "svc");
+                entity.ToView("uvw_Setting", "svc");
 
                 entity.Property(e => e.ConfigKey)
                     .IsRequired()
@@ -271,11 +273,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<uvw_States>(entity =>
+            modelBuilder.Entity<uvw_State>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_States", "svc");
+                entity.ToView("uvw_State", "svc");
 
                 entity.Property(e => e.StateType)
                     .IsRequired()
@@ -284,22 +286,22 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                 entity.Property(e => e.StateValue).HasMaxLength(1024);
             });
 
-            modelBuilder.Entity<uvw_Urls>(entity =>
+            modelBuilder.Entity<uvw_Url>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_Urls", "svc");
+                entity.ToView("uvw_Url", "svc");
 
                 entity.Property(e => e.UrlHost).HasMaxLength(1024);
 
                 entity.Property(e => e.UrlPath).HasMaxLength(1024);
             });
 
-            modelBuilder.Entity<uvw_Users>(entity =>
+            modelBuilder.Entity<uvw_User>(entity =>
             {
                 entity.HasNoKey();
 
-                entity.ToView("uvw_Users", "svc");
+                entity.ToView("uvw_User", "svc");
 
                 entity.Property(e => e.ConcurrencyStamp)
                     .IsRequired()

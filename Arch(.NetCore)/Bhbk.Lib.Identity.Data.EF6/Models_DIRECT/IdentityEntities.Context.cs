@@ -25,24 +25,24 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<tbl_Activities> tbl_Activities { get; set; }
-        public virtual DbSet<tbl_AudienceRoles> tbl_AudienceRoles { get; set; }
-        public virtual DbSet<tbl_Audiences> tbl_Audiences { get; set; }
-        public virtual DbSet<tbl_Claims> tbl_Claims { get; set; }
-        public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
-        public virtual DbSet<tbl_Logins> tbl_Logins { get; set; }
-        public virtual DbSet<tbl_Refreshes> tbl_Refreshes { get; set; }
-        public virtual DbSet<tbl_RoleClaims> tbl_RoleClaims { get; set; }
-        public virtual DbSet<tbl_Roles> tbl_Roles { get; set; }
-        public virtual DbSet<tbl_Settings> tbl_Settings { get; set; }
-        public virtual DbSet<tbl_States> tbl_States { get; set; }
-        public virtual DbSet<tbl_Urls> tbl_Urls { get; set; }
-        public virtual DbSet<tbl_UserClaims> tbl_UserClaims { get; set; }
-        public virtual DbSet<tbl_UserLogins> tbl_UserLogins { get; set; }
-        public virtual DbSet<tbl_UserRoles> tbl_UserRoles { get; set; }
-        public virtual DbSet<tbl_Users> tbl_Users { get; set; }
-        public virtual DbSet<tbl_MOTDs> tbl_MOTDs { get; set; }
-        public virtual DbSet<tbl_QueueEmails> tbl_QueueEmails { get; set; }
-        public virtual DbSet<tbl_QueueTexts> tbl_QueueTexts { get; set; }
+        public virtual DbSet<tbl_Activity> tbl_Activity { get; set; }
+        public virtual DbSet<tbl_Audience> tbl_Audience { get; set; }
+        public virtual DbSet<tbl_AudienceRole> tbl_AudienceRole { get; set; }
+        public virtual DbSet<tbl_Claim> tbl_Claim { get; set; }
+        public virtual DbSet<tbl_Issuer> tbl_Issuer { get; set; }
+        public virtual DbSet<tbl_Login> tbl_Login { get; set; }
+        public virtual DbSet<tbl_MOTD> tbl_MOTD { get; set; }
+        public virtual DbSet<tbl_QueueEmail> tbl_QueueEmail { get; set; }
+        public virtual DbSet<tbl_QueueText> tbl_QueueText { get; set; }
+        public virtual DbSet<tbl_Refresh> tbl_Refresh { get; set; }
+        public virtual DbSet<tbl_Role> tbl_Role { get; set; }
+        public virtual DbSet<tbl_RoleClaim> tbl_RoleClaim { get; set; }
+        public virtual DbSet<tbl_Setting> tbl_Setting { get; set; }
+        public virtual DbSet<tbl_State> tbl_State { get; set; }
+        public virtual DbSet<tbl_Url> tbl_Url { get; set; }
+        public virtual DbSet<tbl_User> tbl_User { get; set; }
+        public virtual DbSet<tbl_UserClaim> tbl_UserClaim { get; set; }
+        public virtual DbSet<tbl_UserLogin> tbl_UserLogin { get; set; }
+        public virtual DbSet<tbl_UserRole> tbl_UserRole { get; set; }
     }
 }

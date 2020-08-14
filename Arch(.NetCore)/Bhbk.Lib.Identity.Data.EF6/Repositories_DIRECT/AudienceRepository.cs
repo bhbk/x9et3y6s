@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
 {
-    public class AudienceRepository : GenericRepository<tbl_Audiences>
+    public class AudienceRepository : GenericRepository<tbl_Audience>
     {
         private IClockService _clock;
 
@@ -23,35 +23,35 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
             set { _clock.UtcNow = value; }
         }
 
-        public override tbl_Audiences Delete(tbl_Audiences audience)
+        public override tbl_Audience Delete(tbl_Audience audience)
         {
-            var activity = _context.Set<tbl_Activities>()
+            var activity = _context.Set<tbl_Activity>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            var refreshes = _context.Set<tbl_Refreshes>()
+            var refreshes = _context.Set<tbl_Refresh>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            var settings = _context.Set<tbl_Settings>()
+            var settings = _context.Set<tbl_Setting>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            var states = _context.Set<tbl_States>()
+            var states = _context.Set<tbl_State>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            var roles = _context.Set<tbl_Roles>()
+            var roles = _context.Set<tbl_Role>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            _context.Set<tbl_Activities>().RemoveRange(activity);
-            _context.Set<tbl_Refreshes>().RemoveRange(refreshes);
-            _context.Set<tbl_Settings>().RemoveRange(settings);
-            _context.Set<tbl_States>().RemoveRange(states);
-            _context.Set<tbl_Roles>().RemoveRange(roles);
+            _context.Set<tbl_Activity>().RemoveRange(activity);
+            _context.Set<tbl_Refresh>().RemoveRange(refreshes);
+            _context.Set<tbl_Setting>().RemoveRange(settings);
+            _context.Set<tbl_State>().RemoveRange(states);
+            _context.Set<tbl_Role>().RemoveRange(roles);
 
-            return _context.Set<tbl_Audiences>().Remove(audience);
+            return _context.Set<tbl_Audience>().Remove(audience);
         }
 
-        public override tbl_Audiences Update(tbl_Audiences audience)
+        public override tbl_Audience Update(tbl_Audience audience)
         {
-            var entity = _context.Set<tbl_Audiences>()
+            var entity = _context.Set<tbl_Audience>()
                 .Where(x => x.Id == audience.Id).Single();
 
             /*

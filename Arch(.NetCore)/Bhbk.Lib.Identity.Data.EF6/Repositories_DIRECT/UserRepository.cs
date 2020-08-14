@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
      */
 
-    public class UserRepository : GenericRepository<tbl_Users>
+    public class UserRepository : GenericRepository<tbl_User>
     {
         private IClockService _clock;
 
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
             set { _clock.UtcNow = value; }
         }
 
-        public override tbl_Users Create(tbl_Users user)
+        public override tbl_User Create(tbl_User user)
         {
             user.ConcurrencyStamp = Guid.NewGuid().ToString();
             user.SecurityStamp = Guid.NewGuid().ToString();
@@ -38,34 +38,34 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
             if (!user.HumanBeing)
                 user.EmailConfirmed = true;
 
-            return _context.Set<tbl_Users>().Add(user);
+            return _context.Set<tbl_User>().Add(user);
         }
 
-        public override tbl_Users Delete(tbl_Users user)
+        public override tbl_User Delete(tbl_User user)
         {
-            var activity = _context.Set<tbl_Activities>()
+            var activity = _context.Set<tbl_Activity>()
                 .Where(x => x.UserId == user.Id);
 
-            var refreshes = _context.Set<tbl_Refreshes>()
+            var refreshes = _context.Set<tbl_Refresh>()
                 .Where(x => x.UserId == user.Id);
 
-            var settings = _context.Set<tbl_Settings>()
+            var settings = _context.Set<tbl_Setting>()
                 .Where(x => x.UserId == user.Id);
 
-            var states = _context.Set<tbl_States>()
+            var states = _context.Set<tbl_State>()
                 .Where(x => x.UserId == user.Id);
 
-            _context.Set<tbl_Activities>().RemoveRange(activity);
-            _context.Set<tbl_Refreshes>().RemoveRange(refreshes);
-            _context.Set<tbl_Settings>().RemoveRange(settings);
-            _context.Set<tbl_States>().RemoveRange(states);
+            _context.Set<tbl_Activity>().RemoveRange(activity);
+            _context.Set<tbl_Refresh>().RemoveRange(refreshes);
+            _context.Set<tbl_Setting>().RemoveRange(settings);
+            _context.Set<tbl_State>().RemoveRange(states);
 
-            return _context.Set<tbl_Users>().Remove(user);
+            return _context.Set<tbl_User>().Remove(user);
         }
 
-        public override tbl_Users Update(tbl_Users user)
+        public override tbl_User Update(tbl_User user)
         {
-            var entity = _context.Set<tbl_Users>()
+            var entity = _context.Set<tbl_User>()
                 .Where(x => x.Id == user.Id).Single();
 
             /*

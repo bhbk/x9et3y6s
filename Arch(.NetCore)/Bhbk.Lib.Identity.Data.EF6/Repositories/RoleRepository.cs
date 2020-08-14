@@ -9,12 +9,12 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
-    public class RoleRepository : GenericRepository<uvw_Roles>
+    public class RoleRepository : GenericRepository<uvw_Role>
     {
         public RoleRepository(IdentityEntities context)
             : base(context) { }
 
-        public override uvw_Roles Create(uvw_Roles entity)
+        public override uvw_Role Create(uvw_Role entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -26,7 +26,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
                 new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
             };
 
-            return _context.Database.SqlQuery<uvw_Roles>("[svc].[usp_Role_Insert]"
+            return _context.Database.SqlQuery<uvw_Role>("[svc].[usp_Role_Insert]"
                 + "@AudienceId, @ActorId, @Name, @Description, @Enabled, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
@@ -42,14 +42,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
                 var result = cmd.ExecuteReader();
 
-                return result.Cast<uvw_Roles>().AsEnumerable().Single();
+                return result.Cast<uvw_Role>().AsEnumerable().Single();
             }
             */
         }
 
-        public override IEnumerable<uvw_Roles> Create(IEnumerable<uvw_Roles> entities)
+        public override IEnumerable<uvw_Role> Create(IEnumerable<uvw_Role> entities)
         {
-            var results = new List<uvw_Roles>();
+            var results = new List<uvw_Role>();
 
             foreach (var entity in entities)
             {
@@ -61,20 +61,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override uvw_Roles Delete(uvw_Roles entity)
+        public override uvw_Role Delete(uvw_Role entity)
         {
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
             };
 
-            return _context.Database.SqlQuery<uvw_Roles>("[svc].[usp_Role_Delete] @Id", pvalues.ToArray())
+            return _context.Database.SqlQuery<uvw_Role>("[svc].[usp_Role_Delete] @Id", pvalues.ToArray())
                 .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Roles> Delete(IEnumerable<uvw_Roles> entities)
+        public override IEnumerable<uvw_Role> Delete(IEnumerable<uvw_Role> entities)
         {
-            var results = new List<uvw_Roles>();
+            var results = new List<uvw_Role>();
 
             foreach (var entity in entities)
             {
@@ -86,12 +86,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Roles> Delete(LambdaExpression lambda)
+        public override IEnumerable<uvw_Role> Delete(LambdaExpression lambda)
         {
             throw new NotImplementedException();
         }
 
-        public override uvw_Roles Update(uvw_Roles entity)
+        public override uvw_Role Update(uvw_Role entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -104,14 +104,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
                 new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
             };
 
-            return _context.Database.SqlQuery<uvw_Roles>("[svc].[usp_Role_Update]"
+            return _context.Database.SqlQuery<uvw_Role>("[svc].[usp_Role_Update]"
                 + "@Id, @AudienceId, @ActorId, @Name, @Description, @Enabled, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Roles> Update(IEnumerable<uvw_Roles> entities)
+        public override IEnumerable<uvw_Role> Update(IEnumerable<uvw_Role> entities)
         {
-            var results = new List<uvw_Roles>();
+            var results = new List<uvw_Role>();
 
             foreach (var entity in entities)
             {

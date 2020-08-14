@@ -9,12 +9,12 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
-    public class ActivityRepository : GenericRepository<uvw_Activities>
+    public class ActivityRepository : GenericRepository<uvw_Activity>
     {
         public ActivityRepository(IdentityEntities context)
             : base(context) { }
 
-        public override uvw_Activities Create(uvw_Activities entity)
+        public override uvw_Activity Create(uvw_Activity entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -28,7 +28,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
                 new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
             };
 
-            return _context.Database.SqlQuery<uvw_Activities>("[svc].[usp_Activity_Insert]" 
+            return _context.Database.SqlQuery<uvw_Activity>("[svc].[usp_Activity_Insert]" 
                 + "@AudienceId, @UserId, @ActivityType, @TableName, @KeyValues, @OriginalValues, @CurrentValues, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
@@ -44,14 +44,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 
                 var result = cmd.ExecuteReader();
 
-                return result.Cast<uvw_Activities>().AsEnumerable().Single();
+                return result.Cast<uvw_Activity>().AsEnumerable().Single();
             }
             */
         }
 
-        public override IEnumerable<uvw_Activities> Create(IEnumerable<uvw_Activities> entities)
+        public override IEnumerable<uvw_Activity> Create(IEnumerable<uvw_Activity> entities)
         {
-            var results = new List<uvw_Activities>();
+            var results = new List<uvw_Activity>();
 
             foreach (var entity in entities)
             {
@@ -63,20 +63,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override uvw_Activities Delete(uvw_Activities entity)
+        public override uvw_Activity Delete(uvw_Activity entity)
         {
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
             };
 
-            return _context.Database.SqlQuery<uvw_Activities>("[svc].[usp_Activity_Delete] @Id", pvalues.ToArray())
+            return _context.Database.SqlQuery<uvw_Activity>("[svc].[usp_Activity_Delete] @Id", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Activities> Delete(IEnumerable<uvw_Activities> entities)
+        public override IEnumerable<uvw_Activity> Delete(IEnumerable<uvw_Activity> entities)
         {
-            var results = new List<uvw_Activities>();
+            var results = new List<uvw_Activity>();
 
             foreach (var entity in entities)
             {
@@ -88,17 +88,17 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Activities> Delete(LambdaExpression lambda)
+        public override IEnumerable<uvw_Activity> Delete(LambdaExpression lambda)
         {
             throw new NotImplementedException();
         }
 
-        public override uvw_Activities Update(uvw_Activities entity)
+        public override uvw_Activity Update(uvw_Activity entity)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<uvw_Activities> Update(IEnumerable<uvw_Activities> entities)
+        public override IEnumerable<uvw_Activity> Update(IEnumerable<uvw_Activity> entities)
         {
             throw new NotImplementedException();
         }

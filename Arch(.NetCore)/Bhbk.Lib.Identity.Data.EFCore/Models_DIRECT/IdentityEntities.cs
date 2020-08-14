@@ -15,25 +15,25 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
         {
         }
 
-        public virtual DbSet<tbl_Activities> tbl_Activities { get; set; }
-        public virtual DbSet<tbl_AudienceRoles> tbl_AudienceRoles { get; set; }
-        public virtual DbSet<tbl_Audiences> tbl_Audiences { get; set; }
-        public virtual DbSet<tbl_Claims> tbl_Claims { get; set; }
-        public virtual DbSet<tbl_Issuers> tbl_Issuers { get; set; }
-        public virtual DbSet<tbl_Logins> tbl_Logins { get; set; }
-        public virtual DbSet<tbl_MOTDs> tbl_MOTDs { get; set; }
-        public virtual DbSet<tbl_QueueEmails> tbl_QueueEmails { get; set; }
-        public virtual DbSet<tbl_QueueTexts> tbl_QueueTexts { get; set; }
-        public virtual DbSet<tbl_Refreshes> tbl_Refreshes { get; set; }
-        public virtual DbSet<tbl_RoleClaims> tbl_RoleClaims { get; set; }
-        public virtual DbSet<tbl_Roles> tbl_Roles { get; set; }
-        public virtual DbSet<tbl_Settings> tbl_Settings { get; set; }
-        public virtual DbSet<tbl_States> tbl_States { get; set; }
-        public virtual DbSet<tbl_Urls> tbl_Urls { get; set; }
-        public virtual DbSet<tbl_UserClaims> tbl_UserClaims { get; set; }
-        public virtual DbSet<tbl_UserLogins> tbl_UserLogins { get; set; }
-        public virtual DbSet<tbl_UserRoles> tbl_UserRoles { get; set; }
-        public virtual DbSet<tbl_Users> tbl_Users { get; set; }
+        public virtual DbSet<tbl_Activity> tbl_Activity { get; set; }
+        public virtual DbSet<tbl_Audience> tbl_Audience { get; set; }
+        public virtual DbSet<tbl_AudienceRole> tbl_AudienceRole { get; set; }
+        public virtual DbSet<tbl_Claim> tbl_Claim { get; set; }
+        public virtual DbSet<tbl_Issuer> tbl_Issuer { get; set; }
+        public virtual DbSet<tbl_Login> tbl_Login { get; set; }
+        public virtual DbSet<tbl_MOTD> tbl_MOTD { get; set; }
+        public virtual DbSet<tbl_QueueEmail> tbl_QueueEmail { get; set; }
+        public virtual DbSet<tbl_QueueText> tbl_QueueText { get; set; }
+        public virtual DbSet<tbl_Refresh> tbl_Refresh { get; set; }
+        public virtual DbSet<tbl_Role> tbl_Role { get; set; }
+        public virtual DbSet<tbl_RoleClaim> tbl_RoleClaim { get; set; }
+        public virtual DbSet<tbl_Setting> tbl_Setting { get; set; }
+        public virtual DbSet<tbl_State> tbl_State { get; set; }
+        public virtual DbSet<tbl_Url> tbl_Url { get; set; }
+        public virtual DbSet<tbl_User> tbl_User { get; set; }
+        public virtual DbSet<tbl_UserClaim> tbl_UserClaim { get; set; }
+        public virtual DbSet<tbl_UserLogin> tbl_UserLogin { get; set; }
+        public virtual DbSet<tbl_UserRole> tbl_UserRole { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -46,10 +46,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<tbl_Activities>(entity =>
+            modelBuilder.Entity<tbl_Activity>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Activity")
+                    .HasName("IX_tbl_Activity")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -61,40 +61,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                 entity.Property(e => e.TableName).HasMaxLength(256);
 
                 entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_Activities)
+                    .WithMany(p => p.tbl_Activity)
                     .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_Activities_AudienceID");
+                    .HasConstraintName("FK_tbl_Activity_AudienceID");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_Activities)
+                    .WithMany(p => p.tbl_Activity)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_Activities_UserID");
+                    .HasConstraintName("FK_tbl_Activity_UserID");
             });
 
-            modelBuilder.Entity<tbl_AudienceRoles>(entity =>
-            {
-                entity.HasKey(e => new { e.AudienceId, e.RoleId })
-                    .HasName("PK_AudienceRoles");
-
-                entity.HasIndex(e => new { e.AudienceId, e.RoleId })
-                    .HasName("IX_AudienceRoles")
-                    .IsUnique();
-
-                entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_AudienceRoles)
-                    .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_AudienceRoles_AudienceID");
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.tbl_AudienceRoles)
-                    .HasForeignKey(d => d.RoleId)
-                    .HasConstraintName("FK_AudienceRoles_RoleID");
-            });
-
-            modelBuilder.Entity<tbl_Audiences>(entity =>
+            modelBuilder.Entity<tbl_Audience>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Audiences")
+                    .HasName("IX_tbl_Audience")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -114,16 +94,35 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                 entity.Property(e => e.SecurityStamp).HasMaxLength(256);
 
                 entity.HasOne(d => d.Issuer)
-                    .WithMany(p => p.tbl_Audiences)
+                    .WithMany(p => p.tbl_Audience)
                     .HasForeignKey(d => d.IssuerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Audiences_IssuerID");
+                    .HasConstraintName("FK_tbl_Audience_IssuerID");
             });
 
-            modelBuilder.Entity<tbl_Claims>(entity =>
+            modelBuilder.Entity<tbl_AudienceRole>(entity =>
+            {
+                entity.HasKey(e => new { e.AudienceId, e.RoleId });
+
+                entity.HasIndex(e => new { e.AudienceId, e.RoleId })
+                    .HasName("IX_tbl_AudienceRole")
+                    .IsUnique();
+
+                entity.HasOne(d => d.Audience)
+                    .WithMany(p => p.tbl_AudienceRole)
+                    .HasForeignKey(d => d.AudienceId)
+                    .HasConstraintName("FK_tbl_AudienceRole_AudienceID");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.tbl_AudienceRole)
+                    .HasForeignKey(d => d.RoleId)
+                    .HasConstraintName("FK_tbl_AudienceRole_RoleID");
+            });
+
+            modelBuilder.Entity<tbl_Claim>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Claims")
+                    .HasName("IX_tbl_Claim")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -145,20 +144,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .HasMaxLength(64);
 
                 entity.HasOne(d => d.Actor)
-                    .WithMany(p => p.tbl_Claims)
+                    .WithMany(p => p.tbl_Claim)
                     .HasForeignKey(d => d.ActorId)
-                    .HasConstraintName("FK_Claims_ActorID");
+                    .HasConstraintName("FK_tbl_Claim_ActorID");
 
                 entity.HasOne(d => d.Issuer)
-                    .WithMany(p => p.tbl_Claims)
+                    .WithMany(p => p.tbl_Claim)
                     .HasForeignKey(d => d.IssuerId)
-                    .HasConstraintName("FK_Claims_IssuerID");
+                    .HasConstraintName("FK_tbl_Claim_IssuerID");
             });
 
-            modelBuilder.Entity<tbl_Issuers>(entity =>
+            modelBuilder.Entity<tbl_Issuer>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Issuers")
+                    .HasName("IX_tbl_Issuer")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -174,10 +173,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .HasMaxLength(128);
             });
 
-            modelBuilder.Entity<tbl_Logins>(entity =>
+            modelBuilder.Entity<tbl_Login>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Logins")
+                    .HasName("IX_tbl_Login")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -191,15 +190,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .HasMaxLength(128);
 
                 entity.HasOne(d => d.Actor)
-                    .WithMany(p => p.tbl_Logins)
+                    .WithMany(p => p.tbl_Login)
                     .HasForeignKey(d => d.ActorId)
-                    .HasConstraintName("FK_Logins_ActorID");
+                    .HasConstraintName("FK_tbl_Login_ActorID");
             });
 
-            modelBuilder.Entity<tbl_MOTDs>(entity =>
+            modelBuilder.Entity<tbl_MOTD>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_tbl_MOTDs")
+                    .HasName("IX_tbl_MOTD")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -235,10 +234,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<tbl_QueueEmails>(entity =>
+            modelBuilder.Entity<tbl_QueueEmail>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_tbl_QueueEmails")
+                    .HasName("IX_tbl_QueueEmail")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -270,16 +269,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.From)
-                    .WithMany(p => p.tbl_QueueEmails)
+                    .WithMany(p => p.tbl_QueueEmail)
                     .HasForeignKey(d => d.FromId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_QueueEmails_UserID");
+                    .HasConstraintName("FK_tbl_QueueEmail_UserID");
             });
 
-            modelBuilder.Entity<tbl_QueueTexts>(entity =>
+            modelBuilder.Entity<tbl_QueueText>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_tbl_QueueTexts")
+                    .HasName("IX_tbl_QueueText")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -298,16 +297,16 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.From)
-                    .WithMany(p => p.tbl_QueueTexts)
+                    .WithMany(p => p.tbl_QueueText)
                     .HasForeignKey(d => d.FromId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_QueueTexts_UserID");
+                    .HasConstraintName("FK_tbl_QueueText_UserID");
             });
 
-            modelBuilder.Entity<tbl_Refreshes>(entity =>
+            modelBuilder.Entity<tbl_Refresh>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Refreshes")
+                    .HasName("IX_tbl_Refresh")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -321,47 +320,25 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .HasMaxLength(2048);
 
                 entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_Refreshes)
+                    .WithMany(p => p.tbl_Refresh)
                     .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_Refreshes_AudienceID");
+                    .HasConstraintName("FK_tbl_Refresh_AudienceID");
 
                 entity.HasOne(d => d.Issuer)
-                    .WithMany(p => p.tbl_Refreshes)
+                    .WithMany(p => p.tbl_Refresh)
                     .HasForeignKey(d => d.IssuerId)
-                    .HasConstraintName("FK_Refreshes_IssuerID");
+                    .HasConstraintName("FK_tbl_Refresh_IssuerID");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_Refreshes)
+                    .WithMany(p => p.tbl_Refresh)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_Refreshes_UserID");
+                    .HasConstraintName("FK_tbl_Refresh_UserID");
             });
 
-            modelBuilder.Entity<tbl_RoleClaims>(entity =>
-            {
-                entity.HasKey(e => new { e.RoleId, e.ClaimId })
-                    .HasName("PK_RoleClaims");
-
-                entity.HasIndex(e => new { e.RoleId, e.ClaimId })
-                    .HasName("IX_RoleClaims")
-                    .IsUnique();
-
-                entity.Property(e => e.Created).HasColumnType("datetime");
-
-                entity.HasOne(d => d.Claim)
-                    .WithMany(p => p.tbl_RoleClaims)
-                    .HasForeignKey(d => d.ClaimId)
-                    .HasConstraintName("FK_RoleClaims_ClaimID");
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.tbl_RoleClaims)
-                    .HasForeignKey(d => d.RoleId)
-                    .HasConstraintName("FK_RoleClaims_RoleID");
-            });
-
-            modelBuilder.Entity<tbl_Roles>(entity =>
+            modelBuilder.Entity<tbl_Role>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Roles")
+                    .HasName("IX_tbl_Role")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -373,16 +350,37 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .HasMaxLength(128);
 
                 entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_Roles)
+                    .WithMany(p => p.tbl_Role)
                     .HasForeignKey(d => d.AudienceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Roles_AudienceID");
+                    .HasConstraintName("FK_tbl_Role_AudienceID");
             });
 
-            modelBuilder.Entity<tbl_Settings>(entity =>
+            modelBuilder.Entity<tbl_RoleClaim>(entity =>
+            {
+                entity.HasKey(e => new { e.RoleId, e.ClaimId });
+
+                entity.HasIndex(e => new { e.RoleId, e.ClaimId })
+                    .HasName("IX_RoleClaims")
+                    .IsUnique();
+
+                entity.Property(e => e.Created).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Claim)
+                    .WithMany(p => p.tbl_RoleClaim)
+                    .HasForeignKey(d => d.ClaimId)
+                    .HasConstraintName("FK_tbl_RoleClaim_ClaimID");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.tbl_RoleClaim)
+                    .HasForeignKey(d => d.RoleId)
+                    .HasConstraintName("FK_tbl_RoleClaim_RoleID");
+            });
+
+            modelBuilder.Entity<tbl_Setting>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Settings")
+                    .HasName("IX_tbl_Setting")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -398,28 +396,28 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_Settings)
+                    .WithMany(p => p.tbl_Setting)
                     .HasForeignKey(d => d.AudienceId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_Settings_AudienceID");
+                    .HasConstraintName("FK_tbl_Setting_AudienceID");
 
                 entity.HasOne(d => d.Issuer)
-                    .WithMany(p => p.tbl_Settings)
+                    .WithMany(p => p.tbl_Setting)
                     .HasForeignKey(d => d.IssuerId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_Settings_IssuerID");
+                    .HasConstraintName("FK_tbl_Setting_IssuerID");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_Settings)
+                    .WithMany(p => p.tbl_Setting)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_Settings_UserID");
+                    .HasConstraintName("FK_tbl_Setting_UserID");
             });
 
-            modelBuilder.Entity<tbl_States>(entity =>
+            modelBuilder.Entity<tbl_State>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_States")
+                    .HasName("IX_tbl_State")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -431,27 +429,27 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                 entity.Property(e => e.StateValue).HasMaxLength(1024);
 
                 entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_States)
+                    .WithMany(p => p.tbl_State)
                     .HasForeignKey(d => d.AudienceId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_States_AudienceID");
+                    .HasConstraintName("FK_tbl_State_AudienceID");
 
                 entity.HasOne(d => d.Issuer)
-                    .WithMany(p => p.tbl_States)
+                    .WithMany(p => p.tbl_State)
                     .HasForeignKey(d => d.IssuerId)
-                    .HasConstraintName("FK_States_IssuerID");
+                    .HasConstraintName("FK_tbl_State_IssuerID");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_States)
+                    .WithMany(p => p.tbl_State)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_States_UserID");
+                    .HasConstraintName("FK_tbl_State_UserID");
             });
 
-            modelBuilder.Entity<tbl_Urls>(entity =>
+            modelBuilder.Entity<tbl_Url>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Urls")
+                    .HasName("IX_tbl_Url")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -461,75 +459,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                 entity.Property(e => e.UrlPath).HasMaxLength(1024);
 
                 entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_Urls)
+                    .WithMany(p => p.tbl_Url)
                     .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_Urls_AudienceID");
+                    .HasConstraintName("FK_tbl_Url_AudienceID");
             });
 
-            modelBuilder.Entity<tbl_UserClaims>(entity =>
-            {
-                entity.HasKey(e => new { e.UserId, e.ClaimId })
-                    .HasName("PK_UserClaims");
-
-                entity.HasIndex(e => new { e.UserId, e.ClaimId })
-                    .HasName("IX_UserClaims")
-                    .IsUnique();
-
-                entity.HasOne(d => d.Claim)
-                    .WithMany(p => p.tbl_UserClaims)
-                    .HasForeignKey(d => d.ClaimId)
-                    .HasConstraintName("FK_UserClaims_ClaimID");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_UserClaims)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_UserClaims_UserID");
-            });
-
-            modelBuilder.Entity<tbl_UserLogins>(entity =>
-            {
-                entity.HasKey(e => new { e.UserId, e.LoginId })
-                    .HasName("PK_UserLogins");
-
-                entity.HasIndex(e => new { e.UserId, e.LoginId })
-                    .HasName("IX_UserLogins")
-                    .IsUnique();
-
-                entity.HasOne(d => d.Login)
-                    .WithMany(p => p.tbl_UserLogins)
-                    .HasForeignKey(d => d.LoginId)
-                    .HasConstraintName("FK_UserLogins_LoginID");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_UserLogins)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_UserLogins_UserID");
-            });
-
-            modelBuilder.Entity<tbl_UserRoles>(entity =>
-            {
-                entity.HasKey(e => new { e.UserId, e.RoleId })
-                    .HasName("PK_UserRoles");
-
-                entity.HasIndex(e => new { e.UserId, e.RoleId })
-                    .HasName("IX_UserRoles")
-                    .IsUnique();
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.tbl_UserRoles)
-                    .HasForeignKey(d => d.RoleId)
-                    .HasConstraintName("FK_UserRoles_RoleID");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_UserRoles)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_UserRoles_UserID");
-            });
-
-            modelBuilder.Entity<tbl_Users>(entity =>
+            modelBuilder.Entity<tbl_User>(entity =>
             {
                 entity.HasIndex(e => e.Id)
-                    .HasName("IX_Users")
+                    .HasName("IX_tbl_User")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -563,6 +501,63 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                 entity.Property(e => e.UserName)
                     .IsRequired()
                     .HasMaxLength(128);
+            });
+
+            modelBuilder.Entity<tbl_UserClaim>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.ClaimId });
+
+                entity.HasIndex(e => new { e.UserId, e.ClaimId })
+                    .HasName("IX_tbl_UserClaim")
+                    .IsUnique();
+
+                entity.HasOne(d => d.Claim)
+                    .WithMany(p => p.tbl_UserClaim)
+                    .HasForeignKey(d => d.ClaimId)
+                    .HasConstraintName("FK_tbl_UserClaim_ClaimID");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.tbl_UserClaim)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_tbl_UserClaim_UserID");
+            });
+
+            modelBuilder.Entity<tbl_UserLogin>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.LoginId });
+
+                entity.HasIndex(e => new { e.UserId, e.LoginId })
+                    .HasName("IX_tbl_UserLogin")
+                    .IsUnique();
+
+                entity.HasOne(d => d.Login)
+                    .WithMany(p => p.tbl_UserLogin)
+                    .HasForeignKey(d => d.LoginId)
+                    .HasConstraintName("FK_tbl_UserLogin_LoginID");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.tbl_UserLogin)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_tbl_UserLogin_UserID");
+            });
+
+            modelBuilder.Entity<tbl_UserRole>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.RoleId });
+
+                entity.HasIndex(e => new { e.UserId, e.RoleId })
+                    .HasName("IX_tbl_UserRole")
+                    .IsUnique();
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.tbl_UserRole)
+                    .HasForeignKey(d => d.RoleId)
+                    .HasConstraintName("FK_tbl_UserRole_RoleID");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.tbl_UserRole)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_tbl_UserRole_UserID");
             });
 
             OnModelCreatingPartial(modelBuilder);

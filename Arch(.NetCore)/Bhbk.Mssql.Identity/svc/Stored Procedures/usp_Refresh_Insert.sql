@@ -14,7 +14,7 @@ BEGIN
 
 DECLARE @REFRESHID UNIQUEIDENTIFIER = NEWID()
 
-INSERT INTO [dbo].[tbl_Refreshes]
+INSERT INTO [dbo].[tbl_Refresh]
 	(
      Id         
 	,IssuerId
@@ -39,6 +39,6 @@ VALUES
 	,@ValidToUtc
 	);
 
-SELECT * FROM [svc].[uvw_Refreshes] WHERE [svc].[uvw_Refreshes].Id = @REFRESHID
+SELECT * FROM [svc].[uvw_Refresh] WHERE [svc].[uvw_Refresh].Id = @REFRESHID
 
 END

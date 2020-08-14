@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    var disabledExpr = QueryExpressionFactory.GetQueryExpression<tbl_Users>()
+                    var disabledExpr = QueryExpressionFactory.GetQueryExpression<tbl_User>()
                             .Where(x => x.LockoutEnd < DateTime.UtcNow).ToLambda();
 
                     var disabled = uow.Users.Get(disabledExpr);

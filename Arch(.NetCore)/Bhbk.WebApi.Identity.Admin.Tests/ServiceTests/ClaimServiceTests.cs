@@ -123,7 +123,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     });
                 result.Should().BeAssignableTo<ClaimV1>();
 
-                var check = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+                var check = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Id == result.Id).ToLambda())
                     .Any();
                 check.Should().BeTrue();
@@ -207,7 +207,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Type == Constants.TestClaim).ToLambda())
                     .Single();
                 testClaim.Immutable = true;
@@ -246,14 +246,14 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Type == Constants.TestClaim).ToLambda())
                     .Single();
 
                 var result = await service.Claim_DeleteV1(testClaim.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+                var check = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Id == testClaim.Id).ToLambda())
                     .Any();
                 check.Should().BeFalse();
@@ -285,7 +285,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Type == Constants.TestClaim).ToLambda())
                     .Single();
 
@@ -416,7 +416,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Type == Constants.TestClaim).ToLambda())
                     .Single();
                 testClaim.Value += "(Updated)";

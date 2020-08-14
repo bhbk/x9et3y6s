@@ -40,7 +40,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+            if (UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.IssuerId == model.IssuerId && x.Type == model.Type).ToLambda())
                 .Any())
             {
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var result = UoW.Claims.Create(Mapper.Map<tbl_Claims>(model));
+            var result = UoW.Claims.Create(Mapper.Map<tbl_Claim>(model));
 
             UoW.Commit();
 
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid claimID)
         {
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 
@@ -90,10 +90,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IActionResult GetV1([FromRoute] string claimValue)
         {
             Guid claimID;
-            tbl_Claims claim = null;
+            tbl_Claim claim = null;
 
             if (Guid.TryParse(claimValue, out claimID))
-                claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+                claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Id == claimID).ToLambda())
                     .SingleOrDefault();
 
@@ -118,12 +118,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 {
                     Data = Mapper.Map<IEnumerable<ClaimV1>>(
                         UoW.Claims.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
-                                QueryExpressionFactory.GetQueryExpression<tbl_Claims>().ApplyState(state)))),
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claim>, IQueryable<tbl_Claim>>>>(
+                                QueryExpressionFactory.GetQueryExpression<tbl_Claim>().ApplyState(state)))),
 
                     Total = UoW.Claims.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claims>, IQueryable<tbl_Claims>>>>(
-                            QueryExpressionFactory.GetQueryExpression<tbl_Claims>().ApplyPredicate(state)))
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claim>, IQueryable<tbl_Claim>>>>(
+                            QueryExpressionFactory.GetQueryExpression<tbl_Claim>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);
@@ -143,7 +143,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
@@ -161,7 +161,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var result = UoW.Claims.Update(Mapper.Map<tbl_Claims>(model));
+            var result = UoW.Claims.Update(Mapper.Map<tbl_Claim>(model));
 
             UoW.Commit();
 

@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var motd = Mapper.Map<tbl_MOTDs>(model);
+            var motd = Mapper.Map<tbl_MOTD>(model);
             var result = UoW.MOTDs.Create(motd);
 
             UoW.Commit();
@@ -78,10 +78,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IActionResult GetV1([FromRoute] string motdValue)
         {
             Guid motdID;
-            tbl_MOTDs motd = null;
+            tbl_MOTD motd = null;
 
             if (Guid.TryParse(motdValue, out motdID))
-                motd = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>()
+                motd = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
                     .Where(x => x.Id == motdID).ToLambda())
                     .SingleOrDefault();
 
@@ -106,12 +106,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 {
                     Data = Mapper.Map<IEnumerable<MOTDTssV1>>(
                         UoW.MOTDs.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTDs>, IQueryable<tbl_MOTDs>>>>(
-                                QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>().ApplyState(state)))),
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTD>, IQueryable<tbl_MOTD>>>>(
+                                QueryExpressionFactory.GetQueryExpression<tbl_MOTD>().ApplyState(state)))),
 
                     Total = UoW.MOTDs.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTDs>, IQueryable<tbl_MOTDs>>>>(
-                            QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>().ApplyPredicate(state)))
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTD>, IQueryable<tbl_MOTD>>>>(
+                            QueryExpressionFactory.GetQueryExpression<tbl_MOTD>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);
@@ -139,7 +139,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var result = UoW.MOTDs.Update(Mapper.Map<tbl_MOTDs>(model));
+            var result = UoW.MOTDs.Update(Mapper.Map<tbl_MOTD>(model));
 
             UoW.Commit();
 

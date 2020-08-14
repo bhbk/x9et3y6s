@@ -6,14 +6,14 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
 {
-    public class LoginRepository : GenericRepository<tbl_Logins>
+    public class LoginRepository : GenericRepository<tbl_Login>
     {
         public LoginRepository(IdentityEntities context)
             : base(context) { }
 
-        public override tbl_Logins Update(tbl_Logins login)
+        public override tbl_Login Update(tbl_Login login)
         {
-            var entity = _context.Set<tbl_Logins>()
+            var entity = _context.Set<tbl_Login>()
                 .Where(x => x.Id == login.Id).Single();
 
             /*

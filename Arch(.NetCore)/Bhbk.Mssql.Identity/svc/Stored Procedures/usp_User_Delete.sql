@@ -5,21 +5,21 @@ CREATE PROCEDURE [svc].[usp_User_Delete]
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Users] WHERE [svc].[uvw_Users].Id = @ID
+SELECT * FROM [svc].[uvw_User] WHERE [svc].[uvw_User].Id = @ID
 
-DELETE [dbo].[tbl_Activities]
+DELETE [dbo].[tbl_Activity]
 WHERE UserId = @ID
 
-DELETE [dbo].[tbl_Refreshes]
+DELETE [dbo].[tbl_Refresh]
 WHERE UserId = @ID
 
-DELETE [dbo].[tbl_Settings]
+DELETE [dbo].[tbl_Setting]
 WHERE UserId = @ID
 
-DELETE [dbo].[tbl_States]
+DELETE [dbo].[tbl_State]
 WHERE UserId = @ID
 
-DELETE [dbo].[tbl_Users]
+DELETE [dbo].[tbl_User]
 WHERE Id = @ID
 
 END

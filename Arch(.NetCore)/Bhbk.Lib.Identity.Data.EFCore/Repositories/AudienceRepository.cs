@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
-    public class AudienceRepository : GenericRepository<uvw_Audiences>
+    public class AudienceRepository : GenericRepository<uvw_Audience>
     {
         private IClockService _clock;
 
@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public override uvw_Audiences Create(uvw_Audiences entity)
+        public override uvw_Audience Create(uvw_Audience entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -44,7 +44,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
             };
 
-            return _context.Set<uvw_Audiences>().FromSqlRaw("[svc].[usp_Audience_Insert]"
+            return _context.Set<uvw_Audience>().FromSqlRaw("[svc].[usp_Audience_Insert]"
                 + "@IssuerId, @ActorId, @Name, @Description, @LockoutEnabled, @LockoutEnd,"
                 + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
@@ -61,14 +61,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 
                 var result = cmd.ExecuteReader();
 
-                return result.Cast<uvw_Audiences>().AsEnumerable().Single();
+                return result.Cast<uvw_Audience>().AsEnumerable().Single();
             }
             */
         }
 
-        public override IEnumerable<uvw_Audiences> Create(IEnumerable<uvw_Audiences> entities)
+        public override IEnumerable<uvw_Audience> Create(IEnumerable<uvw_Audience> entities)
         {
-            var results = new List<uvw_Audiences>();
+            var results = new List<uvw_Audience>();
 
             foreach (var entity in entities)
             {
@@ -80,20 +80,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override uvw_Audiences Delete(uvw_Audiences entity)
+        public override uvw_Audience Delete(uvw_Audience entity)
         {
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
             };
 
-            return _context.Set<uvw_Audiences>().FromSqlRaw("[svc].[usp_Audience_Delete] @Id", pvalues.ToArray())
+            return _context.Set<uvw_Audience>().FromSqlRaw("[svc].[usp_Audience_Delete] @Id", pvalues.ToArray())
                 .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Audiences> Delete(IEnumerable<uvw_Audiences> entities)
+        public override IEnumerable<uvw_Audience> Delete(IEnumerable<uvw_Audience> entities)
         {
-            var results = new List<uvw_Audiences>();
+            var results = new List<uvw_Audience>();
 
             foreach (var entity in entities)
             {
@@ -105,12 +105,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Audiences> Delete(LambdaExpression lambda)
+        public override IEnumerable<uvw_Audience> Delete(LambdaExpression lambda)
         {
             throw new NotImplementedException();
         }
 
-        public override uvw_Audiences Update(uvw_Audiences entity)
+        public override uvw_Audience Update(uvw_Audience entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -128,15 +128,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
             };
 
-            return _context.Set<uvw_Audiences>().FromSqlRaw("[svc].[usp_Audience_Update]"
+            return _context.Set<uvw_Audience>().FromSqlRaw("[svc].[usp_Audience_Update]"
                 + "@Id, @IssuerId, @ActorId, @Name, @Description, @LockoutEnabled, @LockoutEnd,"
                 + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Audiences> Update(IEnumerable<uvw_Audiences> entities)
+        public override IEnumerable<uvw_Audience> Update(IEnumerable<uvw_Audience> entities)
         {
-            var results = new List<uvw_Audiences>();
+            var results = new List<uvw_Audience>();
 
             foreach (var entity in entities)
             {

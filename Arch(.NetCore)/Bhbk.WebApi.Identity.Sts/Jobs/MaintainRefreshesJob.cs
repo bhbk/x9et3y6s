@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Sts.Jobs
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    var invalidExpr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+                    var invalidExpr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                             .Where(x => x.ValidFromUtc > DateTime.UtcNow || x.ValidToUtc < DateTime.UtcNow).ToLambda();
 
                     var invalid = uow.Refreshes.Get(invalidExpr);

@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
 {
-    public class SettingRepository : GenericRepository<tbl_Settings>
+    public class SettingRepository : GenericRepository<tbl_Setting>
     {
         public SettingRepository(IdentityEntities context)
             : base(context) { }
 
-        public override tbl_Settings Update(tbl_Settings model)
+        public override tbl_Setting Update(tbl_Setting model)
         {
-            var entity = _context.Set<tbl_Settings>().Where(x => x.Id == model.Id).Single();
+            var entity = _context.Set<tbl_Setting>().Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.

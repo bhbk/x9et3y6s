@@ -3,7 +3,7 @@ using Bhbk.Lib.Identity.Data.EF6.Models;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
-    public class QueueTextRepository : GenericRepository<uvw_QueueTexts>
+    public class QueueTextRepository : GenericRepository<uvw_QueueText>
     {
         public QueueTextRepository(IdentityEntities context)
             : base(context) { }

@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Alert.Controllers
             model.ActorId = null;
             model.FromId = null;
 
-            var email = Mapper.Map<tbl_QueueEmails>(model);
+            var email = Mapper.Map<tbl_QueueEmail>(model);
 
             UoW.QueueEmails.Create(email);
             UoW.Commit();

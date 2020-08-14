@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
      */
 
-    public class UserRepository : GenericRepository<tbl_Users>
+    public class UserRepository : GenericRepository<tbl_User>
     {
         private IClockService _clock;
 
@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             set { _clock.UtcNow = value; }
         }
 
-        public tbl_Users AccessFailed(tbl_Users user)
+        public tbl_User AccessFailed(tbl_User user)
         {
             user.LastLoginFailure = Clock.UtcDateTime;
             user.AccessFailedCount++;
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public tbl_Users AccessSuccess(tbl_Users user)
+        public tbl_User AccessSuccess(tbl_User user)
         {
             user.LastLoginSuccess = Clock.UtcDateTime;
             user.AccessSuccessCount++;
@@ -56,10 +56,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public bool AddToClaim(tbl_Users user, tbl_Claims claim)
+        public bool AddToClaim(tbl_User user, tbl_Claim claim)
         {
-            _context.Set<tbl_UserClaims>().Add(
-                new tbl_UserClaims()
+            _context.Set<tbl_UserClaim>().Add(
+                new tbl_UserClaim()
                 {
                     UserId = user.Id,
                     ClaimId = claim.Id,
@@ -70,10 +70,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return true;
         }
 
-        public bool AddToLogin(tbl_Users user, tbl_Logins login)
+        public bool AddToLogin(tbl_User user, tbl_Login login)
         {
-            _context.Set<tbl_UserLogins>().Add(
-                new tbl_UserLogins()
+            _context.Set<tbl_UserLogin>().Add(
+                new tbl_UserLogin()
                 {
                     UserId = user.Id,
                     LoginId = login.Id,
@@ -84,10 +84,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return true;
         }
 
-        public bool AddToRole(tbl_Users user, tbl_Roles role)
+        public bool AddToRole(tbl_User user, tbl_Role role)
         {
-            _context.Set<tbl_UserRoles>().Add(
-                new tbl_UserRoles()
+            _context.Set<tbl_UserRole>().Add(
+                new tbl_UserRole()
                 {
                     UserId = user.Id,
                     RoleId = role.Id,
@@ -98,7 +98,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return true;
         }
 
-        public override tbl_Users Create(tbl_Users user)
+        public override tbl_User Create(tbl_User user)
         {
             var create = InternalCreate(user);
 
@@ -107,7 +107,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return create;
         }
 
-        public tbl_Users Create(tbl_Users user, string password)
+        public tbl_User Create(tbl_User user, string password)
         {
             var create = InternalCreate(user);
 
@@ -118,18 +118,18 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return create;
         }
 
-        public override tbl_Users Delete(tbl_Users user)
+        public override tbl_User Delete(tbl_User user)
         {
-            var activity = _context.Set<tbl_Activities>()
+            var activity = _context.Set<tbl_Activity>()
                 .Where(x => x.UserId == user.Id);
 
-            var refreshes = _context.Set<tbl_Refreshes>()
+            var refreshes = _context.Set<tbl_Refresh>()
                 .Where(x => x.UserId == user.Id);
 
-            var settings = _context.Set<tbl_Settings>()
+            var settings = _context.Set<tbl_Setting>()
                 .Where(x => x.UserId == user.Id);
 
-            var states = _context.Set<tbl_States>()
+            var states = _context.Set<tbl_State>()
                 .Where(x => x.UserId == user.Id);
 
             _context.RemoveRange(activity);
@@ -141,9 +141,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
         }
 
         [Obsolete]
-        public List<Claim> GenerateAccessClaims(tbl_Users user)
+        public List<Claim> GenerateAccessClaims(tbl_User user)
         {
-            var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
+            var legacyClaims = _context.Set<tbl_Setting>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingGlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
@@ -160,8 +160,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
-            var userRoles = _context.Set<tbl_Roles>()
-                .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
+            var userRoles = _context.Set<tbl_Role>()
+                .Where(x => x.tbl_UserRole.Any(y => y.UserId == user.Id)).ToList();
 
             foreach (var role in userRoles.OrderBy(x => x.Name))
             {
@@ -172,8 +172,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                     claims.Add(new Claim("role", role.Name, ClaimTypes.Role));
             }
 
-            var userClaims = _context.Set<tbl_Claims>()
-                .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToList();
+            var userClaims = _context.Set<tbl_Claim>()
+                .Where(x => x.tbl_UserClaim.Any(y => y.UserId == user.Id)).ToList();
 
             foreach (var claim in userClaims.OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
@@ -196,12 +196,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return claims;
         }
 
-        public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Users user)
+        public List<Claim> GenerateAccessClaims(tbl_Issuer issuer, tbl_User user)
         {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
+            var expire = _context.Set<tbl_Setting>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
-            var legacyClaims = _context.Set<tbl_Settings>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
+            var legacyClaims = _context.Set<tbl_Setting>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingGlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
@@ -218,8 +218,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
-            var userRoles = _context.Set<tbl_Roles>()
-                .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
+            var userRoles = _context.Set<tbl_Role>()
+                .Where(x => x.tbl_UserRole.Any(y => y.UserId == user.Id)).ToList();
 
             foreach (var role in userRoles.OrderBy(x => x.Name))
             {
@@ -230,8 +230,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                     claims.Add(new Claim("role", role.Name, ClaimTypes.Role));
             }
 
-            var userClaims = _context.Set<tbl_Claims>()
-                .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToList();
+            var userClaims = _context.Set<tbl_Claim>()
+                .Where(x => x.tbl_UserClaim.Any(y => y.UserId == user.Id)).ToList();
 
             foreach (var claim in userClaims.OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
@@ -254,9 +254,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return claims;
         }
 
-        public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Users user)
+        public List<Claim> GenerateRefreshClaims(tbl_Issuer issuer, tbl_User user)
         {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
+            var expire = _context.Set<tbl_Setting>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingRefreshExpire).Single();
 
             var claims = new List<Claim>();
@@ -282,7 +282,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return claims;
         }
 
-        internal tbl_Users InternalCreate(tbl_Users user)
+        internal tbl_User InternalCreate(tbl_User user)
         {
             user.ConcurrencyStamp = Guid.NewGuid().ToString();
             user.SecurityStamp = Guid.NewGuid().ToString();
@@ -293,40 +293,40 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Add(user).Entity;
         }
 
-        public bool IsInClaim(tbl_Users user, tbl_Claims claim)
+        public bool IsInClaim(tbl_User user, tbl_Claim claim)
         {
             /*
              * TODO need to add check for role based claims...
              */
 
-            if (_context.Set<tbl_UserClaims>()
+            if (_context.Set<tbl_UserClaim>()
                 .Any(x => x.UserId == user.Id && x.ClaimId == claim.Id))
                 return true;
 
             return false;
         }
 
-        public bool IsInLogin(tbl_Users user, tbl_Logins login)
+        public bool IsInLogin(tbl_User user, tbl_Login login)
         {
-            if (_context.Set<tbl_UserLogins>()
+            if (_context.Set<tbl_UserLogin>()
                 .Any(x => x.UserId == user.Id && x.LoginId == login.Id))
                 return true;
 
             return false;
         }
 
-        public bool IsInRole(tbl_Users user, tbl_Roles role)
+        public bool IsInRole(tbl_User user, tbl_Role role)
         {
-            if (_context.Set<tbl_UserRoles>()
+            if (_context.Set<tbl_UserRole>()
                 .Any(x => x.UserId == user.Id && x.RoleId == role.Id))
                 return true;
 
             return false;
         }
 
-        public bool IsLockedOut(tbl_Users user)
+        public bool IsLockedOut(tbl_User user)
         {
-            var entity = _context.Set<tbl_Users>()
+            var entity = _context.Set<tbl_User>()
                 .Where(x => x.Id == user.Id).Single();
 
             if (entity.LockoutEnabled)
@@ -352,9 +352,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             }
         }
 
-        public bool IsPasswordSet(tbl_Users user)
+        public bool IsPasswordSet(tbl_User user)
         {
-            var entity = _context.Set<tbl_Users>()
+            var entity = _context.Set<tbl_User>()
                 .Where(x => x.Id == user.Id).Single();
 
             if (string.IsNullOrEmpty(entity.PasswordHashPBKDF2))
@@ -363,37 +363,37 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return true;
         }
 
-        public bool RemoveFromClaim(tbl_Users user, tbl_Claims claim)
+        public bool RemoveFromClaim(tbl_User user, tbl_Claim claim)
         {
-            var entity = _context.Set<tbl_UserClaims>()
+            var entity = _context.Set<tbl_UserClaim>()
                 .Where(x => x.UserId == user.Id && x.ClaimId == claim.Id).Single();
 
-            _context.Set<tbl_UserClaims>().Remove(entity);
+            _context.Set<tbl_UserClaim>().Remove(entity);
 
             return true;
         }
 
-        public bool RemoveFromLogin(tbl_Users user, tbl_Logins login)
+        public bool RemoveFromLogin(tbl_User user, tbl_Login login)
         {
-            var entity = _context.Set<tbl_UserLogins>()
+            var entity = _context.Set<tbl_UserLogin>()
                 .Where(x => x.UserId == user.Id && x.LoginId == login.Id).Single();
 
-            _context.Set<tbl_UserLogins>().Remove(entity);
+            _context.Set<tbl_UserLogin>().Remove(entity);
 
             return true;
         }
 
-        public bool RemoveFromRole(tbl_Users user, tbl_Roles role)
+        public bool RemoveFromRole(tbl_User user, tbl_Role role)
         {
-            var entity = _context.Set<tbl_UserRoles>()
+            var entity = _context.Set<tbl_UserRole>()
                 .Where(x => x.UserId == user.Id && x.RoleId == role.Id).Single();
 
-            _context.Set<tbl_UserRoles>().Remove(entity);
+            _context.Set<tbl_UserRole>().Remove(entity);
 
             return true;
         }
 
-        public tbl_Users SetConfirmedEmail(tbl_Users user, bool confirmed)
+        public tbl_User SetConfirmedEmail(tbl_User user, bool confirmed)
         {
             user.EmailConfirmed = confirmed;
             user.LastUpdated = Clock.UtcDateTime;
@@ -403,7 +403,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public tbl_Users SetConfirmedPassword(tbl_Users user, bool confirmed)
+        public tbl_User SetConfirmedPassword(tbl_User user, bool confirmed)
         {
             user.PasswordConfirmed = confirmed;
             user.LastUpdated = Clock.UtcDateTime;
@@ -413,7 +413,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public tbl_Users SetConfirmedPhoneNumber(tbl_Users user, bool confirmed)
+        public tbl_User SetConfirmedPhoneNumber(tbl_User user, bool confirmed)
         {
             user.PhoneNumberConfirmed = confirmed;
             user.LastUpdated = Clock.UtcDateTime;
@@ -423,7 +423,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public tbl_Users SetImmutable(tbl_Users user, bool enabled)
+        public tbl_User SetImmutable(tbl_User user, bool enabled)
         {
             user.Immutable = enabled;
             user.LastUpdated = Clock.UtcDateTime;
@@ -433,10 +433,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public tbl_Users SetPasswordHash(tbl_Users user, string password)
+        public tbl_User SetPasswordHash(tbl_User user, string password)
         {
             //https://www.google.com/search?q=identity+securitystamp
-            if (!_context.Set<tbl_Users>()
+            if (!_context.Set<tbl_User>()
                 .Where(x => x.Id == user.Id && x.SecurityStamp == user.SecurityStamp)
                 .Any())
                 throw new InvalidOperationException();
@@ -456,7 +456,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public tbl_Users SetTwoFactorEnabled(tbl_Users user, bool enabled)
+        public tbl_User SetTwoFactorEnabled(tbl_User user, bool enabled)
         {
             user.TwoFactorEnabled = enabled;
             user.LastUpdated = Clock.UtcDateTime;
@@ -466,9 +466,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public override tbl_Users Update(tbl_Users user)
+        public override tbl_User Update(tbl_User user)
         {
-            var entity = _context.Set<tbl_Users>()
+            var entity = _context.Set<tbl_User>()
                 .Where(x => x.Id == user.Id).Single();
 
             //https://www.google.com/search?q=identity+concurrencystamp

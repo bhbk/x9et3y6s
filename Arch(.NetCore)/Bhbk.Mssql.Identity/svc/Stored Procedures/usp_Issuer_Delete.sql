@@ -5,24 +5,24 @@ CREATE PROCEDURE [svc].[usp_Issuer_Delete]
 AS
 BEGIN
 
-SELECT * FROM [svc].[uvw_Issuers] WHERE [svc].[uvw_Issuers].Id = @ID
+SELECT * FROM [svc].[uvw_Issuer] WHERE [svc].[uvw_Issuer].Id = @ID
 
-DELETE [dbo].[tbl_Claims]
+DELETE [dbo].[tbl_Claim]
 WHERE IssuerId = @ID
 
-DELETE [dbo].[tbl_Refreshes]
+DELETE [dbo].[tbl_Refresh]
 WHERE IssuerId = @ID
 
-DELETE [dbo].[tbl_Settings]
+DELETE [dbo].[tbl_Setting]
 WHERE IssuerId = @ID
 
-DELETE [dbo].[tbl_States]
+DELETE [dbo].[tbl_State]
 WHERE IssuerId = @ID
 
-DELETE [dbo].[tbl_Audiences]
+DELETE [dbo].[tbl_Audience]
 WHERE IssuerId = @ID
 
-DELETE [dbo].[tbl_Issuers]
+DELETE [dbo].[tbl_Issuer]
 WHERE Id = @ID
 
 END

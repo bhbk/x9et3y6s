@@ -7,7 +7,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
 {
     public class UrlFactory
     {
-        public static Uri GenerateAuthCodeV2(Uri authorize, Uri redirect, tbl_States state)
+        public static Uri GenerateAuthCodeV2(Uri authorize, Uri redirect, tbl_State state)
         {
             return new Uri(authorize.AbsoluteUri + "?issuer=" + HttpUtility.UrlEncode(state.IssuerId.ToString())
                 + "&client=" + HttpUtility.UrlEncode(state.AudienceId.ToString())
@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 + "&state=" + HttpUtility.UrlEncode(state.StateValue));
         }
 
-        public static Uri GenerateConfirmEmailV1(IConfiguration conf, tbl_Users user, string code)
+        public static Uri GenerateConfirmEmailV1(IConfiguration conf, tbl_User user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-email");
 
@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 + "&code=" + code);
         }
 
-        public static Uri GenerateConfirmPasswordV1(IConfiguration conf, tbl_Users user, string code)
+        public static Uri GenerateConfirmPasswordV1(IConfiguration conf, tbl_User user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-password");
 
@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 + "&code=" + code);
         }
 
-        public static Uri GenerateConfirmPhoneV1(IConfiguration conf, tbl_Users user, string code)
+        public static Uri GenerateConfirmPhoneV1(IConfiguration conf, tbl_User user, string code)
         {
             var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-phone");
 

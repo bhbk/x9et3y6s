@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Roles.Create(
-                    Mapper.Map<tbl_Roles>(new RoleV1()));
+                    Mapper.Map<tbl_Role>(new RoleV1()));
                 UoW.Commit();
             });
         }
@@ -32,19 +32,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
             var result = UoW.Roles.Create(
-                Mapper.Map<tbl_Roles>(new RoleV1()
+                Mapper.Map<tbl_Role>(new RoleV1()
                 {
                     AudienceId = audience.Id,
                     Name = Constants.TestRole,
                     Enabled = true,
                     Immutable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_Roles>();
+            result.Should().BeAssignableTo<tbl_Role>();
 
             UoW.Commit();
         }
@@ -54,7 +54,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Roles.Delete(new tbl_Roles());
+                UoW.Roles.Delete(new tbl_Role());
                 UoW.Commit();
             });
         }
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
+            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
                 .Where(x => x.Name == Constants.TestRole).ToLambda())
                 .Single();
 
@@ -80,7 +80,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Roles.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Roles>>();
+            results.Should().BeAssignableTo<IEnumerable<tbl_Role>>();
             results.Count().Should().Be(UoW.Roles.Count());
         }
 
@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Roles.Update(new tbl_Roles());
+                UoW.Roles.Update(new tbl_Role());
                 UoW.Commit();
             });
         }
@@ -100,13 +100,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
+            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
                 .Where(x => x.Name == Constants.TestRole).ToLambda())
                 .Single();
             role.Name += "(Updated)";
 
             var result = UoW.Roles.Update(role);
-            result.Should().BeAssignableTo<tbl_Roles>();
+            result.Should().BeAssignableTo<tbl_Role>();
 
             UoW.Commit();
         }

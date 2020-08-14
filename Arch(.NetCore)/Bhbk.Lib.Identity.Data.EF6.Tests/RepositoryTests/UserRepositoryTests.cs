@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         {
             Assert.Throws<SqlException>(() =>
             {
-                UoW.Users.Create(new uvw_Users());
+                UoW.Users.Create(new uvw_User());
             });
         }
 
@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Users.Create(
-                new uvw_Users()
+                new uvw_User()
                 {
                     UserName = Constants.TestUser,
                     EmailAddress = Constants.TestUser,
@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                     HumanBeing = true,
                     Immutable = false,
                 });
-            result.Should().BeAssignableTo<uvw_Users>();
+            result.Should().BeAssignableTo<uvw_User>();
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Users.Delete(new uvw_Users());
+                UoW.Users.Delete(new uvw_User());
             });
         }
 
@@ -60,7 +60,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
 
             UoW.Users.Delete(user);
@@ -73,7 +73,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Users.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Users>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_User>>();
             results.Count().Should().Be(UoW.Users.Count());
         }
 
@@ -82,7 +82,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         {
             Assert.Throws<SqlException>(() =>
             {
-                UoW.Users.Update(new uvw_Users());
+                UoW.Users.Update(new uvw_User());
             });
         }
 
@@ -92,13 +92,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";
 
             var result = UoW.Users.Update(user);
-            result.Should().BeAssignableTo<uvw_Users>();
+            result.Should().BeAssignableTo<uvw_User>();
         }
     }
 }

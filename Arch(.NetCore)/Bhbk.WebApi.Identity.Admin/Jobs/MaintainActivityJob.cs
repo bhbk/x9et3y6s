@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                     var auditable = int.Parse(conf["Jobs:MaintainActivity:HoldAuditable"]);
                     var transient = int.Parse(conf["Jobs:MaintainActivity:HoldTransient"]);
 
-                    var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_Activities>()
+                    var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_Activity>()
                         .Where(x => (x.Created.AddSeconds(transient) < DateTime.Now && x.Immutable == false)
                             || (x.Created.AddSeconds(auditable) < DateTime.Now && x.Immutable == true)).ToLambda();
 

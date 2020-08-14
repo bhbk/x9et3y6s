@@ -11,14 +11,14 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
-    public class SettingRepository : GenericRepository<uvw_Settings>
+    public class SettingRepository : GenericRepository<uvw_Setting>
     {
         public SettingRepository(IdentityEntities context)
             : base(context) { }
 
-        public override uvw_Settings Update(uvw_Settings model)
+        public override uvw_Setting Update(uvw_Setting model)
         {
-            var entity = _context.Set<uvw_Settings>().Where(x => x.Id == model.Id).Single();
+            var entity = _context.Set<uvw_Setting>().Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.

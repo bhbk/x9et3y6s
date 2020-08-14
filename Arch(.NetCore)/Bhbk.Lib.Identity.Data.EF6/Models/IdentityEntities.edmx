@@ -6,13 +6,13 @@
     <edmx:StorageModels>
     <Schema Namespace="IdentityModels.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Activities' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Activities">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Activity' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Activity">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
+            <PropertyRef Name="ActivityType" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="AudienceId" Type="uniqueidentifier" />
@@ -26,18 +26,18 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Activities' does not have a p
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Audiences' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Audiences">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Audience' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Audience">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
-            
-            
-            
-            
+            <PropertyRef Name="IssuerId" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="LockoutEnabled" />
+            <PropertyRef Name="AccessFailedCount" />
+            <PropertyRef Name="AccessSuccessCount" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
@@ -60,17 +60,32 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Audiences' does not have a pr
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Claims' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Claims">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_AudienceRole' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_AudienceRole">
+          <Key>
+            <PropertyRef Name="AudienceId" />
+            <PropertyRef Name="RoleId" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
+          </Key>
+          <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Immutable" Type="bit" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Claim' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Claim">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
-            
-            
-            
+            <PropertyRef Name="IssuerId" />
+            <PropertyRef Name="Subject" />
+            <PropertyRef Name="Type" />
+            <PropertyRef Name="Value" />
+            <PropertyRef Name="ValueType" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
@@ -84,15 +99,15 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Claims' does not have a prima
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Issuers' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Issuers">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Issuer' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Issuer">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
-            
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="IssuerKey" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
@@ -105,14 +120,14 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Issuers' does not have a prim
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Logins' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Logins">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Login' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Login">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
@@ -125,8 +140,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Logins' does not have a prima
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_MOTDs' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_MOTDs">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_MOTD' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_MOTD">
           <Key>
             <PropertyRef Name="Id" />
             <PropertyRef Name="Author" />
@@ -144,23 +159,23 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_MOTDs' does not have a primar
           <Property Name="TssBackground" Type="varchar" MaxLength="512" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_QueueEmails' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_QueueEmails">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_QueueEmail' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_QueueEmail">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
-            
+            <PropertyRef Name="ToId" />
+            <PropertyRef Name="ToEmail" />
+            <PropertyRef Name="Subject" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="SendAt" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
-          <Property Name="FromId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FromId" Type="uniqueidentifier" />
           <Property Name="FromEmail" Type="varchar" MaxLength="128" />
           <Property Name="FromDisplay" Type="varchar" MaxLength="128" />
           <Property Name="ToId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ToEmail" Type="varchar" MaxLength="128" />
+          <Property Name="ToEmail" Type="varchar" MaxLength="128" Nullable="false" />
           <Property Name="ToDisplay" Type="varchar" MaxLength="128" />
           <Property Name="Subject" Type="varchar" MaxLength="256" Nullable="false" />
           <Property Name="HtmlContent" Type="varchar(max)" />
@@ -169,38 +184,37 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_QueueEmails' does not have a 
           <Property Name="SendAt" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_QueueTexts' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_QueueTexts">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_QueueText' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_QueueText">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
-            
-            
+            <PropertyRef Name="ToId" />
+            <PropertyRef Name="ToPhoneNumber" />
+            <PropertyRef Name="Body" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="SendAt" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ActorId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="FromId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ActorId" Type="uniqueidentifier" />
+          <Property Name="FromId" Type="uniqueidentifier" />
           <Property Name="FromPhoneNumber" Type="varchar" MaxLength="15" />
           <Property Name="ToId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="ToPhoneNumber" Type="varchar" MaxLength="15" />
+          <Property Name="ToPhoneNumber" Type="varchar" MaxLength="15" Nullable="false" />
           <Property Name="Body" Type="varchar(max)" Nullable="false" />
           <Property Name="Created" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="SendAt" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Refreshes' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Refreshes">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Refresh' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Refresh">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
-            
-            
+            <PropertyRef Name="IssuerId" />
+            <PropertyRef Name="RefreshValue" />
+            <PropertyRef Name="RefreshType" />
+            <PropertyRef Name="ValidFromUtc" />
+            <PropertyRef Name="ValidToUtc" />
+            <PropertyRef Name="IssuedUtc" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
@@ -213,15 +227,15 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Refreshes' does not have a pr
           <Property Name="IssuedUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Roles' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Roles">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Role' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Role">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
-            
+            <PropertyRef Name="AudienceId" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
@@ -234,8 +248,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Roles' does not have a primar
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Settings' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Settings">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Setting' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Setting">
           <Key>
             <PropertyRef Name="Id" />
             <PropertyRef Name="ConfigKey" />
@@ -253,17 +267,17 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Settings' does not have a pri
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_States' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_States">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_State' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_State">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
-            
-            
-            
+            <PropertyRef Name="IssuerId" />
+            <PropertyRef Name="StateType" />
+            <PropertyRef Name="StateConsume" />
+            <PropertyRef Name="ValidFromUtc" />
+            <PropertyRef Name="ValidToUtc" />
+            <PropertyRef Name="IssuedUtc" />
+            <PropertyRef Name="LastPolling" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
@@ -279,14 +293,14 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_States' does not have a prima
           <Property Name="LastPolling" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Urls' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Urls">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_Url' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_Url">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
+            <PropertyRef Name="AudienceId" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
@@ -299,24 +313,24 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Urls' does not have a primary
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Users">
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_User">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+            <PropertyRef Name="UserName" />
+            <PropertyRef Name="EmailConfirmed" />
+            <PropertyRef Name="FirstName" />
+            <PropertyRef Name="LastName" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="LockoutEnabled" />
+            <PropertyRef Name="AccessFailedCount" />
+            <PropertyRef Name="AccessSuccessCount" />
+            <PropertyRef Name="ConcurrencyStamp" />
+            <PropertyRef Name="PasswordConfirmed" />
+            <PropertyRef Name="SecurityStamp" />
+            <PropertyRef Name="TwoFactorEnabled" />
+            <PropertyRef Name="HumanBeing" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
@@ -345,236 +359,265 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Immutable" Type="bit" Nullable="false" />
         </EntityType>
         <EntityContainer Name="IdentityModelsStoreContainer">
-          <EntitySet Name="uvw_Activities" EntityType="Self.uvw_Activities" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_Activity" EntityType="Self.uvw_Activity" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Activities].[Id] AS [Id], 
-    [uvw_Activities].[AudienceId] AS [AudienceId], 
-    [uvw_Activities].[UserId] AS [UserId], 
-    [uvw_Activities].[ActivityType] AS [ActivityType], 
-    [uvw_Activities].[TableName] AS [TableName], 
-    [uvw_Activities].[KeyValues] AS [KeyValues], 
-    [uvw_Activities].[OriginalValues] AS [OriginalValues], 
-    [uvw_Activities].[CurrentValues] AS [CurrentValues], 
-    [uvw_Activities].[Created] AS [Created], 
-    [uvw_Activities].[Immutable] AS [Immutable]
-    FROM [svc].[uvw_Activities] AS [uvw_Activities]</DefiningQuery>
+    [uvw_Activity].[Id] AS [Id], 
+    [uvw_Activity].[AudienceId] AS [AudienceId], 
+    [uvw_Activity].[UserId] AS [UserId], 
+    [uvw_Activity].[ActivityType] AS [ActivityType], 
+    [uvw_Activity].[TableName] AS [TableName], 
+    [uvw_Activity].[KeyValues] AS [KeyValues], 
+    [uvw_Activity].[OriginalValues] AS [OriginalValues], 
+    [uvw_Activity].[CurrentValues] AS [CurrentValues], 
+    [uvw_Activity].[Created] AS [Created], 
+    [uvw_Activity].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Activity] AS [uvw_Activity]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_Audiences" EntityType="Self.uvw_Audiences" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_Audience" EntityType="Self.uvw_Audience" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Audiences].[Id] AS [Id], 
-    [uvw_Audiences].[IssuerId] AS [IssuerId], 
-    [uvw_Audiences].[ActorId] AS [ActorId], 
-    [uvw_Audiences].[Name] AS [Name], 
-    [uvw_Audiences].[Description] AS [Description], 
-    [uvw_Audiences].[ConcurrencyStamp] AS [ConcurrencyStamp], 
-    [uvw_Audiences].[PasswordHashPBKDF2] AS [PasswordHashPBKDF2], 
-    [uvw_Audiences].[PasswordHashSHA256] AS [PasswordHashSHA256], 
-    [uvw_Audiences].[SecurityStamp] AS [SecurityStamp], 
-    [uvw_Audiences].[Enabled] AS [Enabled], 
-    [uvw_Audiences].[Created] AS [Created], 
-    [uvw_Audiences].[LockoutEnabled] AS [LockoutEnabled], 
-    [uvw_Audiences].[LockoutEnd] AS [LockoutEnd], 
-    [uvw_Audiences].[LastLoginSuccess] AS [LastLoginSuccess], 
-    [uvw_Audiences].[LastLoginFailure] AS [LastLoginFailure], 
-    [uvw_Audiences].[AccessFailedCount] AS [AccessFailedCount], 
-    [uvw_Audiences].[AccessSuccessCount] AS [AccessSuccessCount], 
-    [uvw_Audiences].[LastUpdated] AS [LastUpdated], 
-    [uvw_Audiences].[Immutable] AS [Immutable]
-    FROM [svc].[uvw_Audiences] AS [uvw_Audiences]</DefiningQuery>
+    [uvw_Audience].[Id] AS [Id], 
+    [uvw_Audience].[IssuerId] AS [IssuerId], 
+    [uvw_Audience].[ActorId] AS [ActorId], 
+    [uvw_Audience].[Name] AS [Name], 
+    [uvw_Audience].[Description] AS [Description], 
+    [uvw_Audience].[ConcurrencyStamp] AS [ConcurrencyStamp], 
+    [uvw_Audience].[PasswordHashPBKDF2] AS [PasswordHashPBKDF2], 
+    [uvw_Audience].[PasswordHashSHA256] AS [PasswordHashSHA256], 
+    [uvw_Audience].[SecurityStamp] AS [SecurityStamp], 
+    [uvw_Audience].[Enabled] AS [Enabled], 
+    [uvw_Audience].[Created] AS [Created], 
+    [uvw_Audience].[LockoutEnabled] AS [LockoutEnabled], 
+    [uvw_Audience].[LockoutEnd] AS [LockoutEnd], 
+    [uvw_Audience].[LastLoginSuccess] AS [LastLoginSuccess], 
+    [uvw_Audience].[LastLoginFailure] AS [LastLoginFailure], 
+    [uvw_Audience].[AccessFailedCount] AS [AccessFailedCount], 
+    [uvw_Audience].[AccessSuccessCount] AS [AccessSuccessCount], 
+    [uvw_Audience].[LastUpdated] AS [LastUpdated], 
+    [uvw_Audience].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Audience] AS [uvw_Audience]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_Claims" EntityType="Self.uvw_Claims" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_AudienceRole" EntityType="Self.uvw_AudienceRole" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Claims].[Id] AS [Id], 
-    [uvw_Claims].[IssuerId] AS [IssuerId], 
-    [uvw_Claims].[ActorId] AS [ActorId], 
-    [uvw_Claims].[Subject] AS [Subject], 
-    [uvw_Claims].[Type] AS [Type], 
-    [uvw_Claims].[Value] AS [Value], 
-    [uvw_Claims].[ValueType] AS [ValueType], 
-    [uvw_Claims].[Created] AS [Created], 
-    [uvw_Claims].[LastUpdated] AS [LastUpdated], 
-    [uvw_Claims].[Immutable] AS [Immutable]
-    FROM [svc].[uvw_Claims] AS [uvw_Claims]</DefiningQuery>
+    [uvw_AudienceRole].[AudienceId] AS [AudienceId], 
+    [uvw_AudienceRole].[RoleId] AS [RoleId], 
+    [uvw_AudienceRole].[ActorId] AS [ActorId], 
+    [uvw_AudienceRole].[Created] AS [Created], 
+    [uvw_AudienceRole].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_AudienceRole] AS [uvw_AudienceRole]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_Issuers" EntityType="Self.uvw_Issuers" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_Claim" EntityType="Self.uvw_Claim" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Issuers].[Id] AS [Id], 
-    [uvw_Issuers].[ActorId] AS [ActorId], 
-    [uvw_Issuers].[Name] AS [Name], 
-    [uvw_Issuers].[Description] AS [Description], 
-    [uvw_Issuers].[IssuerKey] AS [IssuerKey], 
-    [uvw_Issuers].[Enabled] AS [Enabled], 
-    [uvw_Issuers].[Created] AS [Created], 
-    [uvw_Issuers].[LastUpdated] AS [LastUpdated], 
-    [uvw_Issuers].[Immutable] AS [Immutable]
-    FROM [svc].[uvw_Issuers] AS [uvw_Issuers]</DefiningQuery>
+    [uvw_Claim].[Id] AS [Id], 
+    [uvw_Claim].[IssuerId] AS [IssuerId], 
+    [uvw_Claim].[ActorId] AS [ActorId], 
+    [uvw_Claim].[Subject] AS [Subject], 
+    [uvw_Claim].[Type] AS [Type], 
+    [uvw_Claim].[Value] AS [Value], 
+    [uvw_Claim].[ValueType] AS [ValueType], 
+    [uvw_Claim].[Created] AS [Created], 
+    [uvw_Claim].[LastUpdated] AS [LastUpdated], 
+    [uvw_Claim].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Claim] AS [uvw_Claim]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_Logins" EntityType="Self.uvw_Logins" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_Issuer" EntityType="Self.uvw_Issuer" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Logins].[Id] AS [Id], 
-    [uvw_Logins].[ActorId] AS [ActorId], 
-    [uvw_Logins].[Name] AS [Name], 
-    [uvw_Logins].[Description] AS [Description], 
-    [uvw_Logins].[LoginKey] AS [LoginKey], 
-    [uvw_Logins].[Enabled] AS [Enabled], 
-    [uvw_Logins].[Created] AS [Created], 
-    [uvw_Logins].[LastUpdated] AS [LastUpdated], 
-    [uvw_Logins].[Immutable] AS [Immutable]
-    FROM [svc].[uvw_Logins] AS [uvw_Logins]</DefiningQuery>
+    [uvw_Issuer].[Id] AS [Id], 
+    [uvw_Issuer].[ActorId] AS [ActorId], 
+    [uvw_Issuer].[Name] AS [Name], 
+    [uvw_Issuer].[Description] AS [Description], 
+    [uvw_Issuer].[IssuerKey] AS [IssuerKey], 
+    [uvw_Issuer].[Enabled] AS [Enabled], 
+    [uvw_Issuer].[Created] AS [Created], 
+    [uvw_Issuer].[LastUpdated] AS [LastUpdated], 
+    [uvw_Issuer].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Issuer] AS [uvw_Issuer]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_MOTDs" EntityType="Self.uvw_MOTDs" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_Login" EntityType="Self.uvw_Login" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_MOTDs].[Id] AS [Id], 
-    [uvw_MOTDs].[Author] AS [Author], 
-    [uvw_MOTDs].[Quote] AS [Quote], 
-    [uvw_MOTDs].[TssId] AS [TssId], 
-    [uvw_MOTDs].[TssTitle] AS [TssTitle], 
-    [uvw_MOTDs].[TssCategory] AS [TssCategory], 
-    [uvw_MOTDs].[TssLength] AS [TssLength], 
-    [uvw_MOTDs].[TssDate] AS [TssDate], 
-    [uvw_MOTDs].[TssTags] AS [TssTags], 
-    [uvw_MOTDs].[TssBackground] AS [TssBackground]
-    FROM [svc].[uvw_MOTDs] AS [uvw_MOTDs]</DefiningQuery>
+    [uvw_Login].[Id] AS [Id], 
+    [uvw_Login].[ActorId] AS [ActorId], 
+    [uvw_Login].[Name] AS [Name], 
+    [uvw_Login].[Description] AS [Description], 
+    [uvw_Login].[LoginKey] AS [LoginKey], 
+    [uvw_Login].[Enabled] AS [Enabled], 
+    [uvw_Login].[Created] AS [Created], 
+    [uvw_Login].[LastUpdated] AS [LastUpdated], 
+    [uvw_Login].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Login] AS [uvw_Login]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_QueueEmails" EntityType="Self.uvw_QueueEmails" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_MOTD" EntityType="Self.uvw_MOTD" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_QueueEmails].[Id] AS [Id], 
-    [uvw_QueueEmails].[ActorId] AS [ActorId], 
-    [uvw_QueueEmails].[FromId] AS [FromId], 
-    [uvw_QueueEmails].[FromEmail] AS [FromEmail], 
-    [uvw_QueueEmails].[FromDisplay] AS [FromDisplay], 
-    [uvw_QueueEmails].[ToId] AS [ToId], 
-    [uvw_QueueEmails].[ToEmail] AS [ToEmail], 
-    [uvw_QueueEmails].[ToDisplay] AS [ToDisplay], 
-    [uvw_QueueEmails].[Subject] AS [Subject], 
-    [uvw_QueueEmails].[HtmlContent] AS [HtmlContent], 
-    [uvw_QueueEmails].[PlaintextContent] AS [PlaintextContent], 
-    [uvw_QueueEmails].[Created] AS [Created], 
-    [uvw_QueueEmails].[SendAt] AS [SendAt]
-    FROM [svc].[uvw_QueueEmails] AS [uvw_QueueEmails]</DefiningQuery>
+    [uvw_MOTD].[Id] AS [Id], 
+    [uvw_MOTD].[Author] AS [Author], 
+    [uvw_MOTD].[Quote] AS [Quote], 
+    [uvw_MOTD].[TssId] AS [TssId], 
+    [uvw_MOTD].[TssTitle] AS [TssTitle], 
+    [uvw_MOTD].[TssCategory] AS [TssCategory], 
+    [uvw_MOTD].[TssLength] AS [TssLength], 
+    [uvw_MOTD].[TssDate] AS [TssDate], 
+    [uvw_MOTD].[TssTags] AS [TssTags], 
+    [uvw_MOTD].[TssBackground] AS [TssBackground]
+    FROM [svc].[uvw_MOTD] AS [uvw_MOTD]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_QueueTexts" EntityType="Self.uvw_QueueTexts" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_QueueEmail" EntityType="Self.uvw_QueueEmail" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_QueueTexts].[Id] AS [Id], 
-    [uvw_QueueTexts].[ActorId] AS [ActorId], 
-    [uvw_QueueTexts].[FromId] AS [FromId], 
-    [uvw_QueueTexts].[FromPhoneNumber] AS [FromPhoneNumber], 
-    [uvw_QueueTexts].[ToId] AS [ToId], 
-    [uvw_QueueTexts].[ToPhoneNumber] AS [ToPhoneNumber], 
-    [uvw_QueueTexts].[Body] AS [Body], 
-    [uvw_QueueTexts].[Created] AS [Created], 
-    [uvw_QueueTexts].[SendAt] AS [SendAt]
-    FROM [svc].[uvw_QueueTexts] AS [uvw_QueueTexts]</DefiningQuery>
+    [uvw_QueueEmail].[Id] AS [Id], 
+    [uvw_QueueEmail].[ActorId] AS [ActorId], 
+    [uvw_QueueEmail].[FromId] AS [FromId], 
+    [uvw_QueueEmail].[FromEmail] AS [FromEmail], 
+    [uvw_QueueEmail].[FromDisplay] AS [FromDisplay], 
+    [uvw_QueueEmail].[ToId] AS [ToId], 
+    [uvw_QueueEmail].[ToEmail] AS [ToEmail], 
+    [uvw_QueueEmail].[ToDisplay] AS [ToDisplay], 
+    [uvw_QueueEmail].[Subject] AS [Subject], 
+    [uvw_QueueEmail].[HtmlContent] AS [HtmlContent], 
+    [uvw_QueueEmail].[PlaintextContent] AS [PlaintextContent], 
+    [uvw_QueueEmail].[Created] AS [Created], 
+    [uvw_QueueEmail].[SendAt] AS [SendAt]
+    FROM [svc].[uvw_QueueEmail] AS [uvw_QueueEmail]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_Refreshes" EntityType="Self.uvw_Refreshes" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_QueueText" EntityType="Self.uvw_QueueText" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Refreshes].[Id] AS [Id], 
-    [uvw_Refreshes].[IssuerId] AS [IssuerId], 
-    [uvw_Refreshes].[AudienceId] AS [AudienceId], 
-    [uvw_Refreshes].[UserId] AS [UserId], 
-    [uvw_Refreshes].[RefreshValue] AS [RefreshValue], 
-    [uvw_Refreshes].[RefreshType] AS [RefreshType], 
-    [uvw_Refreshes].[ValidFromUtc] AS [ValidFromUtc], 
-    [uvw_Refreshes].[ValidToUtc] AS [ValidToUtc], 
-    [uvw_Refreshes].[IssuedUtc] AS [IssuedUtc]
-    FROM [svc].[uvw_Refreshes] AS [uvw_Refreshes]</DefiningQuery>
+    [uvw_QueueText].[Id] AS [Id], 
+    [uvw_QueueText].[ActorId] AS [ActorId], 
+    [uvw_QueueText].[FromId] AS [FromId], 
+    [uvw_QueueText].[FromPhoneNumber] AS [FromPhoneNumber], 
+    [uvw_QueueText].[ToId] AS [ToId], 
+    [uvw_QueueText].[ToPhoneNumber] AS [ToPhoneNumber], 
+    [uvw_QueueText].[Body] AS [Body], 
+    [uvw_QueueText].[Created] AS [Created], 
+    [uvw_QueueText].[SendAt] AS [SendAt]
+    FROM [svc].[uvw_QueueText] AS [uvw_QueueText]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_Roles" EntityType="Self.uvw_Roles" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_Refresh" EntityType="Self.uvw_Refresh" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Roles].[Id] AS [Id], 
-    [uvw_Roles].[AudienceId] AS [AudienceId], 
-    [uvw_Roles].[ActorId] AS [ActorId], 
-    [uvw_Roles].[Name] AS [Name], 
-    [uvw_Roles].[Description] AS [Description], 
-    [uvw_Roles].[Enabled] AS [Enabled], 
-    [uvw_Roles].[Created] AS [Created], 
-    [uvw_Roles].[LastUpdated] AS [LastUpdated], 
-    [uvw_Roles].[Immutable] AS [Immutable]
-    FROM [svc].[uvw_Roles] AS [uvw_Roles]</DefiningQuery>
+    [uvw_Refresh].[Id] AS [Id], 
+    [uvw_Refresh].[IssuerId] AS [IssuerId], 
+    [uvw_Refresh].[AudienceId] AS [AudienceId], 
+    [uvw_Refresh].[UserId] AS [UserId], 
+    [uvw_Refresh].[RefreshValue] AS [RefreshValue], 
+    [uvw_Refresh].[RefreshType] AS [RefreshType], 
+    [uvw_Refresh].[ValidFromUtc] AS [ValidFromUtc], 
+    [uvw_Refresh].[ValidToUtc] AS [ValidToUtc], 
+    [uvw_Refresh].[IssuedUtc] AS [IssuedUtc]
+    FROM [svc].[uvw_Refresh] AS [uvw_Refresh]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_Settings" EntityType="Self.uvw_Settings" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_Role" EntityType="Self.uvw_Role" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Settings].[Id] AS [Id], 
-    [uvw_Settings].[IssuerId] AS [IssuerId], 
-    [uvw_Settings].[AudienceId] AS [AudienceId], 
-    [uvw_Settings].[UserId] AS [UserId], 
-    [uvw_Settings].[ConfigKey] AS [ConfigKey], 
-    [uvw_Settings].[ConfigValue] AS [ConfigValue], 
-    [uvw_Settings].[Created] AS [Created], 
-    [uvw_Settings].[Immutable] AS [Immutable]
-    FROM [svc].[uvw_Settings] AS [uvw_Settings]</DefiningQuery>
+    [uvw_Role].[Id] AS [Id], 
+    [uvw_Role].[AudienceId] AS [AudienceId], 
+    [uvw_Role].[ActorId] AS [ActorId], 
+    [uvw_Role].[Name] AS [Name], 
+    [uvw_Role].[Description] AS [Description], 
+    [uvw_Role].[Enabled] AS [Enabled], 
+    [uvw_Role].[Created] AS [Created], 
+    [uvw_Role].[LastUpdated] AS [LastUpdated], 
+    [uvw_Role].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Role] AS [uvw_Role]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_States" EntityType="Self.uvw_States" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_Setting" EntityType="Self.uvw_Setting" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_States].[Id] AS [Id], 
-    [uvw_States].[IssuerId] AS [IssuerId], 
-    [uvw_States].[AudienceId] AS [AudienceId], 
-    [uvw_States].[UserId] AS [UserId], 
-    [uvw_States].[StateValue] AS [StateValue], 
-    [uvw_States].[StateType] AS [StateType], 
-    [uvw_States].[StateDecision] AS [StateDecision], 
-    [uvw_States].[StateConsume] AS [StateConsume], 
-    [uvw_States].[ValidFromUtc] AS [ValidFromUtc], 
-    [uvw_States].[ValidToUtc] AS [ValidToUtc], 
-    [uvw_States].[IssuedUtc] AS [IssuedUtc], 
-    [uvw_States].[LastPolling] AS [LastPolling]
-    FROM [svc].[uvw_States] AS [uvw_States]</DefiningQuery>
+    [uvw_Setting].[Id] AS [Id], 
+    [uvw_Setting].[IssuerId] AS [IssuerId], 
+    [uvw_Setting].[AudienceId] AS [AudienceId], 
+    [uvw_Setting].[UserId] AS [UserId], 
+    [uvw_Setting].[ConfigKey] AS [ConfigKey], 
+    [uvw_Setting].[ConfigValue] AS [ConfigValue], 
+    [uvw_Setting].[Created] AS [Created], 
+    [uvw_Setting].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Setting] AS [uvw_Setting]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_Urls" EntityType="Self.uvw_Urls" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_State" EntityType="Self.uvw_State" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Urls].[Id] AS [Id], 
-    [uvw_Urls].[AudienceId] AS [AudienceId], 
-    [uvw_Urls].[ActorId] AS [ActorId], 
-    [uvw_Urls].[UrlHost] AS [UrlHost], 
-    [uvw_Urls].[UrlPath] AS [UrlPath], 
-    [uvw_Urls].[Enabled] AS [Enabled], 
-    [uvw_Urls].[Created] AS [Created], 
-    [uvw_Urls].[LastUpdated] AS [LastUpdated], 
-    [uvw_Urls].[Immutable] AS [Immutable]
-    FROM [svc].[uvw_Urls] AS [uvw_Urls]</DefiningQuery>
+    [uvw_State].[Id] AS [Id], 
+    [uvw_State].[IssuerId] AS [IssuerId], 
+    [uvw_State].[AudienceId] AS [AudienceId], 
+    [uvw_State].[UserId] AS [UserId], 
+    [uvw_State].[StateValue] AS [StateValue], 
+    [uvw_State].[StateType] AS [StateType], 
+    [uvw_State].[StateDecision] AS [StateDecision], 
+    [uvw_State].[StateConsume] AS [StateConsume], 
+    [uvw_State].[ValidFromUtc] AS [ValidFromUtc], 
+    [uvw_State].[ValidToUtc] AS [ValidToUtc], 
+    [uvw_State].[IssuedUtc] AS [IssuedUtc], 
+    [uvw_State].[LastPolling] AS [LastPolling]
+    FROM [svc].[uvw_State] AS [uvw_State]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="uvw_Users" EntityType="Self.uvw_Users" store:Type="Views" store:Schema="svc">
+          <EntitySet Name="uvw_Url" EntityType="Self.uvw_Url" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
-    [uvw_Users].[Id] AS [Id], 
-    [uvw_Users].[ActorId] AS [ActorId], 
-    [uvw_Users].[UserName] AS [UserName], 
-    [uvw_Users].[EmailAddress] AS [EmailAddress], 
-    [uvw_Users].[EmailConfirmed] AS [EmailConfirmed], 
-    [uvw_Users].[FirstName] AS [FirstName], 
-    [uvw_Users].[LastName] AS [LastName], 
-    [uvw_Users].[PhoneNumber] AS [PhoneNumber], 
-    [uvw_Users].[PhoneNumberConfirmed] AS [PhoneNumberConfirmed], 
-    [uvw_Users].[Created] AS [Created], 
-    [uvw_Users].[LastUpdated] AS [LastUpdated], 
-    [uvw_Users].[LockoutEnabled] AS [LockoutEnabled], 
-    [uvw_Users].[LockoutEnd] AS [LockoutEnd], 
-    [uvw_Users].[LastLoginSuccess] AS [LastLoginSuccess], 
-    [uvw_Users].[LastLoginFailure] AS [LastLoginFailure], 
-    [uvw_Users].[AccessFailedCount] AS [AccessFailedCount], 
-    [uvw_Users].[AccessSuccessCount] AS [AccessSuccessCount], 
-    [uvw_Users].[ConcurrencyStamp] AS [ConcurrencyStamp], 
-    [uvw_Users].[PasswordHashPBKDF2] AS [PasswordHashPBKDF2], 
-    [uvw_Users].[PasswordHashSHA256] AS [PasswordHashSHA256], 
-    [uvw_Users].[PasswordConfirmed] AS [PasswordConfirmed], 
-    [uvw_Users].[SecurityStamp] AS [SecurityStamp], 
-    [uvw_Users].[TwoFactorEnabled] AS [TwoFactorEnabled], 
-    [uvw_Users].[HumanBeing] AS [HumanBeing], 
-    [uvw_Users].[Immutable] AS [Immutable]
-    FROM [svc].[uvw_Users] AS [uvw_Users]</DefiningQuery>
+    [uvw_Url].[Id] AS [Id], 
+    [uvw_Url].[AudienceId] AS [AudienceId], 
+    [uvw_Url].[ActorId] AS [ActorId], 
+    [uvw_Url].[UrlHost] AS [UrlHost], 
+    [uvw_Url].[UrlPath] AS [UrlPath], 
+    [uvw_Url].[Enabled] AS [Enabled], 
+    [uvw_Url].[Created] AS [Created], 
+    [uvw_Url].[LastUpdated] AS [LastUpdated], 
+    [uvw_Url].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_Url] AS [uvw_Url]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="uvw_User" EntityType="Self.uvw_User" store:Type="Views" store:Schema="svc">
+            <DefiningQuery>SELECT 
+    [uvw_User].[Id] AS [Id], 
+    [uvw_User].[ActorId] AS [ActorId], 
+    [uvw_User].[UserName] AS [UserName], 
+    [uvw_User].[EmailAddress] AS [EmailAddress], 
+    [uvw_User].[EmailConfirmed] AS [EmailConfirmed], 
+    [uvw_User].[FirstName] AS [FirstName], 
+    [uvw_User].[LastName] AS [LastName], 
+    [uvw_User].[PhoneNumber] AS [PhoneNumber], 
+    [uvw_User].[PhoneNumberConfirmed] AS [PhoneNumberConfirmed], 
+    [uvw_User].[Created] AS [Created], 
+    [uvw_User].[LastUpdated] AS [LastUpdated], 
+    [uvw_User].[LockoutEnabled] AS [LockoutEnabled], 
+    [uvw_User].[LockoutEnd] AS [LockoutEnd], 
+    [uvw_User].[LastLoginSuccess] AS [LastLoginSuccess], 
+    [uvw_User].[LastLoginFailure] AS [LastLoginFailure], 
+    [uvw_User].[AccessFailedCount] AS [AccessFailedCount], 
+    [uvw_User].[AccessSuccessCount] AS [AccessSuccessCount], 
+    [uvw_User].[ConcurrencyStamp] AS [ConcurrencyStamp], 
+    [uvw_User].[PasswordHashPBKDF2] AS [PasswordHashPBKDF2], 
+    [uvw_User].[PasswordHashSHA256] AS [PasswordHashSHA256], 
+    [uvw_User].[PasswordConfirmed] AS [PasswordConfirmed], 
+    [uvw_User].[SecurityStamp] AS [SecurityStamp], 
+    [uvw_User].[TwoFactorEnabled] AS [TwoFactorEnabled], 
+    [uvw_User].[HumanBeing] AS [HumanBeing], 
+    [uvw_User].[Immutable] AS [Immutable]
+    FROM [svc].[uvw_User] AS [uvw_User]</DefiningQuery>
           </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="IdentityModels" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="uvw_Activities">
+        <EntityContainer Name="IdentityEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="uvw_Activity" EntityType="IdentityModels.uvw_Activity" />
+          <EntitySet Name="uvw_Audience" EntityType="IdentityModels.uvw_Audience" />
+          <EntitySet Name="uvw_AudienceRole" EntityType="IdentityModels.uvw_AudienceRole" />
+          <EntitySet Name="uvw_Claim" EntityType="IdentityModels.uvw_Claim" />
+          <EntitySet Name="uvw_Issuer" EntityType="IdentityModels.uvw_Issuer" />
+          <EntitySet Name="uvw_Login" EntityType="IdentityModels.uvw_Login" />
+          <EntitySet Name="uvw_MOTD" EntityType="IdentityModels.uvw_MOTD" />
+          <EntitySet Name="uvw_QueueEmail" EntityType="IdentityModels.uvw_QueueEmail" />
+          <EntitySet Name="uvw_QueueText" EntityType="IdentityModels.uvw_QueueText" />
+          <EntitySet Name="uvw_Refresh" EntityType="IdentityModels.uvw_Refresh" />
+          <EntitySet Name="uvw_Role" EntityType="IdentityModels.uvw_Role" />
+          <EntitySet Name="uvw_Setting" EntityType="IdentityModels.uvw_Setting" />
+          <EntitySet Name="uvw_State" EntityType="IdentityModels.uvw_State" />
+          <EntitySet Name="uvw_Url" EntityType="IdentityModels.uvw_Url" />
+          <EntitySet Name="uvw_User" EntityType="IdentityModels.uvw_User" />
+        </EntityContainer>
+        <EntityType Name="uvw_Activity">
           <Key>
             <PropertyRef Name="Id" />
+            <PropertyRef Name="ActivityType" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="AudienceId" Type="Guid" />
           <Property Name="UserId" Type="Guid" />
-          <Property Name="ActivityType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ActivityType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
           <Property Name="TableName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="KeyValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="OriginalValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
@@ -582,14 +625,22 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
         </EntityType>
-        <EntityType Name="uvw_Audiences">
+        <EntityType Name="uvw_Audience">
           <Key>
             <PropertyRef Name="Id" />
+            <PropertyRef Name="IssuerId" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="LockoutEnabled" />
+            <PropertyRef Name="AccessFailedCount" />
+            <PropertyRef Name="AccessSuccessCount" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="IssuerId" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
-          <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="ConcurrencyStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="PasswordHashPBKDF2" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
@@ -606,42 +657,71 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
         </EntityType>
-        <EntityType Name="uvw_Claims">
+        <EntityType Name="uvw_AudienceRole">
+          <Key>
+            <PropertyRef Name="AudienceId" />
+            <PropertyRef Name="RoleId" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
+          </Key>
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="uvw_Claim">
           <Key>
             <PropertyRef Name="Id" />
+            <PropertyRef Name="IssuerId" />
+            <PropertyRef Name="Subject" />
+            <PropertyRef Name="Type" />
+            <PropertyRef Name="Value" />
+            <PropertyRef Name="ValueType" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="IssuerId" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
-          <Property Name="Subject" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Type" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Value" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="ValueType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Subject" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Type" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Value" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="ValueType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
         </EntityType>
-        <EntityType Name="uvw_Issuers">
+        <EntityType Name="uvw_Issuer">
           <Key>
             <PropertyRef Name="Id" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="IssuerKey" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
-          <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="IssuerKey" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IssuerKey" Type="String" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="true" />
           <Property Name="Enabled" Type="Boolean" Nullable="false" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
         </EntityType>
-        <EntityType Name="uvw_Logins">
+        <EntityType Name="uvw_Login">
           <Key>
             <PropertyRef Name="Id" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
-          <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="LoginKey" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="Enabled" Type="Boolean" Nullable="false" />
@@ -649,161 +729,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="LastUpdated" Type="DateTime" Precision="7" />
           <Property Name="Immutable" Type="Boolean" Nullable="false" />
         </EntityType>
-        <EntityType Name="uvw_Refreshes">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="IssuerId" Type="Guid" Nullable="false" />
-          <Property Name="AudienceId" Type="Guid" />
-          <Property Name="UserId" Type="Guid" />
-          <Property Name="RefreshValue" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="RefreshType" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
-        </EntityType>
-        <EntityType Name="uvw_Users">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="UserName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
-          <Property Name="EmailAddress" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
-          <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
-          <Property Name="FirstName" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="LastName" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="PhoneNumber" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
-          <Property Name="PhoneNumberConfirmed" Type="Boolean" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
-          <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="LockoutEnd" Type="DateTimeOffset" Precision="7" />
-          <Property Name="LastLoginSuccess" Type="DateTime" Precision="7" />
-          <Property Name="LastLoginFailure" Type="DateTime" Precision="7" />
-          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
-          <Property Name="ConcurrencyStamp" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="PasswordHashPBKDF2" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" />
-          <Property Name="PasswordHashSHA256" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" />
-          <Property Name="PasswordConfirmed" Type="Boolean" Nullable="false" />
-          <Property Name="SecurityStamp" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="HumanBeing" Type="Boolean" Nullable="false" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-        </EntityType>
-        <EntityContainer Name="IdentityEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="uvw_Activities" EntityType="Self.uvw_Activities" />
-          <EntitySet Name="uvw_Audiences" EntityType="Self.uvw_Audiences" />
-          <EntitySet Name="uvw_Claims" EntityType="Self.uvw_Claims" />
-          <EntitySet Name="uvw_Issuers" EntityType="Self.uvw_Issuers" />
-          <EntitySet Name="uvw_Logins" EntityType="Self.uvw_Logins" />
-          <EntitySet Name="uvw_Refreshes" EntityType="Self.uvw_Refreshes" />
-          <EntitySet Name="uvw_Users" EntityType="Self.uvw_Users" />
-          <EntitySet Name="uvw_Roles" EntityType="IdentityModels.uvw_Roles" />
-          <EntitySet Name="uvw_QueueEmails" EntityType="IdentityModels.uvw_QueueEmails" />
-          <EntitySet Name="uvw_QueueTexts" EntityType="IdentityModels.uvw_QueueTexts" />
-          <EntitySet Name="uvw_Settings" EntityType="IdentityModels.uvw_Settings" />
-          <EntitySet Name="uvw_States" EntityType="IdentityModels.uvw_States" />
-          <EntitySet Name="uvw_Urls" EntityType="IdentityModels.uvw_Urls" />
-          <EntitySet Name="uvw_MOTDs" EntityType="IdentityModels.uvw_MOTDs" />
-          </EntityContainer>
-        <EntityType Name="uvw_Roles">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="AudienceId" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
-          <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="Enabled" Type="Boolean" Nullable="false" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-        </EntityType>
-        <EntityType Name="uvw_QueueEmails">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="FromId" Type="Guid" Nullable="false" />
-          <Property Name="FromEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="FromDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="ToId" Type="Guid" Nullable="false" />
-          <Property Name="ToEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="ToDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="Subject" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
-          <Property Name="HtmlContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="PlaintextContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
-        </EntityType>
-        <EntityType Name="uvw_QueueTexts">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" Nullable="false" />
-          <Property Name="FromId" Type="Guid" Nullable="false" />
-          <Property Name="FromPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="ToId" Type="Guid" Nullable="false" />
-          <Property Name="ToPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="Body" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
-        </EntityType>
-        <EntityType Name="uvw_Settings">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="ConfigKey" />
-            <PropertyRef Name="ConfigValue" />
-            <PropertyRef Name="Created" />
-            <PropertyRef Name="Immutable" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="IssuerId" Type="Guid" />
-          <Property Name="AudienceId" Type="Guid" />
-          <Property Name="UserId" Type="Guid" />
-          <Property Name="ConfigKey" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="ConfigValue" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-        </EntityType>
-        <EntityType Name="uvw_States">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="IssuerId" Type="Guid" Nullable="false" />
-          <Property Name="AudienceId" Type="Guid" />
-          <Property Name="UserId" Type="Guid" />
-          <Property Name="StateValue" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
-          <Property Name="StateType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
-          <Property Name="StateDecision" Type="Boolean" />
-          <Property Name="StateConsume" Type="Boolean" Nullable="false" />
-          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="LastPolling" Type="DateTime" Nullable="false" Precision="7" />
-        </EntityType>
-        <EntityType Name="uvw_Urls">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="AudienceId" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="UrlHost" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
-          <Property Name="UrlPath" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
-          <Property Name="Enabled" Type="Boolean" Nullable="false" />
-          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
-          <Property Name="Immutable" Type="Boolean" Nullable="false" />
-        </EntityType>
-        <EntityType Name="uvw_MOTDs">
+        <EntityType Name="uvw_MOTD">
           <Key>
             <PropertyRef Name="Id" />
             <PropertyRef Name="Author" />
@@ -820,163 +746,313 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
           <Property Name="TssTags" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
           <Property Name="TssBackground" Type="String" MaxLength="512" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="uvw_QueueEmail">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="ToId" />
+            <PropertyRef Name="ToEmail" />
+            <PropertyRef Name="Subject" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="SendAt" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="FromId" Type="Guid" />
+          <Property Name="FromEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="FromDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="ToId" Type="Guid" Nullable="false" />
+          <Property Name="ToEmail" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="ToDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="Subject" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="HtmlContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="PlaintextContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <EntityType Name="uvw_QueueText">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="ToId" />
+            <PropertyRef Name="ToPhoneNumber" />
+            <PropertyRef Name="Body" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="SendAt" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="FromId" Type="Guid" />
+          <Property Name="FromPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="ToId" Type="Guid" Nullable="false" />
+          <Property Name="ToPhoneNumber" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="Body" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="SendAt" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <EntityType Name="uvw_Refresh">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="IssuerId" />
+            <PropertyRef Name="RefreshValue" />
+            <PropertyRef Name="RefreshType" />
+            <PropertyRef Name="ValidFromUtc" />
+            <PropertyRef Name="ValidToUtc" />
+            <PropertyRef Name="IssuedUtc" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="IssuerId" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
+          <Property Name="RefreshValue" Type="String" Nullable="false" MaxLength="2048" FixedLength="false" Unicode="true" />
+          <Property Name="RefreshType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <EntityType Name="uvw_Role">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="AudienceId" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="uvw_Setting">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="ConfigKey" />
+            <PropertyRef Name="ConfigValue" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="IssuerId" Type="Guid" />
+          <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
+          <Property Name="ConfigKey" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="ConfigValue" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="uvw_State">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="IssuerId" />
+            <PropertyRef Name="StateType" />
+            <PropertyRef Name="StateConsume" />
+            <PropertyRef Name="ValidFromUtc" />
+            <PropertyRef Name="ValidToUtc" />
+            <PropertyRef Name="IssuedUtc" />
+            <PropertyRef Name="LastPolling" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="IssuerId" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
+          <Property Name="StateValue" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="StateType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="StateDecision" Type="Boolean" />
+          <Property Name="StateConsume" Type="Boolean" Nullable="false" />
+          <Property Name="ValidFromUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ValidToUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IssuedUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastPolling" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <EntityType Name="uvw_Url">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="AudienceId" />
+            <PropertyRef Name="Enabled" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="Immutable" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="UrlHost" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="UrlPath" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="uvw_User">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="UserName" />
+            <PropertyRef Name="EmailConfirmed" />
+            <PropertyRef Name="FirstName" />
+            <PropertyRef Name="LastName" />
+            <PropertyRef Name="Created" />
+            <PropertyRef Name="LockoutEnabled" />
+            <PropertyRef Name="AccessFailedCount" />
+            <PropertyRef Name="AccessSuccessCount" />
+            <PropertyRef Name="ConcurrencyStamp" />
+            <PropertyRef Name="PasswordConfirmed" />
+            <PropertyRef Name="SecurityStamp" />
+            <PropertyRef Name="TwoFactorEnabled" />
+            <PropertyRef Name="HumanBeing" />
+            <PropertyRef Name="Immutable" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="EmailAddress" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumberConfirmed" Type="Boolean" />
+          <Property Name="Created" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="LastUpdated" Type="DateTime" Precision="7" />
+          <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LockoutEnd" Type="DateTimeOffset" Precision="7" />
+          <Property Name="LastLoginSuccess" Type="DateTime" Precision="7" />
+          <Property Name="LastLoginFailure" Type="DateTime" Precision="7" />
+          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
+          <Property Name="ConcurrencyStamp" Type="String" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHashPBKDF2" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordHashSHA256" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" />
+          <Property Name="PasswordConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="SecurityStamp" Type="String" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="HumanBeing" Type="Boolean" Nullable="false" />
+          <Property Name="Immutable" Type="Boolean" Nullable="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="IdentityModelsStoreContainer" CdmEntityContainer="IdentityEntities">
-          <EntitySetMapping Name="uvw_Activities">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Activities">
-              <MappingFragment StoreEntitySet="uvw_Activities">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
-                <ScalarProperty Name="TableName" ColumnName="TableName" />
-                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
-                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
+          <EntitySetMapping Name="uvw_Activity">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Activity">
+              <MappingFragment StoreEntitySet="uvw_Activity">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
                 <ScalarProperty Name="CurrentValues" ColumnName="CurrentValues" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Audiences">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Audiences">
-              <MappingFragment StoreEntitySet="uvw_Audiences">
-                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
-                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
-                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
-                <ScalarProperty Name="LockoutEnd" ColumnName="LockoutEnd" />
-                <ScalarProperty Name="LastLoginSuccess" ColumnName="LastLoginSuccess" />
-                <ScalarProperty Name="LastLoginFailure" ColumnName="LastLoginFailure" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Claims">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Claims">
-              <MappingFragment StoreEntitySet="uvw_Claims">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Subject" ColumnName="Subject" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
-                <ScalarProperty Name="Value" ColumnName="Value" />
-                <ScalarProperty Name="ValueType" ColumnName="ValueType" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Issuers">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Issuers">
-              <MappingFragment StoreEntitySet="uvw_Issuers">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="IssuerKey" ColumnName="IssuerKey" />
-                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Logins">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Logins">
-              <MappingFragment StoreEntitySet="uvw_Logins">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="LoginKey" ColumnName="LoginKey" />
-                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Refreshes">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Refreshes">
-              <MappingFragment StoreEntitySet="uvw_Refreshes">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
+                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
+                <ScalarProperty Name="TableName" ColumnName="TableName" />
+                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="RefreshValue" ColumnName="RefreshValue" />
-                <ScalarProperty Name="RefreshType" ColumnName="RefreshType" />
-                <ScalarProperty Name="ValidFromUtc" ColumnName="ValidFromUtc" />
-                <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
-                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Users">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Users">
-              <MappingFragment StoreEntitySet="uvw_Users">
-                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
-                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
-                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
-                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
-                <ScalarProperty Name="UserName" ColumnName="UserName" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
-                <ScalarProperty Name="LastName" ColumnName="LastName" />
-                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
-                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
-                <ScalarProperty Name="LockoutEnd" ColumnName="LockoutEnd" />
-                <ScalarProperty Name="LastLoginSuccess" ColumnName="LastLoginSuccess" />
-                <ScalarProperty Name="LastLoginFailure" ColumnName="LastLoginFailure" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
-                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
-                <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />
-                <ScalarProperty Name="HumanBeing" ColumnName="HumanBeing" />
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Roles">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Roles">
-              <MappingFragment StoreEntitySet="uvw_Roles">
-                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="Created" ColumnName="Created" />
-                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
                 <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_QueueEmails">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_QueueEmails">
-              <MappingFragment StoreEntitySet="uvw_QueueEmails">
+          <EntitySetMapping Name="uvw_Audience">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Audience">
+              <MappingFragment StoreEntitySet="uvw_Audience">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="LastLoginFailure" ColumnName="LastLoginFailure" />
+                <ScalarProperty Name="LastLoginSuccess" ColumnName="LastLoginSuccess" />
+                <ScalarProperty Name="LockoutEnd" ColumnName="LockoutEnd" />
+                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
+                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
+                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_AudienceRole">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_AudienceRole">
+              <MappingFragment StoreEntitySet="uvw_AudienceRole">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_Claim">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Claim">
+              <MappingFragment StoreEntitySet="uvw_Claim">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="ValueType" ColumnName="ValueType" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_Issuer">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Issuer">
+              <MappingFragment StoreEntitySet="uvw_Issuer">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="IssuerKey" ColumnName="IssuerKey" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_Login">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Login">
+              <MappingFragment StoreEntitySet="uvw_Login">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="LoginKey" ColumnName="LoginKey" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_MOTD">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_MOTD">
+              <MappingFragment StoreEntitySet="uvw_MOTD">
+                <ScalarProperty Name="TssBackground" ColumnName="TssBackground" />
+                <ScalarProperty Name="TssTags" ColumnName="TssTags" />
+                <ScalarProperty Name="TssDate" ColumnName="TssDate" />
+                <ScalarProperty Name="TssLength" ColumnName="TssLength" />
+                <ScalarProperty Name="TssCategory" ColumnName="TssCategory" />
+                <ScalarProperty Name="TssTitle" ColumnName="TssTitle" />
+                <ScalarProperty Name="TssId" ColumnName="TssId" />
+                <ScalarProperty Name="Quote" ColumnName="Quote" />
+                <ScalarProperty Name="Author" ColumnName="Author" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_QueueEmail">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_QueueEmail">
+              <MappingFragment StoreEntitySet="uvw_QueueEmail">
                 <ScalarProperty Name="SendAt" ColumnName="SendAt" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
                 <ScalarProperty Name="PlaintextContent" ColumnName="PlaintextContent" />
@@ -993,9 +1069,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_QueueTexts">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_QueueTexts">
-              <MappingFragment StoreEntitySet="uvw_QueueTexts">
+          <EntitySetMapping Name="uvw_QueueText">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_QueueText">
+              <MappingFragment StoreEntitySet="uvw_QueueText">
                 <ScalarProperty Name="SendAt" ColumnName="SendAt" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
                 <ScalarProperty Name="Body" ColumnName="Body" />
@@ -1008,9 +1084,39 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Settings">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Settings">
-              <MappingFragment StoreEntitySet="uvw_Settings">
+          <EntitySetMapping Name="uvw_Refresh">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Refresh">
+              <MappingFragment StoreEntitySet="uvw_Refresh">
+                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
+                <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
+                <ScalarProperty Name="ValidFromUtc" ColumnName="ValidFromUtc" />
+                <ScalarProperty Name="RefreshType" ColumnName="RefreshType" />
+                <ScalarProperty Name="RefreshValue" ColumnName="RefreshValue" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="IssuerId" ColumnName="IssuerId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_Role">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Role">
+              <MappingFragment StoreEntitySet="uvw_Role">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="uvw_Setting">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Setting">
+              <MappingFragment StoreEntitySet="uvw_Setting">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
                 <ScalarProperty Name="ConfigValue" ColumnName="ConfigValue" />
@@ -1022,11 +1128,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_States">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_States">
-              <MappingFragment StoreEntitySet="uvw_States">
-                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
+          <EntitySetMapping Name="uvw_State">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_State">
+              <MappingFragment StoreEntitySet="uvw_State">
                 <ScalarProperty Name="LastPolling" ColumnName="LastPolling" />
+                <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
                 <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
                 <ScalarProperty Name="ValidFromUtc" ColumnName="ValidFromUtc" />
                 <ScalarProperty Name="StateConsume" ColumnName="StateConsume" />
@@ -1040,9 +1146,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Urls">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Urls">
-              <MappingFragment StoreEntitySet="uvw_Urls">
+          <EntitySetMapping Name="uvw_Url">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_Url">
+              <MappingFragment StoreEntitySet="uvw_Url">
                 <ScalarProperty Name="Immutable" ColumnName="Immutable" />
                 <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
                 <ScalarProperty Name="Created" ColumnName="Created" />
@@ -1055,18 +1161,33 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Users' does not have a primar
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_MOTDs">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_MOTDs">
-              <MappingFragment StoreEntitySet="uvw_MOTDs">
-                <ScalarProperty Name="TssBackground" ColumnName="TssBackground" />
-                <ScalarProperty Name="TssTags" ColumnName="TssTags" />
-                <ScalarProperty Name="TssDate" ColumnName="TssDate" />
-                <ScalarProperty Name="TssLength" ColumnName="TssLength" />
-                <ScalarProperty Name="TssCategory" ColumnName="TssCategory" />
-                <ScalarProperty Name="TssTitle" ColumnName="TssTitle" />
-                <ScalarProperty Name="TssId" ColumnName="TssId" />
-                <ScalarProperty Name="Quote" ColumnName="Quote" />
-                <ScalarProperty Name="Author" ColumnName="Author" />
+          <EntitySetMapping Name="uvw_User">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_User">
+              <MappingFragment StoreEntitySet="uvw_User">
+                <ScalarProperty Name="Immutable" ColumnName="Immutable" />
+                <ScalarProperty Name="HumanBeing" ColumnName="HumanBeing" />
+                <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
+                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
+                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
+                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
+                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="LastLoginFailure" ColumnName="LastLoginFailure" />
+                <ScalarProperty Name="LastLoginSuccess" ColumnName="LastLoginSuccess" />
+                <ScalarProperty Name="LockoutEnd" ColumnName="LockoutEnd" />
+                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="Created" ColumnName="Created" />
+                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

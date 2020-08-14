@@ -18,7 +18,7 @@ BEGIN
 DECLARE @AUDIENCEID UNIQUEIDENTIFIER = NEWID()
 DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
-INSERT INTO [dbo].[tbl_Audiences]
+INSERT INTO [dbo].[tbl_Audience]
 	(
      Id         
 	,IssuerId
@@ -51,6 +51,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [svc].[uvw_Audiences] WHERE [svc].[uvw_Audiences].Id = @AUDIENCEID
+SELECT * FROM [svc].[uvw_Audience] WHERE [svc].[uvw_Audience].Id = @AUDIENCEID
 
 END

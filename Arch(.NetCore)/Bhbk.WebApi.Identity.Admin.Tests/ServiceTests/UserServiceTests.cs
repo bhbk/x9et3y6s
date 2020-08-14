@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
                 var testClaim = uow.Claims.Create(
-                    mapper.Map<tbl_Claims>(new ClaimV1()
+                    mapper.Map<tbl_Claim>(new ClaimV1()
                     {
                         IssuerId = issuer.Id,
                         Type = Base64.CreateString(4) + "-" + Constants.TestClaim,
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
                 var testLogin = uow.Logins.Create(
-                    mapper.Map<tbl_Logins>(new LoginV1()
+                    mapper.Map<tbl_Login>(new LoginV1()
                     {
                         Name = Base64.CreateString(4) + "-" + Constants.TestLogin,
                         LoginKey = Constants.TestLoginKey,
@@ -152,7 +152,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
                 var testRole = uow.Roles.Create(
-                    mapper.Map<tbl_Roles>(new RoleV1()
+                    mapper.Map<tbl_Role>(new RoleV1()
                     {
                         AudienceId = audience.Id,
                         Name = Base64.CreateString(4) + "-" + Constants.TestLogin,
@@ -436,7 +436,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -475,7 +475,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refreshes>(new RefreshV1()
+                    mapper.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
@@ -486,7 +486,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                     .Where(x => x.UserId == user.Id && x.RefreshValue == rt.RawData).ToLambda()).Single();
 
                 var result = await service.Http.User_DeleteRefreshV1(rop.RawData, user.Id, refresh.Id);
@@ -589,8 +589,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetClaimsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<ClaimV1>>();
-                result.Count().Should().Be(uow.Claims.Count(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
-                    .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToLambda()));
+                result.Count().Should().Be(uow.Claims.Count(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+                    .Where(x => x.tbl_UserClaim.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
 
@@ -618,8 +618,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetAudiencesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<AudienceV1>>();
-                result.Count().Should().Be(uow.Audiences.Count(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
-                    .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda()));
+                result.Count().Should().Be(uow.Audiences.Count(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+                    .Where(x => x.tbl_Role.Any(y => y.tbl_UserRole.Any(z => z.UserId == user.Id))).ToLambda()));
             }
         }
 
@@ -647,8 +647,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetLoginsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<LoginV1>>();
-                result.Count().Should().Be(uow.Logins.Count(QueryExpressionFactory.GetQueryExpression<tbl_Logins>()
-                    .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda()));
+                result.Count().Should().Be(uow.Logins.Count(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
+                    .Where(x => x.tbl_UserLogin.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
 
@@ -680,7 +680,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                     uow.Refreshes.Create(
-                        mapper.Map<tbl_Refreshes>(new RefreshV1()
+                        mapper.Map<tbl_Refresh>(new RefreshV1()
                         {
                             IssuerId = issuer.Id,
                             UserId = user.Id,
@@ -694,7 +694,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetRefreshesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<RefreshV1>>();
-                result.Count().Should().Be(uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+                result.Count().Should().Be(uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                     .Where(x => x.UserId == user.Id).ToLambda()).Count());
             }
         }
@@ -723,8 +723,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var result = await service.User_GetRolesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<RoleV1>>();
-                result.Count().Should().Be(uow.Roles.Count(QueryExpressionFactory.GetQueryExpression<tbl_Roles>()
-                    .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToLambda()));
+                result.Count().Should().Be(uow.Roles.Count(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
+                    .Where(x => x.tbl_UserRole.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
 
@@ -754,7 +754,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
-                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+                var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Type == Constants.TestClaim).ToLambda())
                     .Single();
 

@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                     var expire = int.Parse(conf["Jobs:QueueEmails:ExpireDelay"]);
                     var providerApiKey = conf["Jobs:QueueEmails:ProviderApiKey"];
 
-                    foreach (var entry in uow.QueueEmails.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueEmails>()
+                    foreach (var entry in uow.QueueEmails.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueEmail>()
                         .Where(x => x.Created < DateTime.Now.AddSeconds(-(expire))).ToLambda()))
                     {
                         Log.Warning(callPath + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Alert.Jobs
 
                     var provider = new SendGridProvider();
 
-                    foreach (var msg in uow.QueueEmails.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueEmails>()
+                    foreach (var msg in uow.QueueEmails.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueEmail>()
                         .Where(x => x.SendAt < DateTime.Now).ToLambda()))
                     {
                         switch (uow.InstanceType)

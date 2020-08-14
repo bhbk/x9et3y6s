@@ -13,7 +13,7 @@ BEGIN
 DECLARE @LOGINID UNIQUEIDENTIFIER = NEWID()
 DECLARE @CREATED DATETIME2 (7) = GETDATE()
 
-INSERT INTO [dbo].[tbl_Logins]
+INSERT INTO [dbo].[tbl_Login]
 	(
      Id           
     ,ActorId    
@@ -36,6 +36,6 @@ VALUES
     ,@Immutable        
 	);
 
-SELECT * FROM [svc].[uvw_Logins] WHERE [svc].[uvw_Logins].Id = @LOGINID
+SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @LOGINID
 
 END

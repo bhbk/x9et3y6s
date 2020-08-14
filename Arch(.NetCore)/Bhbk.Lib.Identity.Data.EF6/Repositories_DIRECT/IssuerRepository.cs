@@ -7,15 +7,15 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
 {
-    public class IssuerRepository : GenericRepository<tbl_Issuers>
+    public class IssuerRepository : GenericRepository<tbl_Issuer>
     {
         public IssuerRepository(IdentityEntities context)
             : base(context) { }
 
-        public override tbl_Issuers Create(tbl_Issuers issuer)
+        public override tbl_Issuer Create(tbl_Issuer issuer)
         {
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
+            issuer.tbl_Setting.Add(
+                new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
@@ -25,8 +25,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
                     Immutable = true,
                 });
 
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
+            issuer.tbl_Setting.Add(
+                new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
@@ -36,8 +36,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
                     Immutable = true,
                 });
 
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
+            issuer.tbl_Setting.Add(
+                new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
@@ -47,8 +47,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
                     Immutable = true,
                 });
 
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
+            issuer.tbl_Setting.Add(
+                new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
@@ -58,42 +58,42 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
                     Immutable = true,
                 });
 
-            return _context.Set<tbl_Issuers>().Add(issuer);
+            return _context.Set<tbl_Issuer>().Add(issuer);
         }
 
-        public override tbl_Issuers Delete(tbl_Issuers issuer)
+        public override tbl_Issuer Delete(tbl_Issuer issuer)
         {            
-            var claims = _context.Set<tbl_Claims>()
+            var claims = _context.Set<tbl_Claim>()
                 .Where(x => x.IssuerId == issuer.Id);
 
-            var refreshes = _context.Set<tbl_Refreshes>()
+            var refreshes = _context.Set<tbl_Refresh>()
                 .Where(x => x.IssuerId == issuer.Id);
 
-            var settings = _context.Set<tbl_Settings>()
+            var settings = _context.Set<tbl_Setting>()
                 .Where(x => x.IssuerId == issuer.Id);
 
-            var states = _context.Set<tbl_States>()
+            var states = _context.Set<tbl_State>()
                 .Where(x => x.IssuerId == issuer.Id);
 
-            var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.tbl_Audiences.IssuerId == issuer.Id);
+            var roles = _context.Set<tbl_Role>()
+                .Where(x => x.tbl_Audience.IssuerId == issuer.Id);
 
-            var audiences = _context.Set<tbl_Audiences>()
+            var audiences = _context.Set<tbl_Audience>()
                 .Where(x => x.IssuerId == issuer.Id);
 
-            _context.Set<tbl_Claims>().RemoveRange(claims);
-            _context.Set<tbl_Refreshes>().RemoveRange(refreshes);
-            _context.Set<tbl_Settings>().RemoveRange(settings);
-            _context.Set<tbl_States>().RemoveRange(states);
-            _context.Set<tbl_Roles>().RemoveRange(roles);
-            _context.Set<tbl_Audiences>().RemoveRange(audiences);
+            _context.Set<tbl_Claim>().RemoveRange(claims);
+            _context.Set<tbl_Refresh>().RemoveRange(refreshes);
+            _context.Set<tbl_Setting>().RemoveRange(settings);
+            _context.Set<tbl_State>().RemoveRange(states);
+            _context.Set<tbl_Role>().RemoveRange(roles);
+            _context.Set<tbl_Audience>().RemoveRange(audiences);
 
-            return _context.Set<tbl_Issuers>().Remove(issuer);
+            return _context.Set<tbl_Issuer>().Remove(issuer);
         }
 
-        public override tbl_Issuers Update(tbl_Issuers issuer)
+        public override tbl_Issuer Update(tbl_Issuer issuer)
         {
-            var entity = _context.Set<tbl_Issuers>()
+            var entity = _context.Set<tbl_Issuer>()
                 .Where(x => x.Id == issuer.Id).Single();
 
             /*

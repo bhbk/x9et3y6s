@@ -16,91 +16,91 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             /*
              * activity models
              */
-            CreateMap<ActivityV1, tbl_Activities>()
+            CreateMap<ActivityV1, tbl_Activity>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
-                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Users, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Audience, src => src.Ignore())
+                .ForMember(dest => dest.tbl_User, src => src.Ignore())
                 .ForMember(dest => dest.KeyValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.KeyValues)))
                 .ForMember(dest => dest.OriginalValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.OriginalValues)))
                 .ForMember(dest => dest.CurrentValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.CurrentValues)));
 
-            CreateMap<tbl_Activities, ActivityV1>();
+            CreateMap<tbl_Activity, ActivityV1>();
 
             /*
              * audience models
              */
-            CreateMap<AudienceV1, tbl_Audiences>()
+            CreateMap<AudienceV1, tbl_Audience>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
                 .ForMember(dest => dest.SecurityStamp, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
-                .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Issuers, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
-                .ForMember(dest => dest.tbl_States, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Urls, src => src.Ignore());
+                .ForMember(dest => dest.tbl_Activity, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AudienceRole, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Issuer, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Refresh, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Role, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Setting, src => src.Ignore())
+                .ForMember(dest => dest.tbl_State, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Url, src => src.Ignore());
 
-            CreateMap<tbl_Audiences, AudienceV1>();
+            CreateMap<tbl_Audience, AudienceV1>();
 
             /*
              * claim models
              */
-            CreateMap<ClaimV1, tbl_Claims>()
+            CreateMap<ClaimV1, tbl_Claim>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
-                .ForMember(dest => dest.tbl_Issuers, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Users, src => src.Ignore())
-                .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore());
+                .ForMember(dest => dest.tbl_Issuer, src => src.Ignore())
+                .ForMember(dest => dest.tbl_User, src => src.Ignore())
+                .ForMember(dest => dest.tbl_RoleClaim, src => src.Ignore())
+                .ForMember(dest => dest.tbl_UserClaim, src => src.Ignore());
 
-            CreateMap<tbl_Claims, ClaimV1>();
+            CreateMap<tbl_Claim, ClaimV1>();
 
             /*
              * email models
              */
-            CreateMap<EmailV1, tbl_QueueEmails>()
+            CreateMap<EmailV1, tbl_QueueEmail>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.SendAt, src => src.MapFrom(val => (val.SendAt == default || val.SendAt == null) ? DateTime.Now : val.SendAt))
-                .ForMember(dest => dest.tbl_Users, src => src.Ignore());
+                .ForMember(dest => dest.tbl_User, src => src.Ignore());
 
-            CreateMap<tbl_QueueEmails, EmailV1>();
+            CreateMap<tbl_QueueEmail, EmailV1>();
 
             /*
              * issuer models
              */
-            CreateMap<IssuerV1, tbl_Issuers>()
+            CreateMap<IssuerV1, tbl_Issuer>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
-                .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
-                .ForMember(dest => dest.tbl_States, src => src.Ignore());
+                .ForMember(dest => dest.tbl_Claim, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Audience, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Refresh, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Setting, src => src.Ignore())
+                .ForMember(dest => dest.tbl_State, src => src.Ignore());
 
-            CreateMap<tbl_Issuers, IssuerV1>();
+            CreateMap<tbl_Issuer, IssuerV1>();
 
             /*
              * login models
              */
-            CreateMap<LoginV1, tbl_Logins>()
+            CreateMap<LoginV1, tbl_Login>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.LoginKey, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Users, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore());
+                .ForMember(dest => dest.tbl_User, src => src.Ignore())
+                .ForMember(dest => dest.tbl_UserLogin, src => src.Ignore());
 
-            CreateMap<tbl_Logins, LoginV1>();
+            CreateMap<tbl_Login, LoginV1>();
 
             /*
              * message of the day models
              */
-            CreateMap<MOTDTssV1, tbl_MOTDs>()
+            CreateMap<MOTDTssV1, tbl_MOTD>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.globalId == default || val.globalId == null) ? Guid.NewGuid() : val.globalId))
                 .ForMember(dest => dest.Author, src => src.MapFrom(val => val.author))
                 .ForMember(dest => dest.Quote, src => src.MapFrom(val => val.quote))
@@ -112,7 +112,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 .ForMember(dest => dest.TssTags, src => src.MapFrom(val => string.Join(",", val.tags.Select(x => x))))
                 .ForMember(dest => dest.TssBackground, src => src.MapFrom(val => val.background));
 
-            CreateMap<tbl_MOTDs, MOTDTssV1>()
+            CreateMap<tbl_MOTD, MOTDTssV1>()
                 .ForMember(dest => dest.globalId, src => src.MapFrom(val => val.Id))
                 .ForMember(dest => dest.author, src => src.MapFrom(val => val.Author))
                 .ForMember(dest => dest.quote, src => src.MapFrom(val => val.Quote))
@@ -127,73 +127,73 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             /*
              * refresh models
              */
-            CreateMap<RefreshV1, tbl_Refreshes>()
+            CreateMap<RefreshV1, tbl_Refresh>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
-                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Issuers, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Users, src => src.Ignore());
+                .ForMember(dest => dest.tbl_Audience, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Issuer, src => src.Ignore())
+                .ForMember(dest => dest.tbl_User, src => src.Ignore());
 
-            CreateMap<tbl_Refreshes, RefreshV1>();
+            CreateMap<tbl_Refresh, RefreshV1>();
 
             /*
              * role models
              */
-            CreateMap<RoleV1, tbl_Roles>()
+            CreateMap<RoleV1, tbl_Role>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
-                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
-                .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
-                .ForMember(dest => dest.tbl_RoleClaims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
+                .ForMember(dest => dest.tbl_Audience, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AudienceRole, src => src.Ignore())
+                .ForMember(dest => dest.tbl_RoleClaim, src => src.Ignore())
+                .ForMember(dest => dest.tbl_UserRole, src => src.Ignore());
 
-            CreateMap<tbl_Roles, RoleV1>();
+            CreateMap<tbl_Role, RoleV1>();
 
             /*
              * setting models
              */
-            CreateMap<SettingV1, tbl_Settings>()
+            CreateMap<SettingV1, tbl_Setting>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
-                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Issuers, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Users, src => src.Ignore());
+                .ForMember(dest => dest.tbl_Audience, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Issuer, src => src.Ignore())
+                .ForMember(dest => dest.tbl_User, src => src.Ignore());
 
             /*
              * state models
              */
-            CreateMap<StateV1, tbl_States>()
+            CreateMap<StateV1, tbl_State>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.IssuedUtc, src => src.MapFrom(val => (val.IssuedUtc == default || val.IssuedUtc == null) ? DateTime.Now : val.IssuedUtc))
                 .ForMember(dest => dest.LastPolling, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Issuers, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Users, src => src.Ignore());
+                .ForMember(dest => dest.tbl_Audience, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Issuer, src => src.Ignore())
+                .ForMember(dest => dest.tbl_User, src => src.Ignore());
 
             /*
              * text models
              */
-            CreateMap<TextV1, tbl_QueueTexts>()
+            CreateMap<TextV1, tbl_QueueText>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
                 .ForMember(dest => dest.SendAt, src => src.MapFrom(val => (val.SendAt == default || val.SendAt == null) ? DateTime.Now : val.SendAt))
-                .ForMember(dest => dest.tbl_Users, src => src.Ignore());
+                .ForMember(dest => dest.tbl_User, src => src.Ignore());
 
-            CreateMap<tbl_QueueTexts, TextV1>();
+            CreateMap<tbl_QueueText, TextV1>();
 
             /*
              * url models
              */
-            CreateMap<UrlV1, tbl_Urls>()
+            CreateMap<UrlV1, tbl_Url>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => (val.Created == default || val.Created == null) ? DateTime.Now : val.Created))
-                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore());
+                .ForMember(dest => dest.tbl_Audience, src => src.Ignore());
 
-            CreateMap<tbl_Urls, UrlV1>();
+            CreateMap<tbl_Url, UrlV1>();
 
             /*
              * user models
              */
-            CreateMap<UserV1, tbl_Users>()
+            CreateMap<UserV1, tbl_User>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => (val.Id == default || val.Id == null) ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.UserName, src => src.MapFrom(val => val.UserName))
                 .ForMember(dest => dest.EmailAddress, src => src.MapFrom(val => val.Email))
@@ -203,19 +203,19 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => (val.AccessSuccessCount == default) ? 0 : val.AccessSuccessCount))
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Logins, src => src.Ignore())
-                .ForMember(dest => dest.tbl_QueueEmails, src => src.Ignore())
-                .ForMember(dest => dest.tbl_QueueTexts, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
-                .ForMember(dest => dest.tbl_States, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserClaims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserLogins, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
+                .ForMember(dest => dest.tbl_Activity, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Claim, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Login, src => src.Ignore())
+                .ForMember(dest => dest.tbl_QueueEmail, src => src.Ignore())
+                .ForMember(dest => dest.tbl_QueueText, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Refresh, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Setting, src => src.Ignore())
+                .ForMember(dest => dest.tbl_State, src => src.Ignore())
+                .ForMember(dest => dest.tbl_UserClaim, src => src.Ignore())
+                .ForMember(dest => dest.tbl_UserLogin, src => src.Ignore())
+                .ForMember(dest => dest.tbl_UserRole, src => src.Ignore());
 
-            CreateMap<tbl_Users, UserV1>()
+            CreateMap<tbl_User, UserV1>()
                 .ForMember(dest => dest.IssuerId, src => src.Ignore())
                 .ForMember(dest => dest.UserName, src => src.MapFrom(val => val.UserName))
                 .ForMember(dest => dest.Email, src => src.MapFrom(val => val.EmailAddress))

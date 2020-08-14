@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                     var providerSid = conf["Jobs:QueueTexts:ProviderSid"];
                     var providerToken = conf["Jobs:QueueTexts:ProviderToken"];
 
-                    foreach (var entry in uow.QueueTexts.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueTexts>()
+                    foreach (var entry in uow.QueueTexts.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueText>()
                         .Where(x => x.Created < DateTime.Now.AddSeconds(-(expire))).ToLambda()))
                     {
                         Log.Warning(typeof(QueueTextJob).Name + " hand-off of text (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Alert.Jobs
 
                     var provider = new TwilioProvider();
 
-                    foreach (var msg in uow.QueueTexts.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueTexts>()
+                    foreach (var msg in uow.QueueTexts.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueText>()
                         .Where(x => x.SendAt < DateTime.Now).ToLambda()))
                     {
                         switch (uow.InstanceType)

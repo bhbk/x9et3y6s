@@ -19,7 +19,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<SqlException>(() =>
             {
-                UoW.Roles.Create(new uvw_Roles());
+                UoW.Roles.Create(new uvw_Role());
             });
         }
 
@@ -29,19 +29,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
             var result = UoW.Roles.Create(
-                new uvw_Roles()
+                new uvw_Role()
                 {
                     AudienceId = audience.Id,
                     Name = Constants.TestRole,
                     Enabled = true,
                     Immutable = false,
                 });
-            result.Should().BeAssignableTo<uvw_Roles>();
+            result.Should().BeAssignableTo<uvw_Role>();
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Roles.Delete(new uvw_Roles());
+                UoW.Roles.Delete(new uvw_Role());
             });
         }
 
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Roles>()
+            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Role>()
                 .Where(x => x.Name == Constants.TestRole).ToLambda())
                 .Single();
 
@@ -73,7 +73,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Roles.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Roles>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Role>>();
             results.Count().Should().Be(UoW.Roles.Count());
         }
 
@@ -82,7 +82,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<SqlException>(() =>
             {
-                UoW.Roles.Update(new uvw_Roles());
+                UoW.Roles.Update(new uvw_Role());
             });
         }
 
@@ -92,13 +92,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Roles>()
+            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Role>()
                 .Where(x => x.Name == Constants.TestRole).ToLambda())
                 .Single();
             role.Name += "(Updated)";
 
             var result = UoW.Roles.Update(role);
-            result.Should().BeAssignableTo<uvw_Roles>();
+            result.Should().BeAssignableTo<uvw_Role>();
         }
     }
 }

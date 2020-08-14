@@ -14,10 +14,16 @@ namespace Bhbk.Cli.Identity.Commands
     public class UserCreateCommands : ConsoleCommand
     {
         private static string loginName = string.Empty, userName = string.Empty;
+        private static bool _human;
 
         public UserCreateCommands()
         {
             IsCommand("user-create", "Create user");
+
+            HasRequiredOption("h|human=", "New user is for a human?", arg =>
+            {
+                _human = bool.Parse(arg);
+            });
         }
 
         public override int Run(string[] remainingArguments)
@@ -52,16 +58,32 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.Write(Environment.NewLine + "ENTER last name : ");
                     var lastName = StandardInput.GetInput();
 
-                    user = admin.User_CreateV1NoConfirm(new UserV1()
+                    if (_human)
                     {
-                        UserName = userName,
-                        Email = userName,
-                        FirstName = firstName,
-                        LastName = lastName,
-                        LockoutEnabled = false,
-                        HumanBeing = false,
-                        Immutable = false,
-                    }).Result;
+                        user = admin.User_CreateV1(new UserV1()
+                        {
+                            UserName = userName,
+                            Email = userName,
+                            FirstName = firstName,
+                            LastName = lastName,
+                            LockoutEnabled = false,
+                            HumanBeing = true,
+                            Immutable = false,
+                        }).Result;
+                    }
+                    else
+                    {
+                        user = admin.User_CreateV1NoConfirm(new UserV1()
+                        {
+                            UserName = userName,
+                            Email = userName,
+                            FirstName = firstName,
+                            LastName = lastName,
+                            LockoutEnabled = false,
+                            HumanBeing = false,
+                            Immutable = false,
+                        }).Result;
+                    }
 
                     if (user != null)
                         Console.WriteLine(Environment.NewLine + "SUCCESS create user \"" + userName + "\""

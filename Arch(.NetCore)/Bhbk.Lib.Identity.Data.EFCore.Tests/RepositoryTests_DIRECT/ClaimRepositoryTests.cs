@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             Assert.Throws<NullReferenceException>(() =>
             {
                 UoW.Claims.Create(
-                    Mapper.Map<tbl_Claims>(new ClaimV1()));
+                    Mapper.Map<tbl_Claim>(new ClaimV1()));
 
                 UoW.Commit();
             });
@@ -34,12 +34,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
                 .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
             var result = UoW.Claims.Create(
-                Mapper.Map<tbl_Claims>(new ClaimV1()
+                Mapper.Map<tbl_Claim>(new ClaimV1()
                 {
                     IssuerId = issuer.Id,
                     Subject = Constants.TestClaimSubject,
@@ -48,7 +48,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     ValueType = Constants.TestClaimValueType,
                     Immutable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_Claims>();
+            result.Should().BeAssignableTo<tbl_Claim>();
 
             UoW.Commit();
         }
@@ -58,7 +58,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Claims.Delete(new tbl_Claims());
+                UoW.Claims.Delete(new tbl_Claim());
                 UoW.Commit();
             });
         }
@@ -69,7 +69,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.Type == Constants.TestClaim).ToLambda())
                 .Single();
 
@@ -84,7 +84,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Claims.Get();
-            results.Should().BeAssignableTo<IEnumerable<tbl_Claims>>();
+            results.Should().BeAssignableTo<IEnumerable<tbl_Claim>>();
             results.Count().Should().Be(UoW.Claims.Count());
         }
 
@@ -93,7 +93,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Claims.Update(new tbl_Claims());
+                UoW.Claims.Update(new tbl_Claim());
                 UoW.Commit();
             });
         }
@@ -104,13 +104,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claims>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.Type == Constants.TestClaim).ToLambda())
                 .Single();
             claim.Value += "(Updated)";
 
             var result = UoW.Claims.Update(claim);
-            result.Should().BeAssignableTo<tbl_Claims>();
+            result.Should().BeAssignableTo<tbl_Claim>();
 
             UoW.Commit();
         }

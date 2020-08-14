@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
-    public class UrlRepository : GenericRepository<uvw_Urls>
+    public class UrlRepository : GenericRepository<uvw_Url>
     {
         public UrlRepository(IdentityEntities context)
             : base(context) { }

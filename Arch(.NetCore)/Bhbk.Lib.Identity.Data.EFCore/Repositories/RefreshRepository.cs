@@ -10,12 +10,12 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
-    public class RefreshRepository : GenericRepository<uvw_Refreshes>
+    public class RefreshRepository : GenericRepository<uvw_Refresh>
     {
         public RefreshRepository(IdentityEntities context)
             : base(context) { }
 
-        public override uvw_Refreshes Create(uvw_Refreshes entity)
+        public override uvw_Refresh Create(uvw_Refresh entity)
         {
             var pvalues = new List<SqlParameter>
             {
@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ValueToUtc", SqlDbType.DateTime2) { Value = entity.ValidToUtc }
             };
 
-            return _context.Set<uvw_Refreshes>().FromSqlRaw("[svc].[usp_Refresh_Insert]"
+            return _context.Set<uvw_Refresh>().FromSqlRaw("[svc].[usp_Refresh_Insert]"
                 + "@IssuerId, @AudienceId, @UserId, @RefreshValue, @RefreshType, @IssuerUtc, @ValueFromUtc, @ValueToUtc", pvalues.ToArray())
                     .AsEnumerable().Single();
 
@@ -45,14 +45,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 
                 var result = cmd.ExecuteReader();
 
-                return result.Cast<uvw_Refreshes>().AsEnumerable().Single();
+                return result.Cast<uvw_Refresh>().AsEnumerable().Single();
             }
             */
         }
 
-        public override IEnumerable<uvw_Refreshes> Create(IEnumerable<uvw_Refreshes> entities)
+        public override IEnumerable<uvw_Refresh> Create(IEnumerable<uvw_Refresh> entities)
         {
-            var results = new List<uvw_Refreshes>();
+            var results = new List<uvw_Refresh>();
 
             foreach (var entity in entities)
             {
@@ -64,20 +64,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override uvw_Refreshes Delete(uvw_Refreshes entity)
+        public override uvw_Refresh Delete(uvw_Refresh entity)
         {
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
             };
 
-            return _context.Set<uvw_Refreshes>().FromSqlRaw("[svc].[usp_Refresh_Delete] @Id", pvalues.ToArray())
+            return _context.Set<uvw_Refresh>().FromSqlRaw("[svc].[usp_Refresh_Delete] @Id", pvalues.ToArray())
                 .AsEnumerable().Single();
         }
 
-        public override IEnumerable<uvw_Refreshes> Delete(IEnumerable<uvw_Refreshes> entities)
+        public override IEnumerable<uvw_Refresh> Delete(IEnumerable<uvw_Refresh> entities)
         {
-            var results = new List<uvw_Refreshes>();
+            var results = new List<uvw_Refresh>();
 
             foreach (var entity in entities)
             {
@@ -89,17 +89,17 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Refreshes> Delete(LambdaExpression lambda)
+        public override IEnumerable<uvw_Refresh> Delete(LambdaExpression lambda)
         {
             throw new NotImplementedException();
         }
 
-        public override uvw_Refreshes Update(uvw_Refreshes entity)
+        public override uvw_Refresh Update(uvw_Refresh entity)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<uvw_Refreshes> Update(IEnumerable<uvw_Refreshes> entities)
+        public override IEnumerable<uvw_Refresh> Update(IEnumerable<uvw_Refresh> entities)
         {
             throw new NotImplementedException();
         }

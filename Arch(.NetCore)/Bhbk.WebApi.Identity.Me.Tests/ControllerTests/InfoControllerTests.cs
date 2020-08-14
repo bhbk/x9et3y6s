@@ -93,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rt_claims);
 
                     uow.Refreshes.Create(
-                        mapper.Map<tbl_Refreshes>(new RefreshV1()
+                        mapper.Map<tbl_Refresh>(new RefreshV1()
                         {
                             IssuerId = issuer.Id,
                             UserId = user.Id,
@@ -104,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                         }));
                 }
 
-                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                     .Where(x => x.UserId == user.Id).ToLambda()).First();
 
                 var result = controller.DeleteRefreshV1(refresh.Id) as OkObjectResult;

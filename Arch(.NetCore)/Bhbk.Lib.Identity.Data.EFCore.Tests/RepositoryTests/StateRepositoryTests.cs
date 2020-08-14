@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<SqlException>(() =>
             {
-                UoW.States.Create(new uvw_States());
+                UoW.States.Create(new uvw_State());
             });
         }
 
@@ -31,20 +31,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuers>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
                 .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda())
                 .Single();
 
             var result = UoW.States.Create(
-                new uvw_States()
+                new uvw_State()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                 });
-            result.Should().BeAssignableTo<uvw_States>();
+            result.Should().BeAssignableTo<uvw_State>();
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.States.Delete(new uvw_States());
+                UoW.States.Delete(new uvw_State());
             });
         }
 
@@ -85,7 +85,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.States.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_States>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_State>>();
             results.Count().Should().Be(UoW.States.Count());
         }
 
@@ -94,7 +94,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<SqlException>(() =>
             {
-                UoW.States.Update(new uvw_States());
+                UoW.States.Update(new uvw_State());
             });
         }
 
@@ -104,18 +104,18 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_Users>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda())
                 .Single();
 
-            var state = UoW.States.Get(QueryExpressionFactory.GetQueryExpression<uvw_States>()
+            var state = UoW.States.Get(QueryExpressionFactory.GetQueryExpression<uvw_State>()
                 .Where(x => x.UserId == user.Id).ToLambda())
                 .First();
 
             state.StateConsume = true;
 
             var result = UoW.States.Update(state);
-            result.Should().BeAssignableTo<uvw_States>();
+            result.Should().BeAssignableTo<uvw_State>();
         }
     }
 }

@@ -6,14 +6,14 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
 {
-    public class StateRepository : GenericRepository<tbl_States>
+    public class StateRepository : GenericRepository<tbl_State>
     {
         public StateRepository(IdentityEntities context)
             : base(context) { }
 
-        public override tbl_States Update(tbl_States model)
+        public override tbl_State Update(tbl_State model)
         {
-            var entity = _context.Set<tbl_States>().Where(x => x.Id == model.Id).Single();
+            var entity = _context.Set<tbl_State>().Where(x => x.Id == model.Id).Single();
 
             /*
              * only persist certain fields.

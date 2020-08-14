@@ -55,7 +55,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (skip == 1)
                 skip = 0;
 
-            var motd = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTDs>()
+            var motd = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
                 .OrderBy("id").Skip(skip).Take(1).ToLambda())
                 .SingleOrDefault();
 
@@ -91,7 +91,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_States>()
+            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
                 .Where(x => x.UserId == user.Id).ToLambda());
             UoW.Commit();
 
@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_States>()
+            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
                 .Where(x => x.Id == code.Id).ToLambda());
             UoW.Commit();
 
@@ -176,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/refresh"), HttpGet]
         public IActionResult GetRefreshesV1()
         {
-            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.UserId == GetIdentityGUID()).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
@@ -201,7 +201,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.UserId == user.Id).ToLambda());
 
             UoW.Commit();
@@ -212,7 +212,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/refresh/{refreshID}/revoke"), HttpDelete]
         public IActionResult DeleteRefreshV1([FromRoute] Guid refreshID)
         {
-            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refreshes>()
+            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.UserId == GetIdentityGUID() && x.Id == refreshID).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
@@ -308,7 +308,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Users.Update(Mapper.Map<tbl_Users>(model));
+            var result = UoW.Users.Update(Mapper.Map<tbl_User>(model));
 
             if (result == null)
                 return StatusCode(StatusCodes.Status500InternalServerError);

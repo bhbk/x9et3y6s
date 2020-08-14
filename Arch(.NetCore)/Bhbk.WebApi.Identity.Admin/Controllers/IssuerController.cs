@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var result = UoW.Issuers.Create(Mapper.Map<tbl_Issuers>(model));
+            var result = UoW.Issuers.Create(Mapper.Map<tbl_Issuer>(model));
 
             UoW.Commit();
 
@@ -100,7 +100,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var issuers = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuers>()
+            var issuers = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
                 .Where(x => x.Enabled == true && (model.Contains(x.Id.ToString()) || model.Contains(x.Name))).ToLambda());
 
             return Ok(issuers.ToDictionary(x => x.Id, x => x.IssuerKey));
@@ -110,7 +110,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IActionResult GetV1([FromRoute] string issuerValue)
         {
             Guid issuerID;
-            tbl_Issuers issuer = null;
+            tbl_Issuer issuer = null;
 
             if (Guid.TryParse(issuerValue, out issuerID))
                 issuer = UoW.Issuers.Get(x => x.Id == issuerID)
@@ -140,13 +140,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 {
                     Data = Mapper.Map<IEnumerable<IssuerV1>>(
                         UoW.Issuers.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
-                                QueryExpressionFactory.GetQueryExpression<tbl_Issuers>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Issuers, object>>>() { x => x.tbl_Audiences })),
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(
+                                QueryExpressionFactory.GetQueryExpression<tbl_Issuer>().ApplyState(state)),
+                            new List<Expression<Func<tbl_Issuer, object>>>() { x => x.tbl_Audience })),
 
                     Total = UoW.Issuers.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuers>, IQueryable<tbl_Issuers>>>>(
-                            QueryExpressionFactory.GetQueryExpression<tbl_Issuers>().ApplyPredicate(state)))
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(
+                            QueryExpressionFactory.GetQueryExpression<tbl_Issuer>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);
@@ -170,7 +170,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var audiences = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audiences>()
+            var audiences = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.IssuerId == issuerID).ToLambda());
 
             return Ok(Mapper.Map<AudienceV1>(audiences));
@@ -201,7 +201,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var result = UoW.Issuers.Update(Mapper.Map<tbl_Issuers>(model));
+            var result = UoW.Issuers.Update(Mapper.Map<tbl_Issuer>(model));
 
             UoW.Commit();
 

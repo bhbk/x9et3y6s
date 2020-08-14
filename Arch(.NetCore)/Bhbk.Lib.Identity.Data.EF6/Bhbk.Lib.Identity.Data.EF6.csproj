@@ -156,46 +156,49 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Activities.cs">
+    <Compile Include="Models\uvw_Activity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Audiences.cs">
+    <Compile Include="Models\uvw_Audience.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Claims.cs">
+    <Compile Include="Models\uvw_AudienceRole.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Issuers.cs">
+    <Compile Include="Models\uvw_Claim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Logins.cs">
+    <Compile Include="Models\uvw_Issuer.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_MOTDs.cs">
+    <Compile Include="Models\uvw_Login.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_QueueEmails.cs">
+    <Compile Include="Models\uvw_MOTD.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_QueueTexts.cs">
+    <Compile Include="Models\uvw_QueueEmail.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Refreshes.cs">
+    <Compile Include="Models\uvw_QueueText.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Roles.cs">
+    <Compile Include="Models\uvw_Refresh.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Settings.cs">
+    <Compile Include="Models\uvw_Role.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_States.cs">
+    <Compile Include="Models\uvw_Setting.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Urls.cs">
+    <Compile Include="Models\uvw_State.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Users.cs">
+    <Compile Include="Models\uvw_Url.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_User.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models_DIRECT\IdentityEntities.Context.cs">
@@ -214,61 +217,61 @@
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models_DIRECT\IdentityEntitiesFactory.cs" />
-    <Compile Include="Models_DIRECT\tbl_Activities.cs">
+    <Compile Include="Models_DIRECT\tbl_Activity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_AudienceRoles.cs">
+    <Compile Include="Models_DIRECT\tbl_Audience.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_Audiences.cs">
+    <Compile Include="Models_DIRECT\tbl_AudienceRole.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_Claims.cs">
+    <Compile Include="Models_DIRECT\tbl_Claim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_Issuers.cs">
+    <Compile Include="Models_DIRECT\tbl_Issuer.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_Logins.cs">
+    <Compile Include="Models_DIRECT\tbl_Login.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_MOTDs.cs">
+    <Compile Include="Models_DIRECT\tbl_MOTD.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_QueueEmails.cs">
+    <Compile Include="Models_DIRECT\tbl_QueueEmail.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_QueueTexts.cs">
+    <Compile Include="Models_DIRECT\tbl_QueueText.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_Refreshes.cs">
+    <Compile Include="Models_DIRECT\tbl_Refresh.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_RoleClaims.cs">
+    <Compile Include="Models_DIRECT\tbl_Role.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_Roles.cs">
+    <Compile Include="Models_DIRECT\tbl_RoleClaim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_Settings.cs">
+    <Compile Include="Models_DIRECT\tbl_Setting.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_States.cs">
+    <Compile Include="Models_DIRECT\tbl_State.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_Urls.cs">
+    <Compile Include="Models_DIRECT\tbl_Url.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_UserClaims.cs">
+    <Compile Include="Models_DIRECT\tbl_User.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_UserLogins.cs">
+    <Compile Include="Models_DIRECT\tbl_UserClaim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_UserRoles.cs">
+    <Compile Include="Models_DIRECT\tbl_UserLogin.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_DIRECT\tbl_Users.cs">
+    <Compile Include="Models_DIRECT\tbl_UserRole.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />

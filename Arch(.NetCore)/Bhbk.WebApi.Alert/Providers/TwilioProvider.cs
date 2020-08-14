@@ -11,7 +11,7 @@ namespace Bhbk.WebApi.Alert.Helpers
      */
     public class TwilioProvider
     {
-        public async ValueTask<MessageResource> TryTextHandoff(string sid, string token, tbl_QueueTexts model)
+        public async ValueTask<MessageResource> TryTextHandoff(string sid, string token, tbl_QueueText model)
         {
             TwilioClient.Init(sid, token);
 

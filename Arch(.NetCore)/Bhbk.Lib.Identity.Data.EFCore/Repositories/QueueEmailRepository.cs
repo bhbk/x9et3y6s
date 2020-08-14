@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
-    public class QueueEmailRepository : GenericRepository<uvw_QueueEmails>
+    public class QueueEmailRepository : GenericRepository<uvw_QueueEmail>
     {
         public QueueEmailRepository(IdentityEntities context)
             : base(context) { }

@@ -14,7 +14,7 @@ BEGIN
 
 DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
 
-UPDATE [dbo].[tbl_Claims]
+UPDATE [dbo].[tbl_Claim]
 SET
      Id						= @Id
 	,IssuerId				= @IssuerId
@@ -27,6 +27,6 @@ SET
     ,Immutable				= @Immutable
 WHERE Id = @Id
 
-SELECT * FROM [svc].[uvw_Claims] WHERE [svc].[uvw_Claims].Id = @Id
+SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @Id
 
 END

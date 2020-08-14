@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             _expire = expire;
         }
 
-        public string Generate(string purpose, tbl_Users user)
+        public string Generate(string purpose, tbl_User user)
         {
             byte[] secret = Encoding.Unicode.GetBytes(user.Id.ToString() + purpose);
             Totp code = new Totp(secret, step: _expire, mode: OtpHashMode.Sha512, totpSize: _length);
@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
             return code.ComputeTotp();
         }
 
-        public bool Validate(string purpose, string token, tbl_Users user)
+        public bool Validate(string purpose, string token, tbl_User user)
         {
             byte[] secret = Encoding.Unicode.GetBytes(user.Id.ToString() + purpose);
             Totp code = new Totp(secret, step: _expire, mode: OtpHashMode.Sha512, totpSize: _length);

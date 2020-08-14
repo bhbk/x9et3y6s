@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateV1()
+                    mapper.Map<tbl_State>(new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -183,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateV1()
+                    mapper.Map<tbl_State>(new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -224,7 +224,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_States>(new StateV1()
+                    mapper.Map<tbl_State>(new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,

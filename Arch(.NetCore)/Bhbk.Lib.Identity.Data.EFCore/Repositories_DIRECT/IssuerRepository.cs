@@ -7,15 +7,15 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 {
-    public class IssuerRepository : GenericRepository<tbl_Issuers>
+    public class IssuerRepository : GenericRepository<tbl_Issuer>
     {
         public IssuerRepository(IdentityEntities context)
             : base(context) { }
 
-        public override tbl_Issuers Create(tbl_Issuers issuer)
+        public override tbl_Issuer Create(tbl_Issuer issuer)
         {
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
+            issuer.tbl_Setting.Add(
+                new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
@@ -25,8 +25,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                     Immutable = true,
                 });
 
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
+            issuer.tbl_Setting.Add(
+                new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
@@ -36,8 +36,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                     Immutable = true,
                 });
 
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
+            issuer.tbl_Setting.Add(
+                new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
@@ -47,8 +47,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                     Immutable = true,
                 });
 
-            issuer.tbl_Settings.Add(
-                new tbl_Settings()
+            issuer.tbl_Setting.Add(
+                new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
@@ -61,24 +61,24 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Add(issuer).Entity;
         }
 
-        public override tbl_Issuers Delete(tbl_Issuers issuer)
+        public override tbl_Issuer Delete(tbl_Issuer issuer)
         {            
-            var claims = _context.Set<tbl_Claims>()
+            var claims = _context.Set<tbl_Claim>()
                 .Where(x => x.IssuerId == issuer.Id);
 
-            var refreshes = _context.Set<tbl_Refreshes>()
+            var refreshes = _context.Set<tbl_Refresh>()
                 .Where(x => x.IssuerId == issuer.Id);
 
-            var settings = _context.Set<tbl_Settings>()
+            var settings = _context.Set<tbl_Setting>()
                 .Where(x => x.IssuerId == issuer.Id);
 
-            var states = _context.Set<tbl_States>()
+            var states = _context.Set<tbl_State>()
                 .Where(x => x.IssuerId == issuer.Id);
 
-            var roles = _context.Set<tbl_Roles>()
+            var roles = _context.Set<tbl_Role>()
                 .Where(x => x.Audience.IssuerId == issuer.Id);
 
-            var audiences = _context.Set<tbl_Audiences>()
+            var audiences = _context.Set<tbl_Audience>()
                 .Where(x => x.IssuerId == issuer.Id);
 
             _context.RemoveRange(claims);
@@ -91,9 +91,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Remove(issuer).Entity;
         }
 
-        public override tbl_Issuers Update(tbl_Issuers issuer)
+        public override tbl_Issuer Update(tbl_Issuer issuer)
         {
-            var entity = _context.Set<tbl_Issuers>()
+            var entity = _context.Set<tbl_Issuer>()
                 .Where(x => x.Id == issuer.Id).Single();
 
             /*

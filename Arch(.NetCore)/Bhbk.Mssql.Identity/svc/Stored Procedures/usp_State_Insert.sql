@@ -17,7 +17,7 @@ BEGIN
 
 DECLARE @STATEID UNIQUEIDENTIFIER = NEWID()
 
-INSERT INTO [dbo].[tbl_States]
+INSERT INTO [dbo].[tbl_State]
 	(
      Id         
 	,IssuerId
@@ -48,6 +48,6 @@ VALUES
 	,@LastPolling
 	);
 
-SELECT * FROM [svc].[uvw_States] WHERE [svc].[uvw_States].Id = @STATEID
+SELECT * FROM [svc].[uvw_State] WHERE [svc].[uvw_State].Id = @STATEID
 
 END

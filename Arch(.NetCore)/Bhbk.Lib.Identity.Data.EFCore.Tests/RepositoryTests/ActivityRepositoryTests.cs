@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<SqlException>(() =>
             {
-                UoW.Activities.Create(new uvw_Activities());
+                UoW.Activities.Create(new uvw_Activity());
             });
         }
 
@@ -30,18 +30,18 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audiences>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
             var result = UoW.Activities.Create(
-                new uvw_Activities()
+                new uvw_Activity()
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
                     Immutable = false,
                 });
-            result.Should().BeAssignableTo<uvw_Activities>();
+            result.Should().BeAssignableTo<uvw_Activity>();
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Activities.Delete(new uvw_Activities());
+                UoW.Activities.Delete(new uvw_Activity());
             });
         }
 
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Destroy();
             new GenerateTestData(UoW, Mapper).Create();
 
-            var activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<uvw_Activities>()
+            var activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<uvw_Activity>()
                 .Where(x => x.Immutable == false).ToLambda())
                 .First();
 
@@ -73,7 +73,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var results = UoW.Activities.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Activities>>();
+            results.Should().BeAssignableTo<IEnumerable<uvw_Activity>>();
             results.Count().Should().Be(UoW.Activities.Count());
         }
 
@@ -82,7 +82,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         {
             Assert.Throws<NotImplementedException>(() =>
             {
-                UoW.Activities.Update(new uvw_Activities());
+                UoW.Activities.Update(new uvw_Activity());
             });
         }
     }

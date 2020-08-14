@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var result = UoW.Logins.Create(Mapper.Map<tbl_Logins>(model));
+            var result = UoW.Logins.Create(Mapper.Map<tbl_Login>(model));
 
             UoW.Commit();
 
@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IActionResult GetV1([FromRoute] string loginValue)
         {
             Guid loginID;
-            tbl_Logins login = null;
+            tbl_Login login = null;
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(loginValue, out loginID))
@@ -117,13 +117,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 {
                     Data = Mapper.Map<IEnumerable<LoginV1>>(
                         UoW.Logins.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
-                                QueryExpressionFactory.GetQueryExpression<tbl_Logins>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Logins, object>>>() { x => x.tbl_UserLogins })),
+                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(
+                                QueryExpressionFactory.GetQueryExpression<tbl_Login>().ApplyState(state)),
+                            new List<Expression<Func<tbl_Login, object>>>() { x => x.tbl_UserLogin })),
 
                     Total = UoW.Logins.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Logins>, IQueryable<tbl_Logins>>>>(
-                            QueryExpressionFactory.GetQueryExpression<tbl_Logins>().ApplyPredicate(state)))
+                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(
+                            QueryExpressionFactory.GetQueryExpression<tbl_Login>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);
@@ -147,8 +147,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var users = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_Users>()
-                .Where(x => x.tbl_UserLogins.Any(y => y.LoginId == loginID)).ToLambda());
+            var users = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
+                .Where(x => x.tbl_UserLogin.Any(y => y.LoginId == loginID)).ToLambda());
 
             return Ok(Mapper.Map<UserV1>(users));
         }
@@ -178,7 +178,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var result = UoW.Logins.Update(Mapper.Map<tbl_Logins>(model));
+            var result = UoW.Logins.Update(Mapper.Map<tbl_Login>(model));
 
             UoW.Commit();
 

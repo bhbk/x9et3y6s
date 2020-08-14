@@ -13,7 +13,7 @@ using System.Security.Claims;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 {
-    public class AudienceRepository : GenericRepository<tbl_Audiences>
+    public class AudienceRepository : GenericRepository<tbl_Audience>
     {
         private IClockService _clock;
 
@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             set { _clock.UtcNow = value; }
         }
 
-        public tbl_Audiences AccessFailed(tbl_Audiences audience)
+        public tbl_Audience AccessFailed(tbl_Audience audience)
         {
             audience.LastLoginFailure = Clock.UtcDateTime;
             audience.AccessFailedCount++;
@@ -39,7 +39,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(audience).Entity;
         }
 
-        public tbl_Audiences AccessSuccess(tbl_Audiences audience)
+        public tbl_Audience AccessSuccess(tbl_Audience audience)
         {
             audience.LastLoginSuccess = Clock.UtcDateTime;
             audience.AccessSuccessCount++;
@@ -49,10 +49,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(audience).Entity;
         }
 
-        public bool AddToRole(tbl_Audiences audience, tbl_Roles role)
+        public bool AddToRole(tbl_Audience audience, tbl_Role role)
         {
-            _context.Set<tbl_AudienceRoles>().Add(
-                new tbl_AudienceRoles()
+            _context.Set<tbl_AudienceRole>().Add(
+                new tbl_AudienceRole()
                 {
                     AudienceId = audience.Id,
                     RoleId = role.Id,
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return true;
         }
 
-        public override tbl_Audiences Create(tbl_Audiences audience)
+        public override tbl_Audience Create(tbl_Audience audience)
         {
             var create = InternalCreate(audience);
 
@@ -72,7 +72,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return create;
         }
 
-        public tbl_Audiences Create(tbl_Audiences audience, string password)
+        public tbl_Audience Create(tbl_Audience audience, string password)
         {
             var create = InternalCreate(audience);
 
@@ -83,21 +83,21 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return create;
         }
 
-        public override tbl_Audiences Delete(tbl_Audiences audience)
+        public override tbl_Audience Delete(tbl_Audience audience)
         {
-            var activity = _context.Set<tbl_Activities>()
+            var activity = _context.Set<tbl_Activity>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            var refreshes = _context.Set<tbl_Refreshes>()
+            var refreshes = _context.Set<tbl_Refresh>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            var settings = _context.Set<tbl_Settings>()
+            var settings = _context.Set<tbl_Setting>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            var states = _context.Set<tbl_States>()
+            var states = _context.Set<tbl_State>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            var roles = _context.Set<tbl_Roles>()
+            var roles = _context.Set<tbl_Role>()
                 .Where(x => x.AudienceId == audience.Id);
 
             _context.RemoveRange(activity);
@@ -109,9 +109,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Remove(audience).Entity;
         }
 
-        public List<Claim> GenerateAccessClaims(tbl_Issuers issuer, tbl_Audiences audience)
+        public List<Claim> GenerateAccessClaims(tbl_Issuer issuer, tbl_Audience audience)
         {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
+            var expire = _context.Set<tbl_Setting>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
             var claims = new List<Claim>();
@@ -119,8 +119,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             //add lowest common denominators...
             claims.Add(new Claim(ClaimTypes.NameIdentifier, audience.Id.ToString()));
 
-            var roles = _context.Set<tbl_Roles>()
-                .Where(x => x.tbl_AudienceRoles.Any(y => y.AudienceId == audience.Id)).ToList();
+            var roles = _context.Set<tbl_Role>()
+                .Where(x => x.tbl_AudienceRole.Any(y => y.AudienceId == audience.Id)).ToList();
 
             foreach (var role in roles.OrderBy(x => x.Name))
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
@@ -143,9 +143,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return claims;
         }
 
-        public List<Claim> GenerateRefreshClaims(tbl_Issuers issuer, tbl_Audiences audience)
+        public List<Claim> GenerateRefreshClaims(tbl_Issuer issuer, tbl_Audience audience)
         {
-            var expire = _context.Set<tbl_Settings>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
+            var expire = _context.Set<tbl_Setting>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingRefreshExpire).Single();
 
             var claims = new List<Claim>();
@@ -171,7 +171,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return claims;
         }
 
-        internal tbl_Audiences InternalCreate(tbl_Audiences audience)
+        internal tbl_Audience InternalCreate(tbl_Audience audience)
         {
             audience.ConcurrencyStamp = Guid.NewGuid().ToString();
             audience.SecurityStamp = Guid.NewGuid().ToString();
@@ -179,29 +179,29 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Add(audience).Entity;
         }
 
-        public bool IsInRole(tbl_Audiences audience, tbl_Roles role)
+        public bool IsInRole(tbl_Audience audience, tbl_Role role)
         {
-            if (_context.Set<tbl_AudienceRoles>()
+            if (_context.Set<tbl_AudienceRole>()
                 .Any(x => x.AudienceId == audience.Id && x.RoleId == role.Id))
                 return true;
 
             return false;
         }
 
-        public bool RemoveFromRole(tbl_Audiences audience, tbl_Roles role)
+        public bool RemoveFromRole(tbl_Audience audience, tbl_Role role)
         {
-            var entity = _context.Set<tbl_AudienceRoles>()
+            var entity = _context.Set<tbl_AudienceRole>()
                 .Where(x => x.AudienceId == audience.Id && x.RoleId == role.Id).Single();
 
-            _context.Set<tbl_AudienceRoles>().Remove(entity);
+            _context.Set<tbl_AudienceRole>().Remove(entity);
 
             return true;
         }
 
-        public tbl_Audiences SetPasswordHash(tbl_Audiences audience, string password)
+        public tbl_Audience SetPasswordHash(tbl_Audience audience, string password)
         {
             //https://www.google.com/search?q=identity+securitystamp
-            if (!_context.Set<tbl_Audiences>()
+            if (!_context.Set<tbl_Audience>()
                 .Where(x => x.Id == audience.Id && x.SecurityStamp == audience.SecurityStamp)
                 .Any())
                 throw new InvalidOperationException();
@@ -221,9 +221,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(audience).Entity;
         }
 
-        public override tbl_Audiences Update(tbl_Audiences audience)
+        public override tbl_Audience Update(tbl_Audience audience)
         {
-            var entity = _context.Set<tbl_Audiences>()
+            var entity = _context.Set<tbl_Audience>()
                 .Where(x => x.Id == audience.Id).Single();
 
             //https://www.google.com/search?q=identity+concurrencystamp
