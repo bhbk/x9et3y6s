@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
         public tbl_User AccessFailed(tbl_User user)
         {
-            user.LastLoginFailure = Clock.UtcDateTime;
+            user.LastLoginFailureUtc = Clock.UtcDateTime;
             user.AccessFailedCount++;
 
             _context.Entry(user).State = EntityState.Modified;
@@ -48,7 +48,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
         public tbl_User AccessSuccess(tbl_User user)
         {
-            user.LastLoginSuccess = Clock.UtcDateTime;
+            user.LastLoginSuccessUtc = Clock.UtcDateTime;
             user.AccessSuccessCount++;
 
             _context.Entry(user).State = EntityState.Modified;
@@ -63,8 +63,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                 {
                     UserId = user.Id,
                     ClaimId = claim.Id,
-                    Created = Clock.UtcDateTime,
-                    Immutable = false
+                    CreatedUtc = Clock.UtcDateTime,
+                    IsDeletable = false
                 });
 
             return true;
@@ -77,8 +77,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                 {
                     UserId = user.Id,
                     LoginId = login.Id,
-                    Created = Clock.UtcDateTime,
-                    Immutable = false
+                    CreatedUtc = Clock.UtcDateTime,
+                    IsDeletable = false
                 });
 
             return true;
@@ -91,8 +91,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                 {
                     UserId = user.Id,
                     RoleId = role.Id,
-                    Created = Clock.UtcDateTime,
-                    Immutable = false
+                    CreatedUtc = Clock.UtcDateTime,
+                    IsDeletable = false
                 });
 
             return true;
@@ -161,7 +161,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
             var userRoles = _context.Set<tbl_Role>()
-                .Where(x => x.tbl_UserRole.Any(y => y.UserId == user.Id)).ToList();
+                .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
 
             foreach (var role in userRoles.OrderBy(x => x.Name))
             {
@@ -173,7 +173,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             }
 
             var userClaims = _context.Set<tbl_Claim>()
-                .Where(x => x.tbl_UserClaim.Any(y => y.UserId == user.Id)).ToList();
+                .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToList();
 
             foreach (var claim in userClaims.OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
@@ -219,7 +219,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
             var userRoles = _context.Set<tbl_Role>()
-                .Where(x => x.tbl_UserRole.Any(y => y.UserId == user.Id)).ToList();
+                .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToList();
 
             foreach (var role in userRoles.OrderBy(x => x.Name))
             {
@@ -231,7 +231,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             }
 
             var userClaims = _context.Set<tbl_Claim>()
-                .Where(x => x.tbl_UserClaim.Any(y => y.UserId == user.Id)).ToList();
+                .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToList();
 
             foreach (var claim in userClaims.OrderBy(x => x.Type))
                 claims.Add(new Claim(claim.Type, claim.Value, claim.ValueType));
@@ -287,7 +287,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             user.ConcurrencyStamp = Guid.NewGuid().ToString();
             user.SecurityStamp = Guid.NewGuid().ToString();
 
-            if (!user.HumanBeing)
+            if (!user.IsHumanBeing)
                 user.EmailConfirmed = true;
 
             return _context.Add(user).Entity;
@@ -329,12 +329,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             var entity = _context.Set<tbl_User>()
                 .Where(x => x.Id == user.Id).Single();
 
-            if (entity.LockoutEnabled)
+            if (entity.IsLockedOut)
             {
-                if (entity.LockoutEnd.HasValue && entity.LockoutEnd <= DateTime.UtcNow)
+                if (entity.LockoutEndUtc.HasValue && entity.LockoutEndUtc <= DateTime.UtcNow)
                 {
-                    entity.LockoutEnabled = false;
-                    entity.LockoutEnd = null;
+                    entity.IsLockedOut = false;
+                    entity.LockoutEndUtc = null;
 
                     Update(entity);
 
@@ -345,7 +345,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             }
             else
             {
-                entity.LockoutEnd = null;
+                entity.LockoutEndUtc = null;
                 Update(entity);
 
                 return false;
@@ -396,7 +396,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
         public tbl_User SetConfirmedEmail(tbl_User user, bool confirmed)
         {
             user.EmailConfirmed = confirmed;
-            user.LastUpdated = Clock.UtcDateTime;
+            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -406,7 +406,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
         public tbl_User SetConfirmedPassword(tbl_User user, bool confirmed)
         {
             user.PasswordConfirmed = confirmed;
-            user.LastUpdated = Clock.UtcDateTime;
+            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -416,7 +416,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
         public tbl_User SetConfirmedPhoneNumber(tbl_User user, bool confirmed)
         {
             user.PhoneNumberConfirmed = confirmed;
-            user.LastUpdated = Clock.UtcDateTime;
+            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -425,8 +425,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
         public tbl_User SetImmutable(tbl_User user, bool enabled)
         {
-            user.Immutable = enabled;
-            user.LastUpdated = Clock.UtcDateTime;
+            user.IsDeletable = enabled;
+            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -443,9 +443,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
             user.ConcurrencyStamp = Guid.NewGuid().ToString();
             user.SecurityStamp = Guid.NewGuid().ToString();
-            user.LastUpdated = Clock.UtcDateTime;
+            user.LastUpdatedUtc = Clock.DateTime;
 
-            if (!string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(password))
+            {
+                user.PasswordHashPBKDF2 = null;
+                user.PasswordHashSHA256 = null;
+            }
+            else
             {
                 user.PasswordHashPBKDF2 = PBKDF2.Create(password);
                 user.PasswordHashSHA256 = SHA256.Create(password);
@@ -456,10 +461,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return _context.Entry(user).Entity;
         }
 
-        public tbl_User SetTwoFactorEnabled(tbl_User user, bool enabled)
+        public tbl_User SetMultiFactorEnabled(tbl_User user, bool enabled)
         {
-            user.TwoFactorEnabled = enabled;
-            user.LastUpdated = Clock.UtcDateTime;
+            user.IsMultiFactor = enabled;
+            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -480,10 +485,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
              */
             entity.FirstName = user.FirstName;
             entity.LastName = user.LastName;
-            entity.LockoutEnabled = user.LockoutEnabled;
-            entity.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
-            entity.LastUpdated = Clock.UtcDateTime;
-            entity.Immutable = user.Immutable;
+            entity.IsLockedOut = user.IsLockedOut;
+            entity.LockoutEndUtc = user.LockoutEndUtc.HasValue ? user.LockoutEndUtc.Value.ToUniversalTime() : user.LockoutEndUtc;
+            entity.LastUpdatedUtc = Clock.UtcDateTime;
+            entity.IsDeletable = user.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;
 

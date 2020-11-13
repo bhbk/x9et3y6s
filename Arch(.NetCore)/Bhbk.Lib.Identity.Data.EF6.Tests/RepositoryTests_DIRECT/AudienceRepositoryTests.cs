@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Data.EF6.Models_DIRECT;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -36,16 +36,16 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                 .Single();
 
             var result = UoW.Audiences.Create(
-                new tbl_Audience()
+                Mapper.Map<tbl_Audience>(new AudienceV1()
                 {
                     IssuerId = issuer.Id,
                     Name = Constants.TestAudience,
-                    Enabled = true,
-                    Immutable = false,
-                });
-            result.Should().BeAssignableTo<tbl_Audience>();
-
+                    IsEnabled = true,
+                    IsDeletable = true,
+                }));
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Audience>();
         }
 
         [Fact]
@@ -68,6 +68,21 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
                 .Single();
 
+            UoW.Activities.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Activity>()
+                .Where(x => x.AudienceId == audience.Id).ToLambda());
+
+            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+                .Where(x => x.AudienceId == audience.Id).ToLambda());
+
+            UoW.Settings.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.AudienceId == audience.Id).ToLambda());
+
+            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
+                .Where(x => x.AudienceId == audience.Id).ToLambda());
+
+            UoW.Roles.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
+                .Where(x => x.AudienceId == audience.Id).ToLambda());
+            
             UoW.Audiences.Delete(audience);
             UoW.Commit();
         }
@@ -105,9 +120,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             audience.Name += "(Updated)";
 
             var result = UoW.Audiences.Update(audience);
-            result.Should().BeAssignableTo<tbl_Audience>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Audience>();
         }
     }
 }

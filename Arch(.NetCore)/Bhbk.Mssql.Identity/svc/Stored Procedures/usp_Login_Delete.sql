@@ -4,10 +4,20 @@ CREATE PROCEDURE [svc].[usp_Login_Delete]
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @ID
+	BEGIN TRY
 
-DELETE [dbo].[tbl_Login]
-WHERE Id = @ID
+        SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @ID
+
+        DELETE [dbo].[tbl_Login]
+        WHERE Id = @ID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

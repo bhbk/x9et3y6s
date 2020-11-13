@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
-            else if (!issuer.Enabled)
+            else if (!issuer.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
-            else if (!audience.Enabled
+            else if (!audience.IsEnabled
                 || !PBKDF2.Validate(audience.PasswordHashPBKDF2, input.client_secret))
             {
                 //adjust counter(s) for login failure...
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             var rt_claims = UoW.Audiences.GenerateRefreshClaims(issuer, audience);
@@ -146,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceRefreshTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             UoW.Commit();
@@ -200,7 +200,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
-            else if (!issuer.Enabled)
+            else if (!issuer.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
@@ -220,7 +220,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
-            else if (!audience.Enabled)
+            else if (!audience.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
@@ -251,7 +251,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceRefreshTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             UoW.Commit();

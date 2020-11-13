@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace Bhbk.Lib.Identity.Data.EFCore.Models
 {
     public partial class uvw_Role
@@ -10,9 +12,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         public Guid? ActorId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public bool Enabled { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime? LastUpdated { get; set; }
-        public bool Immutable { get; set; }
+        public bool IsEnabled { get; set; }
+        public bool IsDeletable { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset? LastUpdatedUtc { get; set; }
     }
 }

@@ -7,26 +7,36 @@ CREATE PROCEDURE [svc].[usp_Claim_Update]
     ,@Type					NVARCHAR (MAX)
     ,@Value					NVARCHAR (MAX) 
     ,@ValueType             NVARCHAR (64) 
-    ,@Immutable				BIT
+    ,@IsDeletable			BIT
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-UPDATE [dbo].[tbl_Claim]
-SET
-     Id						= @Id
-	,IssuerId				= @IssuerId
-    ,ActorId				= @ActorId
-	,Subject				= @Subject
-	,Type					= @Type
-	,Value					= @Value
-	,ValueType				= @ValueType
-    ,LastUpdated			= @LASTUPDATED
-    ,Immutable				= @Immutable
-WHERE Id = @Id
+        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @Id
+        UPDATE [dbo].[tbl_Claim]
+        SET
+             Id						= @Id
+	        ,IssuerId				= @IssuerId
+            ,ActorId				= @ActorId
+	        ,Subject				= @Subject
+	        ,Type					= @Type
+	        ,Value					= @Value
+	        ,ValueType				= @ValueType
+            ,IsDeletable			= @IsDeletable
+            ,LastUpdatedUtc			= @LASTUPDATED
+        WHERE Id = @Id
+
+        SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @Id
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

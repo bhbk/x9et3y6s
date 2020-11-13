@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
@@ -20,6 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Logins.Create(new uvw_Login());
+                UoW.Commit();
             });
         }
 
@@ -30,13 +32,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Logins.Create(
-                new uvw_Login()
+                Mapper.Map<uvw_Login>(new LoginV1()
                 {
                     Name = Constants.TestLogin,
                     LoginKey = Constants.TestLoginKey,
-                    Enabled = true,
-                    Immutable = false,
-                });
+                    IsDeletable = false,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Login>();
         }
 
@@ -46,6 +49,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Logins.Delete(new uvw_Login());
+                UoW.Commit();
             });
         }
 
@@ -60,6 +64,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             UoW.Logins.Delete(login);
+            UoW.Commit();
         }
 
         [Fact]
@@ -79,6 +84,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Logins.Update(new uvw_Login());
+                UoW.Commit();
             });
         }
 
@@ -94,6 +100,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             login.Name += "(Updated)";
 
             var result = UoW.Logins.Update(login);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Login>();
         }
     }

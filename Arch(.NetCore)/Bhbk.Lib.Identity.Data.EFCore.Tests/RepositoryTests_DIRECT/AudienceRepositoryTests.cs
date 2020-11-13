@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -19,11 +18,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact(Skip = "NotImplemented")]
         public void Repo_Audiences_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Audiences.Create(
-                    Mapper.Map<tbl_Audience>(new AudienceV1()));
-
+                UoW.Audiences.Create(new tbl_Audience());
                 UoW.Commit();
             });
         }
@@ -43,12 +40,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         IssuerId = issuer.Id,
                         Name = Constants.TestAudience,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
-            result.Should().BeAssignableTo<tbl_Audience>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Audience>();
         }
 
         [Fact]
@@ -108,9 +105,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             audience.Name += "(Updated)";
 
             var result = UoW.Audiences.Update(audience);
-            result.Should().BeAssignableTo<tbl_Audience>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Audience>();
         }
     }
 }

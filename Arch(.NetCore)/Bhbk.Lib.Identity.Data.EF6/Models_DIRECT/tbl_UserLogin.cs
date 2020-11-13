@@ -17,8 +17,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public System.Guid UserId { get; set; }
         public System.Guid LoginId { get; set; }
         public Nullable<System.Guid> ActorId { get; set; }
-        public bool Immutable { get; set; }
-        public System.DateTime Created { get; set; }
+        public bool IsDeletable { get; set; }
+        public Nullable<System.DateTimeOffset> CreatedUtc { get; set; }
     
         public virtual tbl_Login tbl_Login { get; set; }
         public virtual tbl_User tbl_User { get; set; }

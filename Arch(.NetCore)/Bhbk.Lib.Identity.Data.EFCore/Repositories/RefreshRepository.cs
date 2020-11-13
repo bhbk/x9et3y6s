@@ -24,9 +24,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@UserId", SqlDbType.UniqueIdentifier) { Value = entity.UserId.HasValue ? (object)entity.UserId.Value : DBNull.Value },
                 new SqlParameter("@RefreshValue", SqlDbType.NVarChar) { Value = entity.RefreshValue },
                 new SqlParameter("@RefreshType", SqlDbType.NVarChar) { Value = entity.RefreshType },
-                new SqlParameter("@IssuerUtc", SqlDbType.DateTime2) { Value = entity.IssuedUtc },
-                new SqlParameter("@ValueFromUtc", SqlDbType.DateTime2) { Value = entity.ValidFromUtc },
-                new SqlParameter("@ValueToUtc", SqlDbType.DateTime2) { Value = entity.ValidToUtc }
+                new SqlParameter("@IssuerUtc", SqlDbType.DateTimeOffset) { Value = entity.IssuedUtc },
+                new SqlParameter("@ValueFromUtc", SqlDbType.DateTimeOffset) { Value = entity.ValidFromUtc },
+                new SqlParameter("@ValueToUtc", SqlDbType.DateTimeOffset) { Value = entity.ValidToUtc }
             };
 
             return _context.Set<uvw_Refresh>().FromSqlRaw("[svc].[usp_Refresh_Insert]"

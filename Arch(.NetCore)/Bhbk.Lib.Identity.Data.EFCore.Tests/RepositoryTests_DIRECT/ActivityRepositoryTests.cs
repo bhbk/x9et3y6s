@@ -19,11 +19,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact(Skip = "NotImplemented")]
         public void Repo_Activities_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Activities.Create(
-                    Mapper.Map<tbl_Activity>(new ActivityV1()));
-
+                UoW.Activities.Delete(new tbl_Activity());
                 UoW.Commit();
             });
         }
@@ -43,11 +41,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                    Immutable = false,
+                    IsDeletable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_Activity>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Activity>();
         }
 
         [Fact]
@@ -67,7 +65,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             new GenerateTestData(UoW, Mapper).Create();
 
             var activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<tbl_Activity>()
-                .Where(x => x.Immutable == false).ToLambda());
+                .Where(x => x.IsDeletable == false).ToLambda());
 
             UoW.Activities.Delete(activity);
             UoW.Commit();

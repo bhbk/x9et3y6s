@@ -13,6 +13,7 @@ using Bhbk.Lib.QueryExpression.Exceptions;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,37 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public AudienceController(IConfiguration conf, IContextService instance)
         {
             _provider = new AudienceProvider(conf, instance);
+        }
+
+        [Route("v1/{audienceID:guid}/add-to-role/{roleID:guid}"), HttpGet]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
+        public IActionResult AddToRoleV1([FromRoute] Guid audienceID, [FromRoute] Guid roleID)
+        {
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                .SingleOrDefault();
+
+            if (audience == null)
+            {
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{audienceID}");
+                return NotFound(ModelState);
+            }
+
+            var role = UoW.Roles.Get(x => x.Id == roleID)
+                .SingleOrDefault();
+
+            if (role == null)
+            {
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
+                return NotFound(ModelState);
+            }
+
+            if (!UoW.Audiences.AddToRole(audience, role))
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            UoW.Commit();
+
+            return NoContent();
         }
 
         [Route("v1"), HttpPost]
@@ -71,7 +103,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{audienceID}");
                 return NotFound(ModelState);
             }
-            else if (audience.Immutable)
+            else if (audience.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.AudienceImmutable.ToString(), $"Audience:{audienceID}");
                 return BadRequest(ModelState);
@@ -163,7 +195,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Audiences.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audience>, IQueryable<tbl_Audience>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Audience>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Audience, object>>>() { x => x.tbl_Role })),
+                            new List<Expression<Func<tbl_Audience, object>>>() { x => x.tbl_Roles })),
 
                     Total = UoW.Audiences.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audience>, IQueryable<tbl_Audience>>>>(
@@ -233,6 +265,67 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(Mapper.Map<IEnumerable<UrlV1>>(urls));
         }
 
+        [Route("v1/{audienceID:guid}/remove-from-role/{roleID:guid}"), HttpDelete]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
+        public IActionResult RemoveFromRoleV1([FromRoute] Guid audienceID, [FromRoute] Guid roleID)
+        {
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                .SingleOrDefault();
+
+            if (audience == null)
+            {
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{audienceID}");
+                return NotFound(ModelState);
+            }
+
+            var role = UoW.Roles.Get(x => x.Id == roleID)
+                .SingleOrDefault();
+
+            if (role == null)
+            {
+                ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
+                return NotFound(ModelState);
+            }
+            else if (!UoW.Audiences.RemoveFromRole(audience, role))
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            UoW.Commit();
+
+            return NoContent();
+        }
+
+        [Route("v1/{audienceID:guid}/remove-password"), HttpGet]
+        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
+        public IActionResult RemovePasswordV1([FromRoute] Guid audienceID)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+                .SingleOrDefault();
+
+            if (audience == null)
+            {
+                ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{audienceID}");
+                return NotFound(ModelState);
+            }
+
+            audience.ActorId = GetIdentityGUID();
+
+            if (!UoW.Audiences.IsPasswordSet(audience))
+            {
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"No password set for audience:{audience.Id}");
+                return BadRequest(ModelState);
+            }
+
+            UoW.Audiences.SetPasswordHash(audience, null);
+            UoW.Commit();
+
+            return NoContent();
+        }
+
         [Route("v1/{audienceID:guid}/set-password"), HttpPut]
         [Authorize(Policy = Constants.DefaultPolicyForHumans)]
         [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
@@ -281,8 +374,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (audience.Immutable
-                && audience.Immutable != model.Immutable)
+            else if (audience.IsDeletable
+                && audience.IsDeletable != model.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.AudienceImmutable.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);

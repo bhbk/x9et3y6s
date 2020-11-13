@@ -76,7 +76,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"roleID: { roleID }");
                 return NotFound(ModelState);
             }
-            else if (role.Immutable)
+            else if (role.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.RoleImmutable.ToString(), $"Role:{role.Id}");
                 return BadRequest(ModelState);
@@ -126,7 +126,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Roles.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Role>, IQueryable<tbl_Role>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Role>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Role, object>>>() { x => x.tbl_UserRole })),
+                            new List<Expression<Func<tbl_Role, object>>>() { x => x.tbl_UserRoles })),
 
                     Total = UoW.Roles.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Role>, IQueryable<tbl_Role>>>>(
@@ -155,7 +155,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
 
             var users = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.tbl_UserRole.Any(y => y.RoleId == roleID)).ToLambda());
+                .Where(x => x.tbl_UserRoles.Any(y => y.RoleId == roleID)).ToLambda());
 
             return Ok(Mapper.Map<UserV1>(users));
         }
@@ -176,8 +176,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (role.Immutable
-                && role.Immutable != model.Immutable)
+            else if (role.IsDeletable
+                && role.IsDeletable != model.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.RoleImmutable.ToString(), $"Role:{role.Id}");
                 return BadRequest(ModelState);

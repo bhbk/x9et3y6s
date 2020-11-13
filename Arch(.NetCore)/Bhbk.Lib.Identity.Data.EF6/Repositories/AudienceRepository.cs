@@ -2,11 +2,6 @@
 using Bhbk.Lib.DataAccess.EF.Repositories;
 using Bhbk.Lib.Identity.Data.EF6.Models;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EF6.Repositories
 {
@@ -24,127 +19,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories
         {
             get { return _clock.UtcNow; }
             set { _clock.UtcNow = value; }
-        }
-
-        public override uvw_Audience Create(uvw_Audience entity)
-        {
-            var pvalues = new List<SqlParameter>
-            {
-                new SqlParameter("@IssuerId", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId },
-                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
-                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
-                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
-                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
-                new SqlParameter("@LastLoginSuccess", SqlDbType.DateTime2) { Value = entity.LastLoginSuccess.HasValue ? (object)entity.LastLoginSuccess.Value : DBNull.Value },
-                new SqlParameter("@LastLoginFailure", SqlDbType.DateTime2) { Value = entity.LastLoginFailure.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
-                new SqlParameter("@AccessFailedCount", SqlDbType.Int) { Value = entity.AccessFailedCount },
-                new SqlParameter("@AccessSuccessCount", SqlDbType.Int) { Value = entity.AccessSuccessCount },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
-            };
-
-            return _context.Database.SqlQuery<uvw_Audience>("[svc].[usp_Audience_Insert]"
-                + "@IssuerId, @ActorId, @Name, @Description, @LockoutEnabled, @LockoutEnd," 
-                + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
-                    .AsEnumerable().Single();
-
-            /*
-            using (var conn = _context.Database.Connection)
-            {
-                var cmd = conn.CreateCommand();
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "[svc].[usp_Audience_Insert]";
-                cmd.Parameters.AddRange(pvalues.ToArray());
-                cmd.Connection = conn;
-                conn.Open();
-
-                var result = cmd.ExecuteReader();
-
-                return result.Cast<uvw_Auidences>().AsEnumerable().Single();
-            }
-            */
-        }
-
-        public override IEnumerable<uvw_Audience> Create(IEnumerable<uvw_Audience> entities)
-        {
-            var results = new List<uvw_Audience>();
-
-            foreach (var entity in entities)
-            {
-                var result = Create(entity);
-
-                results.Add(result);
-            }
-
-            return results;
-        }
-
-        public override uvw_Audience Delete(uvw_Audience entity)
-        {
-            var pvalues = new List<SqlParameter>
-            {
-                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id }
-            };
-
-            return _context.Database.SqlQuery<uvw_Audience>("[svc].[usp_Audience_Delete] @Id", pvalues.ToArray())
-                .AsEnumerable().Single();
-        }
-
-        public override IEnumerable<uvw_Audience> Delete(IEnumerable<uvw_Audience> entities)
-        {
-            var results = new List<uvw_Audience>();
-
-            foreach (var entity in entities)
-            {
-                var result = Delete(entity);
-
-                results.Add(result);
-            }
-
-            return results;
-        }
-
-        public override IEnumerable<uvw_Audience> Delete(LambdaExpression lambda)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override uvw_Audience Update(uvw_Audience entity)
-        {
-            var pvalues = new List<SqlParameter>
-            {
-                new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
-                new SqlParameter("@IssuerId", SqlDbType.UniqueIdentifier) { Value = entity.IssuerId },
-                new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
-                new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
-                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
-                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
-                new SqlParameter("@LastLoginSuccess", SqlDbType.DateTime2) { Value = entity.LastLoginSuccess.HasValue ? (object)entity.LastLoginSuccess.Value : DBNull.Value },
-                new SqlParameter("@LastLoginFailure", SqlDbType.DateTime2) { Value = entity.LastLoginFailure.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
-                new SqlParameter("@AccessFailedCount", SqlDbType.Int) { Value = entity.AccessFailedCount },
-                new SqlParameter("@AccessSuccessCount", SqlDbType.Int) { Value = entity.AccessSuccessCount },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
-            };
-
-            return _context.Database.SqlQuery<uvw_Audience>("[svc].[usp_Audience_Update]"
-                + "@Id, @IssuerId, @ActorId, @Name, @Description, @LockoutEnabled, @LockoutEnd,"
-                + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
-                    .AsEnumerable().Single();
-        }
-
-        public override IEnumerable<uvw_Audience> Update(IEnumerable<uvw_Audience> entities)
-        {
-            var results = new List<uvw_Audience>();
-
-            foreach (var entity in entities)
-            {
-                var result = Update(entity);
-
-                results.Add(result);
-            }
-
-            return results;
         }
     }
 }

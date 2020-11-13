@@ -5,26 +5,36 @@ CREATE PROCEDURE [svc].[usp_Role_Update]
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
-    ,@Enabled				BIT 
-    ,@Immutable				BIT
+    ,@IsEnabled				BIT 
+    ,@IsDeletable	    	BIT
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-UPDATE [dbo].[tbl_Role]
-SET
-     Id						= @Id
-	,AudienceId				= @AudienceId
-    ,ActorId				= @ActorId
-	,Name					= @Name
-	,Description			= @Description
-	,Enabled				= @Enabled
-    ,LastUpdated			= @LASTUPDATED
-    ,Immutable				= @Immutable
-WHERE Id = @Id
+        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Role] WHERE [svc].[uvw_Role].Id = @Id
+        UPDATE [dbo].[tbl_Role]
+        SET
+             Id						= @Id
+	        ,AudienceId				= @AudienceId
+            ,ActorId				= @ActorId
+	        ,Name					= @Name
+	        ,Description			= @Description
+	        ,IsEnabled				= @IsEnabled
+            ,IsDeletable			= @IsDeletable
+            ,LastUpdatedUtc			= @LASTUPDATED
+        WHERE Id = @Id
+
+        SELECT * FROM [svc].[uvw_Role] WHERE [svc].[uvw_Role].Id = @Id
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

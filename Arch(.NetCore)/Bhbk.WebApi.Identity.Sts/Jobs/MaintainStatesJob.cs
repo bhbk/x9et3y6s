@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Sts.Jobs
                         uow.States.Delete(invalid);
                         uow.Commit();
 
-                        var msg = typeof(MaintainStatesJob).Name + " success on " + DateTime.Now.ToString() + ". Delete "
+                        var msg = typeof(MaintainStatesJob).Name + " success on " + DateTime.UtcNow.ToString() + ". Delete "
                                 + invalidCount.ToString() + " invalid states.";
 
                         Log.Information(msg);

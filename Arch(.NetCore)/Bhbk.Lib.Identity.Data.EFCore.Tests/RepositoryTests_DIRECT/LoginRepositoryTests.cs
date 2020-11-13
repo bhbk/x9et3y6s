@@ -18,10 +18,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact(Skip = "NotImplemented")]
         public void Repo_Logins_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Logins.Create(
-                    Mapper.Map<tbl_Login>(new LoginV1()));
+                UoW.Logins.Create(new tbl_Login());
                 UoW.Commit();
             });
         }
@@ -36,11 +35,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 Mapper.Map<tbl_Login>(new LoginV1()
                 {
                     Name = Constants.TestLogin,
-                    Immutable = false,
+                    LoginKey = Constants.TestLoginKey,
+                    IsDeletable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_Login>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Login>();
         }
 
         [Fact]
@@ -100,9 +100,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             login.Name += "(Updated)";
 
             var result = UoW.Logins.Update(login);
-            result.Should().BeAssignableTo<tbl_Login>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Login>();
         }
     }
 }

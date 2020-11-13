@@ -4,10 +4,20 @@ CREATE PROCEDURE [svc].[usp_Claim_Delete]
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @ID
+	BEGIN TRY
 
-DELETE [dbo].[tbl_Claim]
-WHERE Id = @ID
+        SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @ID
+
+        DELETE [dbo].[tbl_Claim]
+        WHERE Id = @ID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

@@ -18,11 +18,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact(Skip = "NotImplemented")]
         public void Repo_Issuers_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Issuers.Create(
-                    Mapper.Map<tbl_Issuer>(new IssuerV1()));
-
+                UoW.Issuers.Create(new tbl_Issuer());
                 UoW.Commit();
             });
         }
@@ -38,12 +36,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         Name = Constants.TestIssuer,
                         IssuerKey = Constants.TestIssuerKey,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
-            result.Should().BeAssignableTo<tbl_Issuer>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Issuer>();
         }
 
         [Fact]
@@ -103,9 +101,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             issuer.Name += "(Updated)";
 
             var result = UoW.Issuers.Update(issuer);
-            result.Should().BeAssignableTo<tbl_Issuer>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Issuer>();
         }
     }
 }

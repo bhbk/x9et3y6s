@@ -43,21 +43,21 @@ namespace Bhbk.WebApi.Alert.Jobs
                     var expire = int.Parse(conf["Jobs:QueueEmails:ExpireDelay"]);
                     var providerApiKey = conf["Jobs:QueueEmails:ProviderApiKey"];
 
-                    foreach (var entry in uow.QueueEmails.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueEmail>()
-                        .Where(x => x.Created < DateTime.Now.AddSeconds(-(expire))).ToLambda()))
+                    foreach (var entry in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>()
+                        .Where(x => x.CreatedUtc < DateTime.UtcNow.AddSeconds(-(expire))).ToLambda()))
                     {
                         Log.Warning(callPath + " hand-off of email (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
-                            "The email was created on " + entry.Created + " and is being deleted now.");
+                            "The email was created on " + entry.CreatedUtc + " and is being deleted now.");
 
-                        uow.QueueEmails.Delete(entry);
+                        uow.EmailQueue.Delete(entry);
                     }
 
                     uow.Commit();
 
                     var provider = new SendGridProvider();
 
-                    foreach (var msg in uow.QueueEmails.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueEmail>()
-                        .Where(x => x.SendAt < DateTime.Now).ToLambda()))
+                    foreach (var msg in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>()
+                        .Where(x => x.SendAtUtc < DateTime.UtcNow).ToLambda()))
                     {
                         switch (uow.InstanceType)
                         {
@@ -68,14 +68,14 @@ namespace Bhbk.WebApi.Alert.Jobs
 
                                     if (response.StatusCode == HttpStatusCode.Accepted)
                                     {
-                                        uow.QueueEmails.Delete(msg);
+                                        uow.EmailQueue.Delete(msg);
                                         Log.Information(callPath + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
                                     }
                                     else
                                         Log.Warning(callPath + " hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
                                             "Error=" + response.StatusCode);
 #elif !RELEASE
-                                    uow.QueueEmails.Delete(msg);
+                                    uow.EmailQueue.Delete(msg);
                                     Log.Information(callPath + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                 }
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                             case InstanceContext.End2EndTest:
                             case InstanceContext.IntegrationTest:
                                 {
-                                    uow.QueueEmails.Delete(msg);
+                                    uow.EmailQueue.Delete(msg);
                                     Log.Information(callPath + " fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
                                 }
                                 break;

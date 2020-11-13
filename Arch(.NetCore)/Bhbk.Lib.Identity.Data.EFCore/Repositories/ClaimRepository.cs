@@ -25,11 +25,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@Type", SqlDbType.NVarChar) { Value = entity.Type },
                 new SqlParameter("@Value", SqlDbType.NVarChar) { Value = entity.Value },
                 new SqlParameter("@ValueType", SqlDbType.NVarChar) { Value = entity.ValueType },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable }
             };
 
             return _context.Set<uvw_Claim>().FromSqlRaw("[svc].[usp_Claim_Insert]"
-                + "@IssuerId, @ActorId, @Subject, @Type, @Value, @ValueType, @Immutable", pvalues.ToArray())
+                + "@IssuerId, @ActorId, @Subject, @Type, @Value, @ValueType, @IsDeletable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -88,11 +88,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Claim> Delete(LambdaExpression lambda)
-        {
-            throw new NotImplementedException();
-        }
-
         public override uvw_Claim Update(uvw_Claim entity)
         {
             var pvalues = new List<SqlParameter>
@@ -104,11 +99,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@Type", SqlDbType.NVarChar) { Value = entity.Type },
                 new SqlParameter("@Value", SqlDbType.NVarChar) { Value = entity.Value },
                 new SqlParameter("@ValueType", SqlDbType.NVarChar) { Value = entity.ValueType },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable }
             };
 
             return _context.Set<uvw_Claim>().FromSqlRaw("[svc].[usp_Claim_Update]"
-                + "@Id, @IssuerId, @ActorId, @Subject, @Type, @Value, @ValueType, @Immutable", pvalues.ToArray())
+                + "@Id, @IssuerId, @ActorId, @Subject, @Type, @Value, @ValueType, @IsDeletable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

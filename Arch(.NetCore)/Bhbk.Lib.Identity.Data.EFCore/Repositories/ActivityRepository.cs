@@ -27,11 +27,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@KeyValues", SqlDbType.NVarChar) { Value = (object)entity.KeyValues ?? DBNull.Value },
                 new SqlParameter("@OriginalValues", SqlDbType.NVarChar) { Value = (object)entity.OriginalValues ?? DBNull.Value },
                 new SqlParameter("@CurrentValues", SqlDbType.NVarChar) { Value = (object)entity.CurrentValues ?? DBNull.Value },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable },
             };
 
             return _context.Set<uvw_Activity>().FromSqlRaw("[svc].[usp_Activity_Insert]"
-                + "@AudienceId, @UserId, @ActivityType, @TableName, @KeyValues, @OriginalValues, @CurrentValues, @Immutable", pvalues.ToArray())
+                + "@AudienceId, @UserId, @ActivityType, @TableName, @KeyValues, @OriginalValues, @CurrentValues, @IsDeletable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*

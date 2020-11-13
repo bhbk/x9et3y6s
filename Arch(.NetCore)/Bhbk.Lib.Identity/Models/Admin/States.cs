@@ -26,13 +26,13 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool StateConsume { get; set; }
 
         [Required]
-        public DateTime IssuedUtc { get; set; }
+        public DateTimeOffset IssuedUtc { get; set; }
 
         [Required]
-        public DateTime ValidFromUtc { get; set; }
+        public DateTimeOffset ValidFromUtc { get; set; }
 
         [Required]
-        public DateTime ValidToUtc { get; set; }
+        public DateTimeOffset ValidToUtc { get; set; }
     }
 
     public class StateV1 : States

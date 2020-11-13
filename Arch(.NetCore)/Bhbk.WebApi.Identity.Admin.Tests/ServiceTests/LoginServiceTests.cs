@@ -116,8 +116,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     {
                         Name = Base64.CreateString(4) + "-" + Constants.TestLogin,
                         LoginKey = Constants.TestLoginKey,
-                        Enabled = true,
-                        Immutable = false
+                        IsEnabled = true,
+                        IsDeletable = false
                     });
                 result.Should().BeAssignableTo<LoginV1>();
 
@@ -207,7 +207,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testLogin = uow.Logins.Get(x => x.Name == Constants.TestLogin).Single();
-                testLogin.Immutable = true;
+                testLogin.IsDeletable = true;
 
                 uow.Logins.Update(testLogin);
                 uow.Commit();

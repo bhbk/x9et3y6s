@@ -45,8 +45,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         ConfigKey = Constants.SettingGlobalLegacyClaims,
                         ConfigValue = "true",
-                        Immutable = true,
+                        IsDeletable = true,
                     }));
+
+                _uow.Commit();
             }
 
             var foundGlobalLegacyIssuer = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -59,8 +61,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         ConfigKey = Constants.SettingGlobalLegacyIssuer,
                         ConfigValue = "true",
-                        Immutable = true,
+                        IsDeletable = true,
                     }));
+
+                _uow.Commit();
             }
 
             var foundGlobalTotpExpire = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -73,8 +77,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         ConfigKey = Constants.SettingGlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
-                        Immutable = true,
+                        IsDeletable = true,
                     }));
+
+                _uow.Commit();
             }
 
             /*
@@ -91,8 +97,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         Name = Constants.TestIssuer,
                         IssuerKey = Constants.TestIssuerKey,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -112,16 +118,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         IssuerId = foundIssuer.Id,
                         Name = Constants.TestAudience,
-                        Enabled = true,
-                        Immutable = false,
+                        IsLockedOut = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
+
+                _uow.Commit();
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activity>(new ActivityV1()
                     {
                         AudienceId = foundAudience.Id,
                         ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                        Immutable = false,
+                        IsDeletable = false,
                     }));
 
                 _uow.Refreshes.Create(
@@ -157,7 +166,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         AudienceId = foundAudience.Id,
                         UrlHost = url.Scheme + "://" + url.Host,
                         UrlPath = url.AbsolutePath,
-                        Enabled = true,
+                        IsEnabled = true,
                     }));
 
                 _uow.Commit();
@@ -180,7 +189,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         Type = Constants.TestClaim,
                         Value = AlphaNumeric.CreateString(8),
                         ValueType = Constants.TestClaimValueType,
-                        Immutable = false,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -199,7 +208,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     _mapper.Map<tbl_Login>(new LoginV1()
                     {
                         Name = Constants.TestLogin,
-                        Immutable = false,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -219,8 +228,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         AudienceId = foundAudience.Id,
                         Name = Constants.TestRole,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -243,10 +252,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         PhoneNumber = NumberAs.CreateString(9),
                         FirstName = "First-" + AlphaNumeric.CreateString(4),
                         LastName = "Last-" + AlphaNumeric.CreateString(4),
-                        LockoutEnabled = false,
-                        HumanBeing = true,
-                        Immutable = false,
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = false,
                     }), Constants.TestUserPassCurrent);
+
+                _uow.Commit();
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activity>(new ActivityV1()
@@ -254,7 +265,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         AudienceId = foundAudience.Id,
                         UserId = foundUser.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        Immutable = false,
+                        IsDeletable = false,
                     }));
 
                 _uow.Refreshes.Create(
@@ -354,8 +365,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         Name = Constants.TestIssuer + "-" + Base64.CreateString(4),
                         IssuerKey = Constants.TestIssuerKey,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -368,8 +379,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         IssuerId = issuer.Id,
                         Name = Constants.TestAudience + "-" + Base64.CreateString(4),
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Activities.Create(
@@ -377,7 +388,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         AudienceId = audience.Id,
                         ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                        Immutable = false,
+                        IsDeletable = false,
                     }));
 
                 _uow.Refreshes.Create(
@@ -404,7 +415,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         AudienceId = audience.Id,
                         UrlHost = audienceUrl.Scheme + "://" + audienceUrl.Host,
                         UrlPath = audienceUrl.AbsolutePath,
-                        Enabled = true,
+                        IsEnabled = true,
                     }));
 
                 _uow.Commit();
@@ -420,7 +431,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         Type = Constants.TestClaim + "-" + AlphaNumeric.CreateString(4),
                         Value = AlphaNumeric.CreateString(8),
                         ValueType = Constants.TestClaimValueType + "-" + AlphaNumeric.CreateString(4),
-                        Immutable = false,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -433,8 +444,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         Name = Constants.TestLogin + "-" + AlphaNumeric.CreateString(4),
                         LoginKey = Constants.TestLoginKey,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -447,8 +458,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     {
                         AudienceId = audience.Id,
                         Name = Constants.TestRole + "-" + AlphaNumeric.CreateString(4),
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -456,17 +467,22 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 /*
                  * create random users
                  */
+                var userName = AlphaNumeric.CreateString(4);
+
                 user = _uow.Users.Create(
                     _mapper.Map<tbl_User>(new UserV1()
                     {
-                        UserName = AlphaNumeric.CreateString(4) + "-" + Constants.TestUser,
+                        UserName = userName + "-" + Constants.TestUser,
+                        Email = userName + "-" + Constants.TestUser,
                         PhoneNumber = NumberAs.CreateString(9),
                         FirstName = "First-" + Base64.CreateString(4),
                         LastName = "Last-" + Base64.CreateString(4),
-                        LockoutEnabled = false,
-                        HumanBeing = true,
-                        Immutable = false,
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = false,
                     }), Constants.TestUserPassCurrent);
+
+                _uow.Commit();
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activity>(new ActivityV1()
@@ -474,7 +490,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         AudienceId = audience.Id,
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        Immutable = false,
+                        IsDeletable = false,
                     }));
 
                 _uow.States.Create(
@@ -537,6 +553,106 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             }
         }
 
+        public void CreateEmail(uint sets)
+        {
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
+                throw new InvalidOperationException();
+
+            /*
+             * create test users
+             */
+            var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
+                .Where(x => x.UserName == Constants.TestUser).ToLambda())
+                .SingleOrDefault();
+
+            if (foundUser == null)
+            {
+                foundUser = _uow.Users.Create(
+                    _mapper.Map<tbl_User>(new UserV1()
+                    {
+                        UserName = Constants.TestUser,
+                        Email = Constants.TestUser,
+                        PhoneNumber = NumberAs.CreateString(9),
+                        FirstName = "First-" + AlphaNumeric.CreateString(4),
+                        LastName = "Last-" + AlphaNumeric.CreateString(4),
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = false,
+                    }), Constants.TestUserPassCurrent);
+
+                _uow.Commit();
+            }
+
+            for (int i = 0; i < sets; i++)
+            {
+                DateTime now = DateTime.UtcNow;
+
+                var result = _uow.EmailQueue.Create(
+                    new tbl_EmailQueue()
+                    {
+                        Id = Guid.NewGuid(),
+                        FromId = foundUser.Id,
+                        FromEmail = foundUser.EmailAddress,
+                        ToId = foundUser.Id,
+                        ToEmail = foundUser.EmailAddress,
+                        Subject = "Subject-" + Base64.CreateString(4),
+                        HtmlContent = "Body-" + Base64.CreateString(32),
+                        CreatedUtc = now,
+                        SendAtUtc = now,
+                    });
+            }
+            _uow.Commit();
+        }
+
+        public void CreateText(uint sets)
+        {
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
+                throw new InvalidOperationException();
+
+            /*
+             * create test users
+             */
+            var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
+                .Where(x => x.UserName == Constants.TestUser).ToLambda())
+                .SingleOrDefault();
+
+            if (foundUser == null)
+            {
+                foundUser = _uow.Users.Create(
+                    _mapper.Map<tbl_User>(new UserV1()
+                    {
+                        UserName = Constants.TestUser,
+                        Email = Constants.TestUser,
+                        PhoneNumber = NumberAs.CreateString(9),
+                        FirstName = "First-" + AlphaNumeric.CreateString(4),
+                        LastName = "Last-" + AlphaNumeric.CreateString(4),
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = false,
+                    }), Constants.TestUserPassCurrent);
+                _uow.Commit();
+            }
+
+            for (int i = 0; i < sets; i++)
+            {
+                DateTime now = DateTime.UtcNow;
+
+                var result = _uow.TextQueue.Create(
+                    new tbl_TextQueue()
+                    {
+                        Id = Guid.NewGuid(),
+                        FromId = foundUser.Id,
+                        FromPhoneNumber = Constants.TestUserPhoneNumber,
+                        ToId = foundUser.Id,
+                        ToPhoneNumber = Constants.TestUserPhoneNumber,
+                        Body = "Body-" + Base64.CreateString(32),
+                        CreatedUtc = now,
+                        SendAtUtc = now,
+                    });
+            }
+            _uow.Commit();
+        }
+
         public void CreateMOTD(uint sets)
         {
             if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
@@ -548,11 +664,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     new tbl_MOTD()
                     {
                         Id = Guid.NewGuid(),
-                        Author = Constants.TestMOTD,
-                        Quote = "Test Quote",
+                        Author = Constants.TestMotdAuthor,
+                        Quote = "Quote-" + Base64.CreateString(4),
                         TssLength = 666,
                         TssId = AlphaNumeric.CreateString(8),
-                        TssDate = DateTime.Now,
+                        TssDate = DateTime.UtcNow,
                         TssCategory = "Test Category",
                         TssTitle = "Test Title",
                         TssBackground = "Test Background",
@@ -567,6 +683,25 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         {
             if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
                 throw new InvalidOperationException();
+
+            /*
+             * delete test emails
+             */
+            _uow.EmailQueue.Delete(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>().ToLambda());
+            _uow.Commit();
+
+            /*
+             * delete test texts
+             */
+            _uow.TextQueue.Delete(QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>().ToLambda());
+            _uow.Commit();
+
+            /*
+             * delete test motds
+             */
+            _uow.MOTDs.Delete(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
+                .Where(x => x.Author.Contains(Constants.TestMotdAuthor)).ToLambda());
+            _uow.Commit();
 
             /*
              * delete test users
@@ -614,7 +749,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
              * delete test msg of the day
              */
             _uow.MOTDs.Delete(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
-                .Where(x => x.Author.Contains(Constants.TestMOTD)).ToLambda());
+                .Where(x => x.Author.Contains(Constants.TestMotdAuthor)).ToLambda());
             _uow.Commit();
         }
     }

@@ -37,8 +37,8 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                     var transient = int.Parse(conf["Jobs:MaintainActivity:HoldTransient"]);
 
                     var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_Activity>()
-                        .Where(x => (x.Created.AddSeconds(transient) < DateTime.Now && x.Immutable == false)
-                            || (x.Created.AddSeconds(auditable) < DateTime.Now && x.Immutable == true)).ToLambda();
+                        .Where(x => (x.CreatedUtc.AddSeconds(transient) < DateTime.UtcNow && x.IsDeletable == false)
+                            || (x.CreatedUtc.AddSeconds(auditable) < DateTime.UtcNow && x.IsDeletable == true)).ToLambda();
 
                     var expired = uow.Activities.Get(expiredExpr);
                     var expiredCount = expired.Count();
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                         uow.Activities.Delete(expired);
                         uow.Commit();
 
-                        var msg = callPath + " success on " + DateTime.Now.ToString() + ". Delete "
+                        var msg = callPath + " success on " + DateTime.UtcNow.ToString() + ". Delete "
                                 + expiredCount.ToString() + " expired activity entries.";
 
                         Log.Information(msg);

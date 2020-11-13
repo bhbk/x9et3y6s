@@ -20,9 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Issuers.Create(
-                   Mapper.Map<tbl_Issuer>(new IssuerV1()));
-
+                UoW.Issuers.Create(new tbl_Issuer());
                 UoW.Commit();
             });
         }
@@ -38,12 +36,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                 {
                     Name = Constants.TestIssuer,
                     IssuerKey = Constants.TestIssuerKey,
-                    Enabled = true,
-                    Immutable = false,
+                    IsEnabled = true,
+                    IsDeletable = true,
                 }));
-            result.Should().BeAssignableTo<tbl_Issuer>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Issuer>();
         }
 
         [Fact]
@@ -66,6 +64,24 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                 .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
+            UoW.Claims.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
+            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
+            UoW.Settings.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
+            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
+            UoW.Roles.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
+                .Where(x => x.tbl_Audience.IssuerId == issuer.Id).ToLambda());
+
+            UoW.Audiences.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
             UoW.Issuers.Delete(issuer);
             UoW.Commit();
         }
@@ -84,7 +100,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Issuers_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Issuers.Update(new tbl_Issuer());
                 UoW.Commit();
@@ -103,9 +119,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             issuer.Name += "(Updated)";
 
             var result = UoW.Issuers.Update(issuer);
-            result.Should().BeAssignableTo<tbl_Issuer>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Issuer>();
         }
     }
 }

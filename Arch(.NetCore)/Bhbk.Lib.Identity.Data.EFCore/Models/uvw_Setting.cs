@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace Bhbk.Lib.Identity.Data.EFCore.Models
 {
     public partial class uvw_Setting
@@ -11,7 +13,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         public Guid? UserId { get; set; }
         public string ConfigKey { get; set; }
         public string ConfigValue { get; set; }
-        public DateTime Created { get; set; }
-        public bool Immutable { get; set; }
+        public bool IsDeletable { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
     }
 }

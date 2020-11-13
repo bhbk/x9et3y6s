@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         [Required]
         [DefaultValue(false)]
-        public bool Immutable { get; set; }
+        public bool IsDeletable { get; set; }
     }
 
     public class SettingV1 : Settings
@@ -28,6 +28,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public Guid Id { get; set; }
 
-        public DateTime Created { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
@@ -20,6 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Roles.Create(new uvw_Role());
+                UoW.Commit();
             });
         }
 
@@ -34,13 +36,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             var result = UoW.Roles.Create(
-                new uvw_Role()
+                Mapper.Map<uvw_Role>(new RoleV1()
                 {
                     AudienceId = audience.Id,
                     Name = Constants.TestRole,
-                    Enabled = true,
-                    Immutable = false,
-                });
+                    IsEnabled = true,
+                    IsDeletable = false,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Role>();
         }
 
@@ -50,6 +54,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Roles.Delete(new uvw_Role());
+                UoW.Commit();
             });
         }
 
@@ -64,6 +69,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             UoW.Roles.Delete(role);
+            UoW.Commit();
         }
 
         [Fact]
@@ -83,6 +89,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Roles.Update(new uvw_Role());
+                UoW.Commit();
             });
         }
 
@@ -98,6 +105,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             role.Name += "(Updated)";
 
             var result = UoW.Roles.Update(role);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Role>();
         }
     }

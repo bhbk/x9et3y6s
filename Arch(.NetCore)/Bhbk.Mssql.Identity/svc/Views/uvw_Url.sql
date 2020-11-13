@@ -1,5 +1,5 @@
 ﻿
 CREATE VIEW [svc].[uvw_Url]
 AS
-SELECT        Id, AudienceId, ActorId, UrlHost, UrlPath, Enabled, Created, LastUpdated, Immutable
-FROM            dbo.tbl_Url
+SELECT        Id, AudienceId, ActorId, UrlHost, UrlPath, IsEnabled, IsDeletable, CreatedUtc, LastUpdatedUtc
+FROM            [dbo].[tbl_Url]

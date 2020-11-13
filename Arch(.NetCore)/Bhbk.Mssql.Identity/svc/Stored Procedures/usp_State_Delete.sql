@@ -4,10 +4,20 @@ CREATE PROCEDURE [svc].[usp_State_Delete]
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-SELECT * FROM [svc].[uvw_State] WHERE [svc].[uvw_State].Id = @ID
+	BEGIN TRY
 
-DELETE [dbo].[tbl_State]
-WHERE Id = @ID
+        SELECT * FROM [svc].[uvw_State] WHERE [svc].[uvw_State].Id = @ID
+
+        DELETE [dbo].[tbl_State]
+        WHERE Id = @ID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

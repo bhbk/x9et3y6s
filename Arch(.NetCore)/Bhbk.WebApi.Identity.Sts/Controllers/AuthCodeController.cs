@@ -95,9 +95,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
-                audience = UoW.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Url)).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
             else
-                audience = UoW.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Url)).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
 
             if (audience == null)
             {
@@ -136,11 +136,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
-            if (audience.tbl_Url.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
+            if (audience.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
                 redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize-callback"));
             }
-            else if (audience.tbl_Url.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+            else if (audience.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
 
             }
@@ -206,7 +206,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
-            else if (!issuer.Enabled)
+            else if (!issuer.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
@@ -240,13 +240,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             var audienceList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                    .Where(x => x.tbl_Role.Any(y => y.tbl_UserRole.Any(z => z.UserId == user.Id))).ToLambda());
+                    .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
             var audiences = new List<tbl_Audience>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
                 audiences = UoW.Audiences.Get(x => audienceList.Contains(x)
-                    && x.Enabled == true).ToList();
+                    && x.IsEnabled == true).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
@@ -256,16 +256,16 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                     //check if identifier is guid. resolve to guid if not.
                     if (Guid.TryParse(entry.Trim(), out audienceID))
-                        audience = UoW.Audiences.Get(x => x.Id == audienceID, y => y.Include(z => z.tbl_Url)).SingleOrDefault();
+                        audience = UoW.Audiences.Get(x => x.Id == audienceID, y => y.Include(z => z.tbl_Urls)).SingleOrDefault();
                     else
-                        audience = UoW.Audiences.Get(x => x.Name == entry.Trim(), y => y.Include(z => z.tbl_Url)).SingleOrDefault();
+                        audience = UoW.Audiences.Get(x => x.Name == entry.Trim(), y => y.Include(z => z.tbl_Urls)).SingleOrDefault();
 
                     if (audience == null)
                     {
                         ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                         return NotFound(ModelState);
                     }
-                    else if (!audience.Enabled
+                    else if (!audience.IsEnabled
                         || !audienceList.Contains(audience))
                     {
                         ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
@@ -287,8 +287,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             foreach (var entry in audiences)
             {
-                if (!entry.tbl_Url.Where(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath).Any()
-                    && !entry.tbl_Url.Where(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri).Any())
+                if (!entry.tbl_Urls.Where(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath).Any()
+                    && !entry.tbl_Urls.Where(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri).Any())
                 {
                     ModelState.AddModelError(MessageType.UriInvalid.ToString(), $"Uri:{input.redirect_uri}");
                     return BadRequest(ModelState);
@@ -325,7 +325,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
@@ -347,7 +347,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             UoW.Commit();

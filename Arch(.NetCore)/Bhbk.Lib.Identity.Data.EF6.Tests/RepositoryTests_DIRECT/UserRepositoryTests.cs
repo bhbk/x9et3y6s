@@ -21,8 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Users.Create(
-                    Mapper.Map<tbl_User>(new UserV1()));
+                UoW.Users.Create(new tbl_User());
                 UoW.Commit();
             });
         }
@@ -41,13 +40,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                     PhoneNumber = NumberAs.CreateString(9),
                     FirstName = "First-" + Base64.CreateString(4),
                     LastName = "Last-" + Base64.CreateString(4),
-                    LockoutEnabled = false,
-                    HumanBeing = true,
-                    Immutable = false,
+                    IsLockedOut = false,
+                    IsHumanBeing = true,
+                    IsDeletable = true,
                 }));
-            result.Should().BeAssignableTo<tbl_User>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_User>();
         }
 
         [Fact]
@@ -69,6 +68,18 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
 
+            UoW.Activities.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Activity>()
+                .Where(x => x.UserId == user.Id).ToLambda());
+
+            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+                .Where(x => x.UserId == user.Id).ToLambda());
+
+            UoW.Settings.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.UserId == user.Id).ToLambda());
+
+            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
+                .Where(x => x.UserId == user.Id).ToLambda());
+
             UoW.Users.Delete(user);
             UoW.Commit();
         }
@@ -87,7 +98,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Users_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Users.Update(new tbl_User());
                 UoW.Commit();
@@ -106,9 +117,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
             user.LastName += "(Updated)";
 
             var result = UoW.Users.Update(user);
-            result.Should().BeAssignableTo<tbl_User>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_User>();
         }
     }
 }

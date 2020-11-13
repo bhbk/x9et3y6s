@@ -8,7 +8,7 @@ namespace Bhbk.WebApi.Alert.Helpers
 {
     public class SendGridProvider
     {
-        public async ValueTask<Response> TryEmailHandoff(string apiKey, tbl_QueueEmail model)
+        public async ValueTask<Response> TryEmailHandoff(string apiKey, tbl_EmailQueue model)
         {
             var sendgrid = new SendGridClient(apiKey);
 

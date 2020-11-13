@@ -93,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.EntityId}");
                 return NotFound(ModelState);
             }
-            else if (!user.HumanBeing
+            else if (!user.IsHumanBeing
                 || user.Id != model.EntityId)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
@@ -147,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
             else if (user.Id != model.EntityId
-                || !user.HumanBeing)
+                || !user.IsHumanBeing)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);

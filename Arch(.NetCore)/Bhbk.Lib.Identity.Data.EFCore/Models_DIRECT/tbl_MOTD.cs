@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
 {
     public partial class tbl_MOTD

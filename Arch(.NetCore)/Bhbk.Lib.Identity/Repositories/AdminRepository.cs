@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,20 +27,18 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _conf = conf;
             _instance = instance;
-
+               
             if (instance == InstanceContext.DeployedOrLocal)
             {
                 var connect = new HttpClientHandler();
 
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
                 connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+                connect.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
 
                 _http = new HttpClient(connect);
             }
-            else if (instance == InstanceContext.End2EndTest)
-                _http = http;
             else
-                throw new NotImplementedException();
+                _http = http;
 
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -66,6 +65,21 @@ namespace Bhbk.Lib.Identity.Repositories
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
             var endpoint = "/activity/v1/" + activityValue;
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.End2EndTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_AddToRoleV1(string jwt, Guid audienceID, Guid roleID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/audience/v1/" + audienceID.ToString() + "/add-to-role/" + roleID.ToString();
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
@@ -188,6 +202,36 @@ namespace Bhbk.Lib.Identity.Repositories
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
             var endpoint = "/audience/v1/" + audienceValue + "/roles";
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.End2EndTest)
+                return await _http.GetAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_RemoveFromRoleV1(string jwt, Guid audienceID, Guid roleID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/audience/v1/" + audienceID.ToString() + "/remove-from-role/" + roleID.ToString();
+
+            if (_instance == InstanceContext.DeployedOrLocal)
+                return await _http.DeleteAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));
+
+            if (_instance == InstanceContext.End2EndTest)
+                return await _http.DeleteAsync(endpoint);
+
+            throw new NotSupportedException();
+        }
+
+        public async ValueTask<HttpResponseMessage> Audience_RemovePasswordV1(string jwt, Guid audienceID)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
+
+            var endpoint = "/audience/v1/" + audienceID.ToString() + "/remove-password";
 
             if (_instance == InstanceContext.DeployedOrLocal)
                 return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityAdminUrls:BaseApiUrl"], _conf["IdentityAdminUrls:BaseApiPath"], endpoint));

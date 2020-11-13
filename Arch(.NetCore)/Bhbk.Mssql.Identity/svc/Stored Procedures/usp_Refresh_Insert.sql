@@ -5,40 +5,50 @@ CREATE PROCEDURE [svc].[usp_Refresh_Insert]
     ,@UserId				UNIQUEIDENTIFIER
     ,@RefreshValue			NVARCHAR (512) 
     ,@RefreshType			NVARCHAR (64)
-    ,@IssuedUtc				DATETIME2 (7) 
-    ,@ValidFromUtc			DATETIME2 (7)
-    ,@ValidToUtc			DATETIME2 (7) 
+    ,@IssuedUtc				DATETIMEOFFSET (7) 
+    ,@ValidFromUtc			DATETIMEOFFSET (7)
+    ,@ValidToUtc			DATETIMEOFFSET (7) 
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @REFRESHID UNIQUEIDENTIFIER = NEWID()
+	BEGIN TRY
 
-INSERT INTO [dbo].[tbl_Refresh]
-	(
-     Id         
-	,IssuerId
-    ,AudienceId    
-    ,UserId           
-    ,RefreshValue   
-	,RefreshType
-	,IssuedUtc
-	,ValidFromUtc
-	,ValidToUtc
-	)
-VALUES
-	(
-     @REFRESHID          
-	,@IssuerId
-    ,@AudienceId   
-    ,@UserId         
-    ,@RefreshValue       
-	,@RefreshValue
-	,@IssuedUtc
-	,@ValidFromUtc
-	,@ValidToUtc
-	);
+        DECLARE @REFRESHID UNIQUEIDENTIFIER = NEWID()
 
-SELECT * FROM [svc].[uvw_Refresh] WHERE [svc].[uvw_Refresh].Id = @REFRESHID
+        INSERT INTO [dbo].[tbl_Refresh]
+	        (
+             Id         
+	        ,IssuerId
+            ,AudienceId    
+            ,UserId           
+            ,RefreshValue   
+	        ,RefreshType
+	        ,IssuedUtc
+	        ,ValidFromUtc
+	        ,ValidToUtc
+	        )
+        VALUES
+	        (
+             @REFRESHID          
+	        ,@IssuerId
+            ,@AudienceId   
+            ,@UserId         
+            ,@RefreshValue       
+	        ,@RefreshValue
+	        ,@IssuedUtc
+	        ,@ValidFromUtc
+	        ,@ValidToUtc
+	        );
+
+        SELECT * FROM [svc].[uvw_Refresh] WHERE [svc].[uvw_Refresh].Id = @REFRESHID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

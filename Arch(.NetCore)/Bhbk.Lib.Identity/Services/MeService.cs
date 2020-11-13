@@ -80,7 +80,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Info_GetCodesV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<StateV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<StateV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -91,7 +91,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Info_GetRefreshesV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<RefreshV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<RefreshV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -102,7 +102,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Info_GetMOTDV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<MOTDTssV1>().Result;
+                return await response.Content.ReadAsAsync<MOTDTssV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -113,7 +113,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Info_GetV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserV1>().Result;
+                return await response.Content.ReadAsAsync<UserV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -146,7 +146,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Info_UpdateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserV1>().Result;
+                return await response.Content.ReadAsAsync<UserV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

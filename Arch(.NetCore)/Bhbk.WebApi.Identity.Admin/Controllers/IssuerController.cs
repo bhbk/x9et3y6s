@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{issuerID}");
                 return NotFound(ModelState);
             }
-            else if (issuer.Immutable)
+            else if (issuer.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.IssuerImmutable.ToString(), $"Issuer:{issuerID}");
                 return BadRequest(ModelState);
@@ -94,14 +94,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{current}");
                 return NotFound(ModelState);
             }
-            else if (!audience.Enabled)
+            else if (!audience.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{current}");
                 return BadRequest(ModelState);
             }
 
             var issuers = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
-                .Where(x => x.Enabled == true && (model.Contains(x.Id.ToString()) || model.Contains(x.Name))).ToLambda());
+                .Where(x => x.IsEnabled == true && (model.Contains(x.Id.ToString()) || model.Contains(x.Name))).ToLambda());
 
             return Ok(issuers.ToDictionary(x => x.Id, x => x.IssuerKey));
         }
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Issuers.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Issuer>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Issuer, object>>>() { x => x.tbl_Audience })),
+                            new List<Expression<Func<tbl_Issuer, object>>>() { x => x.tbl_Audiences })),
 
                     Total = UoW.Issuers.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(
@@ -192,8 +192,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (issuer.Immutable
-                && issuer.Immutable != model.Immutable)
+            else if (issuer.IsDeletable
+                && issuer.IsDeletable != model.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.IssuerImmutable.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);

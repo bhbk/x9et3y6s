@@ -44,14 +44,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@FirstName", SqlDbType.NVarChar) { Value = entity.FirstName },
                 new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = entity.LastName },
                 new SqlParameter("@PhoneNumber", SqlDbType.NVarChar) { Value = entity.PhoneNumber },
-                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
-                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
-                new SqlParameter("@HumanBeing", SqlDbType.Bit) { Value = entity.HumanBeing },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsHumanBeing", SqlDbType.Bit) { Value = entity.IsHumanBeing },
+                new SqlParameter("@IsLockedOut", SqlDbType.Bit) { Value = entity.IsLockedOut },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable },
+                new SqlParameter("@LockoutEndUtc", SqlDbType.DateTimeOffset) { Value = entity.LockoutEndUtc.HasValue ? (object)entity.LockoutEndUtc.Value : DBNull.Value },
             };
 
             return _context.Set<uvw_User>().FromSqlRaw("[svc].[usp_User_Insert]"
-                + "@ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
+                + "@ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @IsHumanBeing, @IsLockedOut, @IsDeletable, @LockoutEndUtc", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -110,11 +110,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_User> Delete(LambdaExpression lambda)
-        {
-            throw new NotImplementedException();
-        }
-
         public override uvw_User Update(uvw_User entity)
         {
             var pvalues = new List<SqlParameter>
@@ -126,14 +121,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@FirstName", SqlDbType.NVarChar) { Value = entity.FirstName },
                 new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = entity.LastName },
                 new SqlParameter("@PhoneNumber", SqlDbType.NVarChar) { Value = entity.PhoneNumber },
-                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
-                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
-                new SqlParameter("@HumanBeing", SqlDbType.Bit) { Value = entity.HumanBeing },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsHumanBeing", SqlDbType.Bit) { Value = entity.IsHumanBeing },
+                new SqlParameter("@IsLockedOut", SqlDbType.Bit) { Value = entity.IsLockedOut },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable },
+                new SqlParameter("@LockoutEndUtc", SqlDbType.DateTimeOffset) { Value = entity.LockoutEndUtc.HasValue ? (object)entity.LockoutEndUtc.Value : DBNull.Value },
             };
 
             return _context.Set<uvw_User>().FromSqlRaw("[svc].[usp_User_Update]"
-                + "@Id, @ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @LockoutEnabled, @LockoutEnd, @HumanBeing, @Immutable", pvalues.ToArray())
+                + "@Id, @ActorId, @UserName, @EmailAddress, @FirstName, @LastName, @PhoneNumber, @IsHumanBeing, @IsLockedOut, @IsDeletable, @LockoutEndUtc", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace Bhbk.Lib.Identity.Data.EFCore.Models
 {
     public partial class uvw_Claim
@@ -12,8 +14,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         public string Type { get; set; }
         public string Value { get; set; }
         public string ValueType { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime? LastUpdated { get; set; }
-        public bool Immutable { get; set; }
+        public bool IsDeletable { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset? LastUpdatedUtc { get; set; }
     }
 }

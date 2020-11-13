@@ -19,12 +19,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         {
             this.tbl_Activity = new HashSet<tbl_Activity>();
             this.tbl_Claim = new HashSet<tbl_Claim>();
+            this.tbl_EmailQueue = new HashSet<tbl_EmailQueue>();
             this.tbl_Login = new HashSet<tbl_Login>();
-            this.tbl_QueueEmail = new HashSet<tbl_QueueEmail>();
-            this.tbl_QueueText = new HashSet<tbl_QueueText>();
             this.tbl_Refresh = new HashSet<tbl_Refresh>();
             this.tbl_Setting = new HashSet<tbl_Setting>();
             this.tbl_State = new HashSet<tbl_State>();
+            this.tbl_TextQueue = new HashSet<tbl_TextQueue>();
             this.tbl_UserClaim = new HashSet<tbl_UserClaim>();
             this.tbl_UserLogin = new HashSet<tbl_UserLogin>();
             this.tbl_UserRole = new HashSet<tbl_UserRole>();
@@ -39,39 +39,39 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public Nullable<bool> PhoneNumberConfirmed { get; set; }
-        public bool LockoutEnabled { get; set; }
-        public Nullable<System.DateTimeOffset> LockoutEnd { get; set; }
-        public Nullable<System.DateTime> LastLoginSuccess { get; set; }
-        public Nullable<System.DateTime> LastLoginFailure { get; set; }
-        public int AccessFailedCount { get; set; }
-        public int AccessSuccessCount { get; set; }
         public string ConcurrencyStamp { get; set; }
         public string PasswordHashPBKDF2 { get; set; }
         public string PasswordHashSHA256 { get; set; }
         public bool PasswordConfirmed { get; set; }
         public string SecurityStamp { get; set; }
-        public bool TwoFactorEnabled { get; set; }
-        public bool HumanBeing { get; set; }
-        public bool Immutable { get; set; }
-        public System.DateTime Created { get; set; }
-        public Nullable<System.DateTime> LastUpdated { get; set; }
+        public bool IsHumanBeing { get; set; }
+        public bool IsMultiFactor { get; set; }
+        public bool IsLockedOut { get; set; }
+        public bool IsDeletable { get; set; }
+        public int AccessFailedCount { get; set; }
+        public int AccessSuccessCount { get; set; }
+        public Nullable<System.DateTimeOffset> LockoutEndUtc { get; set; }
+        public Nullable<System.DateTimeOffset> LastLoginSuccessUtc { get; set; }
+        public Nullable<System.DateTimeOffset> LastLoginFailureUtc { get; set; }
+        public System.DateTimeOffset CreatedUtc { get; set; }
+        public Nullable<System.DateTimeOffset> LastUpdatedUtc { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Activity> tbl_Activity { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Claim> tbl_Claim { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tbl_EmailQueue> tbl_EmailQueue { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Login> tbl_Login { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_QueueEmail> tbl_QueueEmail { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_QueueText> tbl_QueueText { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Refresh> tbl_Refresh { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Setting> tbl_Setting { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_State> tbl_State { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tbl_TextQueue> tbl_TextQueue { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_UserClaim> tbl_UserClaim { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

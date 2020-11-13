@@ -43,7 +43,7 @@ namespace Bhbk.Cli.Identity.Commands
                     issuer = admin.Issuer_CreateV1(new IssuerV1()
                     {
                         Name = issuerName,
-                        Enabled = true,
+                        IsEnabled = true,
                     }).Result;
 
                     if (issuer.Id != Guid.Empty)

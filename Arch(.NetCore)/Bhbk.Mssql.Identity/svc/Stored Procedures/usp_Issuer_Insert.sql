@@ -4,38 +4,48 @@ CREATE PROCEDURE [svc].[usp_Issuer_Insert]
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
     ,@IssuerKey				NVARCHAR (MAX) 
-    ,@Enabled				BIT 
-    ,@Immutable				BIT
+    ,@IsEnabled				BIT 
+    ,@IsDeletable			BIT
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @ISSUERID UNIQUEIDENTIFIER = NEWID()
-DECLARE @CREATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-INSERT INTO [dbo].[tbl_Issuer]
-	(
-     Id           
-    ,ActorId    
-    ,Name           
-    ,Description       
-    ,IssuerKey       
-    ,Enabled     
-    ,Created           
-    ,Immutable        
-	)
-VALUES
-	(
-     @ISSUERID           
-    ,@ActorId    
-    ,@Name           
-    ,@Description       
-    ,@IssuerKey       
-    ,@Enabled     
-    ,@CREATED          
-    ,@Immutable        
-	);
+        DECLARE @ISSUERID UNIQUEIDENTIFIER = NEWID()
+        DECLARE @CREATEDUTC DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Issuer] WHERE [svc].[uvw_Issuer].Id = @ISSUERID
+        INSERT INTO [dbo].[tbl_Issuer]
+	        (
+             Id           
+            ,ActorId    
+            ,Name           
+            ,Description       
+            ,IssuerKey       
+            ,IsEnabled     
+            ,IsDeletable        
+            ,CreatedUtc           
+	        )
+        VALUES
+	        (
+             @ISSUERID           
+            ,@ActorId    
+            ,@Name           
+            ,@Description       
+            ,@IssuerKey       
+            ,@IsEnabled     
+            ,@IsDeletable        
+            ,@CREATEDUTC          
+	        );
+
+        SELECT * FROM [svc].[uvw_Issuer] WHERE [svc].[uvw_Issuer].Id = @ISSUERID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

@@ -11,6 +11,7 @@ using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Me.Jobs;
+using CronExpressionDescriptor;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +28,7 @@ using Quartz;
 using Serilog;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Bhbk.WebApi.Identity.Me
@@ -35,6 +37,8 @@ namespace Bhbk.WebApi.Identity.Me
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+
             var conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
@@ -45,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Me
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);
             sc.AddSingleton<IMapper>(mapper);
-            sc.AddSingleton<IAuthorizationHandler, IdentityHumansAuthorize>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityUserssAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
             {
@@ -74,20 +78,22 @@ namespace Bhbk.WebApi.Identity.Me
 
                 if (bool.Parse(conf["Jobs:MaintainQuotes:Enable"]))
                 {
-                    var quotesJobKey = new JobKey(JobType.MeQuotesJob.ToString(), GroupType.MeJobs.ToString());
+                    var jobKey = new JobKey(JobType.MeQuotesJob.ToString(), GroupType.MeJobs.ToString());
                     jobs.AddJob<MaintainQuotesJob>(opt => opt
                         .StoreDurably()
-                        .WithIdentity(quotesJobKey)
+                        .WithIdentity(jobKey)
                     );
 
                     foreach (var cron in conf.GetSection("Jobs:MaintainQuotes:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
-                            .ForJob(quotesJobKey)
+                            .ForJob(jobKey)
                             .StartNow()
                             .WithCronSchedule(cron)
                         );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
                     }
                 }
             });
@@ -179,7 +185,7 @@ namespace Bhbk.WebApi.Identity.Me
             {
                 opt.AddPolicy(Constants.DefaultPolicyForHumans, humans =>
                 {
-                    humans.Requirements.Add(new IdentityHumansAuthorizeRequirement());
+                    humans.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                 });
                 opt.AddPolicy(Constants.DefaultPolicyForServices, servers =>
                 {

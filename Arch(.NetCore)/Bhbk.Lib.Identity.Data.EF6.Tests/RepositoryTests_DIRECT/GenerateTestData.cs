@@ -3,7 +3,6 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EF6.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EF6.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -18,13 +17,11 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        private readonly ValidationHelper _validate;
 
         public GenerateTestData(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
             _mapper = mapper ?? throw new ArgumentNullException();
-            _validate = new ValidationHelper();
         }
 
         public void Create()
@@ -46,8 +43,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                     {
                         Name = Constants.TestIssuer,
                         IssuerKey = Constants.TestIssuerKey,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = true,
                     }));
 
                 _uow.Commit();
@@ -67,16 +64,19 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                     {
                         IssuerId = foundIssuer.Id,
                         Name = Constants.TestAudience,
-                        Enabled = true,
-                        Immutable = false,
+                        IsLockedOut = false,
+                        IsEnabled = true,
+                        IsDeletable = true,
                     }));
+
+                _uow.Commit();
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activity>(new ActivityV1()
                     {
                         AudienceId = foundAudience.Id,
                         ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                        Immutable = false,
+                        IsDeletable = true,
                     }));
 
                 _uow.Refreshes.Create(
@@ -88,31 +88,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                         RefreshValue = AlphaNumeric.CreateString(8),
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                    }));
-
-                _uow.Commit();
-            }
-
-            /*
-             * create test client urls
-             */
-            var url = new Uri(Constants.TestUriLink);
-
-            var foundAudienceUrl = _uow.Urls.Get(QueryExpressionFactory.GetQueryExpression<tbl_Url>()
-                .Where(x => x.AudienceId == foundAudience.Id
-                    && x.UrlHost == (url.Scheme + "://" + url.Host)
-                    && x.UrlPath == url.AbsolutePath).ToLambda())
-                .SingleOrDefault();
-
-            if (foundAudienceUrl == null)
-            {
-                foundAudienceUrl = _uow.Urls.Create(
-                    _mapper.Map<tbl_Url>(new UrlV1()
-                    {
-                        AudienceId = foundAudience.Id,
-                        UrlHost = url.Scheme + "://" + url.Host,
-                        UrlPath = url.AbsolutePath,
-                        Enabled = true,
                     }));
 
                 _uow.Commit();
@@ -135,7 +110,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                         Type = Constants.TestClaim,
                         Value = AlphaNumeric.CreateString(8),
                         ValueType = Constants.TestClaimValueType,
-                        Immutable = false,
+                        IsDeletable = true,
                     }));
 
                 _uow.Commit();
@@ -154,7 +129,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                     _mapper.Map<tbl_Login>(new LoginV1()
                     {
                         Name = Constants.TestLogin,
-                        Immutable = false,
+                        IsDeletable = true,
                     }));
 
                 _uow.Commit();
@@ -174,8 +149,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                     {
                         AudienceId = foundAudience.Id,
                         Name = Constants.TestRole,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = true,
                     }));
 
                 _uow.Commit();
@@ -198,10 +173,12 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                         PhoneNumber = NumberAs.CreateString(9),
                         FirstName = "First-" + AlphaNumeric.CreateString(4),
                         LastName = "Last-" + AlphaNumeric.CreateString(4),
-                        LockoutEnabled = false,
-                        HumanBeing = true,
-                        Immutable = false,
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = true,
                     }));
+
+                _uow.Commit();
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activity>(new ActivityV1()
@@ -209,7 +186,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
                         AudienceId = foundAudience.Id,
                         UserId = foundUser.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        Immutable = false,
+                        IsDeletable = true,
                     }));
 
                 _uow.Refreshes.Create(
@@ -252,8 +229,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
 
                 _uow.Commit();
             }
-
-            _uow.Commit();
         }
 
         public void Destroy()

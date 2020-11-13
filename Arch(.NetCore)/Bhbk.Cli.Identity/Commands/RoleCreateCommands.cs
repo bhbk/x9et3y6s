@@ -55,7 +55,7 @@ namespace Bhbk.Cli.Identity.Commands
                     {
                         AudienceId = audience.Id,
                         Name = roleName,
-                        Enabled = true,
+                        IsEnabled = true,
                     }).Result;
 
                     if (role != null)

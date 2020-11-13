@@ -3,6 +3,7 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EF6.Infrastructure;
 using Bhbk.Lib.Identity.Data.EF6.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -39,13 +40,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             if (foundIssuer == null)
             {
                 foundIssuer = _uow.Issuers.Create(
-                    new uvw_Issuer()
+                    _mapper.Map<uvw_Issuer>(new IssuerV1()
                     {
                         Name = Constants.TestIssuer,
                         IssuerKey = Constants.TestIssuerKey,
-                        Enabled = true,
-                        Immutable = false,
-                    });
+                        IsEnabled = true,
+                        IsDeletable = true,
+                    }));
+
+                _uow.Commit();
             }
 
             /*
@@ -58,33 +61,37 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             if (foundAudience == null)
             {
                 foundAudience = _uow.Audiences.Create(
-                    new uvw_Audience()
+                    _mapper.Map<uvw_Audience>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = Constants.TestAudience,
-                        Enabled = true,
-                        Immutable = false,
-                    });
+                        IsLockedOut = false,
+                        IsEnabled = true,
+                        IsDeletable = true,
+                    }));
+
+                _uow.Commit();
 
                 _uow.Activities.Create(
-                    new uvw_Activity()
+                    _mapper.Map<uvw_Activity>(new ActivityV1()
                     {
                         AudienceId = foundAudience.Id,
                         ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                        Immutable = false,
-                    });
+                        IsDeletable = true,
+                    }));
 
                 _uow.Refreshes.Create(
-                    new uvw_Refresh()
+                    _mapper.Map<uvw_Refresh>(new RefreshV1()
                     {
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
                         RefreshType = RefreshType.Client.ToString(),
-                        RefreshValue = Base64.CreateString(8),
-                        IssuedUtc = DateTime.UtcNow,
+                        RefreshValue = AlphaNumeric.CreateString(8),
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                    });
+                    }));
+
+                _uow.Commit();
             }
 
             /*
@@ -97,15 +104,17 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             if (foundClaim == null)
             {
                 foundClaim = _uow.Claims.Create(
-                    new uvw_Claim()
+                    _mapper.Map<uvw_Claim>(new ClaimV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Subject = Constants.TestClaimSubject,
                         Type = Constants.TestClaim,
                         Value = AlphaNumeric.CreateString(8),
                         ValueType = Constants.TestClaimValueType,
-                        Immutable = false,
-                    });
+                        IsDeletable = true,
+                    }));
+
+                _uow.Commit();
             }
 
             /*
@@ -118,13 +127,13 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             if (foundLogin == null)
             {
                 foundLogin = _uow.Logins.Create(
-                    new uvw_Login()
+                    _mapper.Map<uvw_Login>(new LoginV1()
                     {
                         Name = Constants.TestLogin,
-                        LoginKey = Constants.TestLoginKey,
-                        Enabled = false,
-                        Immutable = false,
-                    });
+                        IsDeletable = true,
+                    }));
+
+                _uow.Commit();
             }
 
             /*
@@ -137,13 +146,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             if (foundRole == null)
             {
                 foundRole = _uow.Roles.Create(
-                    new uvw_Role()
+                    _mapper.Map<uvw_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience.Id,
                         Name = Constants.TestRole,
-                        Enabled = true,
-                        Immutable = false,
-                    });
+                        IsEnabled = true,
+                        IsDeletable = true,
+                    }));
+
+                _uow.Commit();
             }
 
             /*
@@ -156,40 +167,43 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             if (foundUser == null)
             {
                 foundUser = _uow.Users.Create(
-                    new uvw_User()
+                    _mapper.Map<uvw_User>(new UserV1()
                     {
                         UserName = Constants.TestUser,
-                        EmailAddress = Constants.TestUser,
+                        Email = Constants.TestUser,
                         PhoneNumber = NumberAs.CreateString(9),
-                        FirstName = "First-" + Base64.CreateString(4),
-                        LastName = "Last-" + Base64.CreateString(4),
-                        LockoutEnabled = false,
-                        HumanBeing = true,
-                        Immutable = false,
-                    });
+                        FirstName = "First-" + AlphaNumeric.CreateString(4),
+                        LastName = "Last-" + AlphaNumeric.CreateString(4),
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = true,
+                    }));
+
+                _uow.Commit();
 
                 _uow.Activities.Create(
-                    new uvw_Activity()
+                    _mapper.Map<uvw_Activity>(new ActivityV1()
                     {
+                        AudienceId = foundAudience.Id,
                         UserId = foundUser.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        Immutable = false,
-                    });
+                        IsDeletable = true,
+                    }));
 
                 _uow.Refreshes.Create(
-                    new uvw_Refresh()
+                    _mapper.Map<uvw_Refresh>(new RefreshV1()
                     {
                         IssuerId = foundIssuer.Id,
+                        AudienceId = foundAudience.Id,
                         UserId = foundUser.Id,
                         RefreshType = RefreshType.User.ToString(),
-                        RefreshValue = Base64.CreateString(8),
-                        IssuedUtc = DateTime.UtcNow,
+                        RefreshValue = AlphaNumeric.CreateString(8),
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                    });
+                    }));
 
                 _uow.States.Create(
-                    new uvw_State()
+                    _mapper.Map<uvw_State>(new StateV1()
                     {
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
@@ -199,11 +213,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                        LastPolling = DateTime.UtcNow,
-                    });
+                    }));
 
                 _uow.States.Create(
-                    new uvw_State()
+                    _mapper.Map<uvw_State>(new StateV1()
                     {
                         IssuerId = foundIssuer.Id,
                         AudienceId = foundAudience.Id,
@@ -213,8 +226,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                        LastPolling = DateTime.UtcNow,
-                    });
+                    }));
+
+                _uow.Commit();
             }
         }
 
@@ -230,7 +244,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Where(x => x.UserName.Contains(Constants.TestUser)).ToLambda());
 
             if(users.Count() > 0)
+            {
                 _uow.Users.Delete(users);
+                _uow.Commit();
+            }
 
             /*
              * delete test roles
@@ -239,7 +256,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Where(x => x.Name.Contains(Constants.TestRole)).ToLambda());
 
             if (roles.Count() > 0)
+            {
                 _uow.Roles.Delete(roles);
+                _uow.Commit();
+            }
 
             /*
              * delete test logins
@@ -248,7 +268,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Where(x => x.Name.Contains(Constants.TestLogin)).ToLambda());
 
             if (logins.Count() > 0)
+            {
                 _uow.Logins.Delete(logins);
+                _uow.Commit();
+            }
 
             /*
              * delete test claims
@@ -257,7 +280,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Where(x => x.Type.Contains(Constants.TestClaim)).ToLambda());
 
             if (claims.Count() > 0)
+            {
                 _uow.Claims.Delete(claims);
+                _uow.Commit();
+            }
 
             /*
              * delete test audiences
@@ -266,7 +292,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Where(x => x.Name.Contains(Constants.TestAudience)).ToLambda());
 
             if (audiences.Count() > 0)
+            {
                 _uow.Audiences.Delete(audiences);
+                _uow.Commit();
+            }
 
             /*
              * delete test issuers
@@ -275,7 +304,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Where(x => x.Name.Contains(Constants.TestIssuer)).ToLambda());
 
             if (issuers.Count() > 0)
+            {
                 _uow.Issuers.Delete(issuers);
+                _uow.Commit();
+            }
         }
     }
 }

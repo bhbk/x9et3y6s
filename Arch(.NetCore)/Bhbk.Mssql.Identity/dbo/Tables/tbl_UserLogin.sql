@@ -1,13 +1,25 @@
 ﻿CREATE TABLE [dbo].[tbl_UserLogin] (
-    [UserId]    UNIQUEIDENTIFIER NOT NULL,
-    [LoginId]   UNIQUEIDENTIFIER NOT NULL,
-    [ActorId]   UNIQUEIDENTIFIER NULL,
-    [Immutable] BIT              CONSTRAINT [DF_tbl_UserLogin_Immutable] DEFAULT ((0)) NOT NULL,
-    [Created]   DATETIME2 (7)    NOT NULL,
+    [UserId]      UNIQUEIDENTIFIER   NOT NULL,
+    [LoginId]     UNIQUEIDENTIFIER   NOT NULL,
+    [ActorId]     UNIQUEIDENTIFIER   NULL,
+    [IsDeletable] BIT                NOT NULL,
+    [CreatedUtc]  DATETIMEOFFSET (7) NULL,
     CONSTRAINT [PK_tbl_UserLogin] PRIMARY KEY CLUSTERED ([UserId] ASC, [LoginId] ASC),
     CONSTRAINT [FK_tbl_UserLogin_LoginID] FOREIGN KEY ([LoginId]) REFERENCES [dbo].[tbl_Login] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT [FK_tbl_UserLogin_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[tbl_User] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 GO

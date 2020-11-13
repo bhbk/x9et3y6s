@@ -19,11 +19,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact(Skip = "NotImplemented")]
         public void Repo_Claims_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Claims.Create(
-                    Mapper.Map<tbl_Claim>(new ClaimV1()));
-
+                UoW.Claims.Create(new tbl_Claim());
                 UoW.Commit();
             });
         }
@@ -46,11 +44,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     Type = Constants.TestClaim,
                     Value = AlphaNumeric.CreateString(8),
                     ValueType = Constants.TestClaimValueType,
-                    Immutable = false,
+                    IsDeletable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_Claim>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Claim>();
         }
 
         [Fact]
@@ -110,9 +108,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             claim.Value += "(Updated)";
 
             var result = UoW.Claims.Update(claim);
-            result.Should().BeAssignableTo<tbl_Claim>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Claim>();
         }
     }
 }

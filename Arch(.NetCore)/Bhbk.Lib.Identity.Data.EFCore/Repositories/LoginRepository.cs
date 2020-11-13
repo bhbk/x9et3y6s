@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
@@ -23,12 +22,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
                 new SqlParameter("@LoginKey", SqlDbType.NVarChar) { Value = entity.LoginKey },
-                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsEnabled", SqlDbType.Bit) { Value = entity.IsEnabled },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable }
             };
 
             return _context.Set<uvw_Login>().FromSqlRaw("[svc].[usp_Login_Insert]"
-                + "@ActorId, @Name, @Description, @LoginKey, @Enabled, @Immutable", pvalues.ToArray())
+                + "@ActorId, @Name, @Description, @LoginKey, @IsEnabled, @IsDeletable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -87,11 +86,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Login> Delete(LambdaExpression lambda)
-        {
-            throw new NotImplementedException();
-        }
-
         public override uvw_Login Update(uvw_Login entity)
         {
             var pvalues = new List<SqlParameter>
@@ -100,12 +94,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
-                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsEnabled", SqlDbType.Bit) { Value = entity.IsEnabled },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable }
             };
 
             return _context.Set<uvw_Login>().FromSqlRaw("[svc].[usp_Login_Update]"
-                + "@Id, @ActorId, @Name, @Description, @Enabled, @Immutable", pvalues.ToArray())
+                + "@Id, @ActorId, @Name, @Description, @IsEnabled, @IsDeletable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

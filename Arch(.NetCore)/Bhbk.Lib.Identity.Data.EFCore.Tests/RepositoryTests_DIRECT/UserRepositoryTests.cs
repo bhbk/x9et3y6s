@@ -19,10 +19,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact(Skip = "NotImplemented")]
         public void Repo_Users_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Users.Create(
-                    Mapper.Map<tbl_User>(new UserV1()));
+                UoW.Users.Create(new tbl_User());
                 UoW.Commit();
             });
         }
@@ -41,13 +40,13 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     PhoneNumber = NumberAs.CreateString(9),
                     FirstName = "First-" + Base64.CreateString(4),
                     LastName = "Last-" + Base64.CreateString(4),
-                    LockoutEnabled = false,
-                    HumanBeing = true,
-                    Immutable = false,
+                    IsLockedOut = false,
+                    IsHumanBeing = true,
+                    IsDeletable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_User>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_User>();
         }
 
         [Fact]
@@ -106,9 +105,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             user.LastName += "(Updated)";
 
             var result = UoW.Users.Update(user);
-            result.Should().BeAssignableTo<tbl_User>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_User>();
         }
     }
 }

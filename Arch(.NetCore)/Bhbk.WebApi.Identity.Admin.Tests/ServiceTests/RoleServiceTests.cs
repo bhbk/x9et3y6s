@@ -116,8 +116,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     {
                         AudienceId = audience.Id,
                         Name = Base64.CreateString(4) + "-" + Constants.TestRole,
-                        Enabled = true,
-                        Immutable = false
+                        IsEnabled = true,
+                        IsDeletable = false
                     });
                 result.Should().BeAssignableTo<RoleV1>();
 
@@ -207,7 +207,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testRole = uow.Roles.Get(x => x.Name == Constants.TestRole).Single();
-                testRole.Immutable = true;
+                testRole.IsDeletable = true;
 
                 uow.Roles.Update(testRole);
                 uow.Commit();

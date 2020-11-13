@@ -17,11 +17,11 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         [Required]
         [DefaultValue(true)]
-        public bool Enabled { get; set; }
+        public bool IsEnabled { get; set; }
 
         [Required]
         [DefaultValue(false)]
-        public bool Immutable { get; set; }
+        public bool IsDeletable { get; set; }
     }
 
     public class LoginV1 : Logins
@@ -30,8 +30,8 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public Guid Id { get; set; }
 
         [Required]
-        public DateTime Created { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
 
-        public DateTime? LastUpdated { get; set; }
+        public DateTimeOffset? LastUpdatedUtc { get; set; }
     }
 }

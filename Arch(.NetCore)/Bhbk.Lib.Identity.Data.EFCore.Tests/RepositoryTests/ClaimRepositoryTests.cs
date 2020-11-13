@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
@@ -21,6 +22,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Claims.Create(new uvw_Claim());
+                UoW.Commit();
             });
         }
 
@@ -35,15 +37,17 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             var result = UoW.Claims.Create(
-                new uvw_Claim()
+                Mapper.Map<uvw_Claim>(new ClaimV1()
                 {
                     IssuerId = issuer.Id,
-                    Subject = "Subject-" + AlphaNumeric.CreateString(4),
+                    Subject = Constants.TestClaimSubject,
                     Type = Constants.TestClaim,
                     Value = AlphaNumeric.CreateString(8),
-                    ValueType = "ValueType-" + AlphaNumeric.CreateString(4),
-                    Immutable = false,
-                });
+                    ValueType = Constants.TestClaimValueType,
+                    IsDeletable = false,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Claim>();
         }
 
@@ -53,6 +57,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Claims.Delete(new uvw_Claim());
+                UoW.Commit();
             });
         }
 
@@ -67,6 +72,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             UoW.Claims.Delete(claim);
+            UoW.Commit();
         }
 
         [Fact]
@@ -86,6 +92,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Claims.Update(new uvw_Claim());
+                UoW.Commit();
             });
         }
 
@@ -101,6 +108,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             claim.Value += "(Updated)";
 
             var result = UoW.Claims.Update(claim);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Claim>();
         }
     }

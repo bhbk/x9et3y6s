@@ -7,41 +7,51 @@ CREATE PROCEDURE [svc].[usp_Activity_Insert]
     ,@KeyValues				NVARCHAR (MAX) 
     ,@OriginalValues		NVARCHAR (MAX) 
     ,@CurrentValues			NVARCHAR (MAX) 
-    ,@Immutable				BIT
+    ,@IsDeletable			BIT
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @ACTIVITYID UNIQUEIDENTIFIER = NEWID()
-DECLARE @CREATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-INSERT INTO [dbo].[tbl_Activity]
-	(
-     Id           
-    ,AudienceId    
-    ,UserId    
-    ,ActivityType           
-    ,TableName
-    ,KeyValues   
-    ,OriginalValues     
-    ,CurrentValues        
-    ,Created    
-    ,Immutable        
-	)
-VALUES
-	(
-     @ACTIVITYID         
-    ,@AudienceId    
-    ,@UserId    
-    ,@ActivityType
-	,@TableName
-    ,@KeyValues    
-    ,@OriginalValues   
-    ,@CurrentValues
-    ,@CREATED        
-    ,@Immutable        
-	);
+        DECLARE @ACTIVITYID UNIQUEIDENTIFIER = NEWID()
+        DECLARE @CREATEDUTC DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Activity] WHERE [svc].[uvw_Activity].Id = @ACTIVITYID
+        INSERT INTO [dbo].[tbl_Activity]
+	        (
+             Id           
+            ,AudienceId    
+            ,UserId    
+            ,ActivityType           
+            ,TableName
+            ,KeyValues   
+            ,OriginalValues     
+            ,CurrentValues        
+            ,IsDeletable        
+            ,CreatedUtc    
+	        )
+        VALUES
+	        (
+             @ACTIVITYID         
+            ,@AudienceId    
+            ,@UserId    
+            ,@ActivityType
+	        ,@TableName
+            ,@KeyValues    
+            ,@OriginalValues   
+            ,@CurrentValues
+            ,@IsDeletable        
+            ,@CREATEDUTC        
+	        );
+
+        SELECT * FROM [svc].[uvw_Activity] WHERE [svc].[uvw_Activity].Id = @ACTIVITYID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

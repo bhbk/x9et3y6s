@@ -55,7 +55,7 @@ namespace Bhbk.Cli.Identity.Commands
                     {
                         IssuerId = issuer.Id,
                         Name = _audienceName,
-                        Enabled = true,
+                        IsEnabled = true,
                     }).Result;
 
                     if (audience != null)

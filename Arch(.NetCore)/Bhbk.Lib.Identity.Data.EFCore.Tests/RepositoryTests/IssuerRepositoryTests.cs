@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
@@ -20,6 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Issuers.Create(new uvw_Issuer());
+                UoW.Commit();
             });
         }
 
@@ -30,13 +32,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Issuers.Create(
-                new uvw_Issuer()
+                Mapper.Map<uvw_Issuer>(new IssuerV1()
                 {
                     Name = Constants.TestIssuer,
                     IssuerKey = Constants.TestIssuerKey,
-                    Enabled = true,
-                    Immutable = false,
-                });
+                    IsEnabled = true,
+                    IsDeletable = false,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Issuer>();
         }
 
@@ -46,6 +50,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Issuers.Delete(new uvw_Issuer());
+                UoW.Commit();
             });
         }
 
@@ -60,6 +65,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             UoW.Issuers.Delete(issuer);
+            UoW.Commit();
         }
 
         [Fact]
@@ -79,6 +85,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Issuers.Update(new uvw_Issuer());
+                UoW.Commit();
             });
         }
 
@@ -94,6 +101,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             issuer.Name += "(Updated)";
 
             var result = UoW.Issuers.Update(issuer);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Issuer>();
         }
     }

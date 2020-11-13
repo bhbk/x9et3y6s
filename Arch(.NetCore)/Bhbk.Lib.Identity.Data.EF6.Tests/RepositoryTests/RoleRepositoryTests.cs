@@ -1,11 +1,12 @@
 ﻿using Bhbk.Lib.Identity.Data.EF6.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Entity.Validation;
 using System.Linq;
 using Xunit;
 
@@ -17,9 +18,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Roles_CreateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Roles.Create(new uvw_Role());
+                UoW.Commit();
             });
         }
 
@@ -34,13 +36,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Single();
 
             var result = UoW.Roles.Create(
-                new uvw_Role()
+                Mapper.Map<uvw_Role>(new RoleV1()
                 {
                     AudienceId = audience.Id,
                     Name = Constants.TestRole,
-                    Enabled = true,
-                    Immutable = false,
-                });
+                    IsEnabled = true,
+                    IsDeletable = true,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Role>();
         }
 
@@ -50,6 +54,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Roles.Delete(new uvw_Role());
+                UoW.Commit();
             });
         }
 
@@ -64,6 +69,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Single();
 
             UoW.Roles.Delete(role);
+            UoW.Commit();
         }
 
         [Fact]
@@ -80,9 +86,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Roles_UpdateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Roles.Update(new uvw_Role());
+                UoW.Commit();
             });
         }
 
@@ -98,6 +105,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             role.Name += "(Updated)";
 
             var result = UoW.Roles.Update(role);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Role>();
         }
     }

@@ -22,8 +22,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public string KeyValues { get; set; }
         public string OriginalValues { get; set; }
         public string CurrentValues { get; set; }
-        public bool Immutable { get; set; }
-        public System.DateTime Created { get; set; }
+        public bool IsDeletable { get; set; }
+        public System.DateTimeOffset CreatedUtc { get; set; }
     
         public virtual tbl_Audience tbl_Audience { get; set; }
         public virtual tbl_User tbl_User { get; set; }

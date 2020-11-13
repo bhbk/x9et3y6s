@@ -8,29 +8,39 @@ CREATE PROCEDURE [svc].[usp_State_Update]
     ,@StateType				NVARCHAR (64)
     ,@StateDecision			BIT
     ,@StateConsume			BIT
-    ,@IssuedUtc				DATETIME2 (7) 
-    ,@ValidFromUtc			DATETIME2 (7)
-    ,@ValidToUtc			DATETIME2 (7) 
-    ,@LastPolling			DATETIME2 (7) 
+    ,@IssuedUtc				DATETIMEOFFSET (7)
+    ,@ValidFromUtc			DATETIMEOFFSET (7)
+    ,@ValidToUtc			DATETIMEOFFSET (7)
+    ,@LastPollingUtc		DATETIMEOFFSET (7)
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-UPDATE [dbo].[tbl_State]
-SET
-     IssuerId				= @IssuerId
-    ,AudienceId				= @AudienceId
-    ,UserId					= @UserId
-	,StateValue				= @StateValue
-	,StateType				= @StateType
-	,StateDecision			= @StateDecision
-	,StateConsume			= @StateConsume
-    ,IssuedUtc				= @IssuedUtc
-    ,ValidFromUtc			= @ValidFromUtc
-    ,ValidToUtc				= @ValidToUtc
-    ,LastPolling			= @LastPolling
-WHERE Id = @Id
+	BEGIN TRY
 
-SELECT * FROM [svc].[uvw_State] WHERE [svc].[uvw_State].Id = @Id
+        UPDATE [dbo].[tbl_State]
+        SET
+             IssuerId				= @IssuerId
+            ,AudienceId				= @AudienceId
+            ,UserId					= @UserId
+	        ,StateValue				= @StateValue
+	        ,StateType				= @StateType
+	        ,StateDecision			= @StateDecision
+	        ,StateConsume			= @StateConsume
+            ,IssuedUtc				= @IssuedUtc
+            ,ValidFromUtc			= @ValidFromUtc
+            ,ValidToUtc				= @ValidToUtc
+            ,LastPollingUtc			= @LastPollingUtc
+        WHERE Id = @Id
+
+        SELECT * FROM [svc].[uvw_State] WHERE [svc].[uvw_State].Id = @Id
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

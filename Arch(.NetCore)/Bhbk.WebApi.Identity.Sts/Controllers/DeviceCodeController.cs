@@ -167,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
-            else if (!issuer.Enabled)
+            else if (!issuer.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
@@ -187,7 +187,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
-            else if (!audience.Enabled)
+            else if (!audience.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
@@ -209,9 +209,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
             //check if device is polling too frequently...
-            else if (uint.Parse(polling.ConfigValue) <= (new DateTimeOffset(state.LastPolling).Subtract(DateTime.UtcNow)).TotalSeconds)
+            else if (uint.Parse(polling.ConfigValue) <= (state.LastPollingUtc.Subtract(DateTime.UtcNow)).TotalSeconds)
             {
-                state.LastPolling = DateTime.UtcNow;
+                state.LastPollingUtc = DateTime.UtcNow;
                 state.StateConsume = false;
 
                 UoW.States.Update(state);
@@ -261,7 +261,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //no reuse of state after this...
-            state.LastPolling = DateTime.UtcNow;
+            state.LastPollingUtc = DateTime.UtcNow;
             state.StateConsume = true;
 
             //adjust state...
@@ -278,7 +278,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
@@ -300,7 +300,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             UoW.Commit();

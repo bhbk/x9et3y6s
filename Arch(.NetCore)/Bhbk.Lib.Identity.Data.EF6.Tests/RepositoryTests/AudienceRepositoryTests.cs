@@ -1,11 +1,12 @@
 ﻿using Bhbk.Lib.Identity.Data.EF6.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Entity.Validation;
 using System.Linq;
 using Xunit;
 
@@ -17,9 +18,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Audiences_CreateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Audiences.Create(new uvw_Audience());
+                UoW.Commit();
             });
         }
 
@@ -34,13 +36,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Single();
 
             var result = UoW.Audiences.Create(
-                new uvw_Audience()
+                Mapper.Map<uvw_Audience>(new AudienceV1()
                 {
                     IssuerId = issuer.Id,
                     Name = Constants.TestAudience,
-                    Enabled = true,
-                    Immutable = false,
-                });
+                    IsEnabled = true,
+                    IsDeletable = true,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Audience>();
         }
 
@@ -50,6 +54,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Audiences.Delete(new uvw_Audience());
+                UoW.Commit();
             });
         }
 
@@ -64,6 +69,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Single();
 
             UoW.Audiences.Delete(audience);
+            UoW.Commit();
         }
 
         [Fact]
@@ -80,9 +86,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Audiences_UpdateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Audiences.Update(new uvw_Audience());
+                UoW.Commit();
             });
         }
 
@@ -98,6 +105,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             audience.Name += "(Updated)";
 
             var result = UoW.Audiences.Update(audience);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Audience>();
         }
     }

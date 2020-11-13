@@ -58,7 +58,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                audience.Enabled = false;
+                audience.IsEnabled = false;
 
                 uow.Audiences.Update(audience);
                 uow.Commit();
@@ -138,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                issuer.Enabled = false;
+                issuer.IsEnabled = false;
 
                 uow.Issuers.Update(issuer);
                 uow.Commit();
@@ -255,8 +255,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                user.LockoutEnabled = true;
-                user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
+                user.IsLockedOut = true;
+                user.LockoutEndUtc = DateTime.UtcNow.AddSeconds(60);
 
                 uow.Users.Update(user);
                 uow.Commit();
@@ -445,7 +445,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                audience.Enabled = false;
+                audience.IsEnabled = false;
 
                 uow.Audiences.Update(audience);
                 uow.Commit();
@@ -540,7 +540,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                issuer.Enabled = false;
+                issuer.IsEnabled = false;
 
                 uow.Issuers.Update(issuer);
                 uow.Commit();
@@ -635,8 +635,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                user.LockoutEnabled = true;
-                user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
+                user.IsLockedOut = true;
+                user.LockoutEndUtc = DateTime.UtcNow.AddSeconds(60);
 
                 uow.Users.Update(user);
                 uow.Commit();
@@ -876,7 +876,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                audience.Enabled = false;
+                audience.IsEnabled = false;
 
                 uow.Audiences.Update(audience);
                 uow.Commit();
@@ -940,7 +940,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                issuer.Enabled = false;
+                issuer.IsEnabled = false;
 
                 uow.Issuers.Update(issuer);
                 uow.Commit();
@@ -1032,8 +1032,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                user.LockoutEnabled = true;
-                user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
+                user.IsLockedOut = true;
+                user.LockoutEndUtc = DateTime.UtcNow.AddMinutes(60);
 
                 uow.Users.Update(user);
                 uow.Commit();
@@ -1276,7 +1276,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                audience.Enabled = false;
+                audience.IsEnabled = false;
 
                 uow.Audiences.Update(audience);
                 uow.Commit();
@@ -1371,7 +1371,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                issuer.Enabled = false;
+                issuer.IsEnabled = false;
 
                 uow.Issuers.Update(issuer);
                 uow.Commit();
@@ -1572,8 +1572,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                user.LockoutEnabled = true;
-                user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
+                user.IsLockedOut = true;
+                user.LockoutEndUtc = DateTime.UtcNow.AddMinutes(60);
 
                 uow.Users.Update(user);
                 uow.Commit();

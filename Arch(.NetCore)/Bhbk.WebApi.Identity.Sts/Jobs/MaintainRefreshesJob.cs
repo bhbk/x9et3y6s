@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Sts.Jobs
                         uow.Refreshes.Delete(invalid);
                         uow.Commit();
 
-                        var msg = typeof(MaintainRefreshesJob).Name + " success on " + DateTime.Now.ToString() + ". Delete "
+                        var msg = typeof(MaintainRefreshesJob).Name + " success on " + DateTime.UtcNow.ToString() + ". Delete "
                                 + invalidCount.ToString() + " invalid refresh tokens.";
 
                         Log.Information(msg);

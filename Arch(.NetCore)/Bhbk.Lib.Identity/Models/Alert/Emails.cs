@@ -30,10 +30,10 @@ namespace Bhbk.Lib.Identity.Models.Alert
         public string PlaintextContent { get; set; }
 
         [Required]
-        public DateTime Created { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
 
         [Required]
-        public DateTime SendAt { get; set; }
+        public DateTimeOffset SendAtUtc { get; set; }
     }
 
     public class EmailV1 : Emails

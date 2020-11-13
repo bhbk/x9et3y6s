@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 {
                     Sort = new List<IDataStateSort>() 
                     {
-                        new DataStateV1Sort() { Field = "created", Dir = "asc" }
+                        new DataStateV1Sort() { Field = "createdUtc", Dir = "asc" }
                     },
                     Skip = 0,
                     Take = take

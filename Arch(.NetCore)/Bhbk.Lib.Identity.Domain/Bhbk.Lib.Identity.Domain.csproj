@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Authors>Bhbk</Authors>
     <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
@@ -11,14 +11,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="10.0.0" />
-    <PackageReference Include="Bhbk.Lib.Common" Version="2020.8.11.1945" />
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.7" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="3.1.7" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="3.1.7" />
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2020.11.11.1800" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="5.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -19,9 +19,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         {
             this.tbl_Audience = new HashSet<tbl_Audience>();
             this.tbl_Claim = new HashSet<tbl_Claim>();
-            this.tbl_State = new HashSet<tbl_State>();
             this.tbl_Refresh = new HashSet<tbl_Refresh>();
             this.tbl_Setting = new HashSet<tbl_Setting>();
+            this.tbl_State = new HashSet<tbl_State>();
         }
     
         public System.Guid Id { get; set; }
@@ -29,20 +29,20 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public string Name { get; set; }
         public string Description { get; set; }
         public string IssuerKey { get; set; }
-        public bool Enabled { get; set; }
-        public bool Immutable { get; set; }
-        public System.DateTime Created { get; set; }
-        public Nullable<System.DateTime> LastUpdated { get; set; }
+        public bool IsEnabled { get; set; }
+        public bool IsDeletable { get; set; }
+        public System.DateTimeOffset CreatedUtc { get; set; }
+        public Nullable<System.DateTimeOffset> LastUpdatedUtc { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Audience> tbl_Audience { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Claim> tbl_Claim { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tbl_State> tbl_State { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Refresh> tbl_Refresh { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_Setting> tbl_Setting { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tbl_State> tbl_State { get; set; }
     }
 }

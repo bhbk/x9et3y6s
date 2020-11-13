@@ -14,48 +14,48 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
         public override tbl_Issuer Create(tbl_Issuer issuer)
         {
-            issuer.tbl_Setting.Add(
+            issuer.tbl_Settings.Add(
                 new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
                     ConfigKey = Constants.SettingAccessExpire,
                     ConfigValue = 600.ToString(),
-                    Created = DateTime.UtcNow,
-                    Immutable = true,
+                    CreatedUtc = DateTime.UtcNow,
+                    IsDeletable = true,
                 });
 
-            issuer.tbl_Setting.Add(
+            issuer.tbl_Settings.Add(
                 new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
                     ConfigKey = Constants.SettingRefreshExpire,
                     ConfigValue = 86400.ToString(),
-                    Created = DateTime.UtcNow,
-                    Immutable = true,
+                    CreatedUtc = DateTime.UtcNow,
+                    IsDeletable = true,
                 });
 
-            issuer.tbl_Setting.Add(
+            issuer.tbl_Settings.Add(
                 new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
                     ConfigKey = Constants.SettingTotpExpire,
                     ConfigValue = 600.ToString(),
-                    Created = DateTime.UtcNow,
-                    Immutable = true,
+                    CreatedUtc = DateTime.UtcNow,
+                    IsDeletable = true,
                 });
 
-            issuer.tbl_Setting.Add(
+            issuer.tbl_Settings.Add(
                 new tbl_Setting()
                 {
                     Id = Guid.NewGuid(),
                     IssuerId = issuer.Id,
                     ConfigKey = Constants.SettingPollingMax,
                     ConfigValue = 10.ToString(),
-                    Created = DateTime.UtcNow,
-                    Immutable = true,
+                    CreatedUtc = DateTime.UtcNow,
+                    IsDeletable = true,
                 });
 
             return _context.Add(issuer).Entity;
@@ -103,9 +103,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             entity.Name = issuer.Name;
             entity.Description = issuer.Description;
             entity.IssuerKey = issuer.IssuerKey;
-            entity.LastUpdated = DateTime.Now;
-            entity.Enabled = issuer.Enabled;
-            entity.Immutable = issuer.Immutable;
+            entity.LastUpdatedUtc = DateTime.UtcNow;
+            entity.IsEnabled = issuer.IsEnabled;
+            entity.IsDeletable = issuer.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;
 

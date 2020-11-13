@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Common.FileSystem;
-using Bhbk.Lib.Hosting.Options;
+﻿using Bhbk.Lib.Hosting.Options;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,9 +11,23 @@ namespace Bhbk.WebApi.Alert
 {
     public class Program
     {
+        private static IConfiguration _conf;
+
         public static IWebHostBuilder CreateIISHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .CaptureStartupErrors(true)
+            .ConfigureLogging((hostContext, builder) =>
+            {
+                Log.Logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(_conf)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console()
+                    .WriteTo.File($"{hostContext.HostingEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}appdebug-.log",
+                        retainedFileCountLimit: int.Parse(_conf["Serilog:RollingFile:RetainedFileCountLimit"]),
+                        fileSizeLimitBytes: int.Parse(_conf["Serilog:RollingFile:FileSizeLimitBytes"]),
+                        rollingInterval: RollingInterval.Day)
+                    .CreateLogger();
+            })
             .UseSerilog()
             .UseIISIntegration()
             .UseStartup<Startup>();
@@ -22,6 +35,18 @@ namespace Bhbk.WebApi.Alert
         public static IWebHostBuilder CreateKestrelHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .CaptureStartupErrors(true)
+            .ConfigureLogging((hostContext, builder) =>
+            {
+                Log.Logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(_conf)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console()
+                    .WriteTo.File($"{hostContext.HostingEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}appdebug-.log",
+                        retainedFileCountLimit: int.Parse(_conf["Serilog:RollingFile:RetainedFileCountLimit"]),
+                        fileSizeLimitBytes: int.Parse(_conf["Serilog:RollingFile:FileSizeLimitBytes"]),
+                        rollingInterval: RollingInterval.Day)
+                    .CreateLogger();
+            })
             .UseSerilog()
             .UseKestrel(options =>
             {
@@ -32,20 +57,9 @@ namespace Bhbk.WebApi.Alert
 
         public static void Main(string[] args)
         {
-            var where = Search.ByAssemblyInvocation("appsettings.json");
-
-            var conf = new ConfigurationBuilder()
-                .AddJsonFile(where.Name, optional: false, reloadOnChange: true)
+            _conf = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
-
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(conf)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.RollingFile(where.DirectoryName + Path.DirectorySeparatorChar + "appdebug.log",
-                    retainedFileCountLimit: int.Parse(conf["Serilog:RollingFile:RetainedFileCountLimit"]),
-                    fileSizeLimitBytes: int.Parse(conf["Serilog:RollingFile:FileSizeLimitBytes"]))
-                .CreateLogger();
 
             var process = Process.GetCurrentProcess();
 

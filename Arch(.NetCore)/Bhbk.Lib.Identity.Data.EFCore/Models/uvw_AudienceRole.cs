@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace Bhbk.Lib.Identity.Data.EFCore.Models
 {
     public partial class uvw_AudienceRole
@@ -8,7 +10,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         public Guid AudienceId { get; set; }
         public Guid RoleId { get; set; }
         public Guid? ActorId { get; set; }
-        public DateTime Created { get; set; }
-        public bool Immutable { get; set; }
+        public bool IsDeletable { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
     }
 }

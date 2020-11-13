@@ -35,18 +35,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
-                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
-                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
-                new SqlParameter("@LastLoginSuccess", SqlDbType.DateTime2) { Value = entity.LastLoginSuccess.HasValue ? (object)entity.LastLoginSuccess.Value : DBNull.Value },
-                new SqlParameter("@LastLoginFailure", SqlDbType.DateTime2) { Value = entity.LastLoginFailure.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
+                new SqlParameter("@IsLockedOut", SqlDbType.Bit) { Value = entity.IsLockedOut },
+                new SqlParameter("@IsEnabled", SqlDbType.Bit) { Value = entity.IsEnabled },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable },
                 new SqlParameter("@AccessFailedCount", SqlDbType.Int) { Value = entity.AccessFailedCount },
                 new SqlParameter("@AccessSuccessCount", SqlDbType.Int) { Value = entity.AccessSuccessCount },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@LockoutEndUtc", SqlDbType.DateTimeOffset) { Value = entity.LockoutEndUtc.HasValue ? (object)entity.LockoutEndUtc.Value : DBNull.Value },
+                new SqlParameter("@LastLoginSuccessUtc", SqlDbType.DateTimeOffset) { Value = entity.LastLoginSuccessUtc.HasValue ? (object)entity.LastLoginSuccessUtc.Value : DBNull.Value },
+                new SqlParameter("@LastLoginFailureUtc", SqlDbType.DateTimeOffset) { Value = entity.LastLoginFailureUtc.HasValue ? (object)entity.LockoutEndUtc.Value : DBNull.Value },
             };
 
             return _context.Set<uvw_Audience>().FromSqlRaw("[svc].[usp_Audience_Insert]"
-                + "@IssuerId, @ActorId, @Name, @Description, @LockoutEnabled, @LockoutEnd,"
-                + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
+                + "@IssuerId, @ActorId, @Name, @Description, @IsLockedOut, @IsEnabled, @IsDeletable, "
+                + "@AccessFailedCount, @AccessSuccessCount, @LockoutEndUtc, @LastLoginSuccessUtc, @LastLoginFailureUtc", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -105,11 +106,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Audience> Delete(LambdaExpression lambda)
-        {
-            throw new NotImplementedException();
-        }
-
         public override uvw_Audience Update(uvw_Audience entity)
         {
             var pvalues = new List<SqlParameter>
@@ -119,18 +115,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
-                new SqlParameter("@LockoutEnabled", SqlDbType.Bit) { Value = entity.LockoutEnabled },
-                new SqlParameter("@LockoutEnd", SqlDbType.DateTimeOffset) { Value = entity.LockoutEnd.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
-                new SqlParameter("@LastLoginSuccess", SqlDbType.DateTime2) { Value = entity.LastLoginSuccess.HasValue ? (object)entity.LastLoginSuccess.Value : DBNull.Value },
-                new SqlParameter("@LastLoginFailure", SqlDbType.DateTime2) { Value = entity.LastLoginFailure.HasValue ? (object)entity.LockoutEnd.Value : DBNull.Value },
+                new SqlParameter("@IsLockedOut", SqlDbType.Bit) { Value = entity.IsLockedOut },
+                new SqlParameter("@IsEnabled", SqlDbType.Bit) { Value = entity.IsEnabled },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable },
                 new SqlParameter("@AccessFailedCount", SqlDbType.Int) { Value = entity.AccessFailedCount },
                 new SqlParameter("@AccessSuccessCount", SqlDbType.Int) { Value = entity.AccessSuccessCount },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@LockoutEndUtc", SqlDbType.DateTimeOffset) { Value = entity.LockoutEndUtc.HasValue ? (object)entity.LockoutEndUtc.Value : DBNull.Value },
+                new SqlParameter("@LastLoginSuccessUtc", SqlDbType.DateTimeOffset) { Value = entity.LastLoginSuccessUtc.HasValue ? (object)entity.LastLoginSuccessUtc.Value : DBNull.Value },
+                new SqlParameter("@LastLoginFailureUtc", SqlDbType.DateTimeOffset) { Value = entity.LastLoginFailureUtc.HasValue ? (object)entity.LockoutEndUtc.Value : DBNull.Value },
             };
 
             return _context.Set<uvw_Audience>().FromSqlRaw("[svc].[usp_Audience_Update]"
-                + "@Id, @IssuerId, @ActorId, @Name, @Description, @LockoutEnabled, @LockoutEnd,"
-                + "@LastLoginSuccess, @LastLoginFailure, @AccessFailedCount, @AccessSuccessCount, @Immutable", pvalues.ToArray())
+                + "@Id, @IssuerId, @ActorId, @Name, @Description, @IsLockedOut, @IsEnabled, @IsDeletable, "
+                + "@AccessFailedCount, @AccessSuccessCount, @LockoutEndUtc, @LastLoginSuccessUtc, @LastLoginFailureUtc", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

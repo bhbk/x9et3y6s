@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 sc.AddSingleton<IConfiguration>(conf);
                 sc.AddSingleton<IContextService>(instance);
                 sc.AddSingleton<IMapper>(mapper);
-                sc.AddSingleton<IAuthorizationHandler, IdentityHumansAuthorize>();
+                sc.AddSingleton<IAuthorizationHandler, IdentityUserssAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
@@ -117,7 +117,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 {
                     opt.AddPolicy(Constants.DefaultPolicyForHumans, humans =>
                     {
-                        humans.Requirements.Add(new IdentityHumansAuthorizeRequirement());
+                        humans.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                     });
                     opt.AddPolicy(Constants.DefaultPolicyForServices, servers =>
                     {

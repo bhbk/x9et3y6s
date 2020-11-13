@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
         public tbl_Audience AccessFailed(tbl_Audience audience)
         {
-            audience.LastLoginFailure = Clock.UtcDateTime;
+            audience.LastLoginFailureUtc = Clock.UtcDateTime;
             audience.AccessFailedCount++;
 
             _context.Entry(audience).State = EntityState.Modified;
@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
         public tbl_Audience AccessSuccess(tbl_Audience audience)
         {
-            audience.LastLoginSuccess = Clock.UtcDateTime;
+            audience.LastLoginSuccessUtc = Clock.UtcDateTime;
             audience.AccessSuccessCount++;
 
             _context.Entry(audience).State = EntityState.Modified;
@@ -56,8 +56,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
                 {
                     AudienceId = audience.Id,
                     RoleId = role.Id,
-                    Created = Clock.UtcDateTime,
-                    Immutable = false
+                    CreatedUtc = Clock.UtcDateTime,
+                    IsDeletable = false
                 });
 
             return true;
@@ -120,7 +120,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             claims.Add(new Claim(ClaimTypes.NameIdentifier, audience.Id.ToString()));
 
             var roles = _context.Set<tbl_Role>()
-                .Where(x => x.tbl_AudienceRole.Any(y => y.AudienceId == audience.Id)).ToList();
+                .Where(x => x.tbl_AudienceRoles.Any(y => y.AudienceId == audience.Id)).ToList();
 
             foreach (var role in roles.OrderBy(x => x.Name))
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
@@ -188,6 +188,17 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             return false;
         }
 
+        public bool IsPasswordSet(tbl_Audience audience)
+        {
+            var entity = _context.Set<tbl_Audience>()
+                .Where(x => x.Id == audience.Id).Single();
+
+            if (string.IsNullOrEmpty(entity.PasswordHashPBKDF2))
+                return false;
+
+            return true;
+        }
+
         public bool RemoveFromRole(tbl_Audience audience, tbl_Role role)
         {
             var entity = _context.Set<tbl_AudienceRole>()
@@ -208,9 +219,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
             audience.ConcurrencyStamp = Guid.NewGuid().ToString();
             audience.SecurityStamp = Guid.NewGuid().ToString();
-            audience.LastUpdated = Clock.UtcDateTime;
+            audience.LastUpdatedUtc = Clock.DateTime;
 
-            if (!string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(password))
+            {
+                audience.PasswordHashPBKDF2 = null;
+                audience.PasswordHashSHA256 = null;
+            }
+            else
             {
                 audience.PasswordHashPBKDF2 = PBKDF2.Create(password);
                 audience.PasswordHashSHA256 = SHA256.Create(password);
@@ -236,9 +252,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
             entity.IssuerId = audience.IssuerId;
             entity.Name = audience.Name;
             entity.Description = audience.Description;
-            entity.LastUpdated = Clock.UtcDateTime;
-            entity.Enabled = audience.Enabled;
-            entity.Immutable = audience.Immutable;
+            entity.LastUpdatedUtc = Clock.UtcDateTime;
+            entity.IsEnabled = audience.IsEnabled;
+            entity.IsDeletable = audience.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;
 

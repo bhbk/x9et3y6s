@@ -30,12 +30,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
-                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsEnabled", SqlDbType.Bit) { Value = entity.IsEnabled },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable }
             };
 
             return _context.Set<uvw_Role>().FromSqlRaw("[svc].[usp_Role_Insert]"
-                + "@AudienceId, @ActorId, @Name, @Description, @Enabled, @Immutable", pvalues.ToArray())
+                + "@AudienceId, @ActorId, @Name, @Description, @IsEnabled, @IsDeletable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -94,11 +94,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Role> Delete(LambdaExpression lambda)
-        {
-            throw new NotImplementedException();
-        }
-
         public override uvw_Role Update(uvw_Role entity)
         {
             var pvalues = new List<SqlParameter>
@@ -108,12 +103,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
-                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsEnabled", SqlDbType.Bit) { Value = entity.IsEnabled },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable }
             };
 
             return _context.Set<uvw_Role>().FromSqlRaw("[svc].[usp_Role_Update]"
-                + "@Id, @AudienceId, @ActorId, @Name, @Description, @Enabled, @Immutable", pvalues.ToArray())
+                + "@Id, @AudienceId, @ActorId, @Name, @Description, @IsEnabled, @IsDeletable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

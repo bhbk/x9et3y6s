@@ -18,10 +18,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact(Skip = "NotImplemented")]
         public void Repo_Roles_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Roles.Create(
-                    Mapper.Map<tbl_Role>(new RoleV1()));
+                UoW.Roles.Create(new tbl_Role());
                 UoW.Commit();
             });
         }
@@ -41,12 +40,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 {
                     AudienceId = audience.Id,
                     Name = Constants.TestRole,
-                    Enabled = true,
-                    Immutable = false,
+                    IsEnabled = true,
+                    IsDeletable = false,
                 }));
-            result.Should().BeAssignableTo<tbl_Role>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Role>();
         }
 
         [Fact]
@@ -106,9 +105,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             role.Name += "(Updated)";
 
             var result = UoW.Roles.Update(role);
-            result.Should().BeAssignableTo<tbl_Role>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Role>();
         }
     }
 }

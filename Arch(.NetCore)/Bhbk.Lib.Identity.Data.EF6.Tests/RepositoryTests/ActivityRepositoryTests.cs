@@ -1,4 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Data.EF6.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -6,7 +7,7 @@ using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Entity.Validation;
 using System.Linq;
 using Xunit;
 
@@ -18,9 +19,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Activities_CreateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Activities.Create(new uvw_Activity());
+                UoW.Commit();
             });
         }
         
@@ -35,12 +37,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Single();
 
             var result = UoW.Activities.Create(
-                new uvw_Activity()
+                Mapper.Map<uvw_Activity>(new ActivityV1()
                 {
                     AudienceId = audience.Id,
                     ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                    Immutable = false,
-                });
+                    IsDeletable = true,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Activity>();
         }
 
@@ -50,6 +54,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Activities.Delete(new uvw_Activity());
+                UoW.Commit();
             });
         }
 
@@ -60,10 +65,11 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<uvw_Activity>()
-                .Where(x => x.Immutable == false).ToLambda())
+                .Where(x => x.IsDeletable == false).ToLambda())
                 .First();
 
             UoW.Activities.Delete(activity);
+            UoW.Commit();
         }
 
         [Fact]
@@ -83,6 +89,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             Assert.Throws<NotImplementedException>(() =>
             {
                 UoW.Activities.Update(new uvw_Activity());
+                UoW.Commit();
             });
         }
     }

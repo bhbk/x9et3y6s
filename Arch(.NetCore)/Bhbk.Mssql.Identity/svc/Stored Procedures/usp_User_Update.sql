@@ -7,31 +7,42 @@ CREATE PROCEDURE [svc].[usp_User_Update]
     ,@FirstName				NVARCHAR (MAX)
     ,@LastName				NVARCHAR (MAX) 
     ,@PhoneNumber			NVARCHAR (16)
-    ,@LockoutEnabled		BIT     
-    ,@LockoutEnd			DATETIMEOFFSET (7)
-    ,@HumanBeing			BIT
-    ,@Immutable				BIT
+    ,@IsLockedOut   		BIT     
+    ,@IsHumanBeing			BIT
+    ,@IsDeletable			BIT
+    ,@LockoutEndUtc			DATETIMEOFFSET (7)
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-UPDATE [dbo].[tbl_User]
-SET
-     Id						= @Id
-    ,ActorId				= @ActorId
-    ,UserName				= @UserName
-	,EmailAddress			= @EmailAddress
-    ,FirstName				= @FirstName
-    ,LastName				= @LastName
-    ,PhoneNumber			= @PhoneNumber
-    ,LastUpdated			= @LASTUPDATED
-    ,LockoutEnabled			= @LockoutEnabled
-    ,LockoutEnd				= @LockoutEnd
-    ,HumanBeing				= @HumanBeing
-    ,Immutable				= @Immutable
-WHERE Id = @Id
+        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_User] WHERE [svc].[uvw_User].Id = @Id
+        UPDATE [dbo].[tbl_User]
+        SET
+             Id						= @Id
+            ,ActorId				= @ActorId
+            ,UserName				= @UserName
+	        ,EmailAddress			= @EmailAddress
+            ,FirstName				= @FirstName
+            ,LastName				= @LastName
+            ,PhoneNumber			= @PhoneNumber
+            ,LastUpdatedUtc			= @LASTUPDATED
+            ,IsLockedOut			= @IsLockedOut
+            ,IsHumanBeing			= @IsHumanBeing
+            ,IsDeletable			= @IsDeletable
+            ,LockoutEndUtc	    	= @LockoutEndUtc
+        WHERE Id = @Id
+
+        SELECT * FROM [svc].[uvw_User] WHERE [svc].[uvw_User].Id = @Id
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
+
 END

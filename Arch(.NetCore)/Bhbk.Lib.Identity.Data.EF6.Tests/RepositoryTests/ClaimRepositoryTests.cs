@@ -1,12 +1,13 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EF6.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Entity.Validation;
 using System.Linq;
 using Xunit;
 
@@ -18,9 +19,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Claims_CreateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Claims.Create(new uvw_Claim());
+                UoW.Commit();
             });
         }
 
@@ -35,15 +37,17 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Single();
 
             var result = UoW.Claims.Create(
-                new uvw_Claim()
+                Mapper.Map<uvw_Claim>(new ClaimV1()
                 {
                     IssuerId = issuer.Id,
                     Subject = Constants.TestClaimSubject,
                     Type = Constants.TestClaim,
                     Value = AlphaNumeric.CreateString(8),
                     ValueType = Constants.TestClaimValueType,
-                    Immutable = false,
-                });
+                    IsDeletable = true,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Claim>();
         }
 
@@ -53,6 +57,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Claims.Delete(new uvw_Claim());
+                UoW.Commit();
             });
         }
 
@@ -67,6 +72,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Single();
 
             UoW.Claims.Delete(claim);
+            UoW.Commit();
         }
 
         [Fact]
@@ -83,9 +89,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Claims_UpdateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Claims.Update(new uvw_Claim());
+                UoW.Commit();
             });
         }
 
@@ -101,6 +108,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             claim.Value += "(Updated)";
 
             var result = UoW.Claims.Update(claim);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Claim>();
         }
     }

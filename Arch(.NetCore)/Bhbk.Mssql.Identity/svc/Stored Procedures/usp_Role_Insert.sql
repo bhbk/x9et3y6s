@@ -4,38 +4,48 @@ CREATE PROCEDURE [svc].[usp_Role_Insert]
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
-    ,@Enabled				BIT 
-    ,@Immutable				BIT
+    ,@IsEnabled				BIT 
+    ,@IsDeletable			BIT
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @ROLEID UNIQUEIDENTIFIER = NEWID()
-DECLARE @CREATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-INSERT INTO [dbo].[tbl_Role]
-	(
-     Id           
-	,AudienceId
-    ,ActorId    
-    ,Name           
-    ,Description       
-    ,Enabled     
-    ,Created           
-    ,Immutable        
-	)
-VALUES
-	(
-     @ROLEID         
-	,@AudienceId
-    ,@ActorId    
-    ,@Name           
-    ,@Description       
-    ,@Enabled     
-    ,@CREATED         
-    ,@Immutable        
-	);
+        DECLARE @ROLEID UNIQUEIDENTIFIER = NEWID()
+        DECLARE @CREATEDUTC DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Role] WHERE [svc].[uvw_Role].Id = @ROLEID
+        INSERT INTO [dbo].[tbl_Role]
+	        (
+             Id           
+	        ,AudienceId
+            ,ActorId    
+            ,Name           
+            ,Description       
+            ,IsEnabled     
+            ,IsDeletable        
+            ,CreatedUtc           
+	        )
+        VALUES
+	        (
+             @ROLEID         
+	        ,@AudienceId
+            ,@ActorId    
+            ,@Name           
+            ,@Description       
+            ,@IsEnabled     
+            ,@IsDeletable        
+            ,@CREATEDUTC         
+	        );
+
+        SELECT * FROM [svc].[uvw_Role] WHERE [svc].[uvw_Role].Id = @ROLEID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

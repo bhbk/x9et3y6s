@@ -66,9 +66,9 @@ namespace Bhbk.Cli.Identity.Commands
                             Email = userName,
                             FirstName = firstName,
                             LastName = lastName,
-                            LockoutEnabled = false,
-                            HumanBeing = true,
-                            Immutable = false,
+                            IsLockedOut = false,
+                            IsHumanBeing = true,
+                            IsDeletable = false,
                         }).Result;
                     }
                     else
@@ -79,9 +79,9 @@ namespace Bhbk.Cli.Identity.Commands
                             Email = userName,
                             FirstName = firstName,
                             LastName = lastName,
-                            LockoutEnabled = false,
-                            HumanBeing = false,
-                            Immutable = false,
+                            IsLockedOut = false,
+                            IsHumanBeing = false,
+                            IsDeletable = false,
                         }).Result;
                     }
 

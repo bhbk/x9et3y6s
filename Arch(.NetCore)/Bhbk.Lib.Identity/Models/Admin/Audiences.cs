@@ -20,20 +20,22 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public string Description { get; set; }
 
-        public DateTime Created { get; set; }
-
-        public bool LockoutEnabled { get; set; }
+        [Required]
+        [DefaultValue(true)]
+        public bool IsLockedOut { get; set; }
 
         [Required]
         [DefaultValue(true)]
-        public bool Enabled { get; set; }
+        public bool IsEnabled { get; set; }
+
+        [Required]
+        [DefaultValue(false)]
+        public bool IsDeletable { get; set; }
 
         public string ConcurrencyStamp { get; set; }
         public string SecurityStamp { get; set; }
 
-        [Required]
-        [DefaultValue(false)]
-        public bool Immutable { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
     }
 
     public class AudienceV1 : Audiences
@@ -41,13 +43,13 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public Guid Id { get; set; }
 
-        public DateTime? LastUpdated { get; set; }
+        public DateTimeOffset? LastUpdatedUtc { get; set; }
 
-        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
+        public Nullable<DateTimeOffset> LockoutEndUtc { get; set; }
 
-        public Nullable<DateTime> LastLoginFailure { get; set; }
+        public Nullable<DateTimeOffset> LastLoginFailureUtc { get; set; }
 
-        public Nullable<DateTime> LastLoginSuccess { get; set; }
+        public Nullable<DateTimeOffset> LastLoginSuccessUtc { get; set; }
 
         public int AccessFailedCount { get; set; }
 

@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
 
-            Log.Error(callPath + " fail on " + DateTime.Now.ToString()
+            Log.Error(callPath + " fail on " + DateTime.UtcNow.ToString()
                 + Environment.NewLine + response.RequestMessage.ToString()
                 + Environment.NewLine + response.ToString());
         }

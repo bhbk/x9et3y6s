@@ -4,53 +4,66 @@ CREATE PROCEDURE [svc].[usp_Audience_Insert]
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
-    ,@LockoutEnabled		BIT     
-    ,@LockoutEnd			DATETIMEOFFSET (7)
-    ,@LastLoginSuccess		DATETIME2 (7)
-    ,@LastLoginFailure		DATETIME2 (7)
+    ,@IsLockedOut   		BIT     
+    ,@IsEnabled 			BIT
+    ,@IsDeletable			BIT
     ,@AccessFailedCount		INT  
     ,@AccessSuccessCount	INT  
-    ,@Immutable				BIT
+    ,@LockoutEndUtc			DATETIMEOFFSET (7)
+    ,@LastLoginSuccessUtc	DATETIMEOFFSET (7)
+    ,@LastLoginFailureUtc	DATETIMEOFFSET (7)
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @AUDIENCEID UNIQUEIDENTIFIER = NEWID()
-DECLARE @CREATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-INSERT INTO [dbo].[tbl_Audience]
-	(
-     Id         
-	,IssuerId
-    ,ActorId    
-    ,Name           
-    ,Description   
-    ,Created           
-    ,LockoutEnabled      
-    ,LockoutEnd        
-    ,LastLoginSuccess 
-    ,LastLoginFailure  
-    ,AccessFailedCount  
-    ,AccessSuccessCount  
-    ,Immutable        
-	)
-VALUES
-	(
-     @AUDIENCEID          
-	,@IssuerId
-    ,@ActorId   
-    ,@Name           
-    ,@Description       
-    ,@CREATED         
-    ,@LockoutEnabled      
-    ,@LockoutEnd        
-    ,@LastLoginSuccess 
-    ,@LastLoginFailure  
-    ,@AccessFailedCount  
-    ,@AccessSuccessCount  
-    ,@Immutable        
-	);
+        DECLARE @AUDIENCEID UNIQUEIDENTIFIER = NEWID()
+        DECLARE @CREATEDUTC DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Audience] WHERE [svc].[uvw_Audience].Id = @AUDIENCEID
+        INSERT INTO [dbo].[tbl_Audience]
+	        (
+             Id         
+	        ,IssuerId
+            ,ActorId    
+            ,Name           
+            ,Description   
+            ,IsLockedOut   
+            ,IsEnabled
+            ,IsDeletable        
+            ,AccessFailedCount  
+            ,AccessSuccessCount  
+            ,LockoutEndUtc        
+            ,LastLoginSuccessUtc 
+            ,LastLoginFailureUtc  
+            ,CreatedUtc           
+	        )
+        VALUES
+	        (
+             @AUDIENCEID          
+	        ,@IssuerId
+            ,@ActorId   
+            ,@Name           
+            ,@Description       
+            ,@IsLockedOut  
+            ,@IsEnabled
+            ,@IsDeletable        
+            ,@AccessFailedCount  
+            ,@AccessSuccessCount  
+            ,@LockoutEndUtc        
+            ,@LastLoginSuccessUtc 
+            ,@LastLoginFailureUtc  
+            ,@CREATEDUTC         
+	        );
+
+        SELECT * FROM [svc].[uvw_Audience] WHERE [svc].[uvw_Audience].Id = @AUDIENCEID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

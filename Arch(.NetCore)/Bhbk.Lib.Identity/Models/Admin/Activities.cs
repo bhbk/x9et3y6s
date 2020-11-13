@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string CurrentValues { get; set; }
 
         [Required]
-        public bool Immutable { get; set; }
+        public bool IsDeletable { get; set; }
     }
 
     public class ActivityV1 : Activities
@@ -30,6 +30,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public Guid Id { get; set; }
 
         [Required]
-        public DateTime Created { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
     }
 }

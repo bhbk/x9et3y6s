@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public string KeyValues { get; set; }
         public string OriginalValues { get; set; }
         public string CurrentValues { get; set; }
-        public System.DateTime Created { get; set; }
-        public bool Immutable { get; set; }
+        public bool IsDeletable { get; set; }
+        public System.DateTimeOffset CreatedUtc { get; set; }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
 {
     public partial class tbl_State
@@ -13,10 +15,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
         public string StateType { get; set; }
         public bool? StateDecision { get; set; }
         public bool StateConsume { get; set; }
-        public DateTime ValidFromUtc { get; set; }
-        public DateTime ValidToUtc { get; set; }
-        public DateTime IssuedUtc { get; set; }
-        public DateTime LastPolling { get; set; }
+        public DateTimeOffset ValidFromUtc { get; set; }
+        public DateTimeOffset ValidToUtc { get; set; }
+        public DateTimeOffset IssuedUtc { get; set; }
+        public DateTimeOffset LastPollingUtc { get; set; }
 
         public virtual tbl_Audience Audience { get; set; }
         public virtual tbl_Issuer Issuer { get; set; }

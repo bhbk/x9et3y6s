@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login: { loginID }");
                 return NotFound(ModelState);
             }
-            else if (login.Immutable)
+            else if (login.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.LoginImmutable.ToString(), $"Login:{login.Id}");
                 return BadRequest(ModelState);
@@ -119,7 +119,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Logins.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Login>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Login, object>>>() { x => x.tbl_UserLogin })),
+                            new List<Expression<Func<tbl_Login, object>>>() { x => x.tbl_UserLogins })),
 
                     Total = UoW.Logins.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(
@@ -148,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
 
             var users = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.tbl_UserLogin.Any(y => y.LoginId == loginID)).ToLambda());
+                .Where(x => x.tbl_UserLogins.Any(y => y.LoginId == loginID)).ToLambda());
 
             return Ok(Mapper.Map<UserV1>(users));
         }
@@ -169,8 +169,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (login.Immutable
-                && login.Immutable != model.Immutable)
+            else if (login.IsDeletable
+                && login.IsDeletable != model.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.LoginImmutable.ToString(), $"Login:{login.Id}");
                 return BadRequest(ModelState);

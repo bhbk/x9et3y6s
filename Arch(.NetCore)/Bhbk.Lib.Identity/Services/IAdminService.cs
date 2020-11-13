@@ -24,6 +24,7 @@ namespace Bhbk.Lib.Identity.Services
         /*
          * audiences
          */
+        ValueTask<bool> Audience_AddToRoleV1(Guid userID, Guid roleID);
         ValueTask<AudienceV1> Audience_CreateV1(AudienceV1 model);
         ValueTask<bool> Audience_DeleteV1(Guid audienceID);
         ValueTask<bool> Audience_DeleteRefreshesV1(Guid audienceID);
@@ -32,6 +33,8 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<DataStateV1Result<AudienceV1>> Audience_GetV1(DataStateV1 model);
         ValueTask<IEnumerable<RefreshV1>> Audience_GetRefreshesV1(string audienceValue);
         ValueTask<IEnumerable<RoleV1>> Audience_GetRolesV1(string audienceValue);
+        ValueTask<bool> Audience_RemoveFromRoleV1(Guid audienceID, Guid roleID);
+        ValueTask<bool> Audience_RemovePasswordV1(Guid audienceID);
         ValueTask<bool> Audience_SetPasswordV1(Guid audienceID, PasswordAddV1 model);
         ValueTask<AudienceV1> Audience_UpdateV1(AudienceV1 model);
 

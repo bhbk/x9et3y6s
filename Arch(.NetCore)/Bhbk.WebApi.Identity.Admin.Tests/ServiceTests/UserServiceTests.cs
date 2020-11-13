@@ -67,7 +67,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         IssuerId = issuer.Id,
                         Type = Base64.CreateString(4) + "-" + Constants.TestClaim,
                         Value = Base64.CreateString(8),
-                        Immutable = false,
+                        IsDeletable = false,
                     }));
 
                 uow.Commit();
@@ -111,8 +111,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     {
                         Name = Base64.CreateString(4) + "-" + Constants.TestLogin,
                         LoginKey = Constants.TestLoginKey,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 uow.Commit();
@@ -155,9 +155,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     mapper.Map<tbl_Role>(new RoleV1()
                     {
                         AudienceId = audience.Id,
-                        Name = Base64.CreateString(4) + "-" + Constants.TestLogin,
-                        Enabled = true,
-                        Immutable = false,
+                        Name = Base64.CreateString(4) + "-" + Constants.TestRole,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 uow.Commit();
@@ -261,8 +261,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         FirstName = "First-" + Base64.CreateString(4),
                         LastName = "Last-" + Base64.CreateString(4),
                         PhoneNumber = NumberAs.CreateString(10),
-                        LockoutEnabled = false,
-                        HumanBeing = true,
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
                     });
                 result.Should().BeAssignableTo<UserV1>();
 
@@ -300,8 +300,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         FirstName = "First-" + Base64.CreateString(4),
                         LastName = "Last-" + Base64.CreateString(4),
                         PhoneNumber = NumberAs.CreateString(10),
-                        LockoutEnabled = false,
-                        HumanBeing = false,
+                        IsLockedOut = false,
+                        IsHumanBeing = false,
                     });
                 result.Should().BeAssignableTo<UserV1>();
 
@@ -364,7 +364,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
-                testUser.Immutable = true;
+                testUser.IsDeletable = true;
 
                 uow.Users.Update(testUser);
                 uow.Commit();
@@ -590,7 +590,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_GetClaimsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<ClaimV1>>();
                 result.Count().Should().Be(uow.Claims.Count(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
-                    .Where(x => x.tbl_UserClaim.Any(y => y.UserId == user.Id)).ToLambda()));
+                    .Where(x => x.tbl_UserClaims.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
 
@@ -619,7 +619,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_GetAudiencesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<AudienceV1>>();
                 result.Count().Should().Be(uow.Audiences.Count(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                    .Where(x => x.tbl_Role.Any(y => y.tbl_UserRole.Any(z => z.UserId == user.Id))).ToLambda()));
+                    .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda()));
             }
         }
 
@@ -648,7 +648,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_GetLoginsV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<LoginV1>>();
                 result.Count().Should().Be(uow.Logins.Count(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                    .Where(x => x.tbl_UserLogin.Any(y => y.UserId == user.Id)).ToLambda()));
+                    .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
 
@@ -724,7 +724,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_GetRolesV1(user.Id.ToString());
                 result.Should().BeAssignableTo<IEnumerable<RoleV1>>();
                 result.Count().Should().Be(uow.Roles.Count(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                    .Where(x => x.tbl_UserRole.Any(y => y.UserId == user.Id)).ToLambda()));
+                    .Where(x => x.tbl_UserRoles.Any(y => y.UserId == user.Id)).ToLambda()));
             }
         }
 
@@ -1059,8 +1059,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                testUser.LockoutEnabled = true;
-                testUser.LockoutEnd = DateTime.UtcNow.AddDays(1);
+                testUser.IsLockedOut = true;
+                testUser.LockoutEndUtc = DateTime.UtcNow.AddDays(1);
 
                 uow.Users.Update(testUser);
                 uow.Commit();

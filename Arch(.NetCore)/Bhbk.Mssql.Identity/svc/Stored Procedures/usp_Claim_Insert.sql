@@ -6,39 +6,49 @@ CREATE PROCEDURE [svc].[usp_Claim_Insert]
     ,@Type					NVARCHAR (MAX)
     ,@Value					NVARCHAR (MAX) 
     ,@ValueType             NVARCHAR (64) 
-    ,@Immutable				BIT
+    ,@IsDeletable			BIT
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @CLAIMID UNIQUEIDENTIFIER = NEWID()
-DECLARE @CREATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-INSERT INTO [dbo].[tbl_Claim]
-	(
-     Id           
-    ,IssuerId    
-    ,ActorId    
-    ,Subject           
-    ,Type       
-    ,Value       
-    ,ValueType     
-    ,Created           
-    ,Immutable        
-	)
-VALUES
-	(
-     @CLAIMID          
-    ,@IssuerId    
-    ,@ActorId    
-    ,@Subject           
-    ,@Type       
-    ,@Value       
-    ,@ValueType     
-    ,@CREATED           
-    ,@Immutable        
-	);
+        DECLARE @CLAIMID UNIQUEIDENTIFIER = NEWID()
+        DECLARE @CREATEDUTC DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @CLAIMID
+        INSERT INTO [dbo].[tbl_Claim]
+	        (
+             Id           
+            ,IssuerId    
+            ,ActorId    
+            ,Subject           
+            ,Type       
+            ,Value       
+            ,ValueType     
+            ,CreatedUtc           
+            ,IsDeletable        
+	        )
+        VALUES
+	        (
+             @CLAIMID          
+            ,@IssuerId    
+            ,@ActorId    
+            ,@Subject           
+            ,@Type       
+            ,@Value       
+            ,@ValueType     
+            ,@CREATEDUTC           
+            ,@IsDeletable        
+	        );
+
+        SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @CLAIMID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

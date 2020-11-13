@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -22,6 +23,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Refreshes.Create(new uvw_Refresh());
+                UoW.Commit();
             });
         }
 
@@ -44,7 +46,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             var result = UoW.Refreshes.Create(
-                new uvw_Refresh()
+                Mapper.Map<uvw_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -53,7 +55,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     RefreshValue = Base64.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                });
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Refresh>();
         }
 
@@ -63,6 +67,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Refreshes.Delete(new uvw_Refresh());
+                UoW.Commit();
             });
         }
 
@@ -75,6 +80,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var activity = UoW.Refreshes.Get().First();
 
             UoW.Refreshes.Delete(activity);
+            UoW.Commit();
         }
 
         [Fact]
@@ -94,6 +100,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<NotImplementedException>(() =>
             {
                 UoW.Refreshes.Update(new uvw_Refresh());
+                UoW.Commit();
             });
         }
     }

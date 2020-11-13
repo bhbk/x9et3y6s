@@ -4,38 +4,48 @@ CREATE PROCEDURE [svc].[usp_Login_Insert]
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
     ,@LoginKey				NVARCHAR (MAX)
-    ,@Enabled				BIT 
-    ,@Immutable				BIT
+    ,@IsEnabled				BIT 
+    ,@IsDeletable			BIT
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @LOGINID UNIQUEIDENTIFIER = NEWID()
-DECLARE @CREATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-INSERT INTO [dbo].[tbl_Login]
-	(
-     Id           
-    ,ActorId    
-    ,Name           
-    ,Description
-	,LoginKey
-    ,Enabled     
-    ,Created           
-    ,Immutable        
-	)
-VALUES
-	(
-     @LOGINID         
-    ,@ActorId    
-    ,@Name           
-    ,@Description       
-	,@LoginKey
-    ,@Enabled     
-    ,@CREATED       
-    ,@Immutable        
-	);
+        DECLARE @LOGINID UNIQUEIDENTIFIER = NEWID()
+        DECLARE @CREATEDUTC DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @LOGINID
+        INSERT INTO [dbo].[tbl_Login]
+	        (
+             Id           
+            ,ActorId    
+            ,Name           
+            ,Description
+	        ,LoginKey
+            ,IsEnabled     
+            ,CreatedUtc           
+            ,IsDeletable        
+	        )
+        VALUES
+	        (
+             @LOGINID         
+            ,@ActorId    
+            ,@Name           
+            ,@Description       
+	        ,@LoginKey
+            ,@IsEnabled     
+            ,@CREATEDUTC       
+            ,@IsDeletable        
+	        );
+
+        SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @LOGINID
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

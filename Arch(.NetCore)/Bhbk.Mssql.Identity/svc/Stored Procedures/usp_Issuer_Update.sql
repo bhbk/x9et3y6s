@@ -5,26 +5,36 @@ CREATE PROCEDURE [svc].[usp_Issuer_Update]
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
     ,@IssuerKey				NVARCHAR (MAX) 
-    ,@Enabled				BIT 
-    ,@Immutable				BIT
+    ,@IsEnabled				BIT 
+    ,@IsDeletable			BIT
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-UPDATE [dbo].[tbl_Issuer]
-SET
-     Id						= @Id
-    ,ActorId				= @ActorId
-	,Name					= @Name
-	,Description			= @Description
-	,IssuerKey				= @IssuerKey
-	,Enabled				= @Enabled
-    ,LastUpdated			= @LASTUPDATED
-    ,Immutable				= @Immutable
-WHERE Id = @Id
+        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Issuer] WHERE [svc].[uvw_Issuer].Id = @Id
+        UPDATE [dbo].[tbl_Issuer]
+        SET
+             Id						= @Id
+            ,ActorId				= @ActorId
+	        ,Name					= @Name
+	        ,Description			= @Description
+	        ,IssuerKey				= @IssuerKey
+	        ,IsEnabled				= @IsEnabled
+            ,IsDeletable			= @IsDeletable
+            ,LastUpdatedUtc			= @LASTUPDATED
+        WHERE Id = @Id
+
+        SELECT * FROM [svc].[uvw_Issuer] WHERE [svc].[uvw_Issuer].Id = @Id
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

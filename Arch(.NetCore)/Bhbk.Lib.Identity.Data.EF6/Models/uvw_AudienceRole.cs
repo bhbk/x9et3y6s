@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public System.Guid AudienceId { get; set; }
         public System.Guid RoleId { get; set; }
         public Nullable<System.Guid> ActorId { get; set; }
-        public System.DateTime Created { get; set; }
-        public bool Immutable { get; set; }
+        public bool IsDeletable { get; set; }
+        public System.DateTimeOffset CreatedUtc { get; set; }
     }
 }

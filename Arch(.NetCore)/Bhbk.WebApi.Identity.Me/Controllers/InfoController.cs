@@ -240,7 +240,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
-            else if (!user.HumanBeing)
+            else if (!user.IsHumanBeing)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
@@ -261,7 +261,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             return NoContent();
         }
 
-        [Route("v1/set-two-factor/{statusValue}"), HttpPut]
+        [Route("v1/set-multi-factor/{statusValue}"), HttpPut]
         public IActionResult SetTwoFactorV1([FromRoute] bool statusValue)
         {
             if (!ModelState.IsValid)
@@ -274,14 +274,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
-            else if (!user.HumanBeing
-                || user.TwoFactorEnabled == statusValue)
+            else if (!user.IsHumanBeing
+                || user.IsMultiFactor == statusValue)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetTwoFactorEnabled(user, statusValue);
+            UoW.Users.SetMultiFactorEnabled(user, statusValue);
             UoW.Commit();
 
             return NoContent();
@@ -302,7 +302,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             if (user.Id != model.Id
-                || !user.HumanBeing)
+                || !user.IsHumanBeing)
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);

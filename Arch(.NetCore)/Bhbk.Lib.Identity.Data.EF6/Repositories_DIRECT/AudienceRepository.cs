@@ -23,32 +23,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
             set { _clock.UtcNow = value; }
         }
 
-        public override tbl_Audience Delete(tbl_Audience audience)
-        {
-            var activity = _context.Set<tbl_Activity>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            var refreshes = _context.Set<tbl_Refresh>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            var settings = _context.Set<tbl_Setting>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            var states = _context.Set<tbl_State>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            var roles = _context.Set<tbl_Role>()
-                .Where(x => x.AudienceId == audience.Id);
-
-            _context.Set<tbl_Activity>().RemoveRange(activity);
-            _context.Set<tbl_Refresh>().RemoveRange(refreshes);
-            _context.Set<tbl_Setting>().RemoveRange(settings);
-            _context.Set<tbl_State>().RemoveRange(states);
-            _context.Set<tbl_Role>().RemoveRange(roles);
-
-            return _context.Set<tbl_Audience>().Remove(audience);
-        }
-
         public override tbl_Audience Update(tbl_Audience audience)
         {
             var entity = _context.Set<tbl_Audience>()
@@ -60,9 +34,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Repositories_DIRECT
             entity.IssuerId = audience.IssuerId;
             entity.Name = audience.Name;
             entity.Description = audience.Description;
-            entity.LastUpdated = Clock.UtcDateTime;
-            entity.Enabled = audience.Enabled;
-            entity.Immutable = audience.Immutable;
+            entity.LastUpdatedUtc = Clock.UtcDateTime;
+            entity.IsEnabled = audience.IsEnabled;
+            entity.IsDeletable = audience.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;
 

@@ -17,15 +17,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT
         public ActivityRepository Activities { get; private set; }
         public AudienceRepository Audiences { get; private set; }
         public ClaimRepository Claims { get; private set; }
+        public EmailQueueRepository EmailQueue { get; private set; }
         public IssuerRepository Issuers { get; private set; }
         public LoginRepository Logins { get; private set; }
         public MOTDRepository MOTDs { get; private set; }
-        public QueueEmailRepository QueueEmails { get; private set; }
-        public QueueTextRepository QueueTexts { get; private set; }
         public RefreshRepository Refreshes { get; private set; }
         public RoleRepository Roles { get; private set; }
         public SettingRepository Settings { get; private set; }
         public StateRepository States { get; private set; }
+        public TextQueueRepository TextQueue { get; private set; }
         public UrlRepository Urls { get; private set; }
         public UserRepository Users { get; private set; }
 
@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT
             _logger = LoggerFactory.Create(opt =>
             {
                 opt.AddFilter("Microsoft", LogLevel.Warning)
-                    .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Information)
+                    .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning)
                     .AddFilter("System", LogLevel.Warning)
                     .AddConsole();
             });
@@ -47,13 +47,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT
                 case InstanceContext.DeployedOrLocal:
                     {
 #if !RELEASE
-                        //var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                        //    .UseSqlServer(connection)
-                        //    .UseLoggerFactory(_logger)
-                        //    .EnableSensitiveDataLogging();
-
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                            .UseSqlServer(connection);
+                            .UseSqlServer(connection)
+                            .UseLoggerFactory(_logger)
+                            .EnableSensitiveDataLogging();
 #elif RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .UseSqlServer(connection);
@@ -67,13 +64,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT
                 case InstanceContext.UnitTest:
                     {
 #if !RELEASE
-                        //var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                        //    .UseInMemoryDatabase(":InMemory:")
-                        //    .UseLoggerFactory(_logger)
-                        //    .EnableSensitiveDataLogging();
-
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
-                            .UseInMemoryDatabase(":InMemory:");
+                            .UseInMemoryDatabase(":InMemory:")
+                            .UseLoggerFactory(_logger)
+                            .EnableSensitiveDataLogging();
 #elif RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .UseInMemoryDatabase(":InMemory:");
@@ -94,15 +88,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT
             Activities = new ActivityRepository(_context);
             Audiences = new AudienceRepository(_context, instance);
             Claims = new ClaimRepository(_context);
+            EmailQueue = new EmailQueueRepository(_context);
             Issuers = new IssuerRepository(_context);
             Logins = new LoginRepository(_context);
             MOTDs = new MOTDRepository(_context);
-            QueueEmails = new QueueEmailRepository(_context);
-            QueueTexts = new QueueTextRepository(_context);
             Refreshes = new RefreshRepository(_context);
             Roles = new RoleRepository(_context);
             Settings = new SettingRepository(_context);
             States = new StateRepository(_context);
+            TextQueue = new TextQueueRepository(_context);
             Urls = new UrlRepository(_context);
             Users = new UserRepository(_context, instance);
         }

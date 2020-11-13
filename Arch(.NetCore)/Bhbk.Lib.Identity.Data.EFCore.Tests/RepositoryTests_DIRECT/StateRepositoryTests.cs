@@ -20,10 +20,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact(Skip = "NotImplemented")]
         public void Repo_States_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.States.Create(
-                    Mapper.Map<tbl_State>(new StateV1()));
+                UoW.States.Create(new tbl_State());
                 UoW.Commit();
             });
         }
@@ -47,21 +46,20 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 .Single();
 
             var result = UoW.States.Create(
-                Mapper.Map<tbl_State>(
-                    new StateV1()
-                    {
-                        IssuerId = issuer.Id,
-                        AudienceId = audience.Id,
-                        UserId = user.Id,
-                        StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
-                        StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                    }));
-            result.Should().BeAssignableTo<tbl_State>();
-
+                Mapper.Map<tbl_State>(new StateV1()
+                {
+                    IssuerId = issuer.Id,
+                    AudienceId = audience.Id,
+                    UserId = user.Id,
+                    StateValue = AlphaNumeric.CreateString(32),
+                    StateType = StateType.Device.ToString(),
+                    StateConsume = false,
+                    ValidFromUtc = DateTime.UtcNow,
+                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                }));
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_State>();
         }
 
         [Fact]
@@ -124,9 +122,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
             state.StateConsume = true;
 
             var result = UoW.States.Update(state);
-            result.Should().BeAssignableTo<tbl_State>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_State>();
         }
     }
 }

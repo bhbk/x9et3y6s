@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
+#nullable disable
+
 namespace Bhbk.Lib.Identity.Data.EFCore.Models
 {
     public partial class IdentityEntities : DbContext
@@ -15,33 +17,26 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         {
         }
 
-        public virtual DbSet<uvw_Activity> uvw_Activity { get; set; }
-        public virtual DbSet<uvw_Audience> uvw_Audience { get; set; }
-        public virtual DbSet<uvw_AudienceRole> uvw_AudienceRole { get; set; }
-        public virtual DbSet<uvw_Claim> uvw_Claim { get; set; }
-        public virtual DbSet<uvw_Issuer> uvw_Issuer { get; set; }
-        public virtual DbSet<uvw_Login> uvw_Login { get; set; }
-        public virtual DbSet<uvw_MOTD> uvw_MOTD { get; set; }
-        public virtual DbSet<uvw_QueueEmail> uvw_QueueEmail { get; set; }
-        public virtual DbSet<uvw_QueueText> uvw_QueueText { get; set; }
-        public virtual DbSet<uvw_Refresh> uvw_Refresh { get; set; }
-        public virtual DbSet<uvw_Role> uvw_Role { get; set; }
-        public virtual DbSet<uvw_Setting> uvw_Setting { get; set; }
-        public virtual DbSet<uvw_State> uvw_State { get; set; }
-        public virtual DbSet<uvw_Url> uvw_Url { get; set; }
-        public virtual DbSet<uvw_User> uvw_User { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Data Source=bits.test.ochap.local; Initial Catalog=BhbkIdentity; User ID=Sql.BhbkIdentity; Password=Pa$$word01!");
-            }
-        }
+        public virtual DbSet<uvw_Activity> uvw_Activities { get; set; }
+        public virtual DbSet<uvw_Audience> uvw_Audiences { get; set; }
+        public virtual DbSet<uvw_AudienceRole> uvw_AudienceRoles { get; set; }
+        public virtual DbSet<uvw_Claim> uvw_Claims { get; set; }
+        public virtual DbSet<uvw_EmailQueue> uvw_EmailQueues { get; set; }
+        public virtual DbSet<uvw_Issuer> uvw_Issuers { get; set; }
+        public virtual DbSet<uvw_Login> uvw_Logins { get; set; }
+        public virtual DbSet<uvw_MOTD> uvw_MOTDs { get; set; }
+        public virtual DbSet<uvw_Refresh> uvw_Refreshes { get; set; }
+        public virtual DbSet<uvw_Role> uvw_Roles { get; set; }
+        public virtual DbSet<uvw_Setting> uvw_Settings { get; set; }
+        public virtual DbSet<uvw_State> uvw_States { get; set; }
+        public virtual DbSet<uvw_TextQueue> uvw_TextQueues { get; set; }
+        public virtual DbSet<uvw_Url> uvw_Urls { get; set; }
+        public virtual DbSet<uvw_User> uvw_Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
             modelBuilder.Entity<uvw_Activity>(entity =>
             {
                 entity.HasNoKey();
@@ -104,6 +99,39 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                 entity.Property(e => e.ValueType)
                     .IsRequired()
                     .HasMaxLength(64);
+            });
+
+            modelBuilder.Entity<uvw_EmailQueue>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("uvw_EmailQueue", "svc");
+
+                entity.Property(e => e.FromDisplay)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FromEmail)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HtmlContent).IsUnicode(false);
+
+                entity.Property(e => e.PlaintextContent).IsUnicode(false);
+
+                entity.Property(e => e.Subject)
+                    .IsRequired()
+                    .HasMaxLength(256)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ToDisplay)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ToEmail)
+                    .IsRequired()
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<uvw_Issuer>(entity =>
@@ -175,59 +203,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<uvw_QueueEmail>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToView("uvw_QueueEmail", "svc");
-
-                entity.Property(e => e.FromDisplay)
-                    .HasMaxLength(128)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.FromEmail)
-                    .HasMaxLength(128)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.HtmlContent).IsUnicode(false);
-
-                entity.Property(e => e.PlaintextContent).IsUnicode(false);
-
-                entity.Property(e => e.Subject)
-                    .IsRequired()
-                    .HasMaxLength(256)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ToDisplay)
-                    .HasMaxLength(128)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ToEmail)
-                    .IsRequired()
-                    .HasMaxLength(128)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<uvw_QueueText>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToView("uvw_QueueText", "svc");
-
-                entity.Property(e => e.Body)
-                    .IsRequired()
-                    .IsUnicode(false);
-
-                entity.Property(e => e.FromPhoneNumber)
-                    .HasMaxLength(15)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ToPhoneNumber)
-                    .IsRequired()
-                    .HasMaxLength(15)
-                    .IsUnicode(false);
-            });
-
             modelBuilder.Entity<uvw_Refresh>(entity =>
             {
                 entity.HasNoKey();
@@ -284,6 +259,26 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .HasMaxLength(64);
 
                 entity.Property(e => e.StateValue).HasMaxLength(1024);
+            });
+
+            modelBuilder.Entity<uvw_TextQueue>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("uvw_TextQueue", "svc");
+
+                entity.Property(e => e.Body)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FromPhoneNumber)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ToPhoneNumber)
+                    .IsRequired()
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<uvw_Url>(entity =>

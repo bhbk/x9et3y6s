@@ -43,9 +43,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     {
                         Name = Constants.TestIssuer,
                         IssuerKey = Constants.TestIssuerKey,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = true,
                     });
+
+                _uow.Commit();
             }
 
             /*
@@ -62,16 +64,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     {
                         IssuerId = foundIssuer.Id,
                         Name = Constants.TestAudience,
-                        Enabled = true,
-                        Immutable = false,
+                        IsLockedOut = false,
+                        IsEnabled = true,
+                        IsDeletable = true,
                     });
+
+                _uow.Commit();
 
                 _uow.Activities.Create(
                     new uvw_Activity()
                     {
                         AudienceId = foundAudience.Id,
                         ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                        Immutable = false,
+                        IsDeletable = true,
                     });
 
                 _uow.Refreshes.Create(
@@ -85,6 +90,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                     });
+
+                _uow.Commit();
             }
 
             /*
@@ -104,8 +111,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                         Type = Constants.TestClaim,
                         Value = AlphaNumeric.CreateString(8),
                         ValueType = Constants.TestClaimValueType,
-                        Immutable = false,
+                        IsDeletable = true,
                     });
+
+                _uow.Commit();
             }
 
             /*
@@ -122,9 +131,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     {
                         Name = Constants.TestLogin,
                         LoginKey = Constants.TestLoginKey,
-                        Enabled = false,
-                        Immutable = false,
+                        IsEnabled = false,
+                        IsDeletable = true,
                     });
+
+                _uow.Commit();
             }
 
             /*
@@ -141,9 +152,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     {
                         AudienceId = foundAudience.Id,
                         Name = Constants.TestRole,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = true,
                     });
+
+                _uow.Commit();
             }
 
             /*
@@ -163,17 +176,19 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                         PhoneNumber = NumberAs.CreateString(9),
                         FirstName = "First-" + Base64.CreateString(4),
                         LastName = "Last-" + Base64.CreateString(4),
-                        LockoutEnabled = false,
-                        HumanBeing = true,
-                        Immutable = false,
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = true,
                     });
+
+                _uow.Commit();
 
                 _uow.Activities.Create(
                     new uvw_Activity()
                     {
                         UserId = foundUser.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        Immutable = false,
+                        IsDeletable = true,
                     });
 
                 _uow.Refreshes.Create(
@@ -199,7 +214,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                        LastPolling = DateTime.UtcNow,
+                        LastPollingUtc = DateTime.UtcNow,
                     });
 
                 _uow.States.Create(
@@ -213,8 +228,131 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                        LastPolling = DateTime.UtcNow,
+                        LastPollingUtc = DateTime.UtcNow,
                     });
+
+                _uow.Commit();
+            }
+        }
+
+        public void CreateEmail(uint sets)
+        {
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
+                throw new InvalidOperationException();
+
+            /*
+             * create test users
+             */
+            var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
+                .Where(x => x.UserName == Constants.TestUser).ToLambda())
+                .SingleOrDefault();
+
+            if (foundUser == null)
+            {
+                foundUser = _uow.Users.Create(
+                    new uvw_User()
+                    {
+                        UserName = Constants.TestUser,
+                        EmailAddress = Constants.TestUser,
+                        PhoneNumber = NumberAs.CreateString(9),
+                        FirstName = "First-" + Base64.CreateString(4),
+                        LastName = "Last-" + Base64.CreateString(4),
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = true,
+                    });
+                _uow.Commit();
+            }
+
+            for (int i = 0; i < sets; i++)
+            {
+                DateTime now = DateTime.UtcNow;
+
+                var result = _uow.EmailQueue.Create(
+                    new uvw_EmailQueue()
+                    {
+                        FromId = foundUser.Id,
+                        FromEmail = foundUser.EmailAddress,
+                        ToId = foundUser.Id,
+                        ToEmail = foundUser.EmailAddress,
+                        Subject = "Subject-" + Base64.CreateString(4),
+                        HtmlContent = "Body-" + Base64.CreateString(32),
+                        SendAtUtc = now,
+                    });
+            }
+            _uow.Commit();
+        }
+
+        public void CreateText(uint sets)
+        {
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
+                throw new InvalidOperationException();
+
+            /*
+             * create test users
+             */
+            var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
+                .Where(x => x.UserName == Constants.TestUser).ToLambda())
+                .SingleOrDefault();
+
+            if (foundUser == null)
+            {
+                foundUser = _uow.Users.Create(
+                    new uvw_User()
+                    {
+                        UserName = Constants.TestUser,
+                        EmailAddress = Constants.TestUser,
+                        PhoneNumber = NumberAs.CreateString(9),
+                        FirstName = "First-" + Base64.CreateString(4),
+                        LastName = "Last-" + Base64.CreateString(4),
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = true,
+                    });
+                _uow.Commit();
+            }
+
+            for (int i = 0; i < sets; i++)
+            {
+                DateTime now = DateTime.UtcNow;
+
+                var result = _uow.TextQueue.Create(
+                    new uvw_TextQueue()
+                    {
+                        FromId = foundUser.Id,
+                        FromPhoneNumber = Constants.TestUserPhoneNumber,
+                        ToId = foundUser.Id,
+                        ToPhoneNumber = Constants.TestUserPhoneNumber,
+                        Body = "Body-" + Base64.CreateString(32),
+                        SendAtUtc = now,
+                    });
+            }
+            _uow.Commit();
+        }
+
+        public void CreateMOTD(uint sets)
+        {
+            if (_uow.InstanceType == InstanceContext.DeployedOrLocal)
+                throw new InvalidOperationException();
+
+            for (int i = 0; i < sets; i++)
+            {
+                _uow.MOTDs.Create(
+                    new uvw_MOTD()
+                    {
+                        Id = Guid.NewGuid(),
+                        Author = Constants.TestMotdAuthor,
+                        Quote = "Quote-" + Base64.CreateString(4),
+                        TssLength = 666,
+                        TssId = AlphaNumeric.CreateString(8),
+                        TssDate = DateTime.UtcNow,
+                        TssCategory = "Test Category",
+                        TssTitle = "Test Title",
+                        TssBackground = "Test Background",
+                        TssTags = "tag1,tag2,tag3",
+                    });
+
+                _uow.Commit();
             }
         }
 
@@ -224,58 +362,65 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 throw new InvalidOperationException();
 
             /*
+             * delete test emails
+             */
+            _uow.EmailQueue.Delete(QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>().ToLambda());
+            _uow.Commit();
+
+            /*
+             * delete test texts
+             */
+            _uow.TextQueue.Delete(QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>().ToLambda());
+            _uow.Commit();
+
+            /*
+             * delete test motds
+             */
+            _uow.MOTDs.Delete(QueryExpressionFactory.GetQueryExpression<uvw_MOTD>()
+                .Where(x => x.Author.Contains(Constants.TestMotdAuthor)).ToLambda());
+            _uow.Commit();
+
+            /*
              * delete test users
              */
-            var users = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
+            _uow.Users.Delete(QueryExpressionFactory.GetQueryExpression<uvw_User>()
                 .Where(x => x.UserName.Contains(Constants.TestUser)).ToLambda());
-
-            if (users.Count() > 0)
-                _uow.Users.Delete(users);
+            _uow.Commit();
 
             /*
              * delete test roles
              */
-            var roles = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Role>()
+            _uow.Roles.Delete(QueryExpressionFactory.GetQueryExpression<uvw_Role>()
                 .Where(x => x.Name.Contains(Constants.TestRole)).ToLambda());
-
-            if (roles.Count() > 0)
-                _uow.Roles.Delete(roles);
+            _uow.Commit();
 
             /*
              * delete test logins
              */
-            var logins = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<uvw_Login>()
+            _uow.Logins.Delete(QueryExpressionFactory.GetQueryExpression<uvw_Login>()
                 .Where(x => x.Name.Contains(Constants.TestLogin)).ToLambda());
-
-            if (logins.Count() > 0)
-                _uow.Logins.Delete(logins);
+            _uow.Commit();
 
             /*
              * delete test claims
              */
-            var claims = _uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claim>()
+            _uow.Claims.Delete(QueryExpressionFactory.GetQueryExpression<uvw_Claim>()
                 .Where(x => x.Type.Contains(Constants.TestClaim)).ToLambda());
-
-            if (claims.Count() > 0)
-                _uow.Claims.Delete(claims);
+            _uow.Commit();
 
             /*
              * delete test audiences
              */
-            var audiences = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
+            _uow.Audiences.Delete(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
                 .Where(x => x.Name.Contains(Constants.TestAudience)).ToLambda());
-
-            if (audiences.Count() > 0)
-                _uow.Audiences.Delete(audiences);
+            _uow.Commit();
 
             /*
              * delete test issuers
              */
-            var issuers = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
+            _uow.Issuers.Delete(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
                 .Where(x => x.Name.Contains(Constants.TestIssuer)).ToLambda());
-
-            if (issuers.Count() > 0)
-                _uow.Issuers.Delete(issuers);
+            _uow.Commit();
         }
     }
 }

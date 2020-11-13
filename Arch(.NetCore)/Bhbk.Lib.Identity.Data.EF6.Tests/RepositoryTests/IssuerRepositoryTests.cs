@@ -1,11 +1,12 @@
 ﻿using Bhbk.Lib.Identity.Data.EF6.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Entity.Validation;
 using System.Linq;
 using Xunit;
 
@@ -17,9 +18,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Issuers_CreateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Issuers.Create(new uvw_Issuer());
+                UoW.Commit();
             });
         }
 
@@ -30,13 +32,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Issuers.Create(
-                new uvw_Issuer()
+                Mapper.Map<uvw_Issuer>(new IssuerV1()
                 {
                     Name = Constants.TestIssuer,
                     IssuerKey = Constants.TestIssuerKey,
-                    Enabled = true,
-                    Immutable = false,
-                });
+                    IsEnabled = true,
+                    IsDeletable = true,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Issuer>();
         }
 
@@ -46,6 +50,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Issuers.Delete(new uvw_Issuer());
+                UoW.Commit();
             });
         }
 
@@ -60,6 +65,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Single();
 
             UoW.Issuers.Delete(issuer);
+            UoW.Commit();
         }
 
         [Fact]
@@ -76,9 +82,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Issuers_UpdateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Issuers.Update(new uvw_Issuer());
+                UoW.Commit();
             });
         }
 
@@ -94,6 +101,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             issuer.Name += "(Updated)";
 
             var result = UoW.Issuers.Update(issuer);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Issuer>();
         }
     }

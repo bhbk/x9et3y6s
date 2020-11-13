@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -21,6 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Audiences.Create(new uvw_Audience());
+                UoW.Commit();
             });
         }
 
@@ -35,13 +36,15 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             var result = UoW.Audiences.Create(
-                new uvw_Audience()
+                Mapper.Map<uvw_Audience>(new AudienceV1()
                 {
                     IssuerId = issuer.Id,
                     Name = Constants.TestAudience,
-                    Enabled = true,
-                    Immutable = false,
-                });
+                    IsEnabled = true,
+                    IsDeletable = false,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Audience>();
         }
 
@@ -51,6 +54,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Audiences.Delete(new uvw_Audience());
+                UoW.Commit();
             });
         }
 
@@ -65,6 +69,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             UoW.Audiences.Delete(audience);
+            UoW.Commit();
         }
 
         [Fact]
@@ -84,6 +89,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Audiences.Update(new uvw_Audience());
+                UoW.Commit();
             });
         }
 
@@ -99,6 +105,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             audience.Name += "(Updated)";
 
             var result = UoW.Audiences.Update(audience);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_Audience>();
         }
     }

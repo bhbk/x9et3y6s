@@ -47,7 +47,7 @@ namespace Bhbk.Cli.Identity.Commands
                     login = admin.Login_CreateV1(new LoginV1()
                     {
                         Name = loginName,
-                        Enabled = true,
+                        IsEnabled = true,
                     }).Result;
 
                     if (login != null)

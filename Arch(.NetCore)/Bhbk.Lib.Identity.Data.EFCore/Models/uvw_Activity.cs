@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace Bhbk.Lib.Identity.Data.EFCore.Models
 {
     public partial class uvw_Activity
@@ -13,7 +15,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         public string KeyValues { get; set; }
         public string OriginalValues { get; set; }
         public string CurrentValues { get; set; }
-        public DateTime Created { get; set; }
-        public bool Immutable { get; set; }
+        public bool IsDeletable { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
     }
 }

@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
 {
@@ -23,12 +22,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
                 new SqlParameter("@IssuerKey", SqlDbType.NVarChar) { Value = entity.IssuerKey },
-                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsEnabled", SqlDbType.Bit) { Value = entity.IsEnabled },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable },
             };
 
             return _context.Set<uvw_Issuer>().FromSqlRaw("[svc].[usp_Issuer_Insert]"
-                + "@ActorId, @Name, @Description, @IssuerKey, @Enabled, @Immutable", pvalues.ToArray())
+                + "@ActorId, @Name, @Description, @IssuerKey, @IsEnabled, @IsDeletable", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -87,11 +86,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             return results;
         }
 
-        public override IEnumerable<uvw_Issuer> Delete(LambdaExpression lambda)
-        {
-            throw new NotImplementedException();
-        }
-
         public override uvw_Issuer Update(uvw_Issuer entity)
         {
             var pvalues = new List<SqlParameter>
@@ -101,12 +95,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@Name", SqlDbType.NVarChar) { Value = entity.Name },
                 new SqlParameter("@Description", SqlDbType.NVarChar) { Value = (object)entity.Description ?? DBNull.Value },
                 new SqlParameter("@IssuerKey", SqlDbType.NVarChar) { Value = entity.IssuerKey },
-                new SqlParameter("@Enabled", SqlDbType.Bit) { Value = entity.Enabled },
-                new SqlParameter("@Immutable", SqlDbType.Bit) { Value = entity.Immutable }
+                new SqlParameter("@IsEnabled", SqlDbType.Bit) { Value = entity.IsEnabled },
+                new SqlParameter("@IsDeletable", SqlDbType.Bit) { Value = entity.IsDeletable }
             };
 
             return _context.Set<uvw_Issuer>().FromSqlRaw("[svc].[usp_Issuer_Update]"
-                + "@Id, @ActorId, @Name, @Description, @IssuerKey, @Enabled, @Immutable", pvalues.ToArray())
+                + "@Id, @ActorId, @Name, @Description, @IssuerKey, @IsEnabled, @IsDeletable", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

@@ -18,13 +18,13 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string RefreshType { get; set; }
 
         [Required]
-        public DateTime ValidFromUtc { get; set; }
+        public DateTimeOffset ValidFromUtc { get; set; }
 
         [Required]
-        public DateTime ValidToUtc { get; set; }
+        public DateTimeOffset ValidToUtc { get; set; }
 
         [Required]
-        public DateTime IssuedUtc { get; set; }
+        public DateTimeOffset IssuedUtc { get; set; }
     }
 
     public class RefreshV1 : Refreshes

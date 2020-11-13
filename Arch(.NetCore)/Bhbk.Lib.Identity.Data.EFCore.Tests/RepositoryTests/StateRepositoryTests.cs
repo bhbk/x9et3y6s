@@ -1,5 +1,6 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -22,6 +23,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.States.Create(new uvw_State());
+                UoW.Commit();
             });
         }
 
@@ -44,7 +46,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Single();
 
             var result = UoW.States.Create(
-                new uvw_State()
+                Mapper.Map<uvw_State>(new StateV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -54,7 +56,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
-                });
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_State>();
         }
 
@@ -64,6 +68,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.States.Delete(new uvw_State());
+                UoW.Commit();
             });
         }
 
@@ -76,6 +81,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             var state = UoW.States.Get().First();
 
             UoW.States.Delete(state);
+            UoW.Commit();
         }
 
         [Fact]
@@ -95,6 +101,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.States.Update(new uvw_State());
+                UoW.Commit();
             });
         }
 
@@ -115,6 +122,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             state.StateConsume = true;
 
             var result = UoW.States.Update(state);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_State>();
         }
     }

@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                     var disabledExpr = QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                            .Where(x => x.LockoutEnd < DateTime.UtcNow).ToLambda();
+                            .Where(x => x.LockoutEndUtc < DateTime.UtcNow).ToLambda();
 
                     var disabled = uow.Users.Get(disabledExpr);
                     var disabledCount = disabled.Count();
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                         uow.Users.Delete(disabled);
                         uow.Commit();
 
-                        var msg = callPath + " success on " + DateTime.Now.ToString() + ". Enabled "
+                        var msg = callPath + " success on " + DateTime.UtcNow.ToString() + ". Enabled "
                                 + disabledCount.ToString() + " users with expired lock-outs.";
 
                         Log.Information(msg);

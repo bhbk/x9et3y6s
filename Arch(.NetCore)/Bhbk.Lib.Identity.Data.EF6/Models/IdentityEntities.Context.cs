@@ -12,6 +12,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class IdentityEntities : DbContext
     {
@@ -29,16 +31,1156 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public virtual DbSet<uvw_Audience> uvw_Audience { get; set; }
         public virtual DbSet<uvw_AudienceRole> uvw_AudienceRole { get; set; }
         public virtual DbSet<uvw_Claim> uvw_Claim { get; set; }
+        public virtual DbSet<uvw_EmailQueue> uvw_EmailQueue { get; set; }
         public virtual DbSet<uvw_Issuer> uvw_Issuer { get; set; }
         public virtual DbSet<uvw_Login> uvw_Login { get; set; }
         public virtual DbSet<uvw_MOTD> uvw_MOTD { get; set; }
-        public virtual DbSet<uvw_QueueEmail> uvw_QueueEmail { get; set; }
-        public virtual DbSet<uvw_QueueText> uvw_QueueText { get; set; }
         public virtual DbSet<uvw_Refresh> uvw_Refresh { get; set; }
         public virtual DbSet<uvw_Role> uvw_Role { get; set; }
         public virtual DbSet<uvw_Setting> uvw_Setting { get; set; }
         public virtual DbSet<uvw_State> uvw_State { get; set; }
+        public virtual DbSet<uvw_TextQueue> uvw_TextQueue { get; set; }
         public virtual DbSet<uvw_Url> uvw_Url { get; set; }
         public virtual DbSet<uvw_User> uvw_User { get; set; }
+    
+        public virtual ObjectResult<usp_Activity_Delete_Result> usp_Activity_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Activity_Delete_Result>("usp_Activity_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Activity_Insert_Result> usp_Activity_Insert(Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string activityType, string tableName, string keyValues, string originalValues, string currentValues, Nullable<bool> isDeletable)
+        {
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var activityTypeParameter = activityType != null ?
+                new ObjectParameter("ActivityType", activityType) :
+                new ObjectParameter("ActivityType", typeof(string));
+    
+            var tableNameParameter = tableName != null ?
+                new ObjectParameter("TableName", tableName) :
+                new ObjectParameter("TableName", typeof(string));
+    
+            var keyValuesParameter = keyValues != null ?
+                new ObjectParameter("KeyValues", keyValues) :
+                new ObjectParameter("KeyValues", typeof(string));
+    
+            var originalValuesParameter = originalValues != null ?
+                new ObjectParameter("OriginalValues", originalValues) :
+                new ObjectParameter("OriginalValues", typeof(string));
+    
+            var currentValuesParameter = currentValues != null ?
+                new ObjectParameter("CurrentValues", currentValues) :
+                new ObjectParameter("CurrentValues", typeof(string));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Activity_Insert_Result>("usp_Activity_Insert", audienceIdParameter, userIdParameter, activityTypeParameter, tableNameParameter, keyValuesParameter, originalValuesParameter, currentValuesParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_Audience_Delete_Result> usp_Audience_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Delete_Result>("usp_Audience_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Audience_Insert_Result> usp_Audience_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string name, string description, Nullable<bool> isLockedOut, Nullable<bool> isEnabled, Nullable<bool> isDeletable, Nullable<int> accessFailedCount, Nullable<int> accessSuccessCount, Nullable<System.DateTimeOffset> lockoutEndUtc, Nullable<System.DateTimeOffset> lastLoginSuccessUtc, Nullable<System.DateTimeOffset> lastLoginFailureUtc)
+        {
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var isLockedOutParameter = isLockedOut.HasValue ?
+                new ObjectParameter("IsLockedOut", isLockedOut) :
+                new ObjectParameter("IsLockedOut", typeof(bool));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            var accessFailedCountParameter = accessFailedCount.HasValue ?
+                new ObjectParameter("AccessFailedCount", accessFailedCount) :
+                new ObjectParameter("AccessFailedCount", typeof(int));
+    
+            var accessSuccessCountParameter = accessSuccessCount.HasValue ?
+                new ObjectParameter("AccessSuccessCount", accessSuccessCount) :
+                new ObjectParameter("AccessSuccessCount", typeof(int));
+    
+            var lockoutEndUtcParameter = lockoutEndUtc.HasValue ?
+                new ObjectParameter("LockoutEndUtc", lockoutEndUtc) :
+                new ObjectParameter("LockoutEndUtc", typeof(System.DateTimeOffset));
+    
+            var lastLoginSuccessUtcParameter = lastLoginSuccessUtc.HasValue ?
+                new ObjectParameter("LastLoginSuccessUtc", lastLoginSuccessUtc) :
+                new ObjectParameter("LastLoginSuccessUtc", typeof(System.DateTimeOffset));
+    
+            var lastLoginFailureUtcParameter = lastLoginFailureUtc.HasValue ?
+                new ObjectParameter("LastLoginFailureUtc", lastLoginFailureUtc) :
+                new ObjectParameter("LastLoginFailureUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Insert_Result>("usp_Audience_Insert", issuerIdParameter, actorIdParameter, nameParameter, descriptionParameter, isLockedOutParameter, isEnabledParameter, isDeletableParameter, accessFailedCountParameter, accessSuccessCountParameter, lockoutEndUtcParameter, lastLoginSuccessUtcParameter, lastLoginFailureUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_Audience_Update_Result> usp_Audience_Update(Nullable<System.Guid> id, Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string name, string description, Nullable<bool> isLockedOut, Nullable<bool> isEnabled, Nullable<bool> isDeletable, Nullable<int> accessFailedCount, Nullable<int> accessSuccessCount, Nullable<System.DateTimeOffset> lockoutEndUtc, Nullable<System.DateTimeOffset> lastLoginSuccessUtc, Nullable<System.DateTimeOffset> lastLoginFailureUtc)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var isLockedOutParameter = isLockedOut.HasValue ?
+                new ObjectParameter("IsLockedOut", isLockedOut) :
+                new ObjectParameter("IsLockedOut", typeof(bool));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            var accessFailedCountParameter = accessFailedCount.HasValue ?
+                new ObjectParameter("AccessFailedCount", accessFailedCount) :
+                new ObjectParameter("AccessFailedCount", typeof(int));
+    
+            var accessSuccessCountParameter = accessSuccessCount.HasValue ?
+                new ObjectParameter("AccessSuccessCount", accessSuccessCount) :
+                new ObjectParameter("AccessSuccessCount", typeof(int));
+    
+            var lockoutEndUtcParameter = lockoutEndUtc.HasValue ?
+                new ObjectParameter("LockoutEndUtc", lockoutEndUtc) :
+                new ObjectParameter("LockoutEndUtc", typeof(System.DateTimeOffset));
+    
+            var lastLoginSuccessUtcParameter = lastLoginSuccessUtc.HasValue ?
+                new ObjectParameter("LastLoginSuccessUtc", lastLoginSuccessUtc) :
+                new ObjectParameter("LastLoginSuccessUtc", typeof(System.DateTimeOffset));
+    
+            var lastLoginFailureUtcParameter = lastLoginFailureUtc.HasValue ?
+                new ObjectParameter("LastLoginFailureUtc", lastLoginFailureUtc) :
+                new ObjectParameter("LastLoginFailureUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Update_Result>("usp_Audience_Update", idParameter, issuerIdParameter, actorIdParameter, nameParameter, descriptionParameter, isLockedOutParameter, isEnabledParameter, isDeletableParameter, accessFailedCountParameter, accessSuccessCountParameter, lockoutEndUtcParameter, lastLoginSuccessUtcParameter, lastLoginFailureUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_Claim_Delete_Result> usp_Claim_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Claim_Delete_Result>("usp_Claim_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Claim_Insert_Result> usp_Claim_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string subject, string type, string value, string valueType, Nullable<bool> isDeletable)
+        {
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var subjectParameter = subject != null ?
+                new ObjectParameter("Subject", subject) :
+                new ObjectParameter("Subject", typeof(string));
+    
+            var typeParameter = type != null ?
+                new ObjectParameter("Type", type) :
+                new ObjectParameter("Type", typeof(string));
+    
+            var valueParameter = value != null ?
+                new ObjectParameter("Value", value) :
+                new ObjectParameter("Value", typeof(string));
+    
+            var valueTypeParameter = valueType != null ?
+                new ObjectParameter("ValueType", valueType) :
+                new ObjectParameter("ValueType", typeof(string));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Claim_Insert_Result>("usp_Claim_Insert", issuerIdParameter, actorIdParameter, subjectParameter, typeParameter, valueParameter, valueTypeParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_Claim_Update_Result> usp_Claim_Update(Nullable<System.Guid> id, Nullable<System.Guid> issuerId, Nullable<System.Guid> actorId, string subject, string type, string value, string valueType, Nullable<bool> isDeletable)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var subjectParameter = subject != null ?
+                new ObjectParameter("Subject", subject) :
+                new ObjectParameter("Subject", typeof(string));
+    
+            var typeParameter = type != null ?
+                new ObjectParameter("Type", type) :
+                new ObjectParameter("Type", typeof(string));
+    
+            var valueParameter = value != null ?
+                new ObjectParameter("Value", value) :
+                new ObjectParameter("Value", typeof(string));
+    
+            var valueTypeParameter = valueType != null ?
+                new ObjectParameter("ValueType", valueType) :
+                new ObjectParameter("ValueType", typeof(string));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Claim_Update_Result>("usp_Claim_Update", idParameter, issuerIdParameter, actorIdParameter, subjectParameter, typeParameter, valueParameter, valueTypeParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_EmailQueue_Delete_Result> usp_EmailQueue_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Delete_Result>("usp_EmailQueue_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_EmailQueue_Insert_Result> usp_EmailQueue_Insert(Nullable<System.Guid> actorId, Nullable<System.Guid> fromId, string fromEmail, string fromDisplay, Nullable<System.Guid> toId, string toEmail, string toDisplay, string subject, string htmlContent, string plaintextContent, Nullable<System.DateTimeOffset> sendAtUtc)
+        {
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var fromIdParameter = fromId.HasValue ?
+                new ObjectParameter("FromId", fromId) :
+                new ObjectParameter("FromId", typeof(System.Guid));
+    
+            var fromEmailParameter = fromEmail != null ?
+                new ObjectParameter("FromEmail", fromEmail) :
+                new ObjectParameter("FromEmail", typeof(string));
+    
+            var fromDisplayParameter = fromDisplay != null ?
+                new ObjectParameter("FromDisplay", fromDisplay) :
+                new ObjectParameter("FromDisplay", typeof(string));
+    
+            var toIdParameter = toId.HasValue ?
+                new ObjectParameter("ToId", toId) :
+                new ObjectParameter("ToId", typeof(System.Guid));
+    
+            var toEmailParameter = toEmail != null ?
+                new ObjectParameter("ToEmail", toEmail) :
+                new ObjectParameter("ToEmail", typeof(string));
+    
+            var toDisplayParameter = toDisplay != null ?
+                new ObjectParameter("ToDisplay", toDisplay) :
+                new ObjectParameter("ToDisplay", typeof(string));
+    
+            var subjectParameter = subject != null ?
+                new ObjectParameter("Subject", subject) :
+                new ObjectParameter("Subject", typeof(string));
+    
+            var htmlContentParameter = htmlContent != null ?
+                new ObjectParameter("HtmlContent", htmlContent) :
+                new ObjectParameter("HtmlContent", typeof(string));
+    
+            var plaintextContentParameter = plaintextContent != null ?
+                new ObjectParameter("PlaintextContent", plaintextContent) :
+                new ObjectParameter("PlaintextContent", typeof(string));
+    
+            var sendAtUtcParameter = sendAtUtc.HasValue ?
+                new ObjectParameter("SendAtUtc", sendAtUtc) :
+                new ObjectParameter("SendAtUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Insert_Result>("usp_EmailQueue_Insert", actorIdParameter, fromIdParameter, fromEmailParameter, fromDisplayParameter, toIdParameter, toEmailParameter, toDisplayParameter, subjectParameter, htmlContentParameter, plaintextContentParameter, sendAtUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_EmailQueue_Update_Result> usp_EmailQueue_Update(Nullable<System.Guid> id, Nullable<System.Guid> actorId, Nullable<System.Guid> fromId, string fromEmail, string fromDisplay, Nullable<System.Guid> toId, string toEmail, string toDisplay, string subject, string htmlContent, string plaintextContent, Nullable<System.DateTimeOffset> sentAtUtc)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var fromIdParameter = fromId.HasValue ?
+                new ObjectParameter("FromId", fromId) :
+                new ObjectParameter("FromId", typeof(System.Guid));
+    
+            var fromEmailParameter = fromEmail != null ?
+                new ObjectParameter("FromEmail", fromEmail) :
+                new ObjectParameter("FromEmail", typeof(string));
+    
+            var fromDisplayParameter = fromDisplay != null ?
+                new ObjectParameter("FromDisplay", fromDisplay) :
+                new ObjectParameter("FromDisplay", typeof(string));
+    
+            var toIdParameter = toId.HasValue ?
+                new ObjectParameter("ToId", toId) :
+                new ObjectParameter("ToId", typeof(System.Guid));
+    
+            var toEmailParameter = toEmail != null ?
+                new ObjectParameter("ToEmail", toEmail) :
+                new ObjectParameter("ToEmail", typeof(string));
+    
+            var toDisplayParameter = toDisplay != null ?
+                new ObjectParameter("ToDisplay", toDisplay) :
+                new ObjectParameter("ToDisplay", typeof(string));
+    
+            var subjectParameter = subject != null ?
+                new ObjectParameter("Subject", subject) :
+                new ObjectParameter("Subject", typeof(string));
+    
+            var htmlContentParameter = htmlContent != null ?
+                new ObjectParameter("HtmlContent", htmlContent) :
+                new ObjectParameter("HtmlContent", typeof(string));
+    
+            var plaintextContentParameter = plaintextContent != null ?
+                new ObjectParameter("PlaintextContent", plaintextContent) :
+                new ObjectParameter("PlaintextContent", typeof(string));
+    
+            var sentAtUtcParameter = sentAtUtc.HasValue ?
+                new ObjectParameter("SentAtUtc", sentAtUtc) :
+                new ObjectParameter("SentAtUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Update_Result>("usp_EmailQueue_Update", idParameter, actorIdParameter, fromIdParameter, fromEmailParameter, fromDisplayParameter, toIdParameter, toEmailParameter, toDisplayParameter, subjectParameter, htmlContentParameter, plaintextContentParameter, sentAtUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_Issuer_Delete_Result> usp_Issuer_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Issuer_Delete_Result>("usp_Issuer_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Issuer_Insert_Result> usp_Issuer_Insert(Nullable<System.Guid> actorId, string name, string description, string issuerKey, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
+        {
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var issuerKeyParameter = issuerKey != null ?
+                new ObjectParameter("IssuerKey", issuerKey) :
+                new ObjectParameter("IssuerKey", typeof(string));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Issuer_Insert_Result>("usp_Issuer_Insert", actorIdParameter, nameParameter, descriptionParameter, issuerKeyParameter, isEnabledParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_Issuer_Update_Result> usp_Issuer_Update(Nullable<System.Guid> id, Nullable<System.Guid> actorId, string name, string description, string issuerKey, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var issuerKeyParameter = issuerKey != null ?
+                new ObjectParameter("IssuerKey", issuerKey) :
+                new ObjectParameter("IssuerKey", typeof(string));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Issuer_Update_Result>("usp_Issuer_Update", idParameter, actorIdParameter, nameParameter, descriptionParameter, issuerKeyParameter, isEnabledParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_Login_Delete_Result> usp_Login_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Login_Delete_Result>("usp_Login_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Login_Insert_Result> usp_Login_Insert(Nullable<System.Guid> actorId, string name, string description, string loginKey, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
+        {
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var loginKeyParameter = loginKey != null ?
+                new ObjectParameter("LoginKey", loginKey) :
+                new ObjectParameter("LoginKey", typeof(string));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Login_Insert_Result>("usp_Login_Insert", actorIdParameter, nameParameter, descriptionParameter, loginKeyParameter, isEnabledParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_Login_Update_Result> usp_Login_Update(Nullable<System.Guid> id, Nullable<System.Guid> actorId, string name, string description, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Login_Update_Result>("usp_Login_Update", idParameter, actorIdParameter, nameParameter, descriptionParameter, isEnabledParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_MOTD_Delete_Result> usp_MOTD_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_MOTD_Delete_Result>("usp_MOTD_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_MOTD_Insert_Result> usp_MOTD_Insert(string author, string quote, string tssId, string tssTitle, string tssCategory, Nullable<System.DateTime> tssDate, string tssTags, Nullable<int> tssLength, string tssBackground)
+        {
+            var authorParameter = author != null ?
+                new ObjectParameter("Author", author) :
+                new ObjectParameter("Author", typeof(string));
+    
+            var quoteParameter = quote != null ?
+                new ObjectParameter("Quote", quote) :
+                new ObjectParameter("Quote", typeof(string));
+    
+            var tssIdParameter = tssId != null ?
+                new ObjectParameter("TssId", tssId) :
+                new ObjectParameter("TssId", typeof(string));
+    
+            var tssTitleParameter = tssTitle != null ?
+                new ObjectParameter("TssTitle", tssTitle) :
+                new ObjectParameter("TssTitle", typeof(string));
+    
+            var tssCategoryParameter = tssCategory != null ?
+                new ObjectParameter("TssCategory", tssCategory) :
+                new ObjectParameter("TssCategory", typeof(string));
+    
+            var tssDateParameter = tssDate.HasValue ?
+                new ObjectParameter("TssDate", tssDate) :
+                new ObjectParameter("TssDate", typeof(System.DateTime));
+    
+            var tssTagsParameter = tssTags != null ?
+                new ObjectParameter("TssTags", tssTags) :
+                new ObjectParameter("TssTags", typeof(string));
+    
+            var tssLengthParameter = tssLength.HasValue ?
+                new ObjectParameter("TssLength", tssLength) :
+                new ObjectParameter("TssLength", typeof(int));
+    
+            var tssBackgroundParameter = tssBackground != null ?
+                new ObjectParameter("TssBackground", tssBackground) :
+                new ObjectParameter("TssBackground", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_MOTD_Insert_Result>("usp_MOTD_Insert", authorParameter, quoteParameter, tssIdParameter, tssTitleParameter, tssCategoryParameter, tssDateParameter, tssTagsParameter, tssLengthParameter, tssBackgroundParameter);
+        }
+    
+        public virtual ObjectResult<usp_MOTD_Update_Result> usp_MOTD_Update(Nullable<System.Guid> id, string author, string quote, string tssId, string tssTitle, string tssCategory, Nullable<System.DateTime> tssDate, string tssTags, Nullable<int> tssLength, string tssBackground)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var authorParameter = author != null ?
+                new ObjectParameter("Author", author) :
+                new ObjectParameter("Author", typeof(string));
+    
+            var quoteParameter = quote != null ?
+                new ObjectParameter("Quote", quote) :
+                new ObjectParameter("Quote", typeof(string));
+    
+            var tssIdParameter = tssId != null ?
+                new ObjectParameter("TssId", tssId) :
+                new ObjectParameter("TssId", typeof(string));
+    
+            var tssTitleParameter = tssTitle != null ?
+                new ObjectParameter("TssTitle", tssTitle) :
+                new ObjectParameter("TssTitle", typeof(string));
+    
+            var tssCategoryParameter = tssCategory != null ?
+                new ObjectParameter("TssCategory", tssCategory) :
+                new ObjectParameter("TssCategory", typeof(string));
+    
+            var tssDateParameter = tssDate.HasValue ?
+                new ObjectParameter("TssDate", tssDate) :
+                new ObjectParameter("TssDate", typeof(System.DateTime));
+    
+            var tssTagsParameter = tssTags != null ?
+                new ObjectParameter("TssTags", tssTags) :
+                new ObjectParameter("TssTags", typeof(string));
+    
+            var tssLengthParameter = tssLength.HasValue ?
+                new ObjectParameter("TssLength", tssLength) :
+                new ObjectParameter("TssLength", typeof(int));
+    
+            var tssBackgroundParameter = tssBackground != null ?
+                new ObjectParameter("TssBackground", tssBackground) :
+                new ObjectParameter("TssBackground", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_MOTD_Update_Result>("usp_MOTD_Update", idParameter, authorParameter, quoteParameter, tssIdParameter, tssTitleParameter, tssCategoryParameter, tssDateParameter, tssTagsParameter, tssLengthParameter, tssBackgroundParameter);
+        }
+    
+        public virtual ObjectResult<usp_Refresh_Delete_Result> usp_Refresh_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Refresh_Delete_Result>("usp_Refresh_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Refresh_Insert_Result> usp_Refresh_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string refreshValue, string refreshType, Nullable<System.DateTimeOffset> issuedUtc, Nullable<System.DateTimeOffset> validFromUtc, Nullable<System.DateTimeOffset> validToUtc)
+        {
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var refreshValueParameter = refreshValue != null ?
+                new ObjectParameter("RefreshValue", refreshValue) :
+                new ObjectParameter("RefreshValue", typeof(string));
+    
+            var refreshTypeParameter = refreshType != null ?
+                new ObjectParameter("RefreshType", refreshType) :
+                new ObjectParameter("RefreshType", typeof(string));
+    
+            var issuedUtcParameter = issuedUtc.HasValue ?
+                new ObjectParameter("IssuedUtc", issuedUtc) :
+                new ObjectParameter("IssuedUtc", typeof(System.DateTimeOffset));
+    
+            var validFromUtcParameter = validFromUtc.HasValue ?
+                new ObjectParameter("ValidFromUtc", validFromUtc) :
+                new ObjectParameter("ValidFromUtc", typeof(System.DateTimeOffset));
+    
+            var validToUtcParameter = validToUtc.HasValue ?
+                new ObjectParameter("ValidToUtc", validToUtc) :
+                new ObjectParameter("ValidToUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Refresh_Insert_Result>("usp_Refresh_Insert", issuerIdParameter, audienceIdParameter, userIdParameter, refreshValueParameter, refreshTypeParameter, issuedUtcParameter, validFromUtcParameter, validToUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_Role_Delete_Result> usp_Role_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Role_Delete_Result>("usp_Role_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Role_Insert_Result> usp_Role_Insert(Nullable<System.Guid> audienceId, Nullable<System.Guid> actorId, string name, string description, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
+        {
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Role_Insert_Result>("usp_Role_Insert", audienceIdParameter, actorIdParameter, nameParameter, descriptionParameter, isEnabledParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_Role_Update_Result> usp_Role_Update(Nullable<System.Guid> id, Nullable<System.Guid> audienceId, Nullable<System.Guid> actorId, string name, string description, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var nameParameter = name != null ?
+                new ObjectParameter("Name", name) :
+                new ObjectParameter("Name", typeof(string));
+    
+            var descriptionParameter = description != null ?
+                new ObjectParameter("Description", description) :
+                new ObjectParameter("Description", typeof(string));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Role_Update_Result>("usp_Role_Update", idParameter, audienceIdParameter, actorIdParameter, nameParameter, descriptionParameter, isEnabledParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_Setting_Delete_Result> usp_Setting_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Setting_Delete_Result>("usp_Setting_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Setting_Insert_Result> usp_Setting_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string configKey, string configValue, Nullable<bool> isDeletable)
+        {
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var configKeyParameter = configKey != null ?
+                new ObjectParameter("ConfigKey", configKey) :
+                new ObjectParameter("ConfigKey", typeof(string));
+    
+            var configValueParameter = configValue != null ?
+                new ObjectParameter("ConfigValue", configValue) :
+                new ObjectParameter("ConfigValue", typeof(string));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Setting_Insert_Result>("usp_Setting_Insert", issuerIdParameter, audienceIdParameter, userIdParameter, configKeyParameter, configValueParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_Setting_Update_Result> usp_Setting_Update(Nullable<System.Guid> id, Nullable<System.Guid> issuerId, Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string configKey, string configValue, Nullable<bool> isDeletable)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var configKeyParameter = configKey != null ?
+                new ObjectParameter("ConfigKey", configKey) :
+                new ObjectParameter("ConfigKey", typeof(string));
+    
+            var configValueParameter = configValue != null ?
+                new ObjectParameter("ConfigValue", configValue) :
+                new ObjectParameter("ConfigValue", typeof(string));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Setting_Update_Result>("usp_Setting_Update", idParameter, issuerIdParameter, audienceIdParameter, userIdParameter, configKeyParameter, configValueParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_State_Delete_Result> usp_State_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_State_Delete_Result>("usp_State_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_State_Insert_Result> usp_State_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string stateValue, string stateType, Nullable<bool> stateDecision, Nullable<bool> stateConsume, Nullable<System.DateTimeOffset> issuedUtc, Nullable<System.DateTimeOffset> validFromUtc, Nullable<System.DateTimeOffset> validToUtc, Nullable<System.DateTimeOffset> lastPollingUtc)
+        {
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var stateValueParameter = stateValue != null ?
+                new ObjectParameter("StateValue", stateValue) :
+                new ObjectParameter("StateValue", typeof(string));
+    
+            var stateTypeParameter = stateType != null ?
+                new ObjectParameter("StateType", stateType) :
+                new ObjectParameter("StateType", typeof(string));
+    
+            var stateDecisionParameter = stateDecision.HasValue ?
+                new ObjectParameter("StateDecision", stateDecision) :
+                new ObjectParameter("StateDecision", typeof(bool));
+    
+            var stateConsumeParameter = stateConsume.HasValue ?
+                new ObjectParameter("StateConsume", stateConsume) :
+                new ObjectParameter("StateConsume", typeof(bool));
+    
+            var issuedUtcParameter = issuedUtc.HasValue ?
+                new ObjectParameter("IssuedUtc", issuedUtc) :
+                new ObjectParameter("IssuedUtc", typeof(System.DateTimeOffset));
+    
+            var validFromUtcParameter = validFromUtc.HasValue ?
+                new ObjectParameter("ValidFromUtc", validFromUtc) :
+                new ObjectParameter("ValidFromUtc", typeof(System.DateTimeOffset));
+    
+            var validToUtcParameter = validToUtc.HasValue ?
+                new ObjectParameter("ValidToUtc", validToUtc) :
+                new ObjectParameter("ValidToUtc", typeof(System.DateTimeOffset));
+    
+            var lastPollingUtcParameter = lastPollingUtc.HasValue ?
+                new ObjectParameter("LastPollingUtc", lastPollingUtc) :
+                new ObjectParameter("LastPollingUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_State_Insert_Result>("usp_State_Insert", issuerIdParameter, audienceIdParameter, userIdParameter, stateValueParameter, stateTypeParameter, stateDecisionParameter, stateConsumeParameter, issuedUtcParameter, validFromUtcParameter, validToUtcParameter, lastPollingUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_State_Update_Result> usp_State_Update(Nullable<System.Guid> id, Nullable<System.Guid> issuerId, Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string stateValue, string stateType, Nullable<bool> stateDecision, Nullable<bool> stateConsume, Nullable<System.DateTimeOffset> issuedUtc, Nullable<System.DateTimeOffset> validFromUtc, Nullable<System.DateTimeOffset> validToUtc, Nullable<System.DateTimeOffset> lastPollingUtc)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var issuerIdParameter = issuerId.HasValue ?
+                new ObjectParameter("IssuerId", issuerId) :
+                new ObjectParameter("IssuerId", typeof(System.Guid));
+    
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var stateValueParameter = stateValue != null ?
+                new ObjectParameter("StateValue", stateValue) :
+                new ObjectParameter("StateValue", typeof(string));
+    
+            var stateTypeParameter = stateType != null ?
+                new ObjectParameter("StateType", stateType) :
+                new ObjectParameter("StateType", typeof(string));
+    
+            var stateDecisionParameter = stateDecision.HasValue ?
+                new ObjectParameter("StateDecision", stateDecision) :
+                new ObjectParameter("StateDecision", typeof(bool));
+    
+            var stateConsumeParameter = stateConsume.HasValue ?
+                new ObjectParameter("StateConsume", stateConsume) :
+                new ObjectParameter("StateConsume", typeof(bool));
+    
+            var issuedUtcParameter = issuedUtc.HasValue ?
+                new ObjectParameter("IssuedUtc", issuedUtc) :
+                new ObjectParameter("IssuedUtc", typeof(System.DateTimeOffset));
+    
+            var validFromUtcParameter = validFromUtc.HasValue ?
+                new ObjectParameter("ValidFromUtc", validFromUtc) :
+                new ObjectParameter("ValidFromUtc", typeof(System.DateTimeOffset));
+    
+            var validToUtcParameter = validToUtc.HasValue ?
+                new ObjectParameter("ValidToUtc", validToUtc) :
+                new ObjectParameter("ValidToUtc", typeof(System.DateTimeOffset));
+    
+            var lastPollingUtcParameter = lastPollingUtc.HasValue ?
+                new ObjectParameter("LastPollingUtc", lastPollingUtc) :
+                new ObjectParameter("LastPollingUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_State_Update_Result>("usp_State_Update", idParameter, issuerIdParameter, audienceIdParameter, userIdParameter, stateValueParameter, stateTypeParameter, stateDecisionParameter, stateConsumeParameter, issuedUtcParameter, validFromUtcParameter, validToUtcParameter, lastPollingUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_TextQueue_Delete_Result> usp_TextQueue_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextQueue_Delete_Result>("usp_TextQueue_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_TextQueue_Insert_Result> usp_TextQueue_Insert(Nullable<System.Guid> actorId, Nullable<System.Guid> fromId, string fromPhoneNumber, Nullable<System.Guid> toId, string toPhoneNumber, string body, Nullable<System.DateTimeOffset> sendAtUtc)
+        {
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var fromIdParameter = fromId.HasValue ?
+                new ObjectParameter("FromId", fromId) :
+                new ObjectParameter("FromId", typeof(System.Guid));
+    
+            var fromPhoneNumberParameter = fromPhoneNumber != null ?
+                new ObjectParameter("FromPhoneNumber", fromPhoneNumber) :
+                new ObjectParameter("FromPhoneNumber", typeof(string));
+    
+            var toIdParameter = toId.HasValue ?
+                new ObjectParameter("ToId", toId) :
+                new ObjectParameter("ToId", typeof(System.Guid));
+    
+            var toPhoneNumberParameter = toPhoneNumber != null ?
+                new ObjectParameter("ToPhoneNumber", toPhoneNumber) :
+                new ObjectParameter("ToPhoneNumber", typeof(string));
+    
+            var bodyParameter = body != null ?
+                new ObjectParameter("Body", body) :
+                new ObjectParameter("Body", typeof(string));
+    
+            var sendAtUtcParameter = sendAtUtc.HasValue ?
+                new ObjectParameter("SendAtUtc", sendAtUtc) :
+                new ObjectParameter("SendAtUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextQueue_Insert_Result>("usp_TextQueue_Insert", actorIdParameter, fromIdParameter, fromPhoneNumberParameter, toIdParameter, toPhoneNumberParameter, bodyParameter, sendAtUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_TextQueue_Update_Result> usp_TextQueue_Update(Nullable<System.Guid> id, Nullable<System.Guid> actorId, Nullable<System.Guid> fromId, string fromPhoneNumber, Nullable<System.Guid> toId, string toPhoneNumber, string body, Nullable<System.DateTimeOffset> sendAtUtc)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var fromIdParameter = fromId.HasValue ?
+                new ObjectParameter("FromId", fromId) :
+                new ObjectParameter("FromId", typeof(System.Guid));
+    
+            var fromPhoneNumberParameter = fromPhoneNumber != null ?
+                new ObjectParameter("FromPhoneNumber", fromPhoneNumber) :
+                new ObjectParameter("FromPhoneNumber", typeof(string));
+    
+            var toIdParameter = toId.HasValue ?
+                new ObjectParameter("ToId", toId) :
+                new ObjectParameter("ToId", typeof(System.Guid));
+    
+            var toPhoneNumberParameter = toPhoneNumber != null ?
+                new ObjectParameter("ToPhoneNumber", toPhoneNumber) :
+                new ObjectParameter("ToPhoneNumber", typeof(string));
+    
+            var bodyParameter = body != null ?
+                new ObjectParameter("Body", body) :
+                new ObjectParameter("Body", typeof(string));
+    
+            var sendAtUtcParameter = sendAtUtc.HasValue ?
+                new ObjectParameter("SendAtUtc", sendAtUtc) :
+                new ObjectParameter("SendAtUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextQueue_Update_Result>("usp_TextQueue_Update", idParameter, actorIdParameter, fromIdParameter, fromPhoneNumberParameter, toIdParameter, toPhoneNumberParameter, bodyParameter, sendAtUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_Url_Delete_Result> usp_Url_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Url_Delete_Result>("usp_Url_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_Url_Insert_Result> usp_Url_Insert(Nullable<System.Guid> audienceId, Nullable<System.Guid> actorId, string urlHost, string urlPath, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
+        {
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var urlHostParameter = urlHost != null ?
+                new ObjectParameter("UrlHost", urlHost) :
+                new ObjectParameter("UrlHost", typeof(string));
+    
+            var urlPathParameter = urlPath != null ?
+                new ObjectParameter("UrlPath", urlPath) :
+                new ObjectParameter("UrlPath", typeof(string));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Url_Insert_Result>("usp_Url_Insert", audienceIdParameter, actorIdParameter, urlHostParameter, urlPathParameter, isEnabledParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_Url_Update_Result> usp_Url_Update(Nullable<System.Guid> id, Nullable<System.Guid> audienceId, Nullable<System.Guid> actorId, string urlHost, string urlPath, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var urlHostParameter = urlHost != null ?
+                new ObjectParameter("UrlHost", urlHost) :
+                new ObjectParameter("UrlHost", typeof(string));
+    
+            var urlPathParameter = urlPath != null ?
+                new ObjectParameter("UrlPath", urlPath) :
+                new ObjectParameter("UrlPath", typeof(string));
+    
+            var isEnabledParameter = isEnabled.HasValue ?
+                new ObjectParameter("IsEnabled", isEnabled) :
+                new ObjectParameter("IsEnabled", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Url_Update_Result>("usp_Url_Update", idParameter, audienceIdParameter, actorIdParameter, urlHostParameter, urlPathParameter, isEnabledParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_User_Delete_Result> usp_User_Delete(Nullable<System.Guid> iD)
+        {
+            var iDParameter = iD.HasValue ?
+                new ObjectParameter("ID", iD) :
+                new ObjectParameter("ID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_User_Delete_Result>("usp_User_Delete", iDParameter);
+        }
+    
+        public virtual ObjectResult<usp_User_Insert_Result> usp_User_Insert(Nullable<System.Guid> actorId, string userName, string emailAddress, string firstName, string lastName, string phoneNumber, Nullable<bool> isHumanBeing, Nullable<bool> isLockedOut, Nullable<bool> isDeletable, Nullable<System.DateTimeOffset> lockoutEndUtc)
+        {
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var userNameParameter = userName != null ?
+                new ObjectParameter("UserName", userName) :
+                new ObjectParameter("UserName", typeof(string));
+    
+            var emailAddressParameter = emailAddress != null ?
+                new ObjectParameter("EmailAddress", emailAddress) :
+                new ObjectParameter("EmailAddress", typeof(string));
+    
+            var firstNameParameter = firstName != null ?
+                new ObjectParameter("FirstName", firstName) :
+                new ObjectParameter("FirstName", typeof(string));
+    
+            var lastNameParameter = lastName != null ?
+                new ObjectParameter("LastName", lastName) :
+                new ObjectParameter("LastName", typeof(string));
+    
+            var phoneNumberParameter = phoneNumber != null ?
+                new ObjectParameter("PhoneNumber", phoneNumber) :
+                new ObjectParameter("PhoneNumber", typeof(string));
+    
+            var isHumanBeingParameter = isHumanBeing.HasValue ?
+                new ObjectParameter("IsHumanBeing", isHumanBeing) :
+                new ObjectParameter("IsHumanBeing", typeof(bool));
+    
+            var isLockedOutParameter = isLockedOut.HasValue ?
+                new ObjectParameter("IsLockedOut", isLockedOut) :
+                new ObjectParameter("IsLockedOut", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            var lockoutEndUtcParameter = lockoutEndUtc.HasValue ?
+                new ObjectParameter("LockoutEndUtc", lockoutEndUtc) :
+                new ObjectParameter("LockoutEndUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_User_Insert_Result>("usp_User_Insert", actorIdParameter, userNameParameter, emailAddressParameter, firstNameParameter, lastNameParameter, phoneNumberParameter, isHumanBeingParameter, isLockedOutParameter, isDeletableParameter, lockoutEndUtcParameter);
+        }
+    
+        public virtual ObjectResult<usp_User_Update_Result> usp_User_Update(Nullable<System.Guid> id, Nullable<System.Guid> actorId, string userName, string emailAddress, string firstName, string lastName, string phoneNumber, Nullable<bool> isLockedOut, Nullable<bool> isHumanBeing, Nullable<bool> isDeletable, Nullable<System.DateTimeOffset> lockoutEndUtc)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var actorIdParameter = actorId.HasValue ?
+                new ObjectParameter("ActorId", actorId) :
+                new ObjectParameter("ActorId", typeof(System.Guid));
+    
+            var userNameParameter = userName != null ?
+                new ObjectParameter("UserName", userName) :
+                new ObjectParameter("UserName", typeof(string));
+    
+            var emailAddressParameter = emailAddress != null ?
+                new ObjectParameter("EmailAddress", emailAddress) :
+                new ObjectParameter("EmailAddress", typeof(string));
+    
+            var firstNameParameter = firstName != null ?
+                new ObjectParameter("FirstName", firstName) :
+                new ObjectParameter("FirstName", typeof(string));
+    
+            var lastNameParameter = lastName != null ?
+                new ObjectParameter("LastName", lastName) :
+                new ObjectParameter("LastName", typeof(string));
+    
+            var phoneNumberParameter = phoneNumber != null ?
+                new ObjectParameter("PhoneNumber", phoneNumber) :
+                new ObjectParameter("PhoneNumber", typeof(string));
+    
+            var isLockedOutParameter = isLockedOut.HasValue ?
+                new ObjectParameter("IsLockedOut", isLockedOut) :
+                new ObjectParameter("IsLockedOut", typeof(bool));
+    
+            var isHumanBeingParameter = isHumanBeing.HasValue ?
+                new ObjectParameter("IsHumanBeing", isHumanBeing) :
+                new ObjectParameter("IsHumanBeing", typeof(bool));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            var lockoutEndUtcParameter = lockoutEndUtc.HasValue ?
+                new ObjectParameter("LockoutEndUtc", lockoutEndUtc) :
+                new ObjectParameter("LockoutEndUtc", typeof(System.DateTimeOffset));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_User_Update_Result>("usp_User_Update", idParameter, actorIdParameter, userNameParameter, emailAddressParameter, firstNameParameter, lastNameParameter, phoneNumberParameter, isLockedOutParameter, isHumanBeingParameter, isDeletableParameter, lockoutEndUtcParameter);
+        }
     }
 }

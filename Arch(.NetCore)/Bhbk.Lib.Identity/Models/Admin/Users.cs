@@ -23,19 +23,19 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public string LastName { get; set; }
 
-        public DateTime Created { get; set; }
+        [Required]
+        public bool IsHumanBeing { get; set; }
 
-        public bool LockoutEnabled { get; set; }
+        public bool IsLockedOut { get; set; }
+
+        [Required]
+        public bool IsDeletable { get; set; }
 
         public string ConcurrencyStamp { get; set; }
 
         public string SecurityStamp { get; set; }
 
-        [Required]
-        public bool HumanBeing { get; set; }
-
-        [Required]
-        public bool Immutable { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
     }
 
     public class UserV1 : Users
@@ -49,13 +49,13 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public Nullable<bool> PhoneNumberConfirmed { get; set; }
 
-        public Nullable<DateTime> LastUpdated { get; set; }
+        public Nullable<DateTimeOffset> LastUpdatedUtc { get; set; }
 
-        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
+        public Nullable<DateTimeOffset> LockoutEndUtc { get; set; }
 
-        public Nullable<DateTime> LastLoginFailure { get; set; }
+        public Nullable<DateTimeOffset> LastLoginFailureUtc { get; set; }
 
-        public Nullable<DateTime> LastLoginSuccess { get; set; }
+        public Nullable<DateTimeOffset> LastLoginSuccessUtc { get; set; }
 
         public int AccessFailedCount { get; set; }
 
@@ -63,6 +63,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public bool PasswordConfirmed { get; set; }
 
-        public bool TwoFactorEnabled { get; set; }
+        public bool IsMultiFactor { get; set; }
     }
 }

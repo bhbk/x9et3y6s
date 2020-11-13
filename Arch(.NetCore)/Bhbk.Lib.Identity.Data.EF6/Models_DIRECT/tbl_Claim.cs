@@ -28,9 +28,9 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public string Type { get; set; }
         public string Value { get; set; }
         public string ValueType { get; set; }
-        public bool Immutable { get; set; }
-        public System.DateTime Created { get; set; }
-        public Nullable<System.DateTime> LastUpdated { get; set; }
+        public bool IsDeletable { get; set; }
+        public System.DateTimeOffset CreatedUtc { get; set; }
+        public Nullable<System.DateTimeOffset> LastUpdatedUtc { get; set; }
     
         public virtual tbl_User tbl_User { get; set; }
         public virtual tbl_Issuer tbl_Issuer { get; set; }

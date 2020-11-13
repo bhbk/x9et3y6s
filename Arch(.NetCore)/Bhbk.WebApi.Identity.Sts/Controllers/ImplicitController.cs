@@ -81,9 +81,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
-                audience = UoW.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Url)).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
             else
-                audience = UoW.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Url)).SingleOrDefault();
+                audience = UoW.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
 
             if (audience == null)
             {
@@ -135,11 +135,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
-            if (audience.tbl_Url.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
+            if (audience.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
                 redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/implicit-callback"));
             }
-            else if (audience.tbl_Url.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
+            else if (audience.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
 
             }
@@ -165,7 +165,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             UoW.Commit();

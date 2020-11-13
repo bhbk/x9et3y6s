@@ -34,7 +34,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.AuthCode_AskV1(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<AuthCodeV1>().Result;
+                return await response.Content.ReadAsAsync<AuthCodeV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -45,7 +45,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.AuthCode_AskV2(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<AuthCodeV2>().Result;
+                return await response.Content.ReadAsAsync<AuthCodeV2>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -56,7 +56,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.AuthCode_AuthV1(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV1>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -67,7 +67,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.AuthCode_AuthV2(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV2>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV2>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -78,7 +78,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.ClientCredential_AuthV1(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<ClientJwtV1>().Result;
+                return await response.Content.ReadAsAsync<ClientJwtV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.ClientCredential_AuthV2(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<ClientJwtV2>().Result;
+                return await response.Content.ReadAsAsync<ClientJwtV2>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -100,7 +100,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.ClientCredential_RefreshV1(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<ClientJwtV1>().Result;
+                return await response.Content.ReadAsAsync<ClientJwtV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -111,7 +111,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.ClientCredential_RefreshV2(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<ClientJwtV2>().Result;
+                return await response.Content.ReadAsAsync<ClientJwtV2>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -122,7 +122,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.DeviceCode_AskV1(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DeviceCodeV1>().Result;
+                return await response.Content.ReadAsAsync<DeviceCodeV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -133,7 +133,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.DeviceCode_AskV2(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DeviceCodeV2>().Result;
+                return await response.Content.ReadAsAsync<DeviceCodeV2>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -144,7 +144,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.DeviceCode_AuthV1(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV1>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -155,7 +155,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.DeviceCode_AuthV2(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV2>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV2>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -166,7 +166,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Implicit_AuthV1(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV1>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -177,7 +177,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Implicit_AuthV2(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV2>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV2>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -188,7 +188,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.ResourceOwner_AuthV1Legacy(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV1Legacy>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV1Legacy>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -199,7 +199,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.ResourceOwner_AuthV1(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV1>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -210,7 +210,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.ResourceOwner_AuthV2(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV2>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV2>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -221,7 +221,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.ResourceOwner_RefreshV1(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV1>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -232,7 +232,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.ResourceOwner_RefreshV2(model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserJwtV2>().Result;
+                return await response.Content.ReadAsAsync<UserJwtV2>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

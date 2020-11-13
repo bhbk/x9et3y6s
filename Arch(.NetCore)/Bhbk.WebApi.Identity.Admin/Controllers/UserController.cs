@@ -161,8 +161,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
 
             //ignore how these may be set in model...
-            model.HumanBeing = true;
-            model.TwoFactorEnabled = false;
+            model.IsHumanBeing = true;
+            model.IsMultiFactor = false;
             model.EmailConfirmed = false;
             model.PasswordConfirmed = false;
             model.PhoneNumberConfirmed = false;
@@ -221,8 +221,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             model.ActorId = GetIdentityGUID();
 
             //ignore how these may be set in model...
-            model.HumanBeing = false;
-            model.TwoFactorEnabled = false;
+            model.IsHumanBeing = false;
+            model.IsMultiFactor = false;
             model.EmailConfirmed = false;
             model.PasswordConfirmed = false;
             model.PhoneNumberConfirmed = false;
@@ -254,7 +254,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (user.Immutable)
+            if (user.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.UserImmutable.ToString(), $"User:{userID}");
                 return BadRequest(ModelState);
@@ -347,7 +347,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Users.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_User>, IQueryable<tbl_User>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_User>().ApplyState(state)),
-                            new List<Expression<Func<tbl_User, object>>>() { x => x.tbl_UserLogin, x => x.tbl_UserRole })),
+                            new List<Expression<Func<tbl_User, object>>>() { x => x.tbl_UserLogins, x => x.tbl_UserRoles })),
 
                     Total = UoW.Users.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_User>, IQueryable<tbl_User>>>>(
@@ -376,7 +376,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
 
             var claims = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
-                .Where(x => x.tbl_UserClaim.Any(y => y.UserId == userID)).ToLambda());
+                .Where(x => x.tbl_UserClaims.Any(y => y.UserId == userID)).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<ClaimV1>>(claims));
         }
@@ -394,7 +394,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
 
             var audiences = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                .Where(x => x.tbl_Role.Any(y => y.tbl_UserRole.Any(z => z.UserId == userID))).ToLambda());
+                .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == userID))).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<AudienceV1>>(audiences));
         }
@@ -412,7 +412,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
 
             var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.tbl_UserLogin.Any(y => y.UserId == userID)).ToLambda());
+                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == userID)).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<LoginV1>>(logins));
         }
@@ -447,7 +447,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
 
             var roles = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.tbl_UserRole.Any(y => y.UserId == userID)).ToLambda());
+                .Where(x => x.tbl_UserRoles.Any(y => y.UserId == userID)).ToLambda());
 
             return Ok(Mapper.Map<IEnumerable<RoleV1>>(roles));
         }
@@ -564,7 +564,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (!UoW.Users.IsPasswordSet(user))
             {
-                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"Bad password for user:{user.Id}");
+                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"No password set for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
@@ -622,8 +622,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (user.Immutable
-                && user.Immutable != model.Immutable)
+            else if (user.IsDeletable
+                && user.IsDeletable != model.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.UserImmutable.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
@@ -659,7 +659,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             }
 
             var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.tbl_UserLogin.Any(y => y.UserId == user.Id)).ToLambda());
+                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
 
             switch (UoW.InstanceType)
             {

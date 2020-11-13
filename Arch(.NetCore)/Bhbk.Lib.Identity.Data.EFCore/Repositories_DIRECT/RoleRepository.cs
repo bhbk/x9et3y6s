@@ -28,9 +28,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
 
             entity.Name = model.Name;
             entity.Description = model.Description;
-            entity.Enabled = model.Enabled;
-            entity.LastUpdated = DateTime.Now;
-            entity.Immutable = model.Immutable;
+            entity.IsEnabled = model.IsEnabled;
+            entity.LastUpdatedUtc = DateTime.UtcNow;
+            entity.IsDeletable = model.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;
 

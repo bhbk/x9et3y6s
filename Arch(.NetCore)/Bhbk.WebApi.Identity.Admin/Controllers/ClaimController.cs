@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (claim.Immutable)
+            if (claim.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.ClaimImmutable.ToString(), $"Claim:{claimID}");
                 return BadRequest(ModelState);
@@ -152,8 +152,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.ClaimNotFound.ToString(), $"Claim:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (claim.Immutable
-                && claim.Immutable != model.Immutable)
+            else if (claim.IsDeletable
+                && claim.IsDeletable != model.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.ClaimImmutable.ToString(), $"Claim:{claim.Id}");
                 return BadRequest(ModelState);

@@ -11,6 +11,7 @@ using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Alert.Jobs;
+using CronExpressionDescriptor;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +28,7 @@ using Quartz;
 using Serilog;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Bhbk.WebApi.Alert
@@ -35,6 +37,8 @@ namespace Bhbk.WebApi.Alert
     {
         public virtual void ConfigureServices(IServiceCollection sc)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+            
             var conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
@@ -45,7 +49,7 @@ namespace Bhbk.WebApi.Alert
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);
             sc.AddSingleton<IMapper>(mapper);
-            sc.AddSingleton<IAuthorizationHandler, IdentityHumansAuthorize>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityUserssAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
             {
@@ -74,39 +78,43 @@ namespace Bhbk.WebApi.Alert
 
                 if (bool.Parse(conf["Jobs:QueueEmails:Enable"]))
                 {
-                    var emailsJobKey = new JobKey(JobType.AlertEmailJob.ToString(), GroupType.AlertJobs.ToString());
+                    var jobKey = new JobKey(JobType.AlertEmailJob.ToString(), GroupType.AlertJobs.ToString());
                     jobs.AddJob<QueueEmailJob>(opt => opt
                         .StoreDurably()
-                        .WithIdentity(emailsJobKey)
+                        .WithIdentity(jobKey)
                     );
 
                     foreach (var cron in conf.GetSection("Jobs:QueueEmails:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
-                            .ForJob(emailsJobKey)
+                            .ForJob(jobKey)
                             .StartNow()
                             .WithCronSchedule(cron)
                         );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
                     }
                 }
 
                 if (bool.Parse(conf["Jobs:QueueTexts:Enable"]))
                 {
-                    var textsJobKey = new JobKey(JobType.AlertTextJob.ToString(), GroupType.AlertJobs.ToString());
+                    var jobKey = new JobKey(JobType.AlertTextJob.ToString(), GroupType.AlertJobs.ToString());
                     jobs.AddJob<QueueTextJob>(opt => opt
                         .StoreDurably()
-                        .WithIdentity(textsJobKey)
+                        .WithIdentity(jobKey)
                     );
 
                     foreach (var cron in conf.GetSection("Jobs:QueueTexts:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
-                            .ForJob(textsJobKey)
+                            .ForJob(jobKey)
                             .StartNow()
                             .WithCronSchedule(cron)
                         );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
                     }
                 }
             });
@@ -198,7 +206,7 @@ namespace Bhbk.WebApi.Alert
             {
                 opt.AddPolicy(Constants.DefaultPolicyForHumans, humans =>
                 {
-                    humans.Requirements.Add(new IdentityHumansAuthorizeRequirement());
+                    humans.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                 });
                 opt.AddPolicy(Constants.DefaultPolicyForServices, servers =>
                 {

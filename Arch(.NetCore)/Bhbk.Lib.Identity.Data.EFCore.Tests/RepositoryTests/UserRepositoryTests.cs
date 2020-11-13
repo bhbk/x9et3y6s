@@ -21,6 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Users.Create(new uvw_User());
+                UoW.Commit();
             });
         }
 
@@ -38,10 +39,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     PhoneNumber = NumberAs.CreateString(9),
                     FirstName = "First-" + Base64.CreateString(4),
                     LastName = "Last-" + Base64.CreateString(4),
-                    LockoutEnabled = false,
-                    HumanBeing = true,
-                    Immutable = false,
+                    IsLockedOut = false,
+                    IsHumanBeing = true,
+                    IsDeletable = false,
                 });
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_User>();
         }
 
@@ -51,6 +54,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Users.Delete(new uvw_User());
+                UoW.Commit();
             });
         }
 
@@ -64,6 +68,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                 .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
 
             UoW.Users.Delete(user);
+            UoW.Commit();
         }
 
         [Fact]
@@ -83,6 +88,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             Assert.Throws<SqlException>(() =>
             {
                 UoW.Users.Update(new uvw_User());
+                UoW.Commit();
             });
         }
 
@@ -98,6 +104,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
             user.LastName += "(Updated)";
 
             var result = UoW.Users.Update(user);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_User>();
         }
     }

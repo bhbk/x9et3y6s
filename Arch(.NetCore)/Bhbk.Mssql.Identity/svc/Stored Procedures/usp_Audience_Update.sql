@@ -5,36 +5,48 @@ CREATE PROCEDURE [svc].[usp_Audience_Update]
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
-    ,@LockoutEnabled		BIT     
-    ,@LockoutEnd			DATETIMEOFFSET (7)
-    ,@LastLoginSuccess		DATETIME2 (7)
-    ,@LastLoginFailure		DATETIME2 (7)
+    ,@IsLockedOut		    BIT     
+    ,@IsEnabled 			BIT
+    ,@IsDeletable			BIT
     ,@AccessFailedCount		INT  
     ,@AccessSuccessCount	INT  
-    ,@Immutable				BIT
+    ,@LockoutEndUtc			DATETIMEOFFSET (7)
+    ,@LastLoginSuccessUtc	DATETIMEOFFSET (7)
+    ,@LastLoginFailureUtc	DATETIMEOFFSET (7)
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-UPDATE [dbo].[tbl_Audience]
-SET
-     Id						= @Id
-    ,ActorId				= @ActorId
-    ,IssuerId				= @IssuerId
-	,Name					= @Name
-	,Description			= @Description
-    ,LastUpdated			= @LASTUPDATED
-    ,LockoutEnabled			= @LockoutEnabled
-    ,LockoutEnd				= @LockoutEnd
-    ,LastLoginSuccess		= @LastLoginSuccess
-    ,LastLoginFailure		= @LastLoginFailure
-    ,AccessFailedCount		= @AccessFailedCount
-    ,AccessSuccessCount		= @AccessSuccessCount
-    ,Immutable				= @Immutable
-WHERE Id = @Id
+        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Audience] WHERE [svc].[uvw_Audience].Id = @Id
+        UPDATE [dbo].[tbl_Audience]
+        SET
+             Id						= @Id
+            ,ActorId				= @ActorId
+            ,IssuerId				= @IssuerId
+	        ,Name					= @Name
+	        ,Description			= @Description
+            ,IsLockedOut			= @IsLockedOut
+            ,IsEnabled              = @IsEnabled
+            ,IsDeletable			= @IsDeletable
+            ,AccessFailedCount		= @AccessFailedCount
+            ,AccessSuccessCount		= @AccessSuccessCount
+            ,LockoutEndUtc			= @LockoutEndUtc
+            ,LastLoginSuccessUtc	= @LastLoginSuccessUtc
+            ,LastLoginFailureUtc	= @LastLoginFailureUtc
+            ,LastUpdatedUtc			= @LASTUPDATED
+        WHERE Id = @Id
+
+        SELECT * FROM [svc].[uvw_Audience] WHERE [svc].[uvw_Audience].Id = @Id
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

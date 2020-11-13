@@ -23,21 +23,21 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public Nullable<bool> PhoneNumberConfirmed { get; set; }
-        public System.DateTime Created { get; set; }
-        public Nullable<System.DateTime> LastUpdated { get; set; }
-        public bool LockoutEnabled { get; set; }
-        public Nullable<System.DateTimeOffset> LockoutEnd { get; set; }
-        public Nullable<System.DateTime> LastLoginSuccess { get; set; }
-        public Nullable<System.DateTime> LastLoginFailure { get; set; }
-        public int AccessFailedCount { get; set; }
-        public int AccessSuccessCount { get; set; }
-        public string ConcurrencyStamp { get; set; }
         public string PasswordHashPBKDF2 { get; set; }
         public string PasswordHashSHA256 { get; set; }
         public bool PasswordConfirmed { get; set; }
+        public string ConcurrencyStamp { get; set; }
         public string SecurityStamp { get; set; }
-        public bool TwoFactorEnabled { get; set; }
-        public bool HumanBeing { get; set; }
-        public bool Immutable { get; set; }
+        public bool IsHumanBeing { get; set; }
+        public bool IsMultiFactor { get; set; }
+        public bool IsDeletable { get; set; }
+        public bool IsLockedOut { get; set; }
+        public int AccessFailedCount { get; set; }
+        public int AccessSuccessCount { get; set; }
+        public Nullable<System.DateTimeOffset> LockoutEndUtc { get; set; }
+        public Nullable<System.DateTimeOffset> LastLoginSuccessUtc { get; set; }
+        public Nullable<System.DateTimeOffset> LastLoginFailureUtc { get; set; }
+        public System.DateTimeOffset CreatedUtc { get; set; }
+        public Nullable<System.DateTimeOffset> LastUpdatedUtc { get; set; }
     }
 }

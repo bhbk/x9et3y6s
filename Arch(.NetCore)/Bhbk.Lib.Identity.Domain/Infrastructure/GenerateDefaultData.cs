@@ -3,7 +3,6 @@ using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using System;
@@ -40,7 +39,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         ConfigKey = Constants.SettingGlobalLegacyClaims,
                         ConfigValue = "true",
-                        Immutable = true,
+                        IsDeletable = false,
                     }));
             }
 
@@ -54,7 +53,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         ConfigKey = Constants.SettingGlobalLegacyIssuer,
                         ConfigValue = "true",
-                        Immutable = true,
+                        IsDeletable = false,
                     }));
             }
 
@@ -68,7 +67,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         ConfigKey = Constants.SettingGlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
-                        Immutable = true,
+                        IsDeletable = false,
                     }));
             }
 
@@ -89,8 +88,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         Name = Constants.DefaultIssuer,
                         IssuerKey = Constants.DefaultIssuerKey,
-                        Enabled = true,
-                        Immutable = true,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -111,8 +110,9 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         IssuerId = foundIssuer.Id,
                         Name = Constants.DefaultAudience_Alert,
-                        Enabled = true,
-                        Immutable = true,
+                        IsLockedOut = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -129,8 +129,9 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         IssuerId = foundIssuer.Id,
                         Name = Constants.DefaultAudience_Identity,
-                        Enabled = true,
-                        Immutable = true,
+                        IsLockedOut = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -151,8 +152,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         Name = Constants.DefaultLogin,
                         LoginKey = Constants.DefaultLoginKey,
-                        Enabled = true,
-                        Immutable = false,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -173,8 +174,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         AudienceId = foundAudience_Alert.Id,
                         Name = Constants.DefaultRoleForAdmin_Alert,
-                        Enabled = true,
-                        Immutable = true,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -191,8 +192,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         AudienceId = foundAudience_Alert.Id,
                         Name = Constants.DefaultRoleForUser_Alert,
-                        Enabled = true,
-                        Immutable = true,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -209,8 +210,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         AudienceId = foundAudience_Identity.Id,
                         Name = Constants.DefaultRoleForAdmin_Identity,
-                        Enabled = true,
-                        Immutable = true,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -227,8 +228,8 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                     {
                         AudienceId = foundAudience_Identity.Id,
                         Name = Constants.DefaultRoleForUser_Identity,
-                        Enabled = true,
-                        Immutable = true,
+                        IsEnabled = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();
@@ -251,9 +252,9 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                         Email = Constants.DefaultUser_Admin,
                         FirstName = Constants.DefaultUserFirstName_Admin,
                         LastName = Constants.DefaultUserLastName_Admin,
-                        LockoutEnabled = false,
-                        HumanBeing = true,
-                        Immutable = true,
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = false,
                     }), Constants.DefaultUserPass_Admin);
 
                 _uow.Users.SetConfirmedEmail(foundAdmin, true);
@@ -275,9 +276,9 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                         Email = Constants.DefaultUser_Normal,
                         FirstName = Constants.DefaultUserFirstName_Normal,
                         LastName = Constants.DefaultUserLastName_Normal,
-                        LockoutEnabled = false,
-                        HumanBeing = true,
-                        Immutable = true,
+                        IsLockedOut = false,
+                        IsHumanBeing = true,
+                        IsDeletable = false,
                     }), Constants.DefaultUserPass_Normal);
 
                 _uow.Users.SetConfirmedEmail(foundUser, true);

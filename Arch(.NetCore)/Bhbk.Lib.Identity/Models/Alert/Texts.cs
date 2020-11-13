@@ -24,10 +24,10 @@ namespace Bhbk.Lib.Identity.Models.Alert
         public string Body { get; set; }
 
         [Required]
-        public DateTime Created { get; set; }
+        public DateTimeOffset CreatedUtc { get; set; }
 
         [Required]
-        public DateTime SendAt { get; set; }
+        public DateTimeOffset SendAtUtc { get; set; }
     }
 
     public class TextV1 : Texts

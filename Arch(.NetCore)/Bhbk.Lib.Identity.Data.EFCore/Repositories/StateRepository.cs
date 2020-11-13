@@ -26,14 +26,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@StateType", SqlDbType.NVarChar) { Value = entity.StateType },
                 new SqlParameter("@StateDecision", SqlDbType.Bit) { Value = entity.StateDecision.HasValue ? (object)entity.StateDecision.Value : DBNull.Value },
                 new SqlParameter("@StateConsume", SqlDbType.Bit) { Value = entity.StateConsume },
-                new SqlParameter("@IssuerUtc", SqlDbType.DateTime2) { Value = entity.IssuedUtc },
-                new SqlParameter("@ValidFromUtc", SqlDbType.DateTime2) { Value = entity.ValidFromUtc },
-                new SqlParameter("@ValidToUtc", SqlDbType.DateTime2) { Value = entity.ValidToUtc },
-                new SqlParameter("@LastPolling", SqlDbType.DateTime2) { Value = entity.LastPolling }
+                new SqlParameter("@IssuerUtc", SqlDbType.DateTimeOffset) { Value = entity.IssuedUtc },
+                new SqlParameter("@ValidFromUtc", SqlDbType.DateTimeOffset) { Value = entity.ValidFromUtc },
+                new SqlParameter("@ValidToUtc", SqlDbType.DateTimeOffset) { Value = entity.ValidToUtc },
+                new SqlParameter("@LastPollingUtc", SqlDbType.DateTimeOffset) { Value = entity.LastPollingUtc }
             };
 
             return _context.Set<uvw_State>().FromSqlRaw("[svc].[usp_State_Insert]"
-                + "@IssuerId, @AudienceId, @UserId, @StateValue, @StateType, @StateDecision, @StateConsume, @IssuerUtc, @ValidFromUtc, @ValidToUtc, @LastPolling", pvalues.ToArray())
+                + "@IssuerId, @AudienceId, @UserId, @StateValue, @StateType, @StateDecision, @StateConsume, @IssuerUtc, @ValidFromUtc, @ValidToUtc, @LastPollingUtc", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -109,14 +109,14 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@StateType", SqlDbType.NVarChar) { Value = entity.StateType },
                 new SqlParameter("@StateDecision", SqlDbType.Bit) { Value = entity.StateDecision.HasValue ? (object)entity.StateDecision.Value : DBNull.Value },
                 new SqlParameter("@StateConsume", SqlDbType.Bit) { Value = entity.StateConsume },
-                new SqlParameter("@IssuerUtc", SqlDbType.DateTime2) { Value = entity.IssuedUtc },
-                new SqlParameter("@ValidFromUtc", SqlDbType.DateTime2) { Value = entity.ValidFromUtc },
-                new SqlParameter("@ValidToUtc", SqlDbType.DateTime2) { Value = entity.ValidToUtc },
-                new SqlParameter("@LastPolling", SqlDbType.DateTime2) { Value = entity.LastPolling }
+                new SqlParameter("@IssuerUtc", SqlDbType.DateTimeOffset) { Value = entity.IssuedUtc },
+                new SqlParameter("@ValidFromUtc", SqlDbType.DateTimeOffset) { Value = entity.ValidFromUtc },
+                new SqlParameter("@ValidToUtc", SqlDbType.DateTimeOffset) { Value = entity.ValidToUtc },
+                new SqlParameter("@LastPollingUtc", SqlDbType.DateTimeOffset) { Value = entity.LastPollingUtc }
             };
 
             return _context.Set<uvw_State>().FromSqlRaw("[svc].[usp_State_Update]"
-                + "@Id, @IssuerId, @AudienceId, @UserId, @StateValue, @StateType, @StateDecision, @StateConsume, @IssuerUtc, @ValidFromUtc, @ValidToUtc, @LastPolling", pvalues.ToArray())
+                + "@Id, @IssuerId, @AudienceId, @UserId, @StateValue, @StateType, @StateDecision, @StateConsume, @IssuerUtc, @ValidFromUtc, @ValidToUtc, @LastPollingUtc", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

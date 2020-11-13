@@ -4,25 +4,35 @@ CREATE PROCEDURE [svc].[usp_Login_Update]
     ,@ActorId				UNIQUEIDENTIFIER
     ,@Name					NVARCHAR (MAX) 
     ,@Description			NVARCHAR (MAX)
-    ,@Enabled				BIT 
-    ,@Immutable				BIT
+    ,@IsEnabled				BIT 
+    ,@IsDeletable			BIT
 
 AS
 BEGIN
+	SET NOCOUNT ON;
 
-DECLARE @LASTUPDATED DATETIME2 (7) = GETDATE()
+	BEGIN TRY
 
-UPDATE [dbo].[tbl_Login]
-SET
-     Id						= @Id
-    ,ActorId				= @ActorId
-	,Name					= @Name
-	,Description			= @Description
-	,Enabled				= @Enabled
-    ,LastUpdated			= @LASTUPDATED
-    ,Immutable				= @Immutable
-WHERE Id = @Id
+        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
 
-SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @Id
+        UPDATE [dbo].[tbl_Login]
+        SET
+             Id						= @Id
+            ,ActorId				= @ActorId
+	        ,Name					= @Name
+	        ,Description			= @Description
+	        ,IsEnabled				= @IsEnabled
+            ,IsDeletable			= @IsDeletable
+            ,LastUpdatedUtc			= @LASTUPDATED
+        WHERE Id = @Id
+
+        SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @Id
+
+    END TRY
+
+    BEGIN CATCH
+        THROW;
+
+    END CATCH
 
 END

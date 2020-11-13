@@ -210,7 +210,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var testClaim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Type == Constants.TestClaim).ToLambda())
                     .Single();
-                testClaim.Immutable = true;
+                testClaim.IsDeletable = true;
 
                 uow.Claims.Update(testClaim);
                 uow.Commit();

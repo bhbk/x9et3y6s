@@ -13,6 +13,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
 using System.Threading.Tasks;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace Bhbk.WebApi.Alert.Jobs
 {
@@ -41,41 +42,39 @@ namespace Bhbk.WebApi.Alert.Jobs
                     var providerSid = conf["Jobs:QueueTexts:ProviderSid"];
                     var providerToken = conf["Jobs:QueueTexts:ProviderToken"];
 
-                    foreach (var entry in uow.QueueTexts.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueText>()
-                        .Where(x => x.Created < DateTime.Now.AddSeconds(-(expire))).ToLambda()))
+                    foreach (var entry in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>()
+                        .Where(x => x.CreatedUtc < DateTime.UtcNow.AddSeconds(-(expire))).ToLambda()))
                     {
                         Log.Warning(typeof(QueueTextJob).Name + " hand-off of text (ID=" + entry.Id.ToString() + ") to upstream provider failed many times. " +
-                            "The text was created on " + entry.Created + " and is being deleted now.");
+                            "The text was created on " + entry.CreatedUtc + " and is being deleted now.");
 
-                        uow.QueueTexts.Delete(entry);
+                        uow.TextQueue.Delete(entry);
                     }
 
                     uow.Commit();
 
                     var provider = new TwilioProvider();
 
-                    foreach (var msg in uow.QueueTexts.Get(QueryExpressionFactory.GetQueryExpression<tbl_QueueText>()
-                        .Where(x => x.SendAt < DateTime.Now).ToLambda()))
+                    foreach (var msg in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>()
+                        .Where(x => x.SendAtUtc < DateTime.UtcNow).ToLambda()))
                     {
                         switch (uow.InstanceType)
                         {
                             case InstanceContext.DeployedOrLocal:
                                 {
 #if RELEASE
-                                    var response = provider.TryTextHandoff(providerSid, providerToken, msg);
+                                    var response = provider.TryTextHandoff(providerSid, providerToken, msg).Result;
 
-                                    uow.QueueTexts.Delete(msg);
-                                    Log.Information(callPath + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
-
-                                    //if (response.IsCompletedSuccessfully)
-                                    //{
-                                    //    uow.QueueTexts.Delete(msg);
-                                    //    Log.Information(callPath + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
-                                    //}
-                                    //else
-                                    //    Log.Warning(callPath + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider failed.");
+                                    //https://www.twilio.com/docs/sms/api/message-resource
+                                    if (response.Status == MessageResource.StatusEnum.Accepted)
+                                    {
+                                        uow.TextQueue.Delete(msg);
+                                        Log.Information(callPath + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
+                                    }
+                                    else
+                                        Log.Warning(callPath + " hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider failed.");
 #elif !RELEASE
-                                    uow.QueueTexts.Delete(msg);
+                                    uow.TextQueue.Delete(msg);
                                     Log.Information(callPath + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                                 }
@@ -84,7 +83,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                             case InstanceContext.End2EndTest:
                             case InstanceContext.IntegrationTest:
                                 {
-                                    uow.QueueTexts.Delete(msg);
+                                    uow.TextQueue.Delete(msg);
                                     Log.Information(callPath + " fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
                                 }
                                 break;

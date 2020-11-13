@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories_DIRECT
              * only persist certain fields.
              */
 
-            entity.LastPolling = model.LastPolling;
+            entity.LastPollingUtc = model.LastPollingUtc;
             entity.StateConsume = model.StateConsume;
 
             _context.Entry(entity).State = EntityState.Modified;

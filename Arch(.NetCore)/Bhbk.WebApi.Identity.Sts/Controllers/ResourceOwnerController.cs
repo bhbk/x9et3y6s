@@ -91,7 +91,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer_id}");
                 return NotFound(ModelState);
             }
-            else if (!issuer.Enabled)
+            else if (!issuer.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
@@ -111,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client_id}");
                 return NotFound(ModelState);
             }
-            else if (!audience.Enabled)
+            else if (!audience.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.tbl_UserLogin.Any(y => y.UserId == user.Id)).ToLambda());
+                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
 
             switch (UoW.InstanceType)
             {
@@ -225,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),
-                        Immutable = false
+                        IsDeletable = false
                     }));
 
                 UoW.Commit();
@@ -249,7 +249,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
-                        Immutable = false
+                        IsDeletable = false
                     }));
 
                 var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
@@ -272,7 +272,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     {
                         UserId = user.Id,
                         ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
-                        Immutable = false
+                        IsDeletable = false
                     }));
 
                 UoW.Commit();
@@ -328,7 +328,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer_id}");
                 return NotFound(ModelState);
             }
-            else if (!issuer.Enabled)
+            else if (!issuer.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
@@ -348,7 +348,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client_id}");
                 return NotFound(ModelState);
             }
-            else if (!audience.Enabled)
+            else if (!audience.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
@@ -397,7 +397,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             UoW.Commit();
@@ -437,7 +437,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
-            else if (!issuer.Enabled)
+            else if (!issuer.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
@@ -471,13 +471,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             var audienceList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                    .Where(x => x.tbl_Role.Any(y => y.tbl_UserRole.Any(z => z.UserId == user.Id))).ToLambda());
+                    .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
             var audiences = new List<tbl_Audience>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
                 audiences = UoW.Audiences.Get(x => audienceList.Contains(x)
-                    && x.Enabled == true).ToList();
+                    && x.IsEnabled == true).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
@@ -496,7 +496,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{entry}");
                         return NotFound(ModelState);
                     }
-                    else if (!audience.Enabled
+                    else if (!audience.IsEnabled
                         || !audienceList.Contains(audience))
                     {
                         ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
@@ -514,7 +514,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.tbl_UserLogin.Any(y => y.UserId == user.Id)).ToLambda());
+                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
 
             switch (UoW.InstanceType)
             {
@@ -591,7 +591,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
@@ -614,7 +614,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             UoW.Commit();
@@ -669,7 +669,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{input.issuer}");
                 return NotFound(ModelState);
             }
-            else if (!issuer.Enabled)
+            else if (!issuer.IsEnabled)
             {
                 ModelState.AddModelError(MessageType.IssuerInvalid.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
@@ -696,13 +696,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             user.ActorId = user.Id;
 
             var clientList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                    .Where(x => x.tbl_Role.Any(y => y.tbl_UserRole.Any(z => z.UserId == user.Id))).ToLambda());
+                    .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
             var audiences = new List<tbl_Audience>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
                 audiences = UoW.Audiences.Get(x => clientList.Contains(x)
-                    && x.Enabled == true).ToList();
+                    && x.IsEnabled == true).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
@@ -721,7 +721,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{entry}");
                         return NotFound(ModelState);
                     }
-                    else if (!audience.Enabled
+                    else if (!audience.IsEnabled
                         || !clientList.Contains(audience))
                     {
                         ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
@@ -761,7 +761,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     UserId = user.Id,
                     ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
-                    Immutable = false
+                    IsDeletable = false
                 }));
 
             UoW.Commit();

@@ -93,7 +93,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
-                audience.Enabled = false;
+                audience.IsEnabled = false;
 
                 uow.Audiences.Update(audience);
                 uow.Commit();
@@ -153,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
-                issuer.Enabled = false;
+                issuer.IsEnabled = false;
 
                 uow.Issuers.Update(issuer);
                 uow.Commit();
@@ -274,7 +274,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                audience.Enabled = false;
+                audience.IsEnabled = false;
 
                 uow.Audiences.Update(audience);
                 uow.Commit();
@@ -367,7 +367,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     }));
                 uow.Commit();
 
-                issuer.Enabled = false;
+                issuer.IsEnabled = false;
 
                 uow.Issuers.Update(issuer);
                 uow.Commit();

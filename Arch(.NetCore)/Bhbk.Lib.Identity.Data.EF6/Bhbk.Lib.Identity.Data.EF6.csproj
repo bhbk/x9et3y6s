@@ -78,17 +78,17 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bhbk.Lib.Common, Version=2020.8.11.1945, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Bhbk.Lib.Common.2020.8.11.1945\lib\netstandard2.0\Bhbk.Lib.Common.dll</HintPath>
+    <Reference Include="Bhbk.Lib.Common, Version=2020.11.11.1800, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\Bhbk.Lib.Common.2020.11.11.1800\lib\netstandard2.0\Bhbk.Lib.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Bhbk.Lib.Cryptography, Version=2020.8.11.1945, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Bhbk.Lib.Cryptography.2020.8.11.1945\lib\netstandard2.0\Bhbk.Lib.Cryptography.dll</HintPath>
+    <Reference Include="Bhbk.Lib.Cryptography, Version=2020.11.11.1800, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\Bhbk.Lib.Cryptography.2020.11.11.1800\lib\netstandard2.0\Bhbk.Lib.Cryptography.dll</HintPath>
     </Reference>
     <Reference Include="Bhbk.Lib.DataAccess.EF, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Bhbk.Lib.DataAccess.EF.2020.8.11.1945\lib\net48\Bhbk.Lib.DataAccess.EF.dll</HintPath>
+      <HintPath>..\packages\Bhbk.Lib.DataAccess.EF.2020.11.11.1800\lib\net48\Bhbk.Lib.DataAccess.EF.dll</HintPath>
     </Reference>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.6.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
-      <HintPath>..\packages\Portable.BouncyCastle.1.8.6.7\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.9.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.9\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="CryptoHelper, Version=3.0.2.0, Culture=neutral, PublicKeyToken=646ad3faa20406ba, processorArchitecture=MSIL">
       <HintPath>..\packages\CryptoHelper.3.0.2\lib\netstandard2.0\CryptoHelper.dll</HintPath>
@@ -102,11 +102,11 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNetCore.Cryptography.Internal, Version=3.1.7.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.Internal.3.1.7\lib\netstandard2.0\Microsoft.AspNetCore.Cryptography.Internal.dll</HintPath>
+    <Reference Include="Microsoft.AspNetCore.Cryptography.Internal, Version=5.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.Internal.5.0.1\lib\net461\Microsoft.AspNetCore.Cryptography.Internal.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation, Version=3.1.7.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.KeyDerivation.3.1.7\lib\netstandard2.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll</HintPath>
+    <Reference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation, Version=5.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.KeyDerivation.5.0.1\lib\net461\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll</HintPath>
     </Reference>
     <Reference Include="NMemory, Version=3.0.0.0, Culture=neutral, PublicKeyToken=afc61983f100d280, processorArchitecture=MSIL">
       <HintPath>..\packages\NMemory.3.1.1\lib\net45\NMemory.dll</HintPath>
@@ -156,6 +156,126 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\usp_Activity_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Activity_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Audience_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Audience_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Audience_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Claim_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Claim_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Claim_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_EmailQueue_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_EmailQueue_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_EmailQueue_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Issuer_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Issuer_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Issuer_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Login_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Login_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Login_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_MOTD_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_MOTD_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_MOTD_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Refresh_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Refresh_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Role_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Role_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Role_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Setting_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Setting_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Setting_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_State_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_State_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_State_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_TextQueue_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_TextQueue_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_TextQueue_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Url_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Url_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_Url_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_User_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_User_Insert_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_User_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\uvw_Activity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
@@ -168,6 +288,9 @@
     <Compile Include="Models\uvw_Claim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\uvw_EmailQueue.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\uvw_Issuer.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
@@ -175,12 +298,6 @@
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\uvw_MOTD.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\uvw_QueueEmail.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\uvw_QueueText.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\uvw_Refresh.cs">
@@ -193,6 +310,9 @@
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\uvw_State.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\uvw_TextQueue.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\uvw_Url.cs">
@@ -229,6 +349,9 @@
     <Compile Include="Models_DIRECT\tbl_Claim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models_DIRECT\tbl_EmailQueue.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models_DIRECT\tbl_Issuer.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
@@ -236,12 +359,6 @@
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models_DIRECT\tbl_MOTD.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models_DIRECT\tbl_QueueEmail.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models_DIRECT\tbl_QueueText.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models_DIRECT\tbl_Refresh.cs">
@@ -257,6 +374,9 @@
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models_DIRECT\tbl_State.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_TextQueue.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models_DIRECT\tbl_Url.cs">
@@ -277,33 +397,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ActivityRepository.cs" />
     <Compile Include="Repositories\AudienceRepository.cs" />
-    <Compile Include="Repositories\ClaimRepository.cs" />
-    <Compile Include="Repositories\IssuerRepository.cs" />
-    <Compile Include="Repositories\LoginRepository.cs" />
-    <Compile Include="Repositories\MOTDRepository.cs" />
-    <Compile Include="Repositories\QueueEmailRepository.cs" />
-    <Compile Include="Repositories\QueueTextRepository.cs" />
     <Compile Include="Repositories\RefreshRespository.cs" />
-    <Compile Include="Repositories\RoleRepository.cs" />
-    <Compile Include="Repositories\SettingRepository.cs" />
-    <Compile Include="Repositories\StateRepository.cs" />
-    <Compile Include="Repositories\UrlRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Infrastructure\IUnitOfWork.cs" />
     <Compile Include="Infrastructure\UnitOfWork.cs" />
     <Compile Include="Repositories_DIRECT\ActivityRepository.cs" />
     <Compile Include="Repositories_DIRECT\AudienceRepository.cs" />
-    <Compile Include="Repositories_DIRECT\ClaimRepository.cs" />
-    <Compile Include="Repositories_DIRECT\IssuerRepository.cs" />
-    <Compile Include="Repositories_DIRECT\LoginRepository.cs" />
-    <Compile Include="Repositories_DIRECT\MOTDRepository.cs" />
-    <Compile Include="Repositories_DIRECT\QueueEmailRepository.cs" />
-    <Compile Include="Repositories_DIRECT\QueueTextRepository.cs" />
     <Compile Include="Repositories_DIRECT\RefreshRepository.cs" />
-    <Compile Include="Repositories_DIRECT\RoleRepository.cs" />
-    <Compile Include="Repositories_DIRECT\SettingRepository.cs" />
-    <Compile Include="Repositories_DIRECT\StateRepository.cs" />
-    <Compile Include="Repositories_DIRECT\UrlRepository.cs" />
     <Compile Include="Repositories_DIRECT\UserRepository.cs" />
   </ItemGroup>
   <ItemGroup>

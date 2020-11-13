@@ -1,12 +1,13 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EF6.Models;
+using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Entity.Validation;
 using System.Linq;
 using Xunit;
 
@@ -18,9 +19,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Users_CreateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Users.Create(new uvw_User());
+                UoW.Commit();
             });
         }
 
@@ -31,17 +33,19 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             new GenerateTestData(UoW, Mapper).Create();
 
             var result = UoW.Users.Create(
-                new uvw_User()
+                Mapper.Map<uvw_User>(new UserV1()
                 {
                     UserName = Constants.TestUser,
-                    EmailAddress = Constants.TestUser,
+                    Email = Constants.TestUser,
                     PhoneNumber = NumberAs.CreateString(9),
                     FirstName = "First-" + Base64.CreateString(4),
                     LastName = "Last-" + Base64.CreateString(4),
-                    LockoutEnabled = false,
-                    HumanBeing = true,
-                    Immutable = false,
-                });
+                    IsLockedOut = false,
+                    IsHumanBeing = true,
+                    IsDeletable = true,
+                }));
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_User>();
         }
 
@@ -51,6 +55,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 UoW.Users.Delete(new uvw_User());
+                UoW.Commit();
             });
         }
 
@@ -64,6 +69,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
                 .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
 
             UoW.Users.Delete(user);
+            UoW.Commit();
         }
 
         [Fact]
@@ -80,9 +86,10 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Users_UpdateV1_Fail()
         {
-            Assert.Throws<SqlException>(() =>
+            Assert.Throws<DbEntityValidationException>(() =>
             {
                 UoW.Users.Update(new uvw_User());
+                UoW.Commit();
             });
         }
 
@@ -98,6 +105,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
             user.LastName += "(Updated)";
 
             var result = UoW.Users.Update(user);
+            UoW.Commit();
+
             result.Should().BeAssignableTo<uvw_User>();
         }
     }

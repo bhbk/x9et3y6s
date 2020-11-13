@@ -37,7 +37,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Activity_GetV1(Grant.Jwt.RawData, activityValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<ActivityV1>().Result;
+                return await response.Content.ReadAsAsync<ActivityV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -48,7 +48,18 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Activity_GetV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DataStateV1Result<ActivityV1>>().Result;
+                return await response.Content.ReadAsAsync<DataStateV1Result<ActivityV1>>();
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
+        public async ValueTask<bool> Audience_AddToRoleV1(Guid audienceID, Guid roleID)
+        {
+            var response = await Http.Audience_AddToRoleV1(Grant.Jwt.RawData, audienceID, roleID);
+
+            if (response.IsSuccessStatusCode)
+                return true;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -59,7 +70,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Audience_CreateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<AudienceV1>().Result;
+                return await response.Content.ReadAsAsync<AudienceV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -103,7 +114,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Audience_GetV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DataStateV1Result<AudienceV1>>().Result;
+                return await response.Content.ReadAsAsync<DataStateV1Result<AudienceV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -114,7 +125,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Audience_GetV1(Grant.Jwt.RawData, audienceValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<AudienceV1>().Result;
+                return await response.Content.ReadAsAsync<AudienceV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -125,7 +136,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Audience_GetRefreshesV1(Grant.Jwt.RawData, audienceValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<RefreshV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<RefreshV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -136,7 +147,29 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Audience_GetRolesV1(Grant.Jwt.RawData, audienceValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<RoleV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<RoleV1>>();
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
+        public async ValueTask<bool> Audience_RemoveFromRoleV1(Guid audienceID, Guid roleID)
+        {
+            var response = await Http.Audience_RemoveFromRoleV1(Grant.Jwt.RawData, audienceID, roleID);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            throw new HttpRequestException(response.ToString(),
+                new Exception(response.RequestMessage.ToString()));
+        }
+
+        public async ValueTask<bool> Audience_RemovePasswordV1(Guid userID)
+        {
+            var response = await Http.Audience_RemovePasswordV1(Grant.Jwt.RawData, userID);
+
+            if (response.IsSuccessStatusCode)
+                return true;
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -158,7 +191,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Audience_UpdateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<AudienceV1>().Result;
+                return await response.Content.ReadAsAsync<AudienceV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -169,7 +202,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Claim_CreateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<ClaimV1>().Result;
+                return await response.Content.ReadAsAsync<ClaimV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -191,7 +224,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Claim_GetV1(Grant.Jwt.RawData, claimValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<ClaimV1>().Result;
+                return await response.Content.ReadAsAsync<ClaimV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -202,7 +235,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Claim_GetV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DataStateV1Result<ClaimV1>>().Result;
+                return await response.Content.ReadAsAsync<DataStateV1Result<ClaimV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -213,7 +246,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Claim_UpdateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<ClaimV1>().Result;
+                return await response.Content.ReadAsAsync<ClaimV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -224,7 +257,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Issuer_CreateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IssuerV1>().Result;
+                return await response.Content.ReadAsAsync<IssuerV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -246,7 +279,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Issuer_GetAudiencesV1(Grant.Jwt.RawData, issuerValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<AudienceV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<AudienceV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -257,7 +290,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Issuer_GetV1(Grant.Jwt.RawData, issuerValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IssuerV1>().Result;
+                return await response.Content.ReadAsAsync<IssuerV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -268,7 +301,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Issuer_GetV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DataStateV1Result<IssuerV1>>().Result;
+                return await response.Content.ReadAsAsync<DataStateV1Result<IssuerV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -279,7 +312,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Issuer_GetKeysV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<Dictionary<Guid, string>>().Result;
+                return await response.Content.ReadAsAsync<Dictionary<Guid, string>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -290,7 +323,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Issuer_UpdateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IssuerV1>().Result;
+                return await response.Content.ReadAsAsync<IssuerV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -301,7 +334,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Login_CreateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<LoginV1>().Result;
+                return await response.Content.ReadAsAsync<LoginV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -323,7 +356,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Login_GetV1(Grant.Jwt.RawData, loginValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<LoginV1>().Result;
+                return await response.Content.ReadAsAsync<LoginV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -334,7 +367,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Login_GetV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DataStateV1Result<LoginV1>>().Result;
+                return await response.Content.ReadAsAsync<DataStateV1Result<LoginV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -345,7 +378,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Login_UpdateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<LoginV1>().Result;
+                return await response.Content.ReadAsAsync<LoginV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -356,7 +389,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.MOTD_GetV1(Grant.Jwt.RawData, motdValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<MOTDTssV1>().Result;
+                return await response.Content.ReadAsAsync<MOTDTssV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -367,7 +400,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.MOTD_GetV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DataStateV1Result<MOTDTssV1>>().Result;
+                return await response.Content.ReadAsAsync<DataStateV1Result<MOTDTssV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -378,7 +411,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Role_CreateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<RoleV1>().Result;
+                return await response.Content.ReadAsAsync<RoleV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -400,7 +433,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Role_GetV1(Grant.Jwt.RawData, roleValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<RoleV1>().Result;
+                return await response.Content.ReadAsAsync<RoleV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -411,7 +444,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Role_GetV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DataStateV1Result<RoleV1>>().Result;
+                return await response.Content.ReadAsAsync<DataStateV1Result<RoleV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -422,7 +455,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.Role_UpdateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<RoleV1>().Result;
+                return await response.Content.ReadAsAsync<RoleV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -466,7 +499,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_CreateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserV1>().Result;
+                return await response.Content.ReadAsAsync<UserV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -477,7 +510,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_CreateV1NoConfirm(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserV1>().Result;
+                return await response.Content.ReadAsAsync<UserV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -521,7 +554,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_GetClaimsV1(Grant.Jwt.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<ClaimV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<ClaimV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -532,7 +565,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_GetAudiencesV1(Grant.Jwt.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<AudienceV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<AudienceV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -543,7 +576,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_GetLoginsV1(Grant.Jwt.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<LoginV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<LoginV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -554,7 +587,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_GetRefreshesV1(Grant.Jwt.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<RefreshV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<RefreshV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -565,7 +598,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_GetRolesV1(Grant.Jwt.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<IEnumerable<RoleV1>>().Result;
+                return await response.Content.ReadAsAsync<IEnumerable<RoleV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -576,7 +609,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_GetV1(Grant.Jwt.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserV1>().Result;
+                return await response.Content.ReadAsAsync<UserV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -587,7 +620,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_GetV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<DataStateV1Result<UserV1>>().Result;
+                return await response.Content.ReadAsAsync<DataStateV1Result<UserV1>>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));
@@ -653,7 +686,7 @@ namespace Bhbk.Lib.Identity.Services
             var response = await Http.User_UpdateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return response.Content.ReadAsAsync<UserV1>().Result;
+                return await response.Content.ReadAsAsync<UserV1>();
 
             throw new HttpRequestException(response.ToString(),
                 new Exception(response.RequestMessage.ToString()));

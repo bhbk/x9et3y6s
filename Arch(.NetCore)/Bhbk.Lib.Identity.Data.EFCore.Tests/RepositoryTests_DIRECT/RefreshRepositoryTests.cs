@@ -20,10 +20,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact(Skip = "NotImplemented")]
         public void Repo_Refreshes_CreateV1_Fail()
         {
-            Assert.Throws<NullReferenceException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
-                UoW.Refreshes.Create(
-                    Mapper.Map<tbl_Refresh>(new RefreshV1()));
+                UoW.Refreshes.Create(new tbl_Refresh());
                 UoW.Commit();
             });
         }
@@ -57,9 +56,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                 }));
-            result.Should().BeAssignableTo<tbl_Refresh>();
-
             UoW.Commit();
+
+            result.Should().BeAssignableTo<tbl_Refresh>();
         }
 
         [Fact]
