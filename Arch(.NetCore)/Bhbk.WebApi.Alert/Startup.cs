@@ -11,6 +11,7 @@ using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Alert.Jobs;
+using Bhbk.WebApi.Alert.Services;
 using CronExpressionDescriptor;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -55,6 +56,7 @@ namespace Bhbk.WebApi.Alert
             {
                 return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
             });
+            sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
             sc.AddSingleton<IAlertService, AlertService>(_ =>
             {
                 var alert = new AlertService(conf);
@@ -62,29 +64,28 @@ namespace Bhbk.WebApi.Alert
 
                 return alert;
             });
-            sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
+            sc.AddScoped<ITwilioService, TwilioService>();
+            sc.AddScoped<ISendgridService, SendgridService>();
             sc.AddQuartz(jobs =>
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
 
-                jobs.UseMicrosoftDependencyInjectionJobFactory(options =>
-                {
-                    options.AllowDefaultConstructor = false;
-                });
-
+                jobs.UseMicrosoftDependencyInjectionJobFactory();
                 jobs.UseSimpleTypeLoader();
                 jobs.UseInMemoryStore();
                 jobs.UseDefaultThreadPool();
 
-                if (bool.Parse(conf["Jobs:QueueEmails:Enable"]))
+                //https://www.freeformatter.com/cron-expression-generator-quartz.html
+
+                if (bool.Parse(conf["Jobs:CleanEmails:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.AlertEmailJob.ToString(), GroupType.AlertJobs.ToString());
-                    jobs.AddJob<QueueEmailJob>(opt => opt
+                    var jobKey = new JobKey(JobType.CleanEmailsJob.ToString(), WorkerType.AlertWorker.ToString());
+                    jobs.AddJob<CleanEmailsJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:QueueEmails:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:CleanEmails:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
@@ -97,15 +98,57 @@ namespace Bhbk.WebApi.Alert
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:QueueTexts:Enable"]))
+                if (bool.Parse(conf["Jobs:CleanTexts:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.AlertTextJob.ToString(), GroupType.AlertJobs.ToString());
-                    jobs.AddJob<QueueTextJob>(opt => opt
+                    var jobKey = new JobKey(JobType.CleanTextsJob.ToString(), WorkerType.AlertWorker.ToString());
+                    jobs.AddJob<CleanTextsJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:QueueTexts:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:CleanTexts:Schedules").GetChildren()
+                        .Select(x => x.Value).ToList())
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(jobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
+                    }
+                }
+
+                if (bool.Parse(conf["Jobs:DequeueEmails:Enable"]))
+                {
+                    var jobKey = new JobKey(JobType.DequeueEmailsJob.ToString(), WorkerType.AlertWorker.ToString());
+                    jobs.AddJob<DequeueEmailsJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(jobKey)
+                    );
+
+                    foreach (var cron in conf.GetSection("Jobs:DequeueEmails:Schedules").GetChildren()
+                        .Select(x => x.Value).ToList())
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(jobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
+                    }
+                }
+
+                if (bool.Parse(conf["Jobs:DequeueTexts:Enable"]))
+                {
+                    var jobKey = new JobKey(JobType.DequeueTextsJob.ToString(), WorkerType.AlertWorker.ToString());
+                    jobs.AddJob<DequeueTextsJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(jobKey)
+                    );
+
+                    foreach (var cron in conf.GetSection("Jobs:DequeueTexts:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt

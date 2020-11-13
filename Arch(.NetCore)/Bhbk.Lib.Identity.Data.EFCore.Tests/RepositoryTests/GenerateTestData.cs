@@ -276,7 +276,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                         ToId = foundUser.Id,
                         ToEmail = foundUser.EmailAddress,
                         Subject = "Subject-" + Base64.CreateString(4),
-                        HtmlContent = "Body-" + Base64.CreateString(32),
+                        Body = "Body-" + Base64.CreateString(32),
                         SendAtUtc = now,
                     });
             }

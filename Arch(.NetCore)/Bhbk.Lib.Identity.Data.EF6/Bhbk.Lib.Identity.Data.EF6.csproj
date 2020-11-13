@@ -78,14 +78,14 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bhbk.Lib.Common, Version=2020.11.11.1800, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Bhbk.Lib.Common.2020.11.11.1800\lib\netstandard2.0\Bhbk.Lib.Common.dll</HintPath>
+    <Reference Include="Bhbk.Lib.Common, Version=2020.11.12.1900, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\Bhbk.Lib.Common.2020.11.12.1900\lib\netstandard2.0\Bhbk.Lib.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Bhbk.Lib.Cryptography, Version=2020.11.11.1800, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Bhbk.Lib.Cryptography.2020.11.11.1800\lib\netstandard2.0\Bhbk.Lib.Cryptography.dll</HintPath>
+    <Reference Include="Bhbk.Lib.Cryptography, Version=2020.11.12.1900, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\Bhbk.Lib.Cryptography.2020.11.12.1900\lib\netstandard2.0\Bhbk.Lib.Cryptography.dll</HintPath>
     </Reference>
     <Reference Include="Bhbk.Lib.DataAccess.EF, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Bhbk.Lib.DataAccess.EF.2020.11.11.1800\lib\net48\Bhbk.Lib.DataAccess.EF.dll</HintPath>
+      <HintPath>..\packages\Bhbk.Lib.DataAccess.EF.2020.11.12.1900\lib\net48\Bhbk.Lib.DataAccess.EF.dll</HintPath>
     </Reference>
     <Reference Include="BouncyCastle.Crypto, Version=1.8.9.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.BouncyCastle.1.8.9\lib\net40\BouncyCastle.Crypto.dll</HintPath>
@@ -349,6 +349,9 @@
     <Compile Include="Models_DIRECT\tbl_Claim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models_DIRECT\tbl_EmailActivity.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models_DIRECT\tbl_EmailQueue.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
@@ -374,6 +377,9 @@
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models_DIRECT\tbl_State.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_DIRECT\tbl_TextActivity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models_DIRECT\tbl_TextQueue.cs">

@@ -48,10 +48,8 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                         uow.Activities.Delete(expired);
                         uow.Commit();
 
-                        var msg = callPath + " success on " + DateTime.UtcNow.ToString() + ". Delete "
-                                + expiredCount.ToString() + " expired activity entries.";
-
-                        Log.Information(msg);
+                        Log.Information($"'{callPath}' success on " + DateTime.UtcNow.ToString() + ". Delete " 
+                            + expiredCount.ToString() + " expired activity entries.");
                     }
                 }
             }
@@ -59,8 +57,11 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
             {
                 Log.Error(ex.ToString());
             }
+            finally
+            {
+                GC.Collect();
+            }
 
-            GC.Collect();
             Log.Information($"'{callPath}' completed");
             Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
 

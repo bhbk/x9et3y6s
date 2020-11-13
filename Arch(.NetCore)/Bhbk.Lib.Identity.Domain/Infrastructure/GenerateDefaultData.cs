@@ -14,13 +14,11 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        private readonly ValidationHelper _validate;
 
         public GenerateDefaultData(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
             _mapper = mapper ?? throw new ArgumentNullException();
-            _validate = new ValidationHelper();
         }
 
         public void Create()
@@ -90,6 +88,42 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                         IssuerKey = Constants.DefaultIssuerKey,
                         IsEnabled = true,
                         IsDeletable = false,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.SettingAccessExpire,
+                        ConfigValue = 600.ToString(),
+                        IsDeletable = true,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.SettingRefreshExpire,
+                        ConfigValue = 86400.ToString(),
+                        IsDeletable = true,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.SettingTotpExpire,
+                        ConfigValue = 600.ToString(),
+                        IsDeletable = true,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.SettingPollingMax,
+                        ConfigValue = 10.ToString(),
+                        IsDeletable = true,
                     }));
 
                 _uow.Commit();
@@ -260,6 +294,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 _uow.Users.SetConfirmedEmail(foundAdmin, true);
                 _uow.Users.SetConfirmedPassword(foundAdmin, true);
                 _uow.Users.SetConfirmedPhoneNumber(foundAdmin, true);
+
                 _uow.Commit();
             }
 

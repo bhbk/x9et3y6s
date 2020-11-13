@@ -700,7 +700,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testAudience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var testAudience = uow.Audiences.GetAsNoTracking(x => x.Name == Constants.TestAudience).Single();
                 testAudience.Description += "(Updated)";
 
                 var result = await service.Audience_UpdateV1(mapper.Map<AudienceV1>(testAudience));

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Grants
@@ -13,7 +14,6 @@ namespace Bhbk.Lib.Identity.Grants
     public class ClientCredentialGrantV2 : IOAuth2JwtGrant
     {
         private readonly IConfiguration _conf;
-        private readonly InstanceContext _instance;
         private readonly HttpClient _http;
         private JwtSecurityToken _access, _refresh;
 
@@ -23,21 +23,20 @@ namespace Bhbk.Lib.Identity.Grants
         public ClientCredentialGrantV2(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
             _conf = conf;
-            _instance = instance;
 
-            if (instance == InstanceContext.DeployedOrLocal)
+            if (instance == InstanceContext.DeployedOrLocal
+                || instance == InstanceContext.End2EndTest)
             {
                 var connect = new HttpClientHandler();
 
-                //https://stackoverflow.com/questions/38138952/bypass-invalid-ssl-certificate-in-net-core
                 connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
+                connect.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
 
                 _http = new HttpClient(connect);
+                _http.BaseAddress = new Uri($"{_conf["IdentityStsUrls:BaseApiUrl"]}/{_conf["IdentityStsUrls:BaseApiPath"]}/");
             }
-            else if (instance == InstanceContext.End2EndTest)
-                _http = http;
             else
-                throw new NotImplementedException();
+                _http = http;
 
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -72,16 +71,7 @@ namespace Bhbk.Lib.Identity.Grants
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
 
-                var endpoint = "/oauth2/v2/ccg-rt";
-
-                if (_instance == InstanceContext.DeployedOrLocal)
-                    response = await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-                else if (_instance == InstanceContext.End2EndTest)
-                    response = await _http.PostAsync(endpoint, content);
-
-                else
-                    throw new NotImplementedException();
+                response = await _http.PostAsync("oauth2/v2/ccg-rt", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -110,16 +100,7 @@ namespace Bhbk.Lib.Identity.Grants
                             new KeyValuePair<string, string>("client_secret", _conf["IdentityCredentials:AudienceSecret"]),
                         });
 
-                var endpoint = "/oauth2/v2/ccg";
-
-                if (_instance == InstanceContext.DeployedOrLocal)
-                    response = await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-                else if (_instance == InstanceContext.End2EndTest)
-                    response = await _http.PostAsync(endpoint, content);
-
-                else
-                    throw new NotImplementedException();
+                response = await _http.PostAsync("oauth2/v2/ccg", content);
 
                 if (response.IsSuccessStatusCode)
                 {

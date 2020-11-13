@@ -3,9 +3,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Bhbk.Lib.Identity.Domain.Providers.Alert
 {
-    public class TextProvider : BaseProvider
+    public class DequeueProvider : BaseProvider
     {
-        public TextProvider(IConfiguration conf, IContextService instance)
+        public DequeueProvider(IConfiguration conf, IContextService instance)
             : base(conf, instance) { }
 
     }

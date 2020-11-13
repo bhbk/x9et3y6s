@@ -188,7 +188,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 var url = UrlFactory.GenerateConfirmEmailV1(Conf, result, code);
                 var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-                alert.Email_EnqueueV1(new EmailV1()
+                alert.Enqueue_EmailV1(new EmailV1()
                 {
                     FromId = result.Id,
                     FromEmail = result.EmailAddress,
@@ -197,7 +197,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     ToEmail = result.EmailAddress,
                     ToDisplay = $"{result.FirstName} {result.LastName}",
                     Subject = $"{issuer.Name} {Constants.MsgConfirmNewUserSubject}",
-                    HtmlContent = Templates.ConfirmNewUser(issuer, result, url)
+                    Body = Templates.ConfirmNewUser(issuer, result, url)
                 });
             }
 
@@ -614,7 +614,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == model.Id)
+            var user = UoW.Users.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_User>()
+                .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
             if (user == null)
@@ -664,6 +665,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             switch (UoW.InstanceType)
             {
                 case InstanceContext.DeployedOrLocal:
+                case InstanceContext.End2EndTest:
                     {
                         //check if login provider is local...
                         if (!logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
@@ -674,7 +676,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     }
                     break;
 
-                case InstanceContext.End2EndTest:
+                case InstanceContext.SystemTest:
                 case InstanceContext.IntegrationTest:
                     {
                         //check if login provider is local or test...

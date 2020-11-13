@@ -14,7 +14,6 @@ namespace Bhbk.Lib.Identity.Repositories
     public class StsRepository
     {
         private readonly IConfiguration _conf;
-        private readonly InstanceContext _instance;
         private readonly HttpClient _http;
 
         public StsRepository(IConfiguration conf)
@@ -23,9 +22,9 @@ namespace Bhbk.Lib.Identity.Repositories
         public StsRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
             _conf = conf;
-            _instance = instance;
 
-            if (instance == InstanceContext.DeployedOrLocal)
+            if (instance == InstanceContext.DeployedOrLocal
+                || instance == InstanceContext.End2EndTest)
             {
                 var connect = new HttpClientHandler();
 
@@ -33,6 +32,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 connect.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
 
                 _http = new HttpClient(connect);
+                _http.BaseAddress = new Uri($"{_conf["IdentityStsUrls:BaseApiUrl"]}/{_conf["IdentityStsUrls:BaseApiPath"]}/");
             }
             else
                 _http = http;
@@ -53,15 +53,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&response_type=" + model.response_type
                 + "&scope=" + HttpUtility.UrlEncode(model.scope);
 
-            var endpoint = "/oauth2/v1/acg-ask";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.GetAsync(endpoint + content);
-
-            throw new NotSupportedException();
+            return await _http.GetAsync("oauth2/v1/acg-ask" + content);
         }
 
         public async ValueTask<HttpResponseMessage> AuthCode_AskV2(AuthCodeAskV2 model)
@@ -73,15 +65,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&response_type=" + model.response_type
                 + "&scope=" + HttpUtility.UrlEncode(model.scope);
 
-            var endpoint = "/oauth2/v2/acg-ask";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.GetAsync(endpoint + content);
-
-            throw new NotSupportedException();
+            return await _http.GetAsync("oauth2/v2/acg-ask" + content);
         }
 
         public async ValueTask<HttpResponseMessage> AuthCode_AuthV1(AuthCodeV1 model)
@@ -94,15 +78,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&code=" + HttpUtility.UrlEncode(model.code)
                 + "&state=" + HttpUtility.UrlEncode(model.state));
 
-            var endpoint = "/oauth2/v1/acg";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.GetAsync(endpoint + content);
-
-            throw new NotSupportedException();
+            return await _http.GetAsync("oauth2/v1/acg" + content);
         }
 
         public async ValueTask<HttpResponseMessage> AuthCode_AuthV2(AuthCodeV2 model)
@@ -115,15 +91,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&code=" + HttpUtility.UrlEncode(model.code)
                 + "&state=" + HttpUtility.UrlEncode(model.state);
 
-            var endpoint = "/oauth2/v2/acg";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.GetAsync(endpoint + content);
-
-            throw new NotSupportedException();
+            return await _http.GetAsync("oauth2/v2/acg" + content);
         }
 
         /*
@@ -140,15 +108,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("client_secret", model.client_secret),
                 });
 
-            var endpoint = "/oauth2/v1/ccg";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v1/ccg", content);
         }
 
         public async ValueTask<HttpResponseMessage> ClientCredential_AuthV2(ClientCredentialV2 model)
@@ -161,15 +121,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("client_secret", model.client_secret),
                 });
 
-            var endpoint = "/oauth2/v2/ccg";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v2/ccg", content);
         }
 
         public async ValueTask<HttpResponseMessage> ClientCredential_RefreshV1(RefreshTokenV1 model)
@@ -182,15 +134,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
-            var endpoint = "/oauth2/v1/ccg-rt";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v1/ccg-rt", content);
         }
 
         public async ValueTask<HttpResponseMessage> ClientCredential_RefreshV2(RefreshTokenV2 model)
@@ -203,15 +147,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
-            var endpoint = "/oauth2/v2/ccg-rt";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v2/ccg-rt", content);
         }
 
         /*
@@ -227,15 +163,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("username", model.username),
                 });
 
-            var endpoint = "/oauth2/v1/dcg-ask";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v1/dcg-ask", content);
         }
 
         public async ValueTask<HttpResponseMessage> DeviceCode_AskV2(DeviceCodeAskV2 model)
@@ -248,15 +176,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("user", model.user),
                 });
 
-            var endpoint = "/oauth2/v2/dcg-ask";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v2/dcg-ask", content);
         }
 
         public async ValueTask<HttpResponseMessage> DeviceCode_AuthV1(DeviceCodeV1 model)
@@ -270,15 +190,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("device_code", model.device_code),
                 });
 
-            var endpoint = "/oauth2/v1/dcg";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v1/dcg", content);
         }
 
         public async ValueTask<HttpResponseMessage> DeviceCode_AuthV2(DeviceCodeV2 model)
@@ -292,15 +204,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("device_code", model.device_code),
                 });
 
-            var endpoint = "/oauth2/v2/dcg";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v2/dcg", content);
         }
 
         /* 
@@ -317,15 +221,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&scope=" + HttpUtility.UrlEncode(model.scope)
                 + "&state=" + HttpUtility.UrlEncode(model.state);
 
-            var endpoint = "/oauth2/v1/ig";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.GetAsync(endpoint + content);
-
-            throw new NotSupportedException();
+            return await _http.GetAsync("oauth2/v1/ig" + content);
         }
 
         public async ValueTask<HttpResponseMessage> Implicit_AuthV2(ImplicitV2 model)
@@ -339,15 +235,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 + "&scope=" + HttpUtility.UrlEncode(model.scope)
                 + "&state=" + HttpUtility.UrlEncode(model.state);
 
-            var endpoint = "/oauth2/v2/ig";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.GetAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint) + content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.GetAsync(endpoint + content);
-
-            throw new NotSupportedException();
+            return await _http.GetAsync("oauth2/v2/ig" + content);
         }
 
         /*
@@ -364,15 +252,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("password", model.password),
                 });
 
-            var endpoint = "/oauth2/v1/ropg";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v1/ropg", content);
         }
 
         public async ValueTask<HttpResponseMessage> ResourceOwner_AuthV1(ResourceOwnerV1 model)
@@ -386,15 +266,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("password", model.password),
                 });
 
-            var endpoint = "/oauth2/v1/ropg";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v1/ropg", content);
         }
 
         public async ValueTask<HttpResponseMessage> ResourceOwner_AuthV2(ResourceOwnerV2 model)
@@ -408,15 +280,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("password", model.password),
                 });
 
-            var endpoint = "/oauth2/v2/ropg";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v2/ropg", content);
         }
 
         public async ValueTask<HttpResponseMessage> ResourceOwner_RefreshV1(RefreshTokenV1 model)
@@ -429,15 +293,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
-            var endpoint = "/oauth2/v1/ropg-rt";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v1/ropg-rt", content);
         }
 
         public async ValueTask<HttpResponseMessage> ResourceOwner_RefreshV2(RefreshTokenV2 model)
@@ -450,15 +306,7 @@ namespace Bhbk.Lib.Identity.Repositories
                     new KeyValuePair<string, string>("refresh_token", model.refresh_token),
                 });
 
-            var endpoint = "/oauth2/v2/ropg-rt";
-
-            if (_instance == InstanceContext.DeployedOrLocal)
-                return await _http.PostAsync(string.Format("{0}{1}{2}", _conf["IdentityStsUrls:BaseApiUrl"], _conf["IdentityStsUrls:BaseApiPath"], endpoint), content);
-
-            if (_instance == InstanceContext.End2EndTest)
-                return await _http.PostAsync(endpoint, content);
-
-            throw new NotSupportedException();
+            return await _http.PostAsync("oauth2/v2/ropg-rt", content);
         }
     }
 }

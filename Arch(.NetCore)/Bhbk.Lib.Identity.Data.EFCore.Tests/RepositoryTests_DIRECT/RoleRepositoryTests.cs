@@ -86,7 +86,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Roles_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
                 UoW.Roles.Update(new tbl_Role());
                 UoW.Commit();

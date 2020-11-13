@@ -41,10 +41,8 @@ namespace Bhbk.WebApi.Identity.Sts.Jobs
                         uow.States.Delete(invalid);
                         uow.Commit();
 
-                        var msg = typeof(MaintainStatesJob).Name + " success on " + DateTime.UtcNow.ToString() + ". Delete "
-                                + invalidCount.ToString() + " invalid states.";
-
-                        Log.Information(msg);
+                        Log.Information($"'{callPath}' success on " + DateTime.UtcNow.ToString() + ". Delete "
+                            + invalidCount.ToString() + " invalid states.");
                     }
                 }
             }
@@ -52,8 +50,11 @@ namespace Bhbk.WebApi.Identity.Sts.Jobs
             {
                 Log.Debug(ex.ToString());
             }
+            finally
+            {
+                GC.Collect();
+            }
 
-            GC.Collect();
             Log.Information($"'{callPath}' completed");
             Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
 

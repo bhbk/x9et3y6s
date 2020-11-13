@@ -5,7 +5,6 @@ using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -64,6 +63,24 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                 .Where(x => x.Name == Constants.TestIssuer).ToLambda())
                 .Single();
 
+            var claims = UoW.Claims.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
+            var refreshes = UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
+            var settings = UoW.Settings.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
+            var states = UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
+            var roles = UoW.Roles.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
+                .Where(x => x.Audience.IssuerId == issuer.Id).ToLambda());
+
+            var audiences = UoW.Audiences.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+                .Where(x => x.IssuerId == issuer.Id).ToLambda());
+
             UoW.Issuers.Delete(issuer);
             UoW.Commit();
         }
@@ -82,7 +99,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Issuers_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
                 UoW.Issuers.Update(new tbl_Issuer());
                 UoW.Commit();

@@ -161,7 +161,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = UoW.Logins.Get(x => x.Id == model.Id)
+            var login = UoW.Logins.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
+                .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
             if (login == null)

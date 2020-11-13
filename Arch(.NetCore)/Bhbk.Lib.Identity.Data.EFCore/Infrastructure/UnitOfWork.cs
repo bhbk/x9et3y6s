@@ -47,7 +47,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
             {
                 case InstanceContext.DeployedOrLocal:
                 case InstanceContext.End2EndTest:
-                case InstanceContext.IntegrationTest:
                     {
 #if !RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
@@ -61,7 +60,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Infrastructure
                         _context = new IdentityEntities(builder.Options);
                     }
                     break;
-                    
+
+                case InstanceContext.SystemTest:
+                case InstanceContext.IntegrationTest:
                 case InstanceContext.UnitTest:
                     {
 #if !RELEASE

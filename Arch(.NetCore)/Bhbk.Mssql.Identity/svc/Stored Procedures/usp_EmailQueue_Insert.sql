@@ -9,8 +9,7 @@ CREATE PROCEDURE [svc].[usp_EmailQueue_Insert]
     ,@ToEmail               NVARCHAR (MAX) 
     ,@ToDisplay             NVARCHAR (MAX) 
     ,@Subject               NVARCHAR (MAX) 
-    ,@HtmlContent			NVARCHAR (MAX)
-    ,@PlaintextContent		NVARCHAR (MAX) 
+    ,@Body      			NVARCHAR (MAX)
     ,@SendAtUtc             DATETIMEOFFSET (7) 
 
 AS
@@ -33,8 +32,7 @@ BEGIN
 			,ToEmail
 			,ToDisplay
             ,Subject           
-            ,HtmlContent  
-            ,PlaintextContent 
+            ,Body 
 			,CreatedUtc
             ,SendAtUtc           
 	        )
@@ -49,8 +47,7 @@ BEGIN
             ,@ToEmail
 			,@ToDisplay
 			,@Subject
-			,@HtmlContent
-			,@PlaintextContent
+			,@Body
             ,@CREATEDUTC           
             ,@SendAtUtc        
 	        );

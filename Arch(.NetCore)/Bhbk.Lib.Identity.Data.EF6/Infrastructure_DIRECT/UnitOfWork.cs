@@ -36,7 +36,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Infrastructure_DIRECT
             {
                 case InstanceContext.DeployedOrLocal:
                 case InstanceContext.End2EndTest:
-                case InstanceContext.IntegrationTest:
                     {
                         _context = new IdentityEntitiesFactory(connection).Create();
 #if !RELEASE
@@ -45,6 +44,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Infrastructure_DIRECT
                     }
                     break;
 
+                case InstanceContext.SystemTest:
+                case InstanceContext.IntegrationTest:
                 case InstanceContext.UnitTest:
                     {
                         var memory = Effort.EntityConnectionFactory.CreateTransient(connection);

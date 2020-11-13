@@ -65,7 +65,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var url = UrlFactory.GenerateConfirmEmailV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            alert.Email_EnqueueV1(new EmailV1()
+            alert.Enqueue_EmailV1(new EmailV1()
             {
                 FromId = user.Id,
                 FromEmail = user.EmailAddress,
@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ToEmail = user.EmailAddress,
                 ToDisplay = $"{user.FirstName} {user.LastName}",
                 Subject = Constants.MsgConfirmEmailSubject,
-                HtmlContent = Templates.ConfirmEmail(user, url)
+                Body = Templates.ConfirmEmail(user, url)
             });
 
             return NoContent();
@@ -118,7 +118,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            alert.Email_EnqueueV1(new EmailV1()
+            alert.Enqueue_EmailV1(new EmailV1()
             {
                 FromId = user.Id,
                 FromEmail = user.EmailAddress,
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ToEmail = user.EmailAddress,
                 ToDisplay = $"{user.FirstName} {user.LastName}",
                 Subject = Constants.MsgConfirmPasswordSubject,
-                HtmlContent = Templates.ConfirmPassword(user, url)
+                Body = Templates.ConfirmPassword(user, url)
             });
 
             return NoContent();
@@ -167,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            alert.Text_EnqueueV1(new TextV1()
+            alert.Enqueue_TextV1(new TextV1()
             {
                 FromId = user.Id,
                 FromPhoneNumber = model.NewPhoneNumber,

@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Me
 
         public static void Main(string[] args)
         {
-            _conf = new ConfigurationBuilder()
+            _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 

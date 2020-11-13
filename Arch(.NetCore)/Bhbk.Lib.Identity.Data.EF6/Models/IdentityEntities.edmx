@@ -118,10 +118,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_EmailQueue' does not have a p
           <Property Name="ToEmail" Type="varchar" MaxLength="128" Nullable="false" />
           <Property Name="ToDisplay" Type="varchar" MaxLength="128" />
           <Property Name="Subject" Type="varchar" MaxLength="256" Nullable="false" />
-          <Property Name="HtmlContent" Type="varchar(max)" />
-          <Property Name="PlaintextContent" Type="varchar(max)" />
+          <Property Name="Body" Type="varchar(max)" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
           <Property Name="SendAtUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="DeliveredUtc" Type="datetimeoffset" Precision="7" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_Issuer' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -291,6 +291,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_TextQueue' does not have a pr
           <Property Name="Body" Type="varchar(max)" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
           <Property Name="SendAtUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="DeliveredUtc" Type="datetimeoffset" Precision="7" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_Url' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -317,6 +318,14 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
         <EntityType Name="uvw_User">
           <Key>
             <PropertyRef Name="Id" />
+            
+            
+            
+            
+            
+            
+            
+            
             
             
             
@@ -429,8 +438,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
           <Parameter Name="ToEmail" Type="nvarchar(max)" Mode="In" />
           <Parameter Name="ToDisplay" Type="nvarchar(max)" Mode="In" />
           <Parameter Name="Subject" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="HtmlContent" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PlaintextContent" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Body" Type="nvarchar(max)" Mode="In" />
           <Parameter Name="SendAtUtc" Type="datetimeoffset" Mode="In" />
         </Function>
         <Function Name="usp_EmailQueue_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
@@ -443,9 +451,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
           <Parameter Name="ToEmail" Type="nvarchar(max)" Mode="In" />
           <Parameter Name="ToDisplay" Type="nvarchar(max)" Mode="In" />
           <Parameter Name="Subject" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="HtmlContent" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="PlaintextContent" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="SentAtUtc" Type="datetimeoffset" Mode="In" />
+          <Parameter Name="Body" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="SendAtUtc" Type="datetimeoffset" Mode="In" />
         </Function>
         <Function Name="usp_Issuer_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
@@ -737,10 +744,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
     [uvw_EmailQueue].[ToEmail] AS [ToEmail], 
     [uvw_EmailQueue].[ToDisplay] AS [ToDisplay], 
     [uvw_EmailQueue].[Subject] AS [Subject], 
-    [uvw_EmailQueue].[HtmlContent] AS [HtmlContent], 
-    [uvw_EmailQueue].[PlaintextContent] AS [PlaintextContent], 
+    [uvw_EmailQueue].[Body] AS [Body], 
     [uvw_EmailQueue].[CreatedUtc] AS [CreatedUtc], 
-    [uvw_EmailQueue].[SendAtUtc] AS [SendAtUtc]
+    [uvw_EmailQueue].[SendAtUtc] AS [SendAtUtc], 
+    [uvw_EmailQueue].[DeliveredUtc] AS [DeliveredUtc]
     FROM [svc].[uvw_EmailQueue] AS [uvw_EmailQueue]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_Issuer" EntityType="Self.uvw_Issuer" store:Type="Views" store:Schema="svc">
@@ -847,7 +854,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
     [uvw_TextQueue].[ToPhoneNumber] AS [ToPhoneNumber], 
     [uvw_TextQueue].[Body] AS [Body], 
     [uvw_TextQueue].[CreatedUtc] AS [CreatedUtc], 
-    [uvw_TextQueue].[SendAtUtc] AS [SendAtUtc]
+    [uvw_TextQueue].[SendAtUtc] AS [SendAtUtc], 
+    [uvw_TextQueue].[DeliveredUtc] AS [DeliveredUtc]
     FROM [svc].[uvw_TextQueue] AS [uvw_TextQueue]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_Url" EntityType="Self.uvw_Url" store:Type="Views" store:Schema="svc">
@@ -902,7 +910,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
           <EntitySet Name="uvw_Audience" EntityType="IdentityModels.uvw_Audience" />
           <EntitySet Name="uvw_AudienceRole" EntityType="IdentityModels.uvw_AudienceRole" />
           <EntitySet Name="uvw_Claim" EntityType="IdentityModels.uvw_Claim" />
-          <EntitySet Name="uvw_EmailQueue" EntityType="IdentityModels.uvw_EmailQueue" />
           <EntitySet Name="uvw_Issuer" EntityType="IdentityModels.uvw_Issuer" />
           <EntitySet Name="uvw_Login" EntityType="IdentityModels.uvw_Login" />
           <EntitySet Name="uvw_MOTD" EntityType="IdentityModels.uvw_MOTD" />
@@ -992,8 +999,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
             <Parameter Name="ToEmail" Mode="In" Type="String" />
             <Parameter Name="ToDisplay" Mode="In" Type="String" />
             <Parameter Name="Subject" Mode="In" Type="String" />
-            <Parameter Name="HtmlContent" Mode="In" Type="String" />
-            <Parameter Name="PlaintextContent" Mode="In" Type="String" />
+            <Parameter Name="Body" Mode="In" Type="String" />
             <Parameter Name="SendAtUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
           <FunctionImport Name="usp_EmailQueue_Update" ReturnType="Collection(IdentityModels.usp_EmailQueue_Update_Result)">
@@ -1006,9 +1012,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
             <Parameter Name="ToEmail" Mode="In" Type="String" />
             <Parameter Name="ToDisplay" Mode="In" Type="String" />
             <Parameter Name="Subject" Mode="In" Type="String" />
-            <Parameter Name="HtmlContent" Mode="In" Type="String" />
-            <Parameter Name="PlaintextContent" Mode="In" Type="String" />
-            <Parameter Name="SentAtUtc" Mode="In" Type="DateTimeOffset" />
+            <Parameter Name="Body" Mode="In" Type="String" />
+            <Parameter Name="SendAtUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
           <FunctionImport Name="usp_Issuer_Delete" ReturnType="Collection(IdentityModels.usp_Issuer_Delete_Result)">
           <Parameter Name="ID" Mode="In" Type="Guid" />
@@ -1228,6 +1233,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
             <Parameter Name="LockoutEndUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
+          <EntitySet Name="uvw_EmailQueue" EntityType="IdentityModels.uvw_EmailQueue" />
         </EntityContainer>
         <EntityType Name="uvw_Activity">
           <Key>
@@ -1293,24 +1299,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
-        </EntityType>
-        <EntityType Name="uvw_EmailQueue">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="ActorId" Type="Guid" />
-          <Property Name="FromId" Type="Guid" />
-          <Property Name="FromEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="FromDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="ToId" Type="Guid" Nullable="false" />
-          <Property Name="ToEmail" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="ToDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="Subject" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
-          <Property Name="HtmlContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="PlaintextContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="SendAtUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="uvw_Issuer">
           <Key>
@@ -1428,6 +1416,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
           <Property Name="Body" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="SendAtUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <Property Name="DeliveredUtc" Type="DateTimeOffset" Precision="7" />
         </EntityType>
         <EntityType Name="uvw_Url">
           <Key>
@@ -2017,6 +2006,24 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
           <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
           <Property Type="DateTimeOffset" Name="LastUpdatedUtc" Nullable="true" />
         </ComplexType>
+        <EntityType Name="uvw_EmailQueue">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="ActorId" Type="Guid" />
+          <Property Name="FromId" Type="Guid" />
+          <Property Name="FromEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="FromDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="ToId" Type="Guid" Nullable="false" />
+          <Property Name="ToEmail" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="ToDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="Subject" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="Body" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <Property Name="SendAtUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <Property Name="DeliveredUtc" Type="DateTimeOffset" Precision="7" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2172,61 +2179,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
                   <ScalarProperty Name="Subject" ParameterName="Subject" />
                   <ScalarProperty Name="ActorId" ParameterName="ActorId" />
                   <ScalarProperty Name="IssuerId" ParameterName="IssuerId" />
-                  <ResultBinding Name="Id" ColumnName="Id" />
-                  <ResultBinding Name="CreatedUtc" ColumnName="CreatedUtc" />
-                </InsertFunction>
-              </ModificationFunctionMapping>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_EmailQueue">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_EmailQueue">
-              <MappingFragment StoreEntitySet="uvw_EmailQueue">
-                <ScalarProperty Name="SendAtUtc" ColumnName="SendAtUtc" />
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="PlaintextContent" ColumnName="PlaintextContent" />
-                <ScalarProperty Name="HtmlContent" ColumnName="HtmlContent" />
-                <ScalarProperty Name="Subject" ColumnName="Subject" />
-                <ScalarProperty Name="ToDisplay" ColumnName="ToDisplay" />
-                <ScalarProperty Name="ToEmail" ColumnName="ToEmail" />
-                <ScalarProperty Name="ToId" ColumnName="ToId" />
-                <ScalarProperty Name="FromDisplay" ColumnName="FromDisplay" />
-                <ScalarProperty Name="FromEmail" ColumnName="FromEmail" />
-                <ScalarProperty Name="FromId" ColumnName="FromId" />
-                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_EmailQueue">
-              <ModificationFunctionMapping>
-                <DeleteFunction FunctionName="IdentityModels.Store.usp_EmailQueue_Delete" >
-                  <ScalarProperty Name="Id" ParameterName="ID" />
-                </DeleteFunction>
-                <UpdateFunction FunctionName="IdentityModels.Store.usp_EmailQueue_Update">
-                  <ScalarProperty Name="SendAtUtc" ParameterName="SentAtUtc" Version="Current" />
-                  <ScalarProperty Name="PlaintextContent" ParameterName="PlaintextContent" Version="Current" />
-                  <ScalarProperty Name="HtmlContent" ParameterName="HtmlContent" Version="Current" />
-                  <ScalarProperty Name="Subject" ParameterName="Subject" Version="Current" />
-                  <ScalarProperty Name="ToDisplay" ParameterName="ToDisplay" Version="Current" />
-                  <ScalarProperty Name="ToEmail" ParameterName="ToEmail" Version="Current" />
-                  <ScalarProperty Name="ToId" ParameterName="ToId" Version="Current" />
-                  <ScalarProperty Name="FromDisplay" ParameterName="FromDisplay" Version="Current" />
-                  <ScalarProperty Name="FromEmail" ParameterName="FromEmail" Version="Current" />
-                  <ScalarProperty Name="FromId" ParameterName="FromId" Version="Current" />
-                  <ScalarProperty Name="ActorId" ParameterName="ActorId" Version="Current" />
-                  <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
-                </UpdateFunction>
-                <InsertFunction FunctionName="IdentityModels.Store.usp_EmailQueue_Insert">
-                  <ScalarProperty Name="SendAtUtc" ParameterName="SendAtUtc" />
-                  <ScalarProperty Name="PlaintextContent" ParameterName="PlaintextContent" />
-                  <ScalarProperty Name="HtmlContent" ParameterName="HtmlContent" />
-                  <ScalarProperty Name="Subject" ParameterName="Subject" />
-                  <ScalarProperty Name="ToDisplay" ParameterName="ToDisplay" />
-                  <ScalarProperty Name="ToEmail" ParameterName="ToEmail" />
-                  <ScalarProperty Name="ToId" ParameterName="ToId" />
-                  <ScalarProperty Name="FromDisplay" ParameterName="FromDisplay" />
-                  <ScalarProperty Name="FromEmail" ParameterName="FromEmail" />
-                  <ScalarProperty Name="FromId" ParameterName="FromId" />
-                  <ScalarProperty Name="ActorId" ParameterName="ActorId" />
                   <ResultBinding Name="Id" ColumnName="Id" />
                   <ResultBinding Name="CreatedUtc" ColumnName="CreatedUtc" />
                 </InsertFunction>
@@ -2534,6 +2486,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
           <EntitySetMapping Name="uvw_TextQueue">
             <EntityTypeMapping TypeName="IdentityModels.uvw_TextQueue">
               <MappingFragment StoreEntitySet="uvw_TextQueue">
+                <ScalarProperty Name="DeliveredUtc" ColumnName="DeliveredUtc" />
                 <ScalarProperty Name="SendAtUtc" ColumnName="SendAtUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="Body" ColumnName="Body" />
@@ -3381,6 +3334,59 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="uvw_EmailQueue">
+            <EntityTypeMapping TypeName="IdentityModels.uvw_EmailQueue">
+              <MappingFragment StoreEntitySet="uvw_EmailQueue">
+                <ScalarProperty Name="DeliveredUtc" ColumnName="DeliveredUtc" />
+                <ScalarProperty Name="SendAtUtc" ColumnName="SendAtUtc" />
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+                <ScalarProperty Name="Body" ColumnName="Body" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="ToDisplay" ColumnName="ToDisplay" />
+                <ScalarProperty Name="ToEmail" ColumnName="ToEmail" />
+                <ScalarProperty Name="ToId" ColumnName="ToId" />
+                <ScalarProperty Name="FromDisplay" ColumnName="FromDisplay" />
+                <ScalarProperty Name="FromEmail" ColumnName="FromEmail" />
+                <ScalarProperty Name="FromId" ColumnName="FromId" />
+                <ScalarProperty Name="ActorId" ColumnName="ActorId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+            <EntityTypeMapping TypeName="IdentityModels.uvw_EmailQueue">
+              <ModificationFunctionMapping>
+                <DeleteFunction FunctionName="IdentityModels.Store.usp_EmailQueue_Delete" >
+                  <ScalarProperty Name="Id" ParameterName="ID" />
+                </DeleteFunction>
+                <UpdateFunction FunctionName="IdentityModels.Store.usp_EmailQueue_Update">
+                  <ScalarProperty Name="SendAtUtc" ParameterName="SendAtUtc" Version="Current" />
+                  <ScalarProperty Name="Body" ParameterName="Body" Version="Current" />
+                  <ScalarProperty Name="Subject" ParameterName="Subject" Version="Current" />
+                  <ScalarProperty Name="ToDisplay" ParameterName="ToDisplay" Version="Current" />
+                  <ScalarProperty Name="ToEmail" ParameterName="ToEmail" Version="Current" />
+                  <ScalarProperty Name="ToId" ParameterName="ToId" Version="Current" />
+                  <ScalarProperty Name="FromDisplay" ParameterName="FromDisplay" Version="Current" />
+                  <ScalarProperty Name="FromEmail" ParameterName="FromEmail" Version="Current" />
+                  <ScalarProperty Name="FromId" ParameterName="FromId" Version="Current" />
+                  <ScalarProperty Name="ActorId" ParameterName="ActorId" Version="Current" />
+                  <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
+                </UpdateFunction>
+                <InsertFunction FunctionName="IdentityModels.Store.usp_EmailQueue_Insert">
+                  <ScalarProperty Name="SendAtUtc" ParameterName="SendAtUtc" />
+                  <ScalarProperty Name="Body" ParameterName="Body" />
+                  <ScalarProperty Name="Subject" ParameterName="Subject" />
+                  <ScalarProperty Name="ToDisplay" ParameterName="ToDisplay" />
+                  <ScalarProperty Name="ToEmail" ParameterName="ToEmail" />
+                  <ScalarProperty Name="ToId" ParameterName="ToId" />
+                  <ScalarProperty Name="FromDisplay" ParameterName="FromDisplay" />
+                  <ScalarProperty Name="FromEmail" ParameterName="FromEmail" />
+                  <ScalarProperty Name="FromId" ParameterName="FromId" />
+                  <ScalarProperty Name="ActorId" ParameterName="ActorId" />
+                  <ResultBinding Name="Id" ColumnName="Id" />
+                  <ResultBinding Name="CreatedUtc" ColumnName="CreatedUtc" />
+                </InsertFunction>
+              </ModificationFunctionMapping>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

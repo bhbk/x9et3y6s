@@ -31,7 +31,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public virtual DbSet<uvw_Audience> uvw_Audience { get; set; }
         public virtual DbSet<uvw_AudienceRole> uvw_AudienceRole { get; set; }
         public virtual DbSet<uvw_Claim> uvw_Claim { get; set; }
-        public virtual DbSet<uvw_EmailQueue> uvw_EmailQueue { get; set; }
         public virtual DbSet<uvw_Issuer> uvw_Issuer { get; set; }
         public virtual DbSet<uvw_Login> uvw_Login { get; set; }
         public virtual DbSet<uvw_MOTD> uvw_MOTD { get; set; }
@@ -42,6 +41,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
         public virtual DbSet<uvw_TextQueue> uvw_TextQueue { get; set; }
         public virtual DbSet<uvw_Url> uvw_Url { get; set; }
         public virtual DbSet<uvw_User> uvw_User { get; set; }
+        public virtual DbSet<uvw_EmailQueue> uvw_EmailQueue { get; set; }
     
         public virtual ObjectResult<usp_Activity_Delete_Result> usp_Activity_Delete(Nullable<System.Guid> iD)
         {
@@ -296,7 +296,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Delete_Result>("usp_EmailQueue_Delete", iDParameter);
         }
     
-        public virtual ObjectResult<usp_EmailQueue_Insert_Result> usp_EmailQueue_Insert(Nullable<System.Guid> actorId, Nullable<System.Guid> fromId, string fromEmail, string fromDisplay, Nullable<System.Guid> toId, string toEmail, string toDisplay, string subject, string htmlContent, string plaintextContent, Nullable<System.DateTimeOffset> sendAtUtc)
+        public virtual ObjectResult<usp_EmailQueue_Insert_Result> usp_EmailQueue_Insert(Nullable<System.Guid> actorId, Nullable<System.Guid> fromId, string fromEmail, string fromDisplay, Nullable<System.Guid> toId, string toEmail, string toDisplay, string subject, string body, Nullable<System.DateTimeOffset> sendAtUtc)
         {
             var actorIdParameter = actorId.HasValue ?
                 new ObjectParameter("ActorId", actorId) :
@@ -330,22 +330,18 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
                 new ObjectParameter("Subject", subject) :
                 new ObjectParameter("Subject", typeof(string));
     
-            var htmlContentParameter = htmlContent != null ?
-                new ObjectParameter("HtmlContent", htmlContent) :
-                new ObjectParameter("HtmlContent", typeof(string));
-    
-            var plaintextContentParameter = plaintextContent != null ?
-                new ObjectParameter("PlaintextContent", plaintextContent) :
-                new ObjectParameter("PlaintextContent", typeof(string));
+            var bodyParameter = body != null ?
+                new ObjectParameter("Body", body) :
+                new ObjectParameter("Body", typeof(string));
     
             var sendAtUtcParameter = sendAtUtc.HasValue ?
                 new ObjectParameter("SendAtUtc", sendAtUtc) :
                 new ObjectParameter("SendAtUtc", typeof(System.DateTimeOffset));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Insert_Result>("usp_EmailQueue_Insert", actorIdParameter, fromIdParameter, fromEmailParameter, fromDisplayParameter, toIdParameter, toEmailParameter, toDisplayParameter, subjectParameter, htmlContentParameter, plaintextContentParameter, sendAtUtcParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Insert_Result>("usp_EmailQueue_Insert", actorIdParameter, fromIdParameter, fromEmailParameter, fromDisplayParameter, toIdParameter, toEmailParameter, toDisplayParameter, subjectParameter, bodyParameter, sendAtUtcParameter);
         }
     
-        public virtual ObjectResult<usp_EmailQueue_Update_Result> usp_EmailQueue_Update(Nullable<System.Guid> id, Nullable<System.Guid> actorId, Nullable<System.Guid> fromId, string fromEmail, string fromDisplay, Nullable<System.Guid> toId, string toEmail, string toDisplay, string subject, string htmlContent, string plaintextContent, Nullable<System.DateTimeOffset> sentAtUtc)
+        public virtual ObjectResult<usp_EmailQueue_Update_Result> usp_EmailQueue_Update(Nullable<System.Guid> id, Nullable<System.Guid> actorId, Nullable<System.Guid> fromId, string fromEmail, string fromDisplay, Nullable<System.Guid> toId, string toEmail, string toDisplay, string subject, string body, Nullable<System.DateTimeOffset> sendAtUtc)
         {
             var idParameter = id.HasValue ?
                 new ObjectParameter("Id", id) :
@@ -383,19 +379,15 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models
                 new ObjectParameter("Subject", subject) :
                 new ObjectParameter("Subject", typeof(string));
     
-            var htmlContentParameter = htmlContent != null ?
-                new ObjectParameter("HtmlContent", htmlContent) :
-                new ObjectParameter("HtmlContent", typeof(string));
+            var bodyParameter = body != null ?
+                new ObjectParameter("Body", body) :
+                new ObjectParameter("Body", typeof(string));
     
-            var plaintextContentParameter = plaintextContent != null ?
-                new ObjectParameter("PlaintextContent", plaintextContent) :
-                new ObjectParameter("PlaintextContent", typeof(string));
+            var sendAtUtcParameter = sendAtUtc.HasValue ?
+                new ObjectParameter("SendAtUtc", sendAtUtc) :
+                new ObjectParameter("SendAtUtc", typeof(System.DateTimeOffset));
     
-            var sentAtUtcParameter = sentAtUtc.HasValue ?
-                new ObjectParameter("SentAtUtc", sentAtUtc) :
-                new ObjectParameter("SentAtUtc", typeof(System.DateTimeOffset));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Update_Result>("usp_EmailQueue_Update", idParameter, actorIdParameter, fromIdParameter, fromEmailParameter, fromDisplayParameter, toIdParameter, toEmailParameter, toDisplayParameter, subjectParameter, htmlContentParameter, plaintextContentParameter, sentAtUtcParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Update_Result>("usp_EmailQueue_Update", idParameter, actorIdParameter, fromIdParameter, fromEmailParameter, fromDisplayParameter, toIdParameter, toEmailParameter, toDisplayParameter, subjectParameter, bodyParameter, sendAtUtcParameter);
         }
     
         public virtual ObjectResult<usp_Issuer_Delete_Result> usp_Issuer_Delete(Nullable<System.Guid> iD)

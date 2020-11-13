@@ -1,6 +1,4 @@
-﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -13,24 +11,9 @@ namespace Bhbk.Lib.Identity.Factories
 {
     public class OAuth2JwtFactory : IOAuth2JwtFactory
     {
-        private readonly InstanceContext _instance;
-        private readonly string _type;
+        public const string _authType = "JWT";
 
-        public OAuth2JwtFactory()
-            : this(new ContextService(InstanceContext.DeployedOrLocal)) { }
-
-        public OAuth2JwtFactory(IContextService instance)
-        {
-            _instance = instance.InstanceType;
-
-            if (_instance == InstanceContext.DeployedOrLocal
-                || _instance == InstanceContext.End2EndTest
-                || _instance == InstanceContext.IntegrationTest)
-                _type = "JWT:" + _instance.ToString();
-
-            else
-                throw new NotImplementedException();
-        }
+        public OAuth2JwtFactory() { }
 
         public JwtSecurityToken ClientCredential(KeyValuePair<string, string> issuer, string issuerSalt,
             string audience, KeyValuePair<string, List<string>> claims)
@@ -55,7 +38,7 @@ namespace Bhbk.Lib.Identity.Factories
             claims.Add(new Claim(ClaimTypes.System, AudienceType.server.ToString()));
 
             var principal = new ClaimsPrincipal(
-                new ClaimsIdentity(claims, _type));
+                new ClaimsIdentity(claims, _authType));
 
             var result = new JwtSecurityTokenHandler().WriteToken(
                 new JwtSecurityToken(
@@ -93,7 +76,7 @@ namespace Bhbk.Lib.Identity.Factories
             claims.Add(new Claim(ClaimTypes.System, AudienceType.user_agent.ToString()));
 
             var principal = new ClaimsPrincipal(
-                new ClaimsIdentity(claims, _type));
+                new ClaimsIdentity(claims, _authType));
 
             string issuerResult = string.Empty;
 

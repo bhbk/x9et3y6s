@@ -13,7 +13,7 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
     public enum ActionType
     {
         Allow,
-        Deny
+        Deny,
     }
 
     public enum LoginType
@@ -43,8 +43,7 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
         ClaimImmutable,
         ClaimInvalid,
         ClaimNotFound,
-        EmailDequeueError,
-        EmailEnueueError,
+        EmailNotFound,
         IssuerAlreadyExists,
         IssuerImmutable,
         IssuerInvalid,
@@ -66,8 +65,7 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
         StateNotFound,
         StatePending,
         StateSlowDown,
-        TextDequeueError,
-        TextEnqueueError,
+        TextNotFound,
         TokenInvalid,
         UriInvalid,
         UriNotFound,
@@ -91,33 +89,24 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
         User,
     }
 
-    public enum TaskType
+    public enum WorkerType
     {
-        MaintainActivity,
-        MaintainQuotes,
-        MaintainRefreshes,
-        MaintainStates,
-        MaintainUsers,
-        QueueEmails,
-        QueueTexts
-    }
-
-    public enum GroupType
-    {
-        AdminJobs,
-        AlertJobs,
-        MeJobs,
-        StsJobs
+        AdminWorker,
+        AlertWorker,
+        MeWorker,
+        StsWorker,
     }
 
     public enum JobType
     {
-        AlertEmailJob,
-        AlertTextJob,
-        AdminActivityJob,
-        AdminUsersJob,
-        MeQuotesJob,
-        StsStatesJob,
-        StsRefreshesJob
+        CleanEmailsJob,
+        CleanTextsJob,
+        DequeueEmailsJob,
+        DequeueTextsJob,
+        MaintainActivityJob,
+        MaintainQuotesJob,
+        MaintainRefreshesJob,
+        MaintainStatesJob,
+        MaintainUsersJob,
     }
 }

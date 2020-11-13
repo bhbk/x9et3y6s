@@ -1,15 +1,14 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+﻿using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using Bhbk.Lib.Cryptography.Entropy;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
 {
@@ -43,9 +42,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                     FromEmail = user.EmailAddress,
                     ToId = user.Id,
                     ToEmail = user.EmailAddress,
-                    Subject = "Email Subject",
-                    PlaintextContent = "Email Message",
-                    SendAtUtc = DateTime.UtcNow,
+                    Subject = "Subject-" + AlphaNumeric.CreateString(4),
+                    Body = "Body" + AlphaNumeric.CreateString(4),
                 }));
             UoW.Commit();
 

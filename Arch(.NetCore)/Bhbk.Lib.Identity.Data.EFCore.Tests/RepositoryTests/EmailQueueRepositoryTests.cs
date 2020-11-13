@@ -45,7 +45,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
                     ToId = user.Id,
                     ToEmail = user.EmailAddress,
                     Subject = "Subject-" + Base64.CreateString(4),
-                    HtmlContent = "Body-" + Base64.CreateString(32),
+                    Body = "Body-" + Base64.CreateString(32),
                     SendAtUtc = DateTime.UtcNow,
                 }));
             UoW.Commit();

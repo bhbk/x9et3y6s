@@ -67,18 +67,16 @@ namespace Bhbk.WebApi.Identity.Admin
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
 
-                jobs.UseMicrosoftDependencyInjectionJobFactory(options =>
-                {
-                    options.AllowDefaultConstructor = false;
-                });
-
+                jobs.UseMicrosoftDependencyInjectionJobFactory();
                 jobs.UseSimpleTypeLoader();
                 jobs.UseInMemoryStore();
                 jobs.UseDefaultThreadPool();
 
+                //https://www.freeformatter.com/cron-expression-generator-quartz.html
+
                 if (bool.Parse(conf["Jobs:MaintainActivity:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.AdminActivityJob.ToString(), GroupType.AdminJobs.ToString());
+                    var jobKey = new JobKey(JobType.MaintainActivityJob.ToString(), WorkerType.AdminWorker.ToString());
                     jobs.AddJob<MaintainActivityJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
@@ -99,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin
 
                 if (bool.Parse(conf["Jobs:MaintainUsers:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.AdminUsersJob.ToString(), GroupType.AdminJobs.ToString());
+                    var jobKey = new JobKey(JobType.MaintainUsersJob.ToString(), WorkerType.AdminWorker.ToString());
                     jobs.AddJob<MaintainUsersJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)

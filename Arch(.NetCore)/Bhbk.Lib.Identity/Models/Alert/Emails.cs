@@ -25,15 +25,14 @@ namespace Bhbk.Lib.Identity.Models.Alert
         [Required]
         public string Subject { get; set; }
 
-        public string HtmlContent { get; set; }
-
-        public string PlaintextContent { get; set; }
+        public string Body { get; set; }
 
         [Required]
         public DateTimeOffset CreatedUtc { get; set; }
 
         [Required]
         public DateTimeOffset SendAtUtc { get; set; }
+        public Nullable<DateTimeOffset> DeliveredUtc { get; set; }
     }
 
     public class EmailV1 : Emails

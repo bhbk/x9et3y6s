@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure;
@@ -21,11 +20,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
         public BaseRepositoryTests()
         {
-            var file = Search.ByAssemblyInvocation("appsettings.json");
-
             var conf = (IConfiguration)new ConfigurationBuilder()
-                .SetBasePath(file.DirectoryName)
-                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
             var instance = new ContextService(InstanceContext.IntegrationTest);

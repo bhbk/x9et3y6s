@@ -29,7 +29,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public virtual DbSet<tbl_Audience> tbl_Audience { get; set; }
         public virtual DbSet<tbl_AudienceRole> tbl_AudienceRole { get; set; }
         public virtual DbSet<tbl_Claim> tbl_Claim { get; set; }
-        public virtual DbSet<tbl_EmailQueue> tbl_EmailQueue { get; set; }
         public virtual DbSet<tbl_Issuer> tbl_Issuer { get; set; }
         public virtual DbSet<tbl_Login> tbl_Login { get; set; }
         public virtual DbSet<tbl_MOTD> tbl_MOTD { get; set; }
@@ -38,11 +37,14 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public virtual DbSet<tbl_RoleClaim> tbl_RoleClaim { get; set; }
         public virtual DbSet<tbl_Setting> tbl_Setting { get; set; }
         public virtual DbSet<tbl_State> tbl_State { get; set; }
-        public virtual DbSet<tbl_TextQueue> tbl_TextQueue { get; set; }
         public virtual DbSet<tbl_Url> tbl_Url { get; set; }
         public virtual DbSet<tbl_User> tbl_User { get; set; }
         public virtual DbSet<tbl_UserClaim> tbl_UserClaim { get; set; }
         public virtual DbSet<tbl_UserLogin> tbl_UserLogin { get; set; }
         public virtual DbSet<tbl_UserRole> tbl_UserRole { get; set; }
+        public virtual DbSet<tbl_EmailQueue> tbl_EmailQueue { get; set; }
+        public virtual DbSet<tbl_TextQueue> tbl_TextQueue { get; set; }
+        public virtual DbSet<tbl_EmailActivity> tbl_EmailActivity { get; set; }
+        public virtual DbSet<tbl_TextActivity> tbl_TextActivity { get; set; }
     }
 }

@@ -3,9 +3,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Bhbk.Lib.Identity.Domain.Providers.Alert
 {
-    public class EmailProvider : BaseProvider
+    public class EnqueueProvider : BaseProvider
     {
-        public EmailProvider(IConfiguration conf, IContextService instance)
+        public EnqueueProvider(IConfiguration conf, IContextService instance)
             : base(conf, instance) { }
 
     }

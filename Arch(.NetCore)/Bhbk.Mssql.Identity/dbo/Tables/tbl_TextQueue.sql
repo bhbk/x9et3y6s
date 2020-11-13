@@ -8,9 +8,12 @@
     [Body]            VARCHAR (MAX)      NOT NULL,
     [CreatedUtc]      DATETIMEOFFSET (7) NOT NULL,
     [SendAtUtc]       DATETIMEOFFSET (7) NOT NULL,
+    [DeliveredUtc]    DATETIMEOFFSET (7) NULL,
     CONSTRAINT [PK_tbl_TextQueue] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_tbl_TextQueue_UserID] FOREIGN KEY ([FromId]) REFERENCES [dbo].[tbl_User] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 GO

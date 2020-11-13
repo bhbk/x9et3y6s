@@ -67,18 +67,16 @@ namespace Bhbk.WebApi.Identity.Sts
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
 
-                jobs.UseMicrosoftDependencyInjectionJobFactory(options =>
-                {
-                    options.AllowDefaultConstructor = false;
-                });
-
+                jobs.UseMicrosoftDependencyInjectionJobFactory();
                 jobs.UseSimpleTypeLoader();
                 jobs.UseInMemoryStore();
                 jobs.UseDefaultThreadPool();
 
+                //https://www.freeformatter.com/cron-expression-generator-quartz.html
+
                 if (bool.Parse(conf["Jobs:MaintainRefreshes:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.StsRefreshesJob.ToString(), GroupType.StsJobs.ToString());
+                    var jobKey = new JobKey(JobType.MaintainRefreshesJob.ToString(), WorkerType.StsWorker.ToString());
                     jobs.AddJob<MaintainRefreshesJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
@@ -99,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts
 
                 if (bool.Parse(conf["Jobs:MaintainStates:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.StsStatesJob.ToString(), GroupType.StsJobs.ToString());
+                    var jobKey = new JobKey(JobType.MaintainStatesJob.ToString(), WorkerType.StsWorker.ToString());
                     jobs.AddJob<MaintainStatesJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)

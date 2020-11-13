@@ -21,6 +21,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
         public virtual DbSet<tbl_Audience> tbl_Audiences { get; set; }
         public virtual DbSet<tbl_AudienceRole> tbl_AudienceRoles { get; set; }
         public virtual DbSet<tbl_Claim> tbl_Claims { get; set; }
+        public virtual DbSet<tbl_EmailActivity> tbl_EmailActivities { get; set; }
         public virtual DbSet<tbl_EmailQueue> tbl_EmailQueues { get; set; }
         public virtual DbSet<tbl_Issuer> tbl_Issuers { get; set; }
         public virtual DbSet<tbl_Login> tbl_Logins { get; set; }
@@ -30,6 +31,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
         public virtual DbSet<tbl_RoleClaim> tbl_RoleClaims { get; set; }
         public virtual DbSet<tbl_Setting> tbl_Settings { get; set; }
         public virtual DbSet<tbl_State> tbl_States { get; set; }
+        public virtual DbSet<tbl_TextActivity> tbl_TextActivities { get; set; }
         public virtual DbSet<tbl_TextQueue> tbl_TextQueues { get; set; }
         public virtual DbSet<tbl_Url> tbl_Urls { get; set; }
         public virtual DbSet<tbl_User> tbl_Users { get; set; }
@@ -153,6 +155,29 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .HasConstraintName("FK_tbl_Claim_IssuerID");
             });
 
+            modelBuilder.Entity<tbl_EmailActivity>(entity =>
+            {
+                entity.ToTable("tbl_EmailActivity");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_EmailActivity")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.SendgridId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SendgridStatus)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Email)
+                    .WithMany(p => p.tbl_EmailActivities)
+                    .HasForeignKey(d => d.EmailId)
+                    .HasConstraintName("FK_tbl_EmailActivity_EmailID");
+            });
+
             modelBuilder.Entity<tbl_EmailQueue>(entity =>
             {
                 entity.ToTable("tbl_EmailQueue");
@@ -162,6 +187,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.Body).IsUnicode(false);
+
                 entity.Property(e => e.FromDisplay)
                     .HasMaxLength(128)
                     .IsUnicode(false);
@@ -169,10 +196,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                 entity.Property(e => e.FromEmail)
                     .HasMaxLength(128)
                     .IsUnicode(false);
-
-                entity.Property(e => e.HtmlContent).IsUnicode(false);
-
-                entity.Property(e => e.PlaintextContent).IsUnicode(false);
 
                 entity.Property(e => e.Subject)
                     .IsRequired()
@@ -422,6 +445,33 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_tbl_State_UserID");
+            });
+
+            modelBuilder.Entity<tbl_TextActivity>(entity =>
+            {
+                entity.ToTable("tbl_TextActivity");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_TextActivity")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.TwilioMessage)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TwilioSid)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TwilioStatus)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Text)
+                    .WithMany(p => p.tbl_TextActivities)
+                    .HasForeignKey(d => d.TextId)
+                    .HasConstraintName("FK_tbl_TextActivity_TextID");
             });
 
             modelBuilder.Entity<tbl_TextQueue>(entity =>

@@ -66,11 +66,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 && string.IsNullOrEmpty(input.issuer_id))
             {
                 //really gross but needed for backward compatibility. can be lame if more than one issuer.
-                if (UoW.InstanceType == InstanceContext.DeployedOrLocal)
+                if (UoW.InstanceType == InstanceContext.DeployedOrLocal
+                    || UoW.InstanceType == InstanceContext.End2EndTest)
                     issuer = UoW.Issuers.Get(x => x.Name == Conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                         .Select(i => i.Value).First()).SingleOrDefault();
 
-                else if (UoW.InstanceType == InstanceContext.End2EndTest
+                else if (UoW.InstanceType == InstanceContext.SystemTest
                     || UoW.InstanceType == InstanceContext.IntegrationTest)
                     issuer = UoW.Issuers.Get(x => x.Name == Constants.TestIssuer).SingleOrDefault();
 
@@ -150,6 +151,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             switch (UoW.InstanceType)
             {
                 case InstanceContext.DeployedOrLocal:
+                case InstanceContext.End2EndTest:
                     {
                         //check if login provider is local...
                         if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
@@ -178,7 +180,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     }
                     break;
 
-                case InstanceContext.End2EndTest:
+                case InstanceContext.SystemTest:
                 case InstanceContext.IntegrationTest:
                     {
                         //check if login provider is local or test...
@@ -519,6 +521,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             switch (UoW.InstanceType)
             {
                 case InstanceContext.DeployedOrLocal:
+                case InstanceContext.End2EndTest:
                     {
                         //check if login provider is local...
                         if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
@@ -547,7 +550,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     }
                     break;
 
-                case InstanceContext.End2EndTest:
+                case InstanceContext.SystemTest:
                 case InstanceContext.IntegrationTest:
                     {
                         //check if login provider is local or test...

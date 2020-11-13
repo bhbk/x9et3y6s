@@ -471,7 +471,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testIssuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var testIssuer = uow.Issuers.GetAsNoTracking(x => x.Name == Constants.TestIssuer).Single();
                 testIssuer.Description += "(Updated)";
 
                 var result = await service.Issuer_UpdateV1(mapper.Map<IssuerV1>(testIssuer));

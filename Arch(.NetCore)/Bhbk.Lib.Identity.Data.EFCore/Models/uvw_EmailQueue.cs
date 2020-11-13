@@ -16,9 +16,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
         public string ToEmail { get; set; }
         public string ToDisplay { get; set; }
         public string Subject { get; set; }
-        public string HtmlContent { get; set; }
-        public string PlaintextContent { get; set; }
+        public string Body { get; set; }
         public DateTimeOffset CreatedUtc { get; set; }
         public DateTimeOffset SendAtUtc { get; set; }
+        public DateTimeOffset? DeliveredUtc { get; set; }
     }
 }

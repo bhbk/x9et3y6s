@@ -36,7 +36,6 @@ namespace Bhbk.Lib.Identity.Data.EF6.Infrastructure
             {
                 case InstanceContext.DeployedOrLocal:
                 case InstanceContext.End2EndTest:
-                case InstanceContext.IntegrationTest:
                     {
                         _context = new IdentityEntitiesFactory(connection).Create();
 #if !RELEASE
@@ -45,6 +44,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Infrastructure
                     }
                     break;
 
+                case InstanceContext.SystemTest:
+                case InstanceContext.IntegrationTest:
                 case InstanceContext.UnitTest:
                     {
                         _context = new IdentityEntitiesFactory(connection).Create();

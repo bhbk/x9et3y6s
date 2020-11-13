@@ -2,24 +2,17 @@
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
-using Twilio.Rest.Lookups.V1;
 
-namespace Bhbk.WebApi.Alert.Helpers
+namespace Bhbk.WebApi.Alert.Services
 {
     /*
      * https://www.twilio.com/docs
      */
-    public class TwilioProvider
+    public class TwilioService : ITwilioService
     {
         public async ValueTask<MessageResource> TryTextHandoff(string sid, string token, tbl_TextQueue model)
         {
             TwilioClient.Init(sid, token);
-
-            /*
-             * https://www.twilio.com/docs/lookup/quickstart
-             */
-            var lookup = PhoneNumberResource.Fetch(
-                pathPhoneNumber: new Twilio.Types.PhoneNumber(model.ToPhoneNumber));
 
             return await MessageResource.CreateAsync(
                 body: model.Body,

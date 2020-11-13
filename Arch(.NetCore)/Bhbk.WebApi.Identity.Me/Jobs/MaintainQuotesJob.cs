@@ -68,8 +68,11 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
             {
                 Log.Error(ex.ToString());
             }
+            finally
+            {
+                GC.Collect();
+            }
 
-            GC.Collect();
             Log.Information($"'{callPath}' completed");
             Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
 
@@ -80,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
 
-            Log.Error(callPath + " fail on " + DateTime.UtcNow.ToString()
+            Log.Error($"'{callPath}' fail on " + DateTime.UtcNow.ToString()
                 + Environment.NewLine + response.RequestMessage.ToString()
                 + Environment.NewLine + response.ToString());
         }
@@ -102,14 +105,14 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
                 if (string.IsNullOrEmpty(model.Author)
                     || string.IsNullOrEmpty(model.Quote))
                 {
-                    Log.Error($"{callPath} fail adding. Author:\"{model.Author}\" Quote:\"{model.Quote}\"");
+                    Log.Error($"'{callPath}' fail adding. Author:\"{model.Author}\" Quote:\"{model.Quote}\"");
                 }
                 else
                 {
                     uow.MOTDs.Create(model);
                     uow.Commit();
 
-                    Log.Information($"{callPath} success adding. Author:\"{model.Author}\" Quote:\"{model.Quote}\"");
+                    Log.Information($"'{callPath}' success adding. Author:\"{model.Author}\" Quote:\"{model.Quote}\"");
                 }
             }
             else if (motds.Count() == 1)
@@ -161,7 +164,7 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
                     uow.MOTDs.Update(motd);
                     uow.Commit();
 
-                    Log.Warning($"{callPath} success updating non-key(s). Author:\"{model.Author}\" Quote:\"{model.Quote}\"");
+                    Log.Warning($"'{callPath}' success updating non-key(s). Author:\"{model.Author}\" Quote:\"{model.Quote}\"");
                 }
             }
             else

@@ -107,6 +107,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
 
                 entity.ToView("uvw_EmailQueue", "svc");
 
+                entity.Property(e => e.Body).IsUnicode(false);
+
                 entity.Property(e => e.FromDisplay)
                     .HasMaxLength(128)
                     .IsUnicode(false);
@@ -114,10 +116,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                 entity.Property(e => e.FromEmail)
                     .HasMaxLength(128)
                     .IsUnicode(false);
-
-                entity.Property(e => e.HtmlContent).IsUnicode(false);
-
-                entity.Property(e => e.PlaintextContent).IsUnicode(false);
 
                 entity.Property(e => e.Subject)
                     .IsRequired()

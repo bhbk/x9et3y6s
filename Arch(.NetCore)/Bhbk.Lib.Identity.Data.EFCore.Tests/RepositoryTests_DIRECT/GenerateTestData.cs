@@ -3,7 +3,6 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -18,13 +17,11 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        private readonly ValidationHelper _validate;
 
         public GenerateTestData(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
             _mapper = mapper ?? throw new ArgumentNullException();
-            _validate = new ValidationHelper();
         }
 
         public void Create()
@@ -101,6 +98,42 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         IsDeletable = false,
                     }));
 
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.SettingAccessExpire,
+                        ConfigValue = 600.ToString(),
+                        IsDeletable = true,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.SettingRefreshExpire,
+                        ConfigValue = 86400.ToString(),
+                        IsDeletable = true,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.SettingTotpExpire,
+                        ConfigValue = 600.ToString(),
+                        IsDeletable = true,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = foundIssuer.Id,
+                        ConfigKey = Constants.SettingPollingMax,
+                        ConfigValue = 10.ToString(),
+                        IsDeletable = true,
+                    }));
+
                 _uow.Commit();
             }
 
@@ -122,8 +155,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         IsEnabled = true,
                         IsDeletable = false,
                     }));
-
-                _uow.Commit();
 
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activity>(new ActivityV1()
@@ -257,8 +288,6 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         IsDeletable = false,
                     }), Constants.TestUserPassCurrent);
 
-                _uow.Commit();
-
                 _uow.Activities.Create(
                     _mapper.Map<tbl_Activity>(new ActivityV1()
                     {
@@ -367,6 +396,42 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         IssuerKey = Constants.TestIssuerKey,
                         IsEnabled = true,
                         IsDeletable = false,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = issuer.Id,
+                        ConfigKey = Constants.SettingAccessExpire,
+                        ConfigValue = 600.ToString(),
+                        IsDeletable = true,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = issuer.Id,
+                        ConfigKey = Constants.SettingRefreshExpire,
+                        ConfigValue = 86400.ToString(),
+                        IsDeletable = true,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = issuer.Id,
+                        ConfigKey = Constants.SettingTotpExpire,
+                        ConfigValue = 600.ToString(),
+                        IsDeletable = true,
+                    }));
+
+                _uow.Settings.Create(
+                    _mapper.Map<tbl_Setting>(new SettingV1()
+                    {
+                        IssuerId = issuer.Id,
+                        ConfigKey = Constants.SettingPollingMax,
+                        ConfigValue = 10.ToString(),
+                        IsDeletable = true,
                     }));
 
                 _uow.Commit();
@@ -596,7 +661,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
                         ToId = foundUser.Id,
                         ToEmail = foundUser.EmailAddress,
                         Subject = "Subject-" + Base64.CreateString(4),
-                        HtmlContent = "Body-" + Base64.CreateString(32),
+                        Body = "Body-" + Base64.CreateString(32),
                         CreatedUtc = now,
                         SendAtUtc = now,
                     });

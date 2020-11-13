@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Common.FileSystem;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
@@ -33,14 +32,11 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            var file = Search.ByAssemblyInvocation("appsettings.json");
-
             var conf = (IConfiguration)new ConfigurationBuilder()
-                .SetBasePath(file.DirectoryName)
-                .AddJsonFile(file.Name, optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var instance = new ContextService(InstanceContext.End2EndTest);
+            var instance = new ContextService(InstanceContext.SystemTest);
             var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
 
             builder.ConfigureServices(sc =>

@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Claims_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
                 UoW.Claims.Update(new tbl_Claim());
                 UoW.Commit();

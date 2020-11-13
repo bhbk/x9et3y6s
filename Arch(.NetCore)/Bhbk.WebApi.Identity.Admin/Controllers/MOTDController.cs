@@ -131,7 +131,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var motd = UoW.MOTDs.Get(x => x.Id == model.globalId).SingleOrDefault();
+            var motd = UoW.MOTDs.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
+                .Where(x => x.Id == model.globalId).ToLambda()).SingleOrDefault();
 
             if (motd == null)
             {

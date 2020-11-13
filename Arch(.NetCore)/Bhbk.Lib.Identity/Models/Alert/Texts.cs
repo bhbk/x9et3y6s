@@ -28,6 +28,7 @@ namespace Bhbk.Lib.Identity.Models.Alert
 
         [Required]
         public DateTimeOffset SendAtUtc { get; set; }
+        public Nullable<DateTimeOffset> DeliveredUtc { get; set; }
     }
 
     public class TextV1 : Texts

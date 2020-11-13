@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Logins_UpdateV1_Fail()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<DbUpdateConcurrencyException>(() =>
             {
                 UoW.Logins.Update(new tbl_Login());
                 UoW.Commit();

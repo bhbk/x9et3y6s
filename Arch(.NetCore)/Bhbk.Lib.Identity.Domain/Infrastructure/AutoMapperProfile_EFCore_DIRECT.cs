@@ -66,6 +66,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
                 .ForMember(dest => dest.SendAtUtc, src => src.MapFrom(val => val.SendAtUtc == default ? DateTime.UtcNow : val.SendAtUtc))
+                .ForMember(dest => dest.tbl_EmailActivities, src => src.Ignore())
                 .ForMember(dest => dest.From, src => src.Ignore());
 
             CreateMap<tbl_EmailQueue, EmailV1>();
@@ -174,6 +175,7 @@ namespace Bhbk.Lib.Identity.Domain.Infrastructure
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
                 .ForMember(dest => dest.SendAtUtc, src => src.MapFrom(val => val.SendAtUtc == default ? DateTime.UtcNow : val.SendAtUtc))
+                .ForMember(dest => dest.tbl_TextActivities, src => src.Ignore())
                 .ForMember(dest => dest.From, src => src.Ignore());
 
             CreateMap<tbl_TextQueue, TextV1>();

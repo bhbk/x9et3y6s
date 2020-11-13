@@ -10,9 +10,8 @@ CREATE PROCEDURE [svc].[usp_EmailQueue_Update]
     ,@ToEmail               NVARCHAR (MAX) 
     ,@ToDisplay             NVARCHAR (MAX) 
     ,@Subject               NVARCHAR (MAX) 
-    ,@HtmlContent			NVARCHAR (MAX)
-    ,@PlaintextContent		NVARCHAR (MAX) 
-    ,@SentAtUtc             DATETIMEOFFSET (7) 
+    ,@Body      			NVARCHAR (MAX)
+    ,@SendAtUtc             DATETIMEOFFSET (7) 
 
 AS
 BEGIN
@@ -33,9 +32,8 @@ BEGIN
             ,ToEmail				= @ToEmail
             ,ToDisplay				= @ToDisplay
             ,Subject				= @Subject
-            ,HtmlContent			= @HtmlContent
-            ,PlaintextContent		= @PlaintextContent
-            ,SendAtUtc				= @SentAtUtc
+            ,Body       			= @Body
+            ,SendAtUtc				= @SendAtUtc
         WHERE Id = @Id
 
         SELECT * FROM [svc].[uvw_EmailQueue] WHERE [svc].[uvw_EmailQueue].Id = @Id

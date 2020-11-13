@@ -168,7 +168,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var role = UoW.Roles.Get(x => x.Id == model.Id)
+            var role = UoW.Roles.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
+                .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
             if (role == null)

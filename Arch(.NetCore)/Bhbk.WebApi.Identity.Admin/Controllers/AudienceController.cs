@@ -366,7 +366,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var audience = UoW.Audiences.Get(x => x.Id == model.Id)
+            var audience = UoW.Audiences.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+                .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
             if (audience == null)

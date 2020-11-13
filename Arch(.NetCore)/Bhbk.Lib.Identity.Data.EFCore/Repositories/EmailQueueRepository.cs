@@ -26,13 +26,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ToEmail", SqlDbType.NVarChar) { Value = entity.ToEmail },
                 new SqlParameter("@ToDisplay", SqlDbType.NVarChar) { Value = (object)entity.ToDisplay ?? DBNull.Value },
                 new SqlParameter("@Subject", SqlDbType.NVarChar) { Value = entity.Subject },
-                new SqlParameter("@HtmlContent", SqlDbType.NVarChar) { Value = (object)entity.HtmlContent ?? DBNull.Value },
-                new SqlParameter("@PlaintextContent", SqlDbType.NVarChar) { Value = (object)entity.PlaintextContent ?? DBNull.Value },
+                new SqlParameter("@Body", SqlDbType.NVarChar) { Value = (object)entity.Body ?? DBNull.Value },
                 new SqlParameter("@SentAtUtc", SqlDbType.DateTimeOffset) { Value = entity.SendAtUtc },
             };
 
             return _context.Set<uvw_EmailQueue>().FromSqlRaw("[svc].[usp_EmailQueue_Insert]"
-                + "@ActorId, @FromId, @FromEmail, @FromDisplay, @ToId, @ToEmail, @ToDisplay, @Subject, @HtmlContent, @PlaintextContent, @SentAtUtc", pvalues.ToArray())
+                + "@ActorId, @FromId, @FromEmail, @FromDisplay, @ToId, @ToEmail, @ToDisplay, @Subject, @Body, @SentAtUtc", pvalues.ToArray())
                     .AsEnumerable().Single();
 
             /*
@@ -104,13 +103,12 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
                 new SqlParameter("@ToEmail", SqlDbType.NVarChar) { Value = entity.ToEmail },
                 new SqlParameter("@ToDisplay", SqlDbType.NVarChar) { Value = (object)entity.ToDisplay ?? DBNull.Value },
                 new SqlParameter("@Subject", SqlDbType.NVarChar) { Value = entity.Subject },
-                new SqlParameter("@HtmlContent", SqlDbType.NVarChar) { Value = (object)entity.HtmlContent ?? DBNull.Value },
-                new SqlParameter("@PlaintextContent", SqlDbType.NVarChar) { Value = (object)entity.PlaintextContent ?? DBNull.Value },
+                new SqlParameter("@Body", SqlDbType.NVarChar) { Value = (object)entity.Body ?? DBNull.Value },
                 new SqlParameter("@SentAtUtc", SqlDbType.DateTimeOffset) { Value = entity.SendAtUtc },
             };
 
             return _context.Set<uvw_EmailQueue>().FromSqlRaw("[svc].[usp_EmailQueue_Update]"
-                + "@Id, @ActorId, @FromId, @FromEmail, @FromDisplay, @ToId, @ToEmail, @ToDisplay, @Subject, @HtmlContent, @PlaintextContent, @SentAtUtc", pvalues.ToArray())
+                + "@Id, @ActorId, @FromId, @FromEmail, @FromDisplay, @ToId, @ToEmail, @ToDisplay, @Subject, @Body, @SentAtUtc", pvalues.ToArray())
                     .AsEnumerable().Single();
         }
 

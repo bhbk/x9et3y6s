@@ -67,18 +67,16 @@ namespace Bhbk.WebApi.Identity.Me
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
 
-                jobs.UseMicrosoftDependencyInjectionJobFactory(options =>
-                {
-                    options.AllowDefaultConstructor = false;
-                });
-
+                jobs.UseMicrosoftDependencyInjectionJobFactory();
                 jobs.UseSimpleTypeLoader();
                 jobs.UseInMemoryStore();
                 jobs.UseDefaultThreadPool();
 
+                //https://www.freeformatter.com/cron-expression-generator-quartz.html
+
                 if (bool.Parse(conf["Jobs:MaintainQuotes:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.MeQuotesJob.ToString(), GroupType.MeJobs.ToString());
+                    var jobKey = new JobKey(JobType.MaintainQuotesJob.ToString(), WorkerType.MeWorker.ToString());
                     jobs.AddJob<MaintainQuotesJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)

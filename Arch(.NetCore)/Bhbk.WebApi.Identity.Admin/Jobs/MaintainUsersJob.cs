@@ -42,10 +42,8 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                         uow.Users.Delete(disabled);
                         uow.Commit();
 
-                        var msg = callPath + " success on " + DateTime.UtcNow.ToString() + ". Enabled "
-                                + disabledCount.ToString() + " users with expired lock-outs.";
-
-                        Log.Information(msg);
+                        Log.Information($"'{callPath}' success on " + DateTime.UtcNow.ToString() + ". Enabled "
+                            + disabledCount.ToString() + " users with expired lock-outs.");
                     }
                 }
             }
@@ -53,8 +51,11 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
             {
                 Log.Error(ex.ToString());
             }
+            finally
+            {
+                GC.Collect();
+            }
 
-            GC.Collect();
             Log.Information($"'{callPath}' completed");
             Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
 
