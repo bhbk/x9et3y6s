@@ -5,7 +5,7 @@ using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Primitives;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;

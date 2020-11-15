@@ -15,6 +15,7 @@ using System.Linq.Dynamic.Core;
 using System.Net;
 #endif
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Bhbk.WebApi.Alert.Jobs
 {
@@ -22,14 +23,14 @@ namespace Bhbk.WebApi.Alert.Jobs
     public class DequeueEmailsJob : IJob
     {
         private readonly IServiceScopeFactory _factory;
-        private const string _callPath = "DequeueEmailsJob.Execute";
 
         public DequeueEmailsJob(IServiceScopeFactory factory) => _factory = factory;
 
-        public async Task Execute(IJobExecutionContext context)
+        public Task Execute(IJobExecutionContext context)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
 #if !RELEASE
-            Log.Information($"'{_callPath}' running");
+            Log.Information($"'{callPath}' running");
 #endif
             try
             {
@@ -39,7 +40,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var sendgrid = scope.ServiceProvider.GetRequiredService<ISendgridService>();
 
-                    await DoDequeueWork(conf, uow, sendgrid);
+                    DoDequeueWork(conf, uow, sendgrid);
                 }
             }
             catch (Exception ex)
@@ -51,13 +52,15 @@ namespace Bhbk.WebApi.Alert.Jobs
                 GC.Collect();
             }
 #if !RELEASE
-            Log.Information($"'{_callPath}' completed");
-            Log.Information($"'{_callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
+            Log.Information($"'{callPath}' completed");
+            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
 #endif
+            return Task.CompletedTask;
         }
 
-        private async ValueTask DoDequeueWork(IConfiguration conf, IUnitOfWork uow, ISendgridService sendgrid)
+        private void DoDequeueWork(IConfiguration conf, IUnitOfWork uow, ISendgridService sendgrid)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
             var sendgridApiKey = conf["Jobs:DequeueEmails:SendgridApiKey"];
 
             foreach (var msg in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>()
@@ -69,7 +72,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                     case InstanceContext.End2EndTest:
                         {
 #if RELEASE
-                            var response = await sendgrid.TryEmailHandoff(sendgridApiKey, msg);
+                            var response = sendgrid.TryEmailHandoff(sendgridApiKey, msg).Result;
 
                             if (response.StatusCode == HttpStatusCode.Accepted)
                             {
@@ -86,7 +89,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                                 msg.DeliveredUtc = DateTime.UtcNow;
                                 uow.EmailQueue.Update(msg);
 
-                                Log.Information($"'{_callPath}' hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
+                                Log.Information($"'{callPath}' hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
                             }
                             else
                             {
@@ -99,14 +102,14 @@ namespace Bhbk.WebApi.Alert.Jobs
                                         StatusAtUtc = DateTime.UtcNow,
                                     });
 
-                                Log.Warning($"'{_callPath}' hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
+                                Log.Warning($"'{callPath}' hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
                                         "Error=" + response.StatusCode);
                             }
 #elif !RELEASE
                             msg.DeliveredUtc = DateTime.UtcNow;
                             uow.EmailQueue.Update(msg);
 
-                            Log.Information($"'{_callPath}' fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
+                            Log.Information($"'{callPath}' fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                         }
                         break;
@@ -116,7 +119,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                             msg.DeliveredUtc = DateTime.UtcNow;
                             uow.EmailQueue.Update(msg);
 
-                            Log.Information($"'{_callPath}' fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
+                            Log.Information($"'{callPath}' fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
                         }
                         break;
                 }

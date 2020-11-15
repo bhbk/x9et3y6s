@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;

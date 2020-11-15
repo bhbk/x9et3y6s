@@ -24,7 +24,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public Nullable<System.Guid> ActorId { get; set; }
         public Nullable<System.Guid> FromId { get; set; }
         public string FromPhoneNumber { get; set; }
-        public System.Guid ToId { get; set; }
+        public Nullable<System.Guid> ToId { get; set; }
         public string ToPhoneNumber { get; set; }
         public string Body { get; set; }
         public System.DateTimeOffset CreatedUtc { get; set; }

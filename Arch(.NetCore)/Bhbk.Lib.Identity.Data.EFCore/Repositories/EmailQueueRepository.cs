@@ -19,10 +19,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@FromId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@FromEmail", SqlDbType.NVarChar) { Value = (object)entity.FromEmail ?? DBNull.Value },
+                new SqlParameter("@FromId", SqlDbType.UniqueIdentifier) { Value = entity.FromId.HasValue ? (object)entity.FromId.Value : DBNull.Value },
+                new SqlParameter("@FromEmail", SqlDbType.NVarChar) { Value = entity.FromEmail },
                 new SqlParameter("@FromDisplay", SqlDbType.NVarChar) { Value = (object)entity.FromDisplay ?? DBNull.Value },
-                new SqlParameter("@ToId", SqlDbType.UniqueIdentifier) { Value = entity.ToId },
+                new SqlParameter("@ToId", SqlDbType.UniqueIdentifier) { Value = entity.ToId.HasValue ? (object)entity.ToId.Value : DBNull.Value },
                 new SqlParameter("@ToEmail", SqlDbType.NVarChar) { Value = entity.ToEmail },
                 new SqlParameter("@ToDisplay", SqlDbType.NVarChar) { Value = (object)entity.ToDisplay ?? DBNull.Value },
                 new SqlParameter("@Subject", SqlDbType.NVarChar) { Value = entity.Subject },
@@ -96,10 +96,10 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             {
                 new SqlParameter("@Id", SqlDbType.UniqueIdentifier) { Value = entity.Id },
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@FromId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@FromEmail", SqlDbType.NVarChar) { Value = (object)entity.FromEmail ?? DBNull.Value },
+                new SqlParameter("@FromId", SqlDbType.UniqueIdentifier) { Value = entity.FromId.HasValue ? (object)entity.FromId.Value : DBNull.Value },
+                new SqlParameter("@FromEmail", SqlDbType.NVarChar) { Value = entity.FromEmail },
                 new SqlParameter("@FromDisplay", SqlDbType.NVarChar) { Value = (object)entity.FromDisplay ?? DBNull.Value },
-                new SqlParameter("@ToId", SqlDbType.UniqueIdentifier) { Value = entity.ToId },
+                new SqlParameter("@ToId", SqlDbType.UniqueIdentifier) { Value = entity.ToId.HasValue ? (object)entity.ToId.Value : DBNull.Value },
                 new SqlParameter("@ToEmail", SqlDbType.NVarChar) { Value = entity.ToEmail },
                 new SqlParameter("@ToDisplay", SqlDbType.NVarChar) { Value = (object)entity.ToDisplay ?? DBNull.Value },
                 new SqlParameter("@Subject", SqlDbType.NVarChar) { Value = entity.Subject },

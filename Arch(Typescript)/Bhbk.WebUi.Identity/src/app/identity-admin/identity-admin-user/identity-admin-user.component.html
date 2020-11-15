@@ -1,0 +1,23 @@
+
+<div>
+  <form novalidate #userForm="ngForm">
+    <kendo-grid
+      [data]="userData"
+      [loading]="userLoading"
+      [pageable]="true"
+      [pageSize]="userState.take"
+      [skip]="userState.skip"
+      [sortable]="true"
+      [sort]="userState.sort"
+      (pageChange)="pageChange($event)"
+      (dataStateChange)="dataStateChange($event)">
+      <kendo-grid-column field="email" title="Email"></kendo-grid-column>
+      <kendo-grid-column field="phoneNumber" title="Phone Number"></kendo-grid-column>
+      <kendo-grid-column field="firstName" title="First Name"></kendo-grid-column>
+      <kendo-grid-column field="lastName" title="Last Name"></kendo-grid-column>
+      <kendo-grid-column field="created" title="Created"></kendo-grid-column>
+      <kendo-grid-column field="lastUpdated" title="Last Updated"></kendo-grid-column>
+      <kendo-grid-column field="immutable" title="Immutable" [width]="125"></kendo-grid-column>
+    </kendo-grid>
+  </form>
+</div>

@@ -1,0 +1,16 @@
+
+<div>
+  <form novalidate #activityForm="ngForm">
+    <kendo-grid
+      [data]="activityData"
+      [loading]="activityLoading"
+      [pageable]="true" [pageSize]="activityState.take" [skip]="activityState.skip"
+      [sortable]="true" [sort]="activityState.sort"
+      (pageChange)="pageChange($event)"
+      (dataStateChange)="dataStateChange($event)">
+      <kendo-grid-column field="created" title="Created" filter="date" [format]="{ datetime: 'medium' }"></kendo-grid-column>
+      <kendo-grid-column field="activityType" title="Activity" filter="date" [format]="{ datetime: 'medium' }"></kendo-grid-column>
+      <kendo-grid-column field="immutable" title="Immutable" [width]="125"></kendo-grid-column>
+    </kendo-grid>
+  </form>
+</div>

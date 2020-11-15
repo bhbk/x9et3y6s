@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Data.EFCore.Primitives;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;

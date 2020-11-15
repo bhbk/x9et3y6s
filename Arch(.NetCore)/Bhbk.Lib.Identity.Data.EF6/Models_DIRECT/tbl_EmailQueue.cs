@@ -25,7 +25,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Models_DIRECT
         public Nullable<System.Guid> FromId { get; set; }
         public string FromEmail { get; set; }
         public string FromDisplay { get; set; }
-        public System.Guid ToId { get; set; }
+        public Nullable<System.Guid> ToId { get; set; }
         public string ToEmail { get; set; }
         public string ToDisplay { get; set; }
         public string Subject { get; set; }

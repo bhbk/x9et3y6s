@@ -19,9 +19,9 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Repositories
             var pvalues = new List<SqlParameter>
             {
                 new SqlParameter("@ActorId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@FromId", SqlDbType.UniqueIdentifier) { Value = entity.ActorId.HasValue ? (object)entity.ActorId.Value : DBNull.Value },
-                new SqlParameter("@FromPhoneNumber", SqlDbType.NVarChar) { Value = (object)entity.FromPhoneNumber ?? DBNull.Value },
-                new SqlParameter("@ToId", SqlDbType.UniqueIdentifier) { Value = entity.ToId },
+                new SqlParameter("@FromId", SqlDbType.UniqueIdentifier) { Value = entity.FromId.HasValue ? (object)entity.FromId.Value : DBNull.Value },
+                new SqlParameter("@FromPhoneNumber", SqlDbType.NVarChar) { Value = entity.FromPhoneNumber },
+                new SqlParameter("@ToId", SqlDbType.UniqueIdentifier) { Value = entity.ToId.HasValue ? (object)entity.ToId.Value : DBNull.Value },
                 new SqlParameter("@ToPhoneNumber", SqlDbType.NVarChar) { Value = entity.ToPhoneNumber },
                 new SqlParameter("@Body", SqlDbType.NVarChar) { Value = entity.Body },
                 new SqlParameter("@SentAtUtc", SqlDbType.DateTimeOffset) { Value = entity.SendAtUtc },

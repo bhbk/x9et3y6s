@@ -3,7 +3,7 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Domain.Authorize;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Primitives;
@@ -77,15 +77,15 @@ namespace Bhbk.WebApi.Alert
 
                 //https://www.freeformatter.com/cron-expression-generator-quartz.html
 
-                if (bool.Parse(conf["Jobs:CleanEmails:Enable"]))
+                if (bool.Parse(conf["Jobs:CleanupEmails:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.CleanEmailsJob.ToString(), WorkerType.AlertWorker.ToString());
-                    jobs.AddJob<CleanEmailsJob>(opt => opt
+                    var jobKey = new JobKey(JobType.CleanupEmailsJob.ToString(), WorkerType.AlertWorker.ToString());
+                    jobs.AddJob<CleanupEmailsJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:CleanEmails:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:CleanupEmails:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
@@ -98,15 +98,15 @@ namespace Bhbk.WebApi.Alert
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:CleanTexts:Enable"]))
+                if (bool.Parse(conf["Jobs:CleanupTexts:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.CleanTextsJob.ToString(), WorkerType.AlertWorker.ToString());
-                    jobs.AddJob<CleanTextsJob>(opt => opt
+                    var jobKey = new JobKey(JobType.CleanupTextsJob.ToString(), WorkerType.AlertWorker.ToString());
+                    jobs.AddJob<CleanupTextsJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:CleanTexts:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:CleanupTexts:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
@@ -229,8 +229,6 @@ namespace Bhbk.WebApi.Alert
 #endif
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
-                    //AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
-                    //ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                     ValidAudiences = audiences.ToArray(),
@@ -242,7 +240,6 @@ namespace Bhbk.WebApi.Alert
                     RequireAudience = true,
                     RequireExpirationTime = true,
                     RequireSignedTokens = true,
-                    ClockSkew = TimeSpan.Zero,
                 };
             });
             sc.AddAuthorization(opt =>

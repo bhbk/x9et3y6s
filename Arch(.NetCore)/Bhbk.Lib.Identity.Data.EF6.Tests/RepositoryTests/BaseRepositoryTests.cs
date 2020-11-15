@@ -3,7 +3,7 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EF6.Infrastructure;
 using Bhbk.Lib.Identity.Data.EF6.Tests.Helpers;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Profiles;
 using Microsoft.Extensions.Configuration;
 using System;
 using Xunit;

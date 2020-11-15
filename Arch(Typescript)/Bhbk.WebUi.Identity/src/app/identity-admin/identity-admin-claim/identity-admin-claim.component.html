@@ -1,0 +1,20 @@
+
+<div>
+  <form novalidate #claimForm="ngForm">
+    <kendo-grid
+      [data]="claimData"
+      [loading]="claimLoading"
+      [pageable]="true"
+      [pageSize]="claimState.take"
+      [skip]="claimState.skip"
+      [sortable]="true"
+      [sort]="claimState.sort"
+      (pageChange)="pageChange($event)"
+      (dataStateChange)="dataStateChange($event)">
+      <kendo-grid-column field="subject" title="Subject"></kendo-grid-column>
+      <kendo-grid-column field="type" title="Type"></kendo-grid-column>
+      <kendo-grid-column field="value" title="Value"></kendo-grid-column>
+      <kendo-grid-column field="immutable" title="Immutable" [width]="125"></kendo-grid-column>
+    </kendo-grid>
+  </form>
+</div>

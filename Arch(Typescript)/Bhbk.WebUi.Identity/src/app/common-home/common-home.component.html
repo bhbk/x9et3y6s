@@ -1,0 +1,14 @@
+
+<div>
+  All info in Identity for me...
+  <ul *ngIf="currentUserDetail">
+      <li>{{currentUserDetail.email}}</li>
+      <li>{{currentUserDetail.firstName}} {{currentUserDetail.lastName}}</li>
+      <li *ngFor="let role of currentUserDetail.roles">{{role.name}}</li>
+      <li *ngFor="let login of currentUserDetail.logins">{{login.name}}</li>
+  </ul>
+  <!-- <ul *ngIf="currentUser">
+      <li *ngFor="let claim of JWTDecode(currentUser)">{{claim.type}}:{{claim.value}}</li>
+      <li>{{currentUser.access_token}}</li>
+  </ul> -->
+</div>

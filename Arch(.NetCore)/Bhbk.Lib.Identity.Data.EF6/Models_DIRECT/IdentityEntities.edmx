@@ -87,9 +87,9 @@
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
           <Property Name="FromId" Type="uniqueidentifier" />
-          <Property Name="FromEmail" Type="varchar" MaxLength="128" />
+          <Property Name="FromEmail" Type="varchar" MaxLength="128" Nullable="false" />
           <Property Name="FromDisplay" Type="varchar" MaxLength="128" />
-          <Property Name="ToId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ToId" Type="uniqueidentifier" />
           <Property Name="ToEmail" Type="varchar" MaxLength="128" Nullable="false" />
           <Property Name="ToDisplay" Type="varchar" MaxLength="128" />
           <Property Name="Subject" Type="varchar" MaxLength="256" Nullable="false" />
@@ -228,8 +228,8 @@
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ActorId" Type="uniqueidentifier" />
           <Property Name="FromId" Type="uniqueidentifier" />
-          <Property Name="FromPhoneNumber" Type="varchar" MaxLength="15" />
-          <Property Name="ToId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FromPhoneNumber" Type="varchar" MaxLength="15" Nullable="false" />
+          <Property Name="ToId" Type="uniqueidentifier" />
           <Property Name="ToPhoneNumber" Type="varchar" MaxLength="15" Nullable="false" />
           <Property Name="Body" Type="varchar(max)" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
@@ -1708,9 +1708,9 @@
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
           <Property Name="FromId" Type="Guid" />
-          <Property Name="FromEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="FromEmail" Type="String" MaxLength="128" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="FromDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="ToId" Type="Guid" Nullable="false" />
+          <Property Name="ToId" Type="Guid" />
           <Property Name="ToEmail" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
           <Property Name="ToDisplay" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
           <Property Name="Subject" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
@@ -1728,8 +1728,8 @@
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="ActorId" Type="Guid" />
           <Property Name="FromId" Type="Guid" />
-          <Property Name="FromPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="ToId" Type="Guid" Nullable="false" />
+          <Property Name="FromPhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ToId" Type="Guid" />
           <Property Name="ToPhoneNumber" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
           <Property Name="Body" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />

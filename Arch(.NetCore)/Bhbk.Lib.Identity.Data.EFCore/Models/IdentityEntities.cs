@@ -114,6 +114,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.FromEmail)
+                    .IsRequired()
                     .HasMaxLength(128)
                     .IsUnicode(false);
 
@@ -270,6 +271,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.FromPhoneNumber)
+                    .IsRequired()
                     .HasMaxLength(15)
                     .IsUnicode(false);
 

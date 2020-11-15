@@ -1,6 +1,10 @@
 
 before_script:
     - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
+    - powershell -command "& { if (test-path ..\.node_modules-x9et3y6s) { move-item ..\.node_modules-x9et3y6s .\node_modules } }"
+
+after_script:
+    - powershell -command "& { if (test-path .\node_modules) { move-item .\node_modules ..\.node_modules-x9et3y6s } }"
 
 stages:
     - build
@@ -12,25 +16,38 @@ build:
   only:
     - dummy
   script:
-    - cd ..\Arch(.NetCore)
+    - pushd Arch(.NetCore)
     - nuget restore Bhbk.Lib.Identity.Data.EF6\Bhbk.Lib.Identity.Data.EF6.csproj -SolutionDirectory . -Verbosity quiet
-    - dotnet restore Bhbk.WebApi.Identity.sln --no-cache --verbosity minimal
-    - dotnet build Bhbk.WebApi.Identity.sln --configuration Release --verbosity minimal /p:platform=x64
+    - dotnet restore Bhbk.Identity.sln --no-cache --verbosity quiet
+    - dotnet build Bhbk.Identity.sln --configuration Release --verbosity quiet /p:platform=x64
+    - popd
+    - pushd Arch(Typescript)\Bhbk.WebUi.Identity
+    - call "%PROGRAMFILES%\nodejs\npm" config set registry https://registry.npmjs.org/
+    - call "%PROGRAMFILES%\nodejs\npm" prune 
+    - call "%PROGRAMFILES%\nodejs\npm" cache verify
+    - call "%PROGRAMFILES%\nodejs\npm" install --silent
+    - call "%APPDATA%\npm\ng" build --prod --base-href /ui/identity/ --no-progress
+    - popd
 
 test:
   stage: test
   only:
     - dummy
   script:
-    - cd ..\Arch(.NetCore)
+    - pushd Arch(.NetCore)
     - nuget restore Bhbk.Lib.Identity.Data.EF6\Bhbk.Lib.Identity.Data.EF6.csproj -SolutionDirectory . -Verbosity quiet
-    - dotnet restore Bhbk.WebApi.Identity.sln --no-cache --verbosity quiet
-    - dotnet build Bhbk.WebApi.Identity.sln --configuration Release --verbosity quiet /p:platform=x64
-    - dotnet test Bhbk.Lib.Identity.Domain.Tests\Bhbk.Lib.Identity.Domain.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
+    - dotnet restore Bhbk.Identity.sln --no-cache --verbosity quiet
+    - dotnet build Bhbk.Identity.sln --configuration Release --verbosity quiet /p:platform=x64
+    - dotnet test Bhbk.Lib.Identity.Data.EF6.Tests\Bhbk.Lib.Identity.Data.EF6.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
+    - dotnet test Bhbk.Lib.Identity.Data.EFCore.Tests\Bhbk.Lib.Identity.Data.EFCore.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
     - dotnet test Bhbk.WebApi.Alert.Tests\Bhbk.WebApi.Alert.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
     - dotnet test Bhbk.WebApi.Identity.Admin.Tests\Bhbk.WebApi.Identity.Admin.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
     - dotnet test Bhbk.WebApi.Identity.Me.Tests\Bhbk.WebApi.Identity.Me.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
     - dotnet test Bhbk.WebApi.Identity.Sts.Tests\Bhbk.WebApi.Identity.Sts.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
+    - popd
+    - pushd Arch(Typescript)\Bhbk.WebUi.Identity
+    - call "%APPDATA%\npm\ng" test --browsers ChromeHeadless --watch=false
+    - popd
 
 deploy:
   stage: deploy
@@ -38,23 +55,27 @@ deploy:
     - dummy
   script:
     - set VERSION=2020.11.12.1900
-    - cd ..\Arch(.NetCore)
+    - pushd Arch(.NetCore)
     - nuget restore Bhbk.Lib.Identity.Data.EF6\Bhbk.Lib.Identity.Data.EF6.csproj -SolutionDirectory . -Verbosity quiet
-    - dotnet restore Bhbk.WebApi.Identity.sln --no-cache --verbosity quiet
-    - dotnet build Bhbk.WebApi.Identity.sln --configuration Release --verbosity quiet /p:platform=x64
+    - dotnet restore Bhbk.Identity.sln --no-cache --verbosity quiet
+    - dotnet build Bhbk.Identity.sln --configuration Release --verbosity quiet /p:platform=x64
     - dotnet pack Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj -p:PackageVersion=%VERSION% --output . --configuration Release /p:platform=x64
-    - dotnet publish Bhbk.Cli.Alert\Bhbk.Cli.Alert.csproj --output Bhbk.Cli.Alert\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
-    - dotnet publish Bhbk.Cli.Identity\Bhbk.Cli.Identity.csproj --output Bhbk.Cli.Identity\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
-    - dotnet publish Bhbk.WebApi.Alert\Bhbk.WebApi.Alert.csproj --output Bhbk.WebApi.Alert\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
-    - dotnet publish Bhbk.WebApi.Identity.Admin\Bhbk.WebApi.Identity.Admin.csproj --output Bhbk.WebApi.Identity.Admin\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
-    - dotnet publish Bhbk.WebApi.Identity.Me\Bhbk.WebApi.Identity.Me.csproj --output Bhbk.WebApi.Identity.Me\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
-    - dotnet publish Bhbk.WebApi.Identity.Sts\Bhbk.WebApi.Identity.Sts.csproj --output Bhbk.WebApi.Identity.Sts\bin\Release\netcoreapp3.1\publish --configuration Release /p:platform=x64
-    - dotnet octo pack --id=Bhbk.Cli.Alert --version=%VERSION% --basePath=Bhbk.Cli.Alert\bin\Release\netcoreapp3.1\publish --outFolder=.
-    - dotnet octo pack --id=Bhbk.Cli.Identity --version=%VERSION% --basePath=Bhbk.Cli.Identity\bin\Release\netcoreapp3.1\publish --outFolder=.
-    - dotnet octo pack --id=Bhbk.WebApi.Alert --version=%VERSION% --basePath=Bhbk.WebApi.Alert\bin\Release\netcoreapp3.1\publish --outFolder=.
-    - dotnet octo pack --id=Bhbk.WebApi.Identity.Admin --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Admin\bin\Release\netcoreapp3.1\publish --outFolder=.
-    - dotnet octo pack --id=Bhbk.WebApi.Identity.Me --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Me\bin\Release\netcoreapp3.1\publish --outFolder=.
-    - dotnet octo pack --id=Bhbk.WebApi.Identity.Sts --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Sts\bin\Release\netcoreapp3.1\publish --outFolder=.
-    - cd ..
+    - dotnet publish Bhbk.Cli.Alert\Bhbk.Cli.Alert.csproj --output Bhbk.Cli.Alert\bin\x64\Release\net5.0\publish\ --configuration Release /p:platform=x64
+    - dotnet publish Bhbk.Cli.Identity\Bhbk.Cli.Identity.csproj --output Bhbk.Cli.Identity\bin\x64\Release\net5.0\publish\ --configuration Release /p:platform=x64
+    - dotnet publish Bhbk.WebApi.Alert\Bhbk.WebApi.Alert.csproj --output Bhbk.WebApi.Alert\bin\x64\Release\net5.0\publish\ --configuration Release /p:platform=x64
+    - dotnet publish Bhbk.WebApi.Identity.Admin\Bhbk.WebApi.Identity.Admin.csproj --output Bhbk.WebApi.Identity.Admin\bin\x64\Release\net5.0\publish\ --configuration Release /p:platform=x64
+    - dotnet publish Bhbk.WebApi.Identity.Me\Bhbk.WebApi.Identity.Me.csproj --output Bhbk.WebApi.Identity.Me\bin\x64\Release\net5.0\publish\ --configuration Release /p:platform=x64
+    - dotnet publish Bhbk.WebApi.Identity.Sts\Bhbk.WebApi.Identity.Sts.csproj --output Bhbk.WebApi.Identity.Sts\bin\x64\Release\net5.0\publish\ --configuration Release /p:platform=x64
+    - dotnet octo pack --id=Bhbk.Cli.Alert --version=%VERSION% --basePath=Bhbk.Cli.Alert\bin\x64\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.Cli.Identity --version=%VERSION% --basePath=Bhbk.Cli.Identity\bin\x64\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.WebApi.Alert --version=%VERSION% --basePath=Bhbk.WebApi.Alert\bin\x64\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.WebApi.Identity.Admin --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Admin\bin\x64\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.WebApi.Identity.Me --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Me\bin\x64\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.WebApi.Identity.Sts --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Sts\bin\x64\Release\net5.0\publish\ --outFolder=. --overwrite
+    - popd
+    - pushd Arch(Typescript)
+    - dotnet octo pack --id=Bhbk.WebUi.Identity --version=%VERSION% --basePath=Bhbk.WebUi.Identity\dist --outFolder=. --overwrite
+    - popd
     - dotnet nuget push Arch(.NetCore)\*.nupkg --api-key %NUGET_FEED_KEY% --source %NUGET_FEED_URL%
+    - dotnet nuget push Arch(Typescript)\*.nupkg --api-key %NUGET_FEED_KEY% --source %NUGET_FEED_URL%
     - set VERSION=

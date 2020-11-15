@@ -1,0 +1,31 @@
+
+<kendo-dialog [draggable]="false">
+    <form class="k-form" #loginForm="ngForm" (ngSubmit)="onSubmit()">
+        <label class="k-form-field">
+            <kendo-textbox-container floatingLabel="User">
+                <input kendoTextBox 
+                    [(ngModel)]="currentLogin.user"
+                    [disabled]="loginLoading"
+                    name="user"
+                    type="email"
+                    required
+                />
+            </kendo-textbox-container>
+        </label>
+        <label class="k-form-field">
+            <kendo-textbox-container floatingLabel="Password">
+                <input kendoTextBox 
+                    [(ngModel)]="currentLogin.password"
+                    [disabled]="loginLoading"
+                    name="password"
+                    type="password"
+                    required
+                />
+            </kendo-textbox-container>
+        </label>
+        <div class="text-right">
+            <button *ngIf="!loginLoading" type="submit" class="k-button k-primary" [disabled]="!loginForm.valid">Submit</button>
+            <span *ngIf="loginLoading" class="k-icon k-i-loading"></span>
+        </div>        
+    </form>
+</kendo-dialog>

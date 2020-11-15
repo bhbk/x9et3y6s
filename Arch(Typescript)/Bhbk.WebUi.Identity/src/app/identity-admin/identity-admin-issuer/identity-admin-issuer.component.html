@@ -1,0 +1,46 @@
+
+<div>
+  <form novalidate #issuerForm="ngForm">
+    <kendo-grid #issuerGrid
+      [data]="issuerData"
+      [loading]="issuerLoading"
+      [navigable]="true"
+      [pageable]="true" [pageSize]="issuerState.take" [skip]="issuerState.skip"
+      [sortable]="true" [sort]="issuerState.sort"
+      (pageChange)="pageChange($event)"
+      (add)="addHandler($event)"
+      (edit)="editHandler($event)"
+      (save)="saveHandler($event, issuerForm)" 
+      (cancel)="cancelHandler($event)"
+      (remove)="removeHandler($event)">
+      <ng-template kendoGridToolbarTemplate>
+        <button kendoGridAddCommand type="button" [disabled]="issuerGrid.isEditing()">Add new</button>
+      </ng-template>
+      <kendo-grid-column field="name" title="Name">
+        <ng-template kendoGridEditTemplate let-dataItem="dataItem">
+          <input [(ngModel)]="dataItem.name" kendoGridFocusable name="Name" class="k-textbox" required/>
+        </ng-template>
+      </kendo-grid-column>
+      <kendo-grid-column field="description" title="Description">
+        <ng-template kendoGridEditTemplate let-dataItem="dataItem">
+          <input [(ngModel)]="dataItem.description" kendoGridFocusable name="Description" class="k-textbox"/>
+        </ng-template>
+      </kendo-grid-column>
+      <kendo-grid-column field="created" title="Created" filter="date" [format]="{ datetime: 'medium' }"></kendo-grid-column>
+      <kendo-grid-column field="lastUpdated" title="Last Updated" filter="date" [format]="{ datetime: 'medium' }"></kendo-grid-column>
+      <kendo-grid-column field="immutable" title="Immutable" [width]="125">
+        <ng-template kendoGridEditTemplate let-dataItem="dataItem">
+          <input [(ngModel)]="dataItem.immutable" kendoGridFocusable name="Immutable" type="checkbox"/>
+        </ng-template>
+      </kendo-grid-column>
+      <kendo-grid-command-column title="Action" width="225">
+        <ng-template kendoGridCellTemplate let-isNew="isNew" let-dataItem>
+          <button kendoGridEditCommand type="button" [primary]="true">Edit</button>
+          <button kendoGridSaveCommand type="button" [disabled]="issuerForm.invalid || issuerForm.pristine">{{ isNew ? 'Add' : 'Update' }}</button>
+          <button kendoGridCancelCommand type="button">{{ isNew ? 'Discard changes' : 'Cancel' }}</button>
+          <button kendoGridRemoveCommand type="button" [disabled]="dataItem.immutable">Remove</button>
+        </ng-template>
+      </kendo-grid-command-column>
+    </kendo-grid>
+  </form>
+</div>

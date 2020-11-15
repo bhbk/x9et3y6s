@@ -1,0 +1,30 @@
+<nav *ngIf="currentUser" class="nav nav-pills justify-content-center">
+    <li class="nav-item">
+        <a class="nav-link" routerLink="home" routerLinkActive="border border-primary rounded">Home</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="admin/issuer" routerLinkActive="border border-primary rounded">Issuers</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="admin/client" routerLinkActive="border border-primary rounded">Clients</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="admin/claim" routerLinkActive="border border-primary rounded">Claims</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="admin/role" routerLinkActive="border border-primary rounded">Roles</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="admin/user" routerLinkActive="border border-primary rounded">Users</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="admin/login" routerLinkActive="border border-primary rounded">Logins</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="admin/activity" routerLinkActive="border border-primary rounded">Activity</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="me/authorize" routerLinkActive="border border-primary rounded" (click)="logout()">Logout</a>
+    </li>
+</nav>
+<router-outlet></router-outlet>

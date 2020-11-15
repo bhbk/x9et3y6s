@@ -16,7 +16,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT
         public Guid? ActorId { get; set; }
         public Guid? FromId { get; set; }
         public string FromPhoneNumber { get; set; }
-        public Guid ToId { get; set; }
+        public Guid? ToId { get; set; }
         public string ToPhoneNumber { get; set; }
         public string Body { get; set; }
         public DateTimeOffset CreatedUtc { get; set; }

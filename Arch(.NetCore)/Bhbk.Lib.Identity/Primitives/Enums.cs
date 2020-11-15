@@ -89,18 +89,10 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
         User,
     }
 
-    public enum WorkerType
-    {
-        AdminWorker,
-        AlertWorker,
-        MeWorker,
-        StsWorker,
-    }
-
     public enum JobType
     {
-        CleanEmailsJob,
-        CleanTextsJob,
+        CleanupEmailsJob,
+        CleanupTextsJob,
         DequeueEmailsJob,
         DequeueTextsJob,
         MaintainActivityJob,
@@ -108,5 +100,13 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
         MaintainRefreshesJob,
         MaintainStatesJob,
         MaintainUsersJob,
+    }
+
+    public enum WorkerType
+    {
+        AdminWorker,
+        AlertWorker,
+        MeWorker,
+        StsWorker,
     }
 }

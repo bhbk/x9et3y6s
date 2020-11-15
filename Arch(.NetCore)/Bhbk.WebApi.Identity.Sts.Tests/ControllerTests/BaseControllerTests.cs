@@ -2,7 +2,8 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Factories;
+using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.WebApi.Identity.Sts.Controllers;
 using Microsoft.AspNetCore.Hosting;

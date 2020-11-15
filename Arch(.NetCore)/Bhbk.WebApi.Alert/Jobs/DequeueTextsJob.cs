@@ -13,6 +13,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Twilio.Exceptions;
+using System.Reflection;
 
 namespace Bhbk.WebApi.Alert.Jobs
 {
@@ -20,14 +21,14 @@ namespace Bhbk.WebApi.Alert.Jobs
     public class DequeueTextsJob : IJob
     {
         private readonly IServiceScopeFactory _factory;
-        private const string _callPath = "DequeueTextsJob.Execute";
 
         public DequeueTextsJob(IServiceScopeFactory factory) => _factory = factory;
 
-        public async Task Execute(IJobExecutionContext context)
+        public Task Execute(IJobExecutionContext context)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
 #if !RELEASE
-            Log.Information($"'{_callPath}' running");
+            Log.Information($"'{callPath}' running");
 #endif
             try
             {
@@ -37,7 +38,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var twilio = scope.ServiceProvider.GetRequiredService<ITwilioService>();
 
-                    await DoDequeueWork(conf, uow, twilio);
+                    DoDequeueWork(conf, uow, twilio);
                 }
             }
             catch (Exception ex)
@@ -49,13 +50,15 @@ namespace Bhbk.WebApi.Alert.Jobs
                 GC.Collect();
             }
 #if !RELEASE
-            Log.Information($"'{_callPath}' completed");
-            Log.Information($"'{_callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
+            Log.Information($"'{callPath}' completed");
+            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
 #endif
+            return Task.CompletedTask;
         }
 
-        private async ValueTask DoDequeueWork(IConfiguration conf, IUnitOfWork uow, ITwilioService twilio)
+        private void DoDequeueWork(IConfiguration conf, IUnitOfWork uow, ITwilioService twilio)
         {
+            var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
             var twilioSid = conf["Jobs:DequeueTexts:TwilioSid"];
             var twilioToken = conf["Jobs:DequeueTexts:TwilioToken"];
 
@@ -70,7 +73,7 @@ namespace Bhbk.WebApi.Alert.Jobs
 #if RELEASE
                             try
                             {
-                                var response = await twilio.TryTextHandoff(twilioSid, twilioToken, msg);
+                                var response = twilio.TryTextHandoff(twilioSid, twilioToken, msg).Result;
 
                                 uow.TextActivity.Create(
                                     new tbl_TextActivity()
@@ -85,7 +88,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                                 msg.DeliveredUtc = DateTime.UtcNow;
                                 uow.TextQueue.Update(msg);
 
-                                Log.Information($"'{_callPath}' hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
+                                Log.Information($"'{callPath}' hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
                             }
                             catch (ApiException ex)
                             {
@@ -99,14 +102,14 @@ namespace Bhbk.WebApi.Alert.Jobs
                                         StatusAtUtc = DateTime.UtcNow,
                                     });
 
-                                Log.Warning($"'{_callPath}' hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
+                                Log.Warning($"'{callPath}' hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +
                                         "Error=" + ex.Code.ToString());
                             }
 #elif !RELEASE
                             msg.DeliveredUtc = DateTime.UtcNow;
                             uow.TextQueue.Update(msg);
 
-                            Log.Information($"'{_callPath}' fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
+                            Log.Information($"'{callPath}' fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
 #endif
                         }
                         break;
@@ -116,7 +119,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                             msg.DeliveredUtc = DateTime.UtcNow;
                             uow.TextQueue.Update(msg);
 
-                            Log.Information($"'{_callPath}' fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
+                            Log.Information($"'{callPath}' fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
                         }
                         break;
                 }

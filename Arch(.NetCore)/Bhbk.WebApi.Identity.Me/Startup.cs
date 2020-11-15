@@ -3,7 +3,7 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
 using Bhbk.Lib.Identity.Domain.Authorize;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Primitives;
@@ -163,8 +163,6 @@ namespace Bhbk.WebApi.Identity.Me
 #endif
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
-                    //AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
-                    //ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                     ValidAudiences = audiences.ToArray(),
@@ -176,7 +174,6 @@ namespace Bhbk.WebApi.Identity.Me
                     RequireAudience = true,
                     RequireExpirationTime = true,
                     RequireSignedTokens = true,
-                    ClockSkew = TimeSpan.Zero,
                 };
             });
             sc.AddAuthorization(opt =>

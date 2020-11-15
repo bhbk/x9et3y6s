@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Domain.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Profiles;
 using Microsoft.Extensions.Configuration;
 using System;
 
