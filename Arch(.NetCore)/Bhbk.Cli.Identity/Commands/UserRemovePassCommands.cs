@@ -1,7 +1,6 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Cli.Identity.Primiitives.Enums;
 using Bhbk.Lib.CommandLine.IO;
-using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Services;
 using ManyConsole;
@@ -26,11 +25,10 @@ namespace Bhbk.Cli.Identity.Commands
             try
             {
                 var conf = (IConfiguration)new ConfigurationBuilder()
-                    .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                var admin = new AdminService(conf);
-                admin.Grant = new ResourceOwnerGrantV2(conf);
+                var admin = new AdminService();
 
                 userName = ConsoleHelper.PromptForInput(CommandTypes.user);
                 user = admin.User_GetV1(userName).Result;

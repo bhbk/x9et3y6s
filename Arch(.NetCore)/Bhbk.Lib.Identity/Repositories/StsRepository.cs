@@ -13,16 +13,10 @@ namespace Bhbk.Lib.Identity.Repositories
 {
     public class StsRepository
     {
-        private readonly IConfiguration _conf;
         private readonly HttpClient _http;
-
-        public StsRepository(IConfiguration conf)
-            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
         public StsRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            _conf = conf;
-
             if (instance == InstanceContext.DeployedOrLocal
                 || instance == InstanceContext.End2EndTest)
             {
@@ -32,7 +26,7 @@ namespace Bhbk.Lib.Identity.Repositories
                 connect.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
 
                 _http = new HttpClient(connect);
-                _http.BaseAddress = new Uri($"{_conf["IdentityStsUrls:BaseApiUrl"]}/{_conf["IdentityStsUrls:BaseApiPath"]}/");
+                _http.BaseAddress = new Uri($"{conf["IdentityStsUrls:BaseApiUrl"]}/{conf["IdentityStsUrls:BaseApiPath"]}/");
             }
             else
                 _http = http;

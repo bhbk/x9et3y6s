@@ -14,15 +14,21 @@ namespace Bhbk.Lib.Identity.Services
 {
     public class MeService : IMeService
     {
-        public MeRepository Http { get; }
+        public MeRepository Endpoints { get; }
         public IOAuth2JwtGrant Grant { get; set; }
 
-        public MeService(IConfiguration conf)
-            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
+        public MeService()
+            : this(InstanceContext.DeployedOrLocal, new HttpClient())
+        { }
+
+        public MeService(InstanceContext instance, HttpClient http)
+            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(),
+                  instance, http)
+        { }
 
         public MeService(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            Http = new MeRepository(conf, instance, http);
+            Endpoints = new MeRepository(conf, instance, http);
         }
 
         public JwtSecurityToken Jwt
@@ -33,7 +39,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_DeleteCodesV1()
         {
-            var response = await Http.Info_DeleteCodesV1(Grant.Jwt.RawData);
+            var response = await Endpoints.Info_DeleteCodesV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -44,7 +50,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_DeleteCodeV1(Guid codeID)
         {
-            var response = await Http.Info_DeleteCodeV1(Grant.Jwt.RawData, codeID);
+            var response = await Endpoints.Info_DeleteCodeV1(Grant.Jwt.RawData, codeID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -55,7 +61,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_DeleteRefreshesV1()
         {
-            var response = await Http.Info_DeleteRefreshesV1(Grant.Jwt.RawData);
+            var response = await Endpoints.Info_DeleteRefreshesV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -66,7 +72,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_DeleteRefreshV1(Guid refreshID)
         {
-            var response = await Http.Info_DeleteRefreshV1(Grant.Jwt.RawData, refreshID);
+            var response = await Endpoints.Info_DeleteRefreshV1(Grant.Jwt.RawData, refreshID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -77,7 +83,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<IEnumerable<StateV1>> Info_GetCodesV1()
         {
-            var response = await Http.Info_GetCodesV1(Grant.Jwt.RawData);
+            var response = await Endpoints.Info_GetCodesV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsAsync<IEnumerable<StateV1>>();
@@ -88,7 +94,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<IEnumerable<RefreshV1>> Info_GetRefreshesV1()
         {
-            var response = await Http.Info_GetRefreshesV1(Grant.Jwt.RawData);
+            var response = await Endpoints.Info_GetRefreshesV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsAsync<IEnumerable<RefreshV1>>();
@@ -99,7 +105,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<MOTDTssV1> Info_GetMOTDV1()
         {
-            var response = await Http.Info_GetMOTDV1(Grant.Jwt.RawData);
+            var response = await Endpoints.Info_GetMOTDV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsAsync<MOTDTssV1>();
@@ -110,7 +116,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<UserV1> Info_GetV1()
         {
-            var response = await Http.Info_GetV1(Grant.Jwt.RawData);
+            var response = await Endpoints.Info_GetV1(Grant.Jwt.RawData);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsAsync<UserV1>();
@@ -121,7 +127,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_SetPasswordV1(PasswordAddV1 model)
         {
-            var response = await Http.Info_SetPasswordV1(Grant.Jwt.RawData, model);
+            var response = await Endpoints.Info_SetPasswordV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -132,7 +138,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_SetTwoFactorV1(bool statusValue)
         {
-            var response = await Http.Info_SetTwoFactorV1(Grant.Jwt.RawData, statusValue);
+            var response = await Endpoints.Info_SetTwoFactorV1(Grant.Jwt.RawData, statusValue);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -143,7 +149,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<UserV1> Info_UpdateV1(UserV1 model)
         {
-            var response = await Http.Info_UpdateV1(Grant.Jwt.RawData, model);
+            var response = await Endpoints.Info_UpdateV1(Grant.Jwt.RawData, model);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsAsync<UserV1>();
@@ -154,7 +160,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public async ValueTask<bool> Info_UpdateCodeV1(string codeValue, string actionValue)
         {
-            var response = await Http.Info_UpdateCodeV1(Grant.Jwt.RawData, codeValue, actionValue);
+            var response = await Endpoints.Info_UpdateCodeV1(Grant.Jwt.RawData, codeValue, actionValue);
 
             if (response.IsSuccessStatusCode)
                 return true;

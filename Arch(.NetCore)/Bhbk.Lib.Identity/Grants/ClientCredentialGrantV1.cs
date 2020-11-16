@@ -13,17 +13,21 @@ namespace Bhbk.Lib.Identity.Grants
 {
     public class ClientCredentialGrantV1 : IOAuth2JwtGrant
     {
-        private readonly IConfiguration _conf;
         private readonly HttpClient _http;
         private JwtSecurityToken _access, _refresh;
+        private readonly string _issuerName, _audienceName, _audienceSecret;
 
-        public ClientCredentialGrantV1(IConfiguration conf)
-            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
+        public ClientCredentialGrantV1()
+            : this(InstanceContext.DeployedOrLocal, new HttpClient())
+        { }
+
+        public ClientCredentialGrantV1(InstanceContext instance, HttpClient http)
+            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(),
+                  instance, http)
+        { }
 
         public ClientCredentialGrantV1(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            _conf = conf;
-
             if (instance == InstanceContext.DeployedOrLocal
                 || instance == InstanceContext.End2EndTest)
             {
@@ -33,13 +37,17 @@ namespace Bhbk.Lib.Identity.Grants
                 connect.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
 
                 _http = new HttpClient(connect);
-                _http.BaseAddress = new Uri($"{_conf["IdentityStsUrls:BaseApiUrl"]}/{_conf["IdentityStsUrls:BaseApiPath"]}/");
+                _http.BaseAddress = new Uri($"{conf["IdentityStsUrls:BaseApiUrl"]}/{conf["IdentityStsUrls:BaseApiPath"]}/");
             }
             else
                 _http = http;
 
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            _issuerName = conf["IdentityCredentials:IssuerName"];
+            _audienceName = conf["IdentityCredentials:AudienceName"];
+            _audienceSecret = conf["IdentityCredentials:AudienceSecret"];
         }
 
         public JwtSecurityToken Jwt
@@ -65,8 +73,8 @@ namespace Bhbk.Lib.Identity.Grants
                 HttpResponseMessage response = null;
                 FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                     {
-                            new KeyValuePair<string, string>("issuer_id", _conf["IdentityCredentials:IssuerName"]),
-                            new KeyValuePair<string, string>("client_id", _conf["IdentityCredentials:AudienceName"]),
+                            new KeyValuePair<string, string>("issuer_id", _issuerName),
+                            new KeyValuePair<string, string>("client_id", _audienceName),
                             new KeyValuePair<string, string>("grant_type", "refresh_token"),
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
@@ -94,10 +102,10 @@ namespace Bhbk.Lib.Identity.Grants
                 HttpResponseMessage response = null;
                 FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                     {
-                            new KeyValuePair<string, string>("issuer_id", _conf["IdentityCredentials:IssuerName"]),
-                            new KeyValuePair<string, string>("client_id", _conf["IdentityCredentials:AudienceName"]),
+                            new KeyValuePair<string, string>("issuer_id", _issuerName),
+                            new KeyValuePair<string, string>("client_id", _audienceName),
                             new KeyValuePair<string, string>("grant_type", "client_secret"),
-                            new KeyValuePair<string, string>("client_secret", _conf["IdentityCredentials:AudienceSecret"]),
+                            new KeyValuePair<string, string>("client_secret", _audienceSecret),
                         });
 
                 response = await _http.PostAsync("oauth2/v1/ccg", content);

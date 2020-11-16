@@ -57,8 +57,8 @@ namespace Bhbk.WebApi.Identity.Admin
             });
             sc.AddSingleton<IAlertService, AlertService>(_ =>
             {
-                var alert = new AlertService(conf);
-                alert.Grant = new ClientCredentialGrantV2(conf);
+                var alert = new AlertService();
+                alert.Grant = new ClientCredentialGrantV2();
 
                 return alert;
             });

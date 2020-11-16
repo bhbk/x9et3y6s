@@ -12,9 +12,9 @@ namespace Bhbk.Lib.Identity.Services
 {
     public interface IAdminService
     {
-        IOAuth2JwtGrant Grant { get; set; }
         JwtSecurityToken Jwt { get; set; }
-        AdminRepository Http { get; }
+        AdminRepository Endpoints { get; }
+        IOAuth2JwtGrant Grant { get; set; }
 
         /*
          * activity

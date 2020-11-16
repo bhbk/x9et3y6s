@@ -59,8 +59,8 @@ namespace Bhbk.WebApi.Alert
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
             sc.AddSingleton<IAlertService, AlertService>(_ =>
             {
-                var alert = new AlertService(conf);
-                alert.Grant = new ClientCredentialGrantV2(conf);
+                var alert = new AlertService();
+                alert.Grant = new ClientCredentialGrantV2();
 
                 return alert;
             });

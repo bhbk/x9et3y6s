@@ -16,26 +16,20 @@ namespace Bhbk.Lib.Identity.Repositories
 {
     public class AdminRepository
     {
-        private readonly IConfiguration _conf;
         private readonly HttpClient _http;
-
-        public AdminRepository(IConfiguration conf)
-            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
 
         public AdminRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            _conf = conf;
-
-            if (instance == InstanceContext.DeployedOrLocal 
+            if (instance == InstanceContext.DeployedOrLocal
                 || instance == InstanceContext.End2EndTest)
             {
                 var connect = new HttpClientHandler();
 
                 connect.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => { return true; };
                 connect.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
-                
+
                 _http = new HttpClient(connect);
-                _http.BaseAddress = new Uri($"{_conf["IdentityAdminUrls:BaseApiUrl"]}/{_conf["IdentityAdminUrls:BaseApiPath"]}/");
+                _http.BaseAddress = new Uri($"{conf["IdentityAdminUrls:BaseApiUrl"]}/{conf["IdentityAdminUrls:BaseApiPath"]}/");
             }
             else
                 _http = http;
@@ -270,7 +264,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("login/v1/page", 
+            return await _http.PostAsync("login/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -278,7 +272,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("login/v1", 
+            return await _http.PutAsync("login/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -293,7 +287,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("motd/v1/page", 
+            return await _http.PostAsync("motd/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -301,7 +295,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("role/v1", 
+            return await _http.PostAsync("role/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -323,7 +317,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("role/v1/page", 
+            return await _http.PostAsync("role/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -331,7 +325,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("role/v1", 
+            return await _http.PutAsync("role/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -360,7 +354,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("user/v1", 
+            return await _http.PostAsync("user/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -368,7 +362,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("user/v1/no-confirm", 
+            return await _http.PostAsync("user/v1/no-confirm",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -439,7 +433,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("user/v1/page", 
+            return await _http.PostAsync("user/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -475,7 +469,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("user/v1/" + userID.ToString() + "/set-password", 
+            return await _http.PutAsync("user/v1/" + userID.ToString() + "/set-password",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -483,7 +477,7 @@ namespace Bhbk.Lib.Identity.Repositories
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("user/v1", 
+            return await _http.PutAsync("user/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 

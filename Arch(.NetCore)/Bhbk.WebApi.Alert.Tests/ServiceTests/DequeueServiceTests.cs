@@ -38,10 +38,10 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new AlertService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                var result = await service.Http.Dequeue_EmailV1(Base64.CreateString(8), Guid.NewGuid());
+                var result = await service.Endpoints.Dequeue_EmailV1(Base64.CreateString(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Dequeue_EmailV1(rop.RawData, Guid.NewGuid());
+                result = await service.Endpoints.Dequeue_EmailV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -70,8 +70,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new AlertService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).CreateEmail(1);
@@ -101,10 +101,10 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new AlertService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                var result = await service.Http.Dequeue_TextV1(Base64.CreateString(8), Guid.NewGuid());
+                var result = await service.Endpoints.Dequeue_TextV1(Base64.CreateString(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -115,7 +115,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Dequeue_TextV1(rop.RawData, Guid.NewGuid());
+                result = await service.Endpoints.Dequeue_TextV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -133,8 +133,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new AlertService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).CreateText(1);

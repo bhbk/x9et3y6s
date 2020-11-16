@@ -8,9 +8,9 @@ namespace Bhbk.Lib.Identity.Services
 {
     public interface IStsService
     {
-        IOAuth2JwtGrant Grant { get; set; }
         JwtSecurityToken Jwt { get; set; }
-        StsRepository Http { get; }
+        StsRepository Endpoints { get; }
+        IOAuth2JwtGrant Grant { get; set; }
 
         /*
          * authorization code flows

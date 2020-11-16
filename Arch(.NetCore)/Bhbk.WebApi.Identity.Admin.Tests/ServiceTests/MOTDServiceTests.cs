@@ -40,8 +40,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new AdminService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).CreateMOTD(3);
@@ -68,8 +68,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new AdminService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).CreateMOTD(3);

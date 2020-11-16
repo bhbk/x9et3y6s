@@ -37,12 +37,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
-                var ask = await service.Http.DeviceCode_AskV1(
+                var ask = await service.Endpoints.DeviceCode_AskV1(
                     new DeviceCodeAskV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
@@ -61,12 +60,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
-                var dc = await service.Http.DeviceCode_AuthV1(
+                var dc = await service.Endpoints.DeviceCode_AuthV1(
                     new DeviceCodeV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
@@ -87,11 +85,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -99,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                var ask = await service.Http.DeviceCode_AskV2(
+                var ask = await service.Endpoints.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
@@ -119,11 +116,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -131,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
-                var ask = await service.Http.DeviceCode_AskV2(
+                var ask = await service.Endpoints.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -151,11 +147,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -163,7 +158,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
-                var ask = await service.Http.DeviceCode_AskV2(
+                var ask = await service.Endpoints.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -183,11 +178,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -215,11 +209,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -248,7 +241,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 uow.Commit();
 
-                var dc = await service.Http.DeviceCode_AuthV2(
+                var dc = await service.Endpoints.DeviceCode_AuthV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -269,11 +262,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -302,7 +294,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 uow.Commit();
 
-                var dc = await service.Http.DeviceCode_AuthV2(
+                var dc = await service.Endpoints.DeviceCode_AuthV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -323,11 +315,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -356,7 +347,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 uow.Commit();
 
-                var dc = await service.Http.DeviceCode_AuthV2(
+                var dc = await service.Endpoints.DeviceCode_AuthV2(
                     new DeviceCodeV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
@@ -377,11 +368,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -410,7 +400,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 uow.Commit();
 
-                var dc = await service.Http.DeviceCode_AuthV2(
+                var dc = await service.Endpoints.DeviceCode_AuthV2(
                     new DeviceCodeV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -436,7 +426,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();

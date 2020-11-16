@@ -11,9 +11,9 @@ namespace Bhbk.Lib.Identity.Services
 {
     public interface IMeService
     {
-        IOAuth2JwtGrant Grant { get; set; }
         JwtSecurityToken Jwt { get; set; }
-        MeRepository Http { get; }
+        MeRepository Endpoints { get; }
+        IOAuth2JwtGrant Grant { get; set; }
 
         /*
          * info

@@ -43,12 +43,12 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).CreateMOTD(3);
 
-                var result = await service.Http.Info_GetMOTDV1(Base64.CreateString(8));
+                var result = await service.Endpoints.Info_GetMOTDV1(Base64.CreateString(8));
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
             }
@@ -66,8 +66,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).CreateMOTD(3);
 
@@ -95,10 +95,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                var result = await service.Http.Info_UpdateCodeV1(Base64.CreateString(8), AlphaNumeric.CreateString(32), ActionType.Allow.ToString());
+                var result = await service.Endpoints.Info_UpdateCodeV1(Base64.CreateString(8), AlphaNumeric.CreateString(32), ActionType.Allow.ToString());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -109,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Http.Info_UpdateCodeV1(rop.RawData, AlphaNumeric.CreateString(32), ActionType.Allow.ToString());
+                result = await service.Endpoints.Info_UpdateCodeV1(rop.RawData, AlphaNumeric.CreateString(32), ActionType.Allow.ToString());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -123,8 +123,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
@@ -151,7 +151,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Http.Info_UpdateCodeV1(rop.RawData, state.StateValue, AlphaNumeric.CreateString(8));
+                var result = await service.Endpoints.Info_UpdateCodeV1(rop.RawData, state.StateValue, AlphaNumeric.CreateString(8));
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -169,8 +169,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
@@ -210,8 +210,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(conf, instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();

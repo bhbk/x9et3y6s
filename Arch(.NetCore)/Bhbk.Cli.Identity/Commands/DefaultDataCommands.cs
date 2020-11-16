@@ -38,7 +38,7 @@ namespace Bhbk.Cli.Identity.Commands
             try
             {
                 var conf = (IConfiguration)new ConfigurationBuilder()
-                    .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);

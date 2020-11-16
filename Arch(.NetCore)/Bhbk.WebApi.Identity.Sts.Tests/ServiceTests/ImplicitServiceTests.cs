@@ -31,12 +31,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
-                var imp = await service.Http.Implicit_AuthV1(
+                var imp = await service.Endpoints.Implicit_AuthV1(
                     new ImplicitV1()
                     {
                         issuer_id = Guid.NewGuid().ToString(),
@@ -60,11 +59,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -74,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(Constants.TestUriLink);
                 var state = Base64.CreateString(8);
-                var imp = await service.Http.Implicit_AuthV2(
+                var imp = await service.Endpoints.Implicit_AuthV2(
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -98,11 +96,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -112,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(Constants.TestUriLink);
                 var state = Base64.CreateString(8);
-                var imp = await service.Http.Implicit_AuthV2(
+                var imp = await service.Endpoints.Implicit_AuthV2(
                     new ImplicitV2()
                     {
                         issuer = Guid.NewGuid().ToString(),
@@ -136,11 +133,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -151,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(Constants.TestUriLink);
                 var state = Base64.CreateString(8);
-                var imp = await service.Http.Implicit_AuthV2(
+                var imp = await service.Endpoints.Implicit_AuthV2(
                     new ImplicitV2()
                     {
                         issuer = issuer.Id.ToString(),
@@ -175,11 +171,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(instance.InstanceType, owin);
 
                 new GenerateTestData(uow, mapper).Destroy();
                 new GenerateTestData(uow, mapper).Create();
@@ -190,7 +185,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var url = new Uri(Constants.TestUriLink);
                 var state = Base64.CreateString(8);
-                var imp = await service.Http.Implicit_AuthV2(
+                var imp = await service.Endpoints.Implicit_AuthV2(
                     new ImplicitV2()
                     {
                         issuer = user.Id.ToString(),

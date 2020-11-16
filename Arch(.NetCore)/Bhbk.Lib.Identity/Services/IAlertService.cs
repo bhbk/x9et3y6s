@@ -9,9 +9,9 @@ namespace Bhbk.Lib.Identity.Services
 {
     public interface IAlertService
     {
-        IOAuth2JwtGrant Grant { get; set; }
         JwtSecurityToken Jwt { get; set; }
-        AlertRepository Http { get; }
+        AlertRepository Endpoints { get; }
+        IOAuth2JwtGrant Grant { get; set; }
 
         ValueTask<bool> Dequeue_EmailV1(Guid emailID);
         ValueTask<bool> Dequeue_TextV1(Guid textID);

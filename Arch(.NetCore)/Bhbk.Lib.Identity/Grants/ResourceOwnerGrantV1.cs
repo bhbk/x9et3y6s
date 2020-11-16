@@ -13,17 +13,21 @@ namespace Bhbk.Lib.Identity.Grants
 {
     public class ResourceOwnerGrantV1 : IOAuth2JwtGrant
     {
-        private readonly IConfiguration _conf;
         private readonly HttpClient _http;
         private JwtSecurityToken _access, _refresh;
+        private readonly string _issuerName, _audienceName, _userName, _userPass;
 
-        public ResourceOwnerGrantV1(IConfiguration conf)
-            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient()) { }
+        public ResourceOwnerGrantV1()
+            : this(InstanceContext.DeployedOrLocal, new HttpClient())
+        { }
+
+        public ResourceOwnerGrantV1(InstanceContext instance, HttpClient http)
+            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(),
+                  instance, http)
+        { }
 
         public ResourceOwnerGrantV1(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            _conf = conf;
-
             if (instance == InstanceContext.DeployedOrLocal
                 || instance == InstanceContext.End2EndTest)
             {
@@ -33,13 +37,18 @@ namespace Bhbk.Lib.Identity.Grants
                 connect.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
 
                 _http = new HttpClient(connect);
-                _http.BaseAddress = new Uri($"{_conf["IdentityStsUrls:BaseApiUrl"]}/{_conf["IdentityStsUrls:BaseApiPath"]}/");
+                _http.BaseAddress = new Uri($"{conf["IdentityStsUrls:BaseApiUrl"]}/{conf["IdentityStsUrls:BaseApiPath"]}/");
             }
             else
                 _http = http;
 
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            _issuerName = conf["IdentityCredentials:IssuerName"];
+            _audienceName = conf["IdentityCredentials:AudienceName"];
+            _userName = conf["IdentityCredentials:UserName"];
+            _userPass = conf["IdentityCredentials:UserPass"];
         }
 
         public JwtSecurityToken Jwt
@@ -65,8 +74,8 @@ namespace Bhbk.Lib.Identity.Grants
                 HttpResponseMessage response = null;
                 FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                     {
-                            new KeyValuePair<string, string>("issuer_id", _conf["IdentityCredentials:IssuerName"]),
-                            new KeyValuePair<string, string>("client_id", _conf["IdentityCredentials:AudienceName"]),
+                            new KeyValuePair<string, string>("issuer_id", _issuerName),
+                            new KeyValuePair<string, string>("client_id", _audienceName),
                             new KeyValuePair<string, string>("grant_type", "refresh_token"),
                             new KeyValuePair<string, string>("refresh_token", _refresh.RawData),
                         });
@@ -94,11 +103,11 @@ namespace Bhbk.Lib.Identity.Grants
                 HttpResponseMessage response = null;
                 FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                     {
-                            new KeyValuePair<string, string>("issuer_id", _conf["IdentityCredentials:IssuerName"]),
-                            new KeyValuePair<string, string>("client_id", _conf["IdentityCredentials:AudienceName"]),
+                            new KeyValuePair<string, string>("issuer_id", _issuerName),
+                            new KeyValuePair<string, string>("client_id", _audienceName),
                             new KeyValuePair<string, string>("grant_type", "password"),
-                            new KeyValuePair<string, string>("username", _conf["IdentityCredentials:UserName"]),
-                            new KeyValuePair<string, string>("password", _conf["IdentityCredentials:UserPass"]),
+                            new KeyValuePair<string, string>("username", _userName),
+                            new KeyValuePair<string, string>("password", _userPass),
                         });
 
                 response = await _http.PostAsync("oauth2/v1/ropg", content);
