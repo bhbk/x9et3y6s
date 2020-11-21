@@ -1,8 +1,6 @@
-﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Cryptography.Entropy;
+﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives;
@@ -13,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,13 +31,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Route("oauth2")]
     public class AuthCodeController : BaseController
     {
-        private AuthCodeProvider _provider;
-
-        public AuthCodeController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new AuthCodeProvider(conf, instance);
-        }
-
         [Route("v1/acg-ask"), HttpGet]
         [AllowAnonymous]
         public IActionResult AuthCodeV1_Ask([FromQuery] AuthCodeAskV1 input)
@@ -132,13 +122,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //no context for auth exists yet... so set actor id same as user id...
             user.ActorId = user.Id;
 
-            var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
+            var authorize = new Uri(string.Format("{0}/{1}/{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "authorize"));
             var redirect = new Uri(input.redirect_uri);
 
             //check if there is redirect url defined for client. if not then use base url for identity ui.
             if (audience.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
-                redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize-callback"));
+                redirect = new Uri(string.Format("{0}/{1}/{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "authorize-callback"));
             }
             else if (audience.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
@@ -276,7 +266,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
-            if (audiences.Count() == 0)
+            if (audiences.Count == 0)
             {
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:None");
                 return BadRequest(ModelState);

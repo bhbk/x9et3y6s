@@ -49,8 +49,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
@@ -145,8 +145,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
@@ -196,8 +196,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(instance.InstanceType, owin);
                 service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
@@ -233,8 +233,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(instance.InstanceType, owin);
                 service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
@@ -268,8 +268,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(instance.InstanceType, owin);
                 service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
@@ -296,8 +296,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(instance.InstanceType, owin);
                 service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create(3);
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create(3);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
@@ -342,8 +342,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
@@ -397,8 +397,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var service = new AdminService(instance.InstanceType, owin);
                 service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();

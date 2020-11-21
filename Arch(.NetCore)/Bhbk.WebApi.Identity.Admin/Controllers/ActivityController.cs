@@ -1,9 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
-using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Exceptions;
@@ -11,7 +9,6 @@ using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,13 +20,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Route("activity")]
     public class ActivityController : BaseController
     {
-        private ActivityProvider _provider;
-
-        public ActivityController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new ActivityProvider(conf, instance);
-        }
-
         [Route("v1/{activityValue}"), HttpGet]
         public IActionResult GetV1([FromRoute] string activityValue)
         {

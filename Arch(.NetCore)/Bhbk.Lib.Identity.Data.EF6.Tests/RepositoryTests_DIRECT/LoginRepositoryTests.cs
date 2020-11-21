@@ -28,8 +28,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Logins_CreateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var result = UoW.Logins.Create(
                 Mapper.Map<tbl_Login>(new LoginV1()
@@ -56,8 +56,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Logins_DeleteV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
                 .Where(x => x.Name == Constants.TestLogin).ToLambda())
@@ -70,8 +70,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Logins_GetV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var results = UoW.Logins.Get();
             results.Should().BeAssignableTo<IEnumerable<tbl_Login>>();
@@ -91,8 +91,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Logins_UpdateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
                 .Where(x => x.Name == Constants.TestLogin).ToLambda())

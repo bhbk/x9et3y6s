@@ -1,9 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
-using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -13,7 +11,6 @@ using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,13 +22,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Route("login")]
     public class LoginController : BaseController
     {
-        private LoginProvider _provider;
-
-        public LoginController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new LoginProvider(conf, instance);
-        }
-
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.DefaultPolicyForHumans)]
         [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]

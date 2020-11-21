@@ -1,10 +1,8 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
-using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
@@ -16,7 +14,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,13 +25,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Route("audience")]
     public class AudienceController : BaseController
     {
-        private AudienceProvider _provider;
-
-        public AudienceController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new AudienceProvider(conf, instance);
-        }
-
         [Route("v1/{audienceID:guid}/add-to-role/{roleID:guid}"), HttpGet]
         [Authorize(Policy = Constants.DefaultPolicyForHumans)]
         [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]

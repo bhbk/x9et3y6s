@@ -13,12 +13,12 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT
 {
-    public class GenerateTestData
+    public class TestDataFactory
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public GenerateTestData(IUnitOfWork uow, IMapper mapper)
+        public TestDataFactory(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
             _mapper = mapper ?? throw new ArgumentNullException();

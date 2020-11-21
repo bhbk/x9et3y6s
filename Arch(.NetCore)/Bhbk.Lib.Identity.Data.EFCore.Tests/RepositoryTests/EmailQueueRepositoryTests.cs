@@ -30,8 +30,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_EmailQueue_CreateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateEmail(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateEmail(3);
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda())
@@ -66,8 +66,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_EmailQueue_DeleteV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateEmail(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateEmail(3);
 
             var email = UoW.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>().ToLambda())
                 .First();
@@ -79,8 +79,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_EmailQueue_GetV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateEmail(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateEmail(3);
 
             var results = UoW.EmailQueue.Get();
             results.Should().BeAssignableTo<IEnumerable<uvw_EmailQueue>>();
@@ -100,8 +100,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_EmailQueue_UpdateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateEmail(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateEmail(3);
 
             var email = UoW.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>().ToLambda())
                 .First();

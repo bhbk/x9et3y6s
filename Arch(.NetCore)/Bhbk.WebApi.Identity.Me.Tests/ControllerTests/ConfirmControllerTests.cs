@@ -35,13 +35,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ConfirmController(conf, instance);
+                var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -74,13 +76,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ConfirmController(conf, instance);
+                var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -112,13 +116,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ConfirmController(conf, instance);
+                var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -151,13 +157,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ConfirmController(conf, instance);
+                var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -189,13 +197,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ConfirmController(conf, instance);
+                var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -224,13 +234,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ConfirmController(conf, instance);
+                var controller = new ConfirmController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();

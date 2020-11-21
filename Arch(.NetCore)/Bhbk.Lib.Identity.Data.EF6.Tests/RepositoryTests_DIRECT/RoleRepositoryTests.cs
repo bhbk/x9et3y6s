@@ -28,8 +28,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Roles_CreateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
@@ -61,8 +61,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Roles_DeleteV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
                 .Where(x => x.Name == Constants.TestRole).ToLambda())
@@ -75,8 +75,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Roles_GetV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var results = UoW.Roles.Get();
             results.Should().BeAssignableTo<IEnumerable<tbl_Role>>();
@@ -96,8 +96,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests_DIRECT
         [Fact]
         public void Repo_Roles_UpdateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
                 .Where(x => x.Name == Constants.TestRole).ToLambda())

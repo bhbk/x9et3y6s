@@ -29,8 +29,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Claims_CreateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
                 .Where(x => x.Name == Constants.TestIssuer).ToLambda())
@@ -64,8 +64,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Claims_DeleteV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claim>()
                 .Where(x => x.Type == Constants.TestClaim).ToLambda())
@@ -78,8 +78,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Claims_GetV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var results = UoW.Claims.Get();
             results.Should().BeAssignableTo<IEnumerable<uvw_Claim>>();
@@ -99,8 +99,8 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
         [Fact]
         public void Repo_Claims_UpdateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claim>()
                 .Where(x => x.Type == Constants.TestClaim).ToLambda())

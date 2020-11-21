@@ -30,8 +30,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_MOTDs_CreateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateMOTD(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateMOTD(3);
 
             var result = UoW.MOTDs.Create(
                 Mapper.Map<uvw_MOTD>(new MOTDTssV1
@@ -57,8 +57,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_MOTDs_DeleteV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateMOTD(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateMOTD(3);
 
             var MOTD = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<uvw_MOTD>()
                 .Where(x => x.Author == Constants.TestMotdAuthor).ToLambda())
@@ -71,8 +71,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_MOTDs_GetV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateMOTD(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateMOTD(3);
 
             var results = UoW.MOTDs.Get();
             results.Should().BeAssignableTo<IEnumerable<uvw_MOTD>>();
@@ -92,8 +92,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_MOTDs_UpdateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateMOTD(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateMOTD(3);
 
             var MOTD = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<uvw_MOTD>()
                 .Where(x => x.Author == Constants.TestMotdAuthor).ToLambda())

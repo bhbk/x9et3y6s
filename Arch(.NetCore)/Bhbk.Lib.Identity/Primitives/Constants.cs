@@ -30,13 +30,13 @@ namespace Bhbk.Lib.Identity.Primitives
         #region Configuration Constants
 
         public const string DefaultAudience_Alert = "Alert";
-        public const string DefaultAudienceKey_Alert = "4Boj4NIFCEZd0D2tyinPVlJ9yzHBl3fV6euTTDO0Xvo";
+        public const string DefaultAudiencePassword_Alert = "4Boj4NIFCEZd0D2tyinPVlJ9yzHBl3fV";
         public const string DefaultAudience_Identity = "Identity";
-        public const string DefaultAudienceKey_Identity = "eBr3r3N1L6JV9jewYJOS6fjZ7EJGeGcb9HUAw6n2ZwY";
+        public const string DefaultAudiencePassword_Identity = "eBr3r3N1L6JV9jewYJOS6fjZ7EJGeGcb";
         public const string DefaultIssuer = "Local";
-        public const string DefaultIssuerKey = "8G3zyoTJB4HpL5n3V-htSaN1KFWZGeFgWcUenGZofmw";
+        public const string DefaultIssuerKey = "x6ZFCKCAtuJ0uuunjbi26O6A2dHFFsf877qpdcqOXqZvjABAHkBjkbb29YNjD75B";
         public const string DefaultLogin = "Local";
-        public const string DefaultLoginKey = "yUrOgQ1RZefUZ5DnC153sLDy23hmSOwnJ1KHDX61K48";
+        public const string DefaultLoginKey = "yUrOgQ1RZefUZ5DnC153sLDy23hmSOwn";
         public const string DefaultLoginName = "Local";
         public const string DefaultPolicyForHumans = "HumansPolicy";
         public const string DefaultPolicyForServices = "ServicesPolicy";

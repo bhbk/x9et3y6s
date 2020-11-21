@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var service = new MeService(instance.InstanceType, owin);
                 service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).CreateMOTD(3);
+                new TestDataFactory(uow, mapper).CreateMOTD(3);
 
                 var result = await service.Endpoints.Info_GetMOTDV1(Base64.CreateString(8));
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -69,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 var service = new MeService(instance.InstanceType, owin);
                 service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).CreateMOTD(3);
+                new TestDataFactory(uow, mapper).CreateMOTD(3);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();

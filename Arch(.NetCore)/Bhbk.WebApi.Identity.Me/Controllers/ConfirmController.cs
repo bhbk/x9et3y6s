@@ -1,12 +1,9 @@
-﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Domain.Providers.Me;
+﻿using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -17,13 +14,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Authorize(Policy = Constants.DefaultPolicyForHumans)]
     public class ConfirmController : BaseController
     {
-        private ConfirmProvider _provider;
-
-        public ConfirmController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new ConfirmProvider(conf, instance);
-        }
-
         [Route("v1/email/{userID:guid}"), HttpPut]
         public IActionResult ConfirmEmailV1([FromRoute] Guid userID, [FromBody] string email, [FromBody] string token)
         {

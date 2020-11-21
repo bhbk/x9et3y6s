@@ -21,6 +21,10 @@ namespace Bhbk.Lib.Identity.Grants
             : this(InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
+        public ResourceOwnerGrantV1(IConfiguration conf)
+            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
+        { }
+
         public ResourceOwnerGrantV1(InstanceContext instance, HttpClient http)
             : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(),
                   instance, http)
@@ -84,7 +88,7 @@ namespace Bhbk.Lib.Identity.Grants
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    var result = JObject.Parse(await response.Content.ReadAsStringAsync());
 
                     _access = new JwtSecurityToken((string)result["access_token"]);
 
@@ -114,7 +118,7 @@ namespace Bhbk.Lib.Identity.Grants
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                    var result = JObject.Parse(await response.Content.ReadAsStringAsync());
 
                     _access = new JwtSecurityToken((string)result["access_token"]);
                     _refresh = new JwtSecurityToken((string)result["refresh_token"]);

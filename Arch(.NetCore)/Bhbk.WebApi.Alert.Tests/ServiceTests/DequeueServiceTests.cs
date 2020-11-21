@@ -73,8 +73,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var service = new AlertService(instance.InstanceType, owin);
                 service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).CreateEmail(1);
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).CreateEmail(1);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
@@ -136,8 +136,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var service = new AlertService(instance.InstanceType, owin);
                 service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).CreateText(1);
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).CreateText(1);
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();

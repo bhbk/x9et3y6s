@@ -3,12 +3,11 @@ using System;
 
 namespace Bhbk.Cli.Alert.Commands
 {
-    public class AdminCommands : ConsoleCommand
+    public class TextCreateCommands : ConsoleCommand
     {
-        public AdminCommands()
+        public TextCreateCommands() 
         {
-            IsCommand("admin", "Do things with alert entities...");
-
+            IsCommand("text-create", "Text create");
         }
 
         public override int Run(string[] remainingArguments)

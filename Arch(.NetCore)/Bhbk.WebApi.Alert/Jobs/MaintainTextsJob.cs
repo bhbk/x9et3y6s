@@ -15,11 +15,11 @@ using System.Threading.Tasks;
 namespace Bhbk.WebApi.Alert.Jobs
 {
     [DisallowConcurrentExecution]
-    public class CleanupEmailsJob : IJob
+    public class MaintainTextsJob : IJob
     {
         private readonly IServiceScopeFactory _factory;
 
-        public CleanupEmailsJob(IServiceScopeFactory factory) => _factory = factory;
+        public MaintainTextsJob(IServiceScopeFactory factory) => _factory = factory;
 
         public Task Execute(IJobExecutionContext context)
         {
@@ -51,18 +51,18 @@ namespace Bhbk.WebApi.Alert.Jobs
             return Task.CompletedTask;
         }
 
-        private void DoCleanupWork(IConfiguration conf, IUnitOfWork uow)
+        private static void DoCleanupWork(IConfiguration conf, IUnitOfWork uow)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var expire = int.Parse(conf["Jobs:CleanupEmails:ExpireDelay"]);
+            var expire = int.Parse(conf["Jobs:MaintainTexts:ExpireDelay"]);
 
-            foreach (var entry in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>()
+            foreach (var entry in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>()
                 .Where(x => x.CreatedUtc < DateTime.UtcNow.AddSeconds(-(expire))).ToLambda()))
             {
-                Log.Warning($"'{callPath}' is deleting email (ID=" + entry.Id.ToString() + ") that was created on " 
+                Log.Warning($"'{callPath}' is deleting text (ID=" + entry.Id.ToString() + ") that was created on "
                     + entry.CreatedUtc.ToLocalTime());
 
-                uow.EmailQueue.Delete(entry);
+                uow.TextQueue.Delete(entry);
             }
 
             uow.Commit();

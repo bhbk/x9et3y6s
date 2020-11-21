@@ -1,8 +1,6 @@
-﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Cryptography.Entropy;
+﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives;
@@ -10,7 +8,6 @@ using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,13 +27,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Route("oauth2")]
     public class DeviceCodeController : BaseController
     {
-        private DeviceCodeProvider _provider;
-
-        public DeviceCodeController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new DeviceCodeProvider(conf, instance);
-        }
-
         [Route("v1/dcg-ask"), HttpPost]
         [AllowAnonymous]
         public IActionResult DeviceCodeV1_Ask([FromForm] DeviceCodeAskV1 input)
@@ -114,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingPollingMax).Single();
 
-            var authorize = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/authorize"));
+            var authorize = new Uri(string.Format("{0}/{1}/{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "authorize"));
             var nonce = Base64.CreateString(32);
 
             //create domain model for this result type...

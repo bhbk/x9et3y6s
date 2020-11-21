@@ -30,8 +30,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_TextQueue_CreateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateText(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateText(3);
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
                 .Where(x => x.UserName == Constants.TestUser).ToLambda())
@@ -65,8 +65,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_TextQueue_DeleteV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateText(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateText(3);
 
             var text = UoW.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>().ToLambda())
                 .First();
@@ -78,8 +78,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_TextQueue_GetV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateText(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateText(3);
 
             var results = UoW.TextQueue.Get();
             results.Should().BeAssignableTo<IEnumerable<uvw_TextQueue>>();
@@ -99,8 +99,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_TextQueue_UpdateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).CreateText(3);
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).CreateText(3);
 
             var text = UoW.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>().ToLambda())
                 .First();

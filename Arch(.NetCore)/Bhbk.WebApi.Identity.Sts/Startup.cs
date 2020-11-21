@@ -7,7 +7,6 @@ using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Sts.Jobs;
@@ -38,6 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts
         public virtual void ConfigureServices(IServiceCollection sc)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
+            var workerName = "StsWorker";
 
             var conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -57,8 +57,10 @@ namespace Bhbk.WebApi.Identity.Sts
             });
             sc.AddSingleton<IAlertService, AlertService>(_ =>
             {
-                var alert = new AlertService();
-                alert.Grant = new ClientCredentialGrantV2();
+                var alert = new AlertService
+                {
+                    Grant = new ClientCredentialGrantV2()
+                };
 
                 return alert;
             });
@@ -76,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Sts
 
                 if (bool.Parse(conf["Jobs:MaintainRefreshes:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.MaintainRefreshesJob.ToString(), WorkerType.StsWorker.ToString());
+                    var jobKey = new JobKey(typeof(MaintainRefreshesJob).Name, workerName);
                     jobs.AddJob<MaintainRefreshesJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
@@ -97,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Sts
 
                 if (bool.Parse(conf["Jobs:MaintainStates:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.MaintainStatesJob.ToString(), WorkerType.StsWorker.ToString());
+                    var jobKey = new JobKey(typeof(MaintainStatesJob).Name, workerName);
                     jobs.AddJob<MaintainStatesJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
@@ -131,20 +133,14 @@ namespace Bhbk.WebApi.Identity.Sts
 
             var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
-            var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+            var issuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                .Select(x => x.Value + ":" + conf["IdentityTenants:Salt"]);
+
+            var issuerKeys = conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren()
                 .Select(x => x.Value);
 
-            var allowedAudiences = conf.GetSection("IdentityTenants:AllowedAudiences").GetChildren()
+            var audiences = conf.GetSection("IdentityTenants:AllowedAudiences").GetChildren()
                 .Select(x => x.Value);
-
-            var issuers = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
-                .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
-
-            var issuerKeys = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
-                .Select(x => x.IssuerKey);
-
-            var audiences = seeds.Audiences.Get(x => allowedAudiences.Any(y => y == x.Name))
-                .Select(x => x.Name);
 
             /*
              * check if issuer compatibility enabled. means no env salt.
@@ -154,8 +150,8 @@ namespace Bhbk.WebApi.Identity.Sts
                 && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
-                issuers = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
-                    .Select(x => x.Name).Concat(issuers);
+                issuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                .Select(x => x.Value).Concat(issuers);
 
             sc.AddLogging(opt =>
             {
@@ -184,6 +180,8 @@ namespace Bhbk.WebApi.Identity.Sts
 #endif
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
+                    //AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
+                    //ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                     ValidAudiences = audiences.ToArray(),

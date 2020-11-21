@@ -1,8 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives;
@@ -13,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,13 +31,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Route("oauth2")]
     public class ResourceOwnerController : BaseController
     {
-        private ResourceOwnerProvider _provider;
-
-        public ResourceOwnerController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new ResourceOwnerProvider(conf, instance);
-        }
-
         [Route("v1/ropg"), HttpPost]
         [AllowAnonymous]
         public IActionResult ResourceOwnerV1_Grant([FromForm] ResourceOwnerV1 input)
@@ -509,7 +499,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
-            if (audiences.Count() == 0)
+            if (audiences.Count == 0)
             {
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:None");
                 return BadRequest(ModelState);
@@ -735,7 +725,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }
             }
 
-            if (audiences.Count() == 0)
+            if (audiences.Count == 0)
             {
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:None");
                 return BadRequest(ModelState);

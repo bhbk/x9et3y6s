@@ -1,9 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
-using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -13,7 +11,6 @@ using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,13 +22,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     [Route("issuer")]
     public class IssuerController : BaseController
     {
-        private IssuerProvider _provider;
-
-        public IssuerController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new IssuerProvider(conf, instance);
-        }
-
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.DefaultPolicyForHumans)]
         [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
@@ -48,12 +38,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             model.ActorId = GetIdentityGUID();
 
-            var foundIssuer = UoW.Issuers.Create(Mapper.Map<tbl_Issuer>(model));
+            var issuer = UoW.Issuers.Create(Mapper.Map<tbl_Issuer>(model));
 
             UoW.Settings.Create(
                 Mapper.Map<tbl_Setting>(new SettingV1()
                 {
-                    IssuerId = foundIssuer.Id,
+                    IssuerId = issuer.Id,
                     ConfigKey = Constants.SettingAccessExpire,
                     ConfigValue = 600.ToString(),
                     IsDeletable = true,
@@ -62,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             UoW.Settings.Create(
                 Mapper.Map<tbl_Setting>(new SettingV1()
                 {
-                    IssuerId = foundIssuer.Id,
+                    IssuerId = issuer.Id,
                     ConfigKey = Constants.SettingRefreshExpire,
                     ConfigValue = 86400.ToString(),
                     IsDeletable = true,
@@ -71,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             UoW.Settings.Create(
                 Mapper.Map<tbl_Setting>(new SettingV1()
                 {
-                    IssuerId = foundIssuer.Id,
+                    IssuerId = issuer.Id,
                     ConfigKey = Constants.SettingTotpExpire,
                     ConfigValue = 600.ToString(),
                     IsDeletable = true,
@@ -80,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             UoW.Settings.Create(
                 Mapper.Map<tbl_Setting>(new SettingV1()
                 {
-                    IssuerId = foundIssuer.Id,
+                    IssuerId = issuer.Id,
                     ConfigKey = Constants.SettingPollingMax,
                     ConfigValue = 10.ToString(),
                     IsDeletable = true,
@@ -88,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            return Ok(Mapper.Map<IssuerV1>(foundIssuer));
+            return Ok(Mapper.Map<IssuerV1>(issuer));
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]

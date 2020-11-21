@@ -1,7 +1,5 @@
-﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Cryptography.Hashing;
+﻿using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Providers.Sts;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -10,7 +8,6 @@ using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -31,13 +28,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Route("oauth2")]
     public class ClientCredentialController : BaseController
     {
-        private ClientCredentialProvider _provider;
-
-        public ClientCredentialController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new ClientCredentialProvider(conf, instance);
-        }
-
         [Route("v1/ccg"), HttpPost]
         [AllowAnonymous]
         public IActionResult ClientCredentialV1_Grant([FromForm] ClientCredentialV1 input)

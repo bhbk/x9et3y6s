@@ -1,12 +1,10 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Data.EFCore.Primitives;
 using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Domain.Providers.Admin;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
@@ -20,7 +18,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -28,19 +25,13 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Web;
+using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
     [Route("user")]
     public class UserController : BaseController
     {
-        private UserProvider _provider;
-
-        public UserController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new UserProvider(conf, instance);
-        }
-
         [Route("v1/{userID:guid}/add-to-claim/{claimID:guid}"), HttpGet]
         [Authorize(Policy = Constants.DefaultPolicyForHumans)]
         [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
@@ -138,7 +129,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1"), HttpPost]
         [Authorize(Policy = Constants.DefaultPolicyForHumans)]
         [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
-        public IActionResult CreateV1([FromBody] UserV1 model)
+        public async ValueTask<IActionResult> CreateV1([FromBody] UserV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -188,17 +179,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 var url = UrlFactory.GenerateConfirmEmailV1(Conf, result, code);
                 var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-                alert.Enqueue_EmailV1(new EmailV1()
-                {
-                    FromId = result.Id,
-                    FromEmail = result.EmailAddress,
-                    FromDisplay = $"{result.FirstName} {result.LastName}",
-                    ToId = result.Id,
-                    ToEmail = result.EmailAddress,
-                    ToDisplay = $"{result.FirstName} {result.LastName}",
-                    Subject = $"{issuer.Name} {Constants.MsgConfirmNewUserSubject}",
-                    Body = Templates.ConfirmNewUser(issuer, result, url)
-                });
+                await alert.Enqueue_EmailV1(
+                    new EmailV1()
+                    {
+                        FromId = result.Id,
+                        FromEmail = result.EmailAddress,
+                        FromDisplay = $"{result.FirstName} {result.LastName}",
+                        ToId = result.Id,
+                        ToEmail = result.EmailAddress,
+                        ToDisplay = $"{result.FirstName} {result.LastName}",
+                        Subject = $"{issuer.Name} {Constants.MsgConfirmNewUserSubject}",
+                        Body = Templates.ConfirmNewUser(issuer, result, url)
+                    });
             }
 
             return Ok(Mapper.Map<UserV1>(result));

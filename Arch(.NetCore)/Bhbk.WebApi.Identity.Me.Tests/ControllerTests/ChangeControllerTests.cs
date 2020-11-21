@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using Xunit;
+using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 {
@@ -24,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
         public ChangeControllerTests(BaseControllerTests factory) => _factory = factory;
 
         [Fact]
-        public void Me_ChangeV1_Email_Fail()
+        public async ValueTask Me_ChangeV1_Email_Fail()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -34,13 +35,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ChangeController(conf, instance);
+                var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -57,13 +60,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     NewEmailConfirm = newEmail
                 };
 
-                var result = controller.ChangeEmailV1(model) as BadRequestObjectResult;
+                var result = await controller.ChangeEmailV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo<BadRequestObjectResult>();
             }
         }
 
         [Fact]
-        public void Me_ChangeV1_Email_Success()
+        public async ValueTask Me_ChangeV1_Email_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -73,13 +76,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ChangeController(conf, instance);
+                var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -96,13 +99,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     NewEmailConfirm = newEmail
                 };
 
-                var result = controller.ChangeEmailV1(model) as OkObjectResult;
+                var result = await controller.ChangeEmailV1(model) as OkObjectResult;
                 result.Should().BeAssignableTo<OkObjectResult>();
             }
         }
 
         [Fact]
-        public void Me_ChangeV1_Password_Fail()
+        public async ValueTask Me_ChangeV1_Password_Fail()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -112,13 +115,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ChangeController(conf, instance);
+                var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -134,13 +137,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     NewPasswordConfirm = Constants.TestUserPassNew
                 };
 
-                var result = controller.ChangePasswordV1(model) as BadRequestObjectResult;
+                var result = await controller.ChangePasswordV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo<BadRequestObjectResult>();
             }
         }
 
         [Fact]
-        public void Me_ChangeV1_Password_Success()
+        public async ValueTask Me_ChangeV1_Password_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -150,13 +153,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ChangeController(conf, instance);
+                var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -172,13 +175,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     NewPasswordConfirm = Constants.TestUserPassNew
                 };
 
-                var result = controller.ChangePasswordV1(model) as OkObjectResult;
+                var result = await controller.ChangePasswordV1(model) as OkObjectResult;
                 result.Should().BeAssignableTo<OkObjectResult>();
             }
         }
 
         [Fact]
-        public void Me_ChangeV1_Phone_Fail()
+        public async ValueTask Me_ChangeV1_Phone_Fail()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -188,13 +191,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ChangeController(conf, instance);
+                var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -211,13 +216,13 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     NewPhoneNumberConfirm = user.PhoneNumber
                 };
 
-                var result = controller.ChangePhoneV1(model) as BadRequestObjectResult;
+                var result = await controller.ChangePhoneV1(model) as BadRequestObjectResult;
                 result.Should().BeAssignableTo<BadRequestObjectResult>();
             }
         }
 
         [Fact]
-        public void Me_ChangeV1_Phone_Success()
+        public async ValueTask Me_ChangeV1_Phone_Success()
         {
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
@@ -227,13 +232,15 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var controller = new ChangeController(conf, instance);
+                var controller = new ChangeController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -250,7 +257,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     NewPhoneNumberConfirm = newPhone
                 };
 
-                var result = controller.ChangePhoneV1(model) as OkObjectResult;
+                var result = await controller.ChangePhoneV1(model) as OkObjectResult;
                 result.Should().BeAssignableTo<OkObjectResult>();
             }
         }

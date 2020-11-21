@@ -38,13 +38,13 @@ namespace Bhbk.Cli.Identity.Commands
             try
             {
                 var conf = (IConfiguration)new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);
                 var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
                 var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                var data = new GenerateDefaultData(uow, mapper);
+                var data = new DefaultDataFactory(uow, mapper);
 
                 if (_create)
                 {

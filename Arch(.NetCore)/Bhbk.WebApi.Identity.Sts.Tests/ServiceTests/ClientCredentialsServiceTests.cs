@@ -90,8 +90,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -122,8 +122,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
 
@@ -152,8 +152,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -184,8 +184,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
@@ -216,8 +216,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -263,8 +263,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -312,8 +312,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -360,8 +360,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -409,8 +409,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -457,8 +457,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -505,8 +505,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -557,8 +557,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new GenerateTestData(uow, mapper).Destroy();
-                new GenerateTestData(uow, mapper).Create();
+                new TestDataFactory(uow, mapper).Destroy();
+                new TestDataFactory(uow, mapper).Create();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();

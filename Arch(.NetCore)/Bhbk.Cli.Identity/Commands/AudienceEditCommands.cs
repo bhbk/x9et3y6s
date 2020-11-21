@@ -1,6 +1,7 @@
 ﻿using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
+using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Services;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -22,10 +23,11 @@ namespace Bhbk.Cli.Identity.Commands
             try
             {
                 var conf = (IConfiguration)new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                var admin = new AdminService();
+                var admin = new AdminService(conf);
+                admin.Grant = new ResourceOwnerGrantV2(conf);
 
                 var audiences = admin.Audience_GetV1(new DataStateV1()
                 {

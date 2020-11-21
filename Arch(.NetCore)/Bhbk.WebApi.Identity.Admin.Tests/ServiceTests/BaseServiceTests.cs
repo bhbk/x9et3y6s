@@ -20,7 +20,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
-using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
@@ -50,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
                     var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                    new GenerateDefaultData(uow, mapper).Create();
+                    new DefaultDataFactory(uow, mapper).Create();
 
                     return uow;
                 });
@@ -62,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 */
 
                 var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                new GenerateDefaultData(seeds, mapper).Create();
+                new DefaultDataFactory(seeds, mapper).Create();
 
                 var issuers = seeds.Issuers.Get()
                     .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
@@ -107,7 +106,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         RequireAudience = true,
                         RequireExpirationTime = true,
                         RequireSignedTokens = true,
-                        ClockSkew = TimeSpan.Zero,
                     };
                 });
                 sc.AddAuthorization(opt =>

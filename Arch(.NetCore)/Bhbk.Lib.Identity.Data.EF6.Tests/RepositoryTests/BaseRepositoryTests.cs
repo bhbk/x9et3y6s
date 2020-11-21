@@ -34,7 +34,7 @@ namespace Bhbk.Lib.Identity.Data.EF6.Tests.RepositoryTests
 
         public void Dispose()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Destroy();
         }
     }
 }

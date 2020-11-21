@@ -22,6 +22,10 @@ namespace Bhbk.Lib.Identity.Services
             : this(InstanceContext.DeployedOrLocal, new HttpClient()) 
         { }
 
+        public AdminService(IConfiguration conf)
+            : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
+        { }
+
         public AdminService(InstanceContext instance, HttpClient http)
             : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(),
                   instance, http)

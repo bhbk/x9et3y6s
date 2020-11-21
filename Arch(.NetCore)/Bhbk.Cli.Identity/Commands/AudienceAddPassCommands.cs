@@ -1,6 +1,7 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
 using Bhbk.Cli.Identity.Primiitives.Enums;
 using Bhbk.Lib.CommandLine.IO;
+using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Services;
@@ -26,13 +27,16 @@ namespace Bhbk.Cli.Identity.Commands
             try
             {
                 var conf = (IConfiguration)new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                var admin = new AdminService();
+                var admin = new AdminService
+                {
+                    Grant = new ResourceOwnerGrantV2()
+                };
 
                 audienceName = ConsoleHelper.PromptForInput(CommandTypes.audience);
-                user = admin.Audience_GetV1(audienceName).Result;
+                user = admin.Audience_GetV1(audienceName).AsTask().Result;
 
                 if (user != null)
                     Console.WriteLine(Environment.NewLine + "FOUND audience \"" + audienceName + "\""
@@ -48,7 +52,7 @@ namespace Bhbk.Cli.Identity.Commands
                         EntityId = user.Id,
                         NewPassword = password,
                         NewPasswordConfirm = password,
-                    }).Result)
+                    }).AsTask().Result)
                     Console.WriteLine(Environment.NewLine + "SUCCESS set password for audience \"" + audienceName + "\"");
                 else
                     throw new ConsoleHelpAsException("FAILED set password for audience \"" + audienceName + "\"");

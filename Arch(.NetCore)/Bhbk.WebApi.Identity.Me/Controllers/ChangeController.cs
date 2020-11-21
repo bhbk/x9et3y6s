@@ -1,9 +1,7 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Data.EFCore.Primitives;
 using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
@@ -12,11 +10,11 @@ using Bhbk.Lib.Identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Bhbk.WebApi.Identity.Me.Controllers
@@ -25,15 +23,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Authorize(Policy = Lib.Identity.Primitives.Constants.DefaultPolicyForHumans)]
     public class ChangeController : BaseController
     {
-        private ChangeProvider _provider;
-
-        public ChangeController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new ChangeProvider(conf, instance);
-        }
-
         [Route("v1/email"), HttpPut]
-        public IActionResult ChangeEmailV1([FromBody] EmailChangeV1 model)
+        public async ValueTask<IActionResult> ChangeEmailV1([FromBody] EmailChangeV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -65,23 +56,24 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var url = UrlFactory.GenerateConfirmEmailV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            alert.Enqueue_EmailV1(new EmailV1()
-            {
-                FromId = user.Id,
-                FromEmail = user.EmailAddress,
-                FromDisplay = $"{user.FirstName} {user.LastName}",
-                ToId = user.Id,
-                ToEmail = user.EmailAddress,
-                ToDisplay = $"{user.FirstName} {user.LastName}",
-                Subject = Constants.MsgConfirmEmailSubject,
-                Body = Templates.ConfirmEmail(user, url)
-            });
+            await alert.Enqueue_EmailV1(
+                new EmailV1()
+                {
+                    FromId = user.Id,
+                    FromEmail = user.EmailAddress,
+                    FromDisplay = $"{user.FirstName} {user.LastName}",
+                    ToId = user.Id,
+                    ToEmail = user.EmailAddress,
+                    ToDisplay = $"{user.FirstName} {user.LastName}",
+                    Subject = Constants.MsgConfirmEmailSubject,
+                    Body = Templates.ConfirmEmail(user, url)
+                });
 
             return NoContent();
         }
 
         [Route("v1/password"), HttpPut]
-        public IActionResult ChangePasswordV1([FromBody] PasswordChangeV1 model)
+        public async ValueTask<IActionResult> ChangePasswordV1([FromBody] PasswordChangeV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -118,23 +110,24 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            alert.Enqueue_EmailV1(new EmailV1()
-            {
-                FromId = user.Id,
-                FromEmail = user.EmailAddress,
-                FromDisplay = $"{user.FirstName} {user.LastName}",
-                ToId = user.Id,
-                ToEmail = user.EmailAddress,
-                ToDisplay = $"{user.FirstName} {user.LastName}",
-                Subject = Constants.MsgConfirmPasswordSubject,
-                Body = Templates.ConfirmPassword(user, url)
-            });
+            await alert.Enqueue_EmailV1(
+                new EmailV1()
+                {
+                    FromId = user.Id,
+                    FromEmail = user.EmailAddress,
+                    FromDisplay = $"{user.FirstName} {user.LastName}",
+                    ToId = user.Id,
+                    ToEmail = user.EmailAddress,
+                    ToDisplay = $"{user.FirstName} {user.LastName}",
+                    Subject = Constants.MsgConfirmPasswordSubject,
+                    Body = Templates.ConfirmPassword(user, url)
+                });
 
             return NoContent();
         }
 
         [Route("v1/phone"), HttpPut]
-        public IActionResult ChangePhoneV1([FromBody] PhoneChangeV1 model)
+        public async ValueTask<IActionResult> ChangePhoneV1([FromBody] PhoneChangeV1 model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -167,14 +160,15 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user, token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
-            alert.Enqueue_TextV1(new TextV1()
-            {
-                FromId = user.Id,
-                FromPhoneNumber = model.NewPhoneNumber,
-                ToId = user.Id,
-                ToPhoneNumber = model.NewPhoneNumber,
-                Body = token
-            });
+            await alert.Enqueue_TextV1(
+                new TextV1()
+                {
+                    FromId = user.Id,
+                    FromPhoneNumber = model.NewPhoneNumber,
+                    ToId = user.Id,
+                    ToPhoneNumber = model.NewPhoneNumber,
+                    Body = token
+                });
 
             return NoContent();
         }

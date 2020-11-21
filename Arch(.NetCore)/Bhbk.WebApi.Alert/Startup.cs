@@ -7,7 +7,6 @@ using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Primitives;
-using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Alert.Jobs;
@@ -39,7 +38,8 @@ namespace Bhbk.WebApi.Alert
         public virtual void ConfigureServices(IServiceCollection sc)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            
+            var workerName = "AlertWorker";
+
             var conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
@@ -59,8 +59,10 @@ namespace Bhbk.WebApi.Alert
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
             sc.AddSingleton<IAlertService, AlertService>(_ =>
             {
-                var alert = new AlertService();
-                alert.Grant = new ClientCredentialGrantV2();
+                var alert = new AlertService
+                {
+                    Grant = new ClientCredentialGrantV2()
+                };
 
                 return alert;
             });
@@ -77,15 +79,15 @@ namespace Bhbk.WebApi.Alert
 
                 //https://www.freeformatter.com/cron-expression-generator-quartz.html
 
-                if (bool.Parse(conf["Jobs:CleanupEmails:Enable"]))
+                if (bool.Parse(conf["Jobs:MaintainEmails:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.CleanupEmailsJob.ToString(), WorkerType.AlertWorker.ToString());
-                    jobs.AddJob<CleanupEmailsJob>(opt => opt
+                    var jobKey = new JobKey(typeof(MaintainEmailsJob).Name, workerName);
+                    jobs.AddJob<MaintainEmailsJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:CleanupEmails:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:MaintainEmails:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
@@ -98,15 +100,15 @@ namespace Bhbk.WebApi.Alert
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:CleanupTexts:Enable"]))
+                if (bool.Parse(conf["Jobs:MaintainTexts:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.CleanupTextsJob.ToString(), WorkerType.AlertWorker.ToString());
-                    jobs.AddJob<CleanupTextsJob>(opt => opt
+                    var jobKey = new JobKey(typeof(MaintainTextsJob).Name, workerName);
+                    jobs.AddJob<MaintainTextsJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:CleanupTexts:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:MaintainTexts:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
@@ -121,7 +123,7 @@ namespace Bhbk.WebApi.Alert
 
                 if (bool.Parse(conf["Jobs:DequeueEmails:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.DequeueEmailsJob.ToString(), WorkerType.AlertWorker.ToString());
+                    var jobKey = new JobKey(typeof(DequeueEmailsJob).Name, workerName);
                     jobs.AddJob<DequeueEmailsJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
@@ -142,7 +144,7 @@ namespace Bhbk.WebApi.Alert
 
                 if (bool.Parse(conf["Jobs:DequeueTexts:Enable"]))
                 {
-                    var jobKey = new JobKey(JobType.DequeueTextsJob.ToString(), WorkerType.AlertWorker.ToString());
+                    var jobKey = new JobKey(typeof(DequeueTextsJob).Name, workerName);
                     jobs.AddJob<DequeueTextsJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
@@ -176,20 +178,14 @@ namespace Bhbk.WebApi.Alert
 
             var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
-            var allowedIssuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+            var issuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                .Select(x => x.Value + ":" + conf["IdentityTenants:Salt"]);
+
+            var issuerKeys = conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren()
                 .Select(x => x.Value);
 
-            var allowedAudiences = conf.GetSection("IdentityTenants:AllowedAudiences").GetChildren()
+            var audiences = conf.GetSection("IdentityTenants:AllowedAudiences").GetChildren()
                 .Select(x => x.Value);
-
-            var issuers = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
-                .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
-
-            var issuerKeys = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
-                .Select(x => x.IssuerKey);
-
-            var audiences = seeds.Audiences.Get(x => allowedAudiences.Any(y => y == x.Name))
-                .Select(x => x.Name);
 
             /*
              * check if issuer compatibility enabled. means no env salt.
@@ -199,8 +195,8 @@ namespace Bhbk.WebApi.Alert
                 && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
-                issuers = seeds.Issuers.Get(x => allowedIssuers.Any(y => y == x.Name))
-                    .Select(x => x.Name).Concat(issuers);
+                issuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                .Select(x => x.Value).Concat(issuers);
 
             sc.AddLogging(opt =>
             {
@@ -229,6 +225,8 @@ namespace Bhbk.WebApi.Alert
 #endif
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
+                    //AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
+                    //ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                     ValidAudiences = audiences.ToArray(),

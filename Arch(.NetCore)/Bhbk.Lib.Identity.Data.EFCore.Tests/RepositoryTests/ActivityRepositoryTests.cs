@@ -28,8 +28,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_Activities_CreateV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
                 .Where(x => x.Name == Constants.TestAudience).ToLambda())
@@ -60,8 +60,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_Activities_DeleteV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var activity = UoW.Activities.Get(QueryExpressionFactory.GetQueryExpression<uvw_Activity>()
                 .Where(x => x.IsDeletable == false).ToLambda())
@@ -74,8 +74,8 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
         [Fact]
         public void Repo_Activities_GetV1_Success()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
-            new GenerateTestData(UoW, Mapper).Create();
+            new TestDataFactory(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Create();
 
             var results = UoW.Activities.Get();
             results.Should().BeAssignableTo<IEnumerable<uvw_Activity>>();

@@ -1,6 +1,4 @@
-﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Providers.Sts;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -8,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,13 +26,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
     [Route("oauth2")]
     public class ImplicitController : BaseController
     {
-        private ImplicitProvider _provider;
-
-        public ImplicitController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new ImplicitProvider(conf, instance);
-        }
-
         [Route("v1/ig"), HttpGet]
         [AllowAnonymous]
         public IActionResult ImplicitV1_Grant([FromQuery] ImplicitV1 input)

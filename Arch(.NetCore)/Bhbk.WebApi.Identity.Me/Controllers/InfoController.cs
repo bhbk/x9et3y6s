@@ -1,7 +1,5 @@
-﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
 using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Domain.Providers.Me;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
@@ -12,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,13 +21,6 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Authorize(Policy = Constants.DefaultPolicyForHumans)]
     public class InfoController : BaseController
     {
-        private InfoProvider _provider;
-
-        public InfoController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new InfoProvider(conf, instance);
-        }
-
         [Route("v1"), HttpGet]
         public IActionResult GetV1()
         {

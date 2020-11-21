@@ -33,7 +33,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
                 {
                     var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                    new GenerateDefaultData(uow, mapper).Create();
+                    new DefaultDataFactory(uow, mapper).Create();
 
                     return uow;
                 });

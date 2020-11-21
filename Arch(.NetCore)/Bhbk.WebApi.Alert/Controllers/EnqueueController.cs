@@ -1,16 +1,13 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
-using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Domain.Providers.Alert;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Exceptions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +18,6 @@ namespace Bhbk.WebApi.Alert.Controllers
     [Route("enqueue")]
     public class EnqueueController : BaseController
     {
-        private EnqueueProvider _provider;
-
-        public EnqueueController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new EnqueueProvider(conf, instance);
-        }
-
         [Route("v1/email"), HttpPost]
         public IActionResult EnqueueEmailV1([FromBody] EmailV1 model)
         {

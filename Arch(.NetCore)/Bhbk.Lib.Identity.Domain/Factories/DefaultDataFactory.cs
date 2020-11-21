@@ -10,12 +10,12 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Domain.Factories
 {
-    public class GenerateDefaultData
+    public class DefaultDataFactory
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public GenerateDefaultData(IUnitOfWork uow, IMapper mapper)
+        public DefaultDataFactory(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow ?? throw new ArgumentNullException();
             _mapper = mapper ?? throw new ArgumentNullException();
@@ -327,8 +327,8 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              * set password to audiences
              */
 
-            _uow.Audiences.SetPasswordHash(foundAudience_Alert, Constants.DefaultAudienceKey_Alert);
-            _uow.Audiences.SetPasswordHash(foundAudience_Identity, Constants.DefaultAudienceKey_Identity);
+            _uow.Audiences.SetPasswordHash(foundAudience_Alert, Constants.DefaultAudiencePassword_Alert);
+            _uow.Audiences.SetPasswordHash(foundAudience_Identity, Constants.DefaultAudiencePassword_Identity);
 
             _uow.Commit();
 

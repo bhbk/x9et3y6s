@@ -22,13 +22,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
-
-                var controller = new DiagnosticController(conf, instance);
+                var controller = new DiagnosticController();
                 controller.ControllerContext = new ControllerContext();
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
+                controller.ControllerContext.HttpContext = new DefaultHttpContext
+                {
+                    RequestServices = _factory.Server.Host.Services
+                };
 
                 var result = controller.GetVersionV1() as OkObjectResult;
                 var ok = result.Should().BeOfType<OkObjectResult>().Subject;

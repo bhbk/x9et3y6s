@@ -1,9 +1,6 @@
-﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Domain.Providers.Alert;
-using Bhbk.Lib.Identity.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -13,13 +10,6 @@ namespace Bhbk.WebApi.Alert.Controllers
     [Route("dequeue")]
     public class DequeueController : BaseController
     {
-        private DequeueProvider _provider;
-
-        public DequeueController(IConfiguration conf, IContextService instance)
-        {
-            _provider = new DequeueProvider(conf, instance);
-        }
-
         [Route("v1/email/{emailID:guid}"), HttpDelete]
         public IActionResult DequeueEmailV1([FromRoute] Guid emailID)
         {

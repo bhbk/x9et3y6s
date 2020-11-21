@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests
 
         public void Dispose()
         {
-            new GenerateTestData(UoW, Mapper).Destroy();
+            new TestDataFactory(UoW, Mapper).Destroy();
         }
     }
 }

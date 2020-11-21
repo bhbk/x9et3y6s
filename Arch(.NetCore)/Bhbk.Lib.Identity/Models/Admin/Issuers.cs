@@ -13,6 +13,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public string Description { get; set; }
 
+        [Required]
         public string IssuerKey { get; set; }
 
         [Required]
