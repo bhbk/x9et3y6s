@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
@@ -23,20 +23,23 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.IntegrationTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
                 sc.AddSingleton<IConfiguration>(conf);
                 sc.AddSingleton<IContextService>(instance);
                 sc.AddSingleton<IMapper>(mapper);
-                sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
+                sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
                     var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                    new DefaultDataFactory(uow, mapper).Create();
+
+                    var data = new DefaultDataFactory_TBL(uow);
+                    data.CreateSettings();
 
                     return uow;
                 });
+                sc.AddSingleton<IDefaultDataFactory_TBL, DefaultDataFactory_TBL>();
                 sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
                 sc.AddControllers()

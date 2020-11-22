@@ -1,8 +1,7 @@
 ﻿
 
 CREATE PROCEDURE [svc].[usp_TextQueue_Insert]
-     @ActorId				UNIQUEIDENTIFIER
-    ,@FromId				UNIQUEIDENTIFIER
+    @FromId		    		UNIQUEIDENTIFIER
     ,@FromPhoneNumber       NVARCHAR (MAX) 
     ,@ToId					UNIQUEIDENTIFIER
     ,@ToPhoneNumber         NVARCHAR (MAX) 
@@ -21,7 +20,6 @@ BEGIN
         INSERT INTO [dbo].[tbl_TextQueue]
 	        (
              Id           
-            ,ActorId    
             ,FromId    
 			,FromPhoneNumber
 			,ToId
@@ -33,7 +31,6 @@ BEGIN
         VALUES
 	        (
              @TEXTID          
-            ,@ActorId    
             ,@FromId    
             ,@FromPhoneNumber       
             ,@ToId 

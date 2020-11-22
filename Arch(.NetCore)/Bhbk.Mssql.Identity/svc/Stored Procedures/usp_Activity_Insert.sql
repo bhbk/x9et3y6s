@@ -3,7 +3,7 @@ CREATE PROCEDURE [svc].[usp_Activity_Insert]
      @AudienceId			UNIQUEIDENTIFIER
     ,@UserId				UNIQUEIDENTIFIER
     ,@ActivityType          NVARCHAR (64) 
-    ,@TableName				NVARCHAR (MAX)
+    ,@TableName				NVARCHAR (256)
     ,@KeyValues				NVARCHAR (MAX) 
     ,@OriginalValues		NVARCHAR (MAX) 
     ,@CurrentValues			NVARCHAR (MAX) 

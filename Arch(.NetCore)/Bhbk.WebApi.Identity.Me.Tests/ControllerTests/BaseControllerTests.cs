@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
@@ -23,19 +23,16 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.IntegrationTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TSQL>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
                 sc.AddSingleton<IConfiguration>(conf);
                 sc.AddSingleton<IContextService>(instance);
                 sc.AddSingleton<IMapper>(mapper);
-                sc.AddScoped<IUnitOfWork, UnitOfWork>(x =>
+                sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                    new DefaultDataFactory(uow, mapper).Create();
-
-                    return uow;
+                    return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
                 });
                 sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 

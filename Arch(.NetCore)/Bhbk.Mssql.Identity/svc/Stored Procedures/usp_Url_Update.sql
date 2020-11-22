@@ -1,11 +1,9 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_Url_Update]
      @Id					UNIQUEIDENTIFIER 
 	,@AudienceId			UNIQUEIDENTIFIER
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@UrlHost				NVARCHAR (MAX) 
-    ,@UrlPath				NVARCHAR (MAX) 
+    ,@UrlHost				NVARCHAR (1024) 
+    ,@UrlPath				NVARCHAR (1024) 
     ,@IsEnabled				BIT 
     ,@IsDeletable			BIT
 
@@ -21,7 +19,6 @@ BEGIN
         SET
              Id						= @Id
 	        ,AudienceId				= @AudienceId
-            ,ActorId				= @ActorId
 	        ,UrlHost				= @UrlHost
 	        ,UrlPath				= @UrlPath
 	        ,IsEnabled				= @IsEnabled

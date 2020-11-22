@@ -5,8 +5,6 @@ namespace Bhbk.Lib.Identity.Models.Alert
 {
     public abstract class Emails
     {
-        public Guid? ActorId { get; set; }
-
         public Guid? FromId { get; set; }
 
         [DataType(DataType.EmailAddress)]

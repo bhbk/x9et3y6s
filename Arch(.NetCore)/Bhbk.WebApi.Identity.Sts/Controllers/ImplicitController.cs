@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -104,9 +104,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
 
             //check if state is valid...
             var state = UoW.States.Get(x => x.StateValue == input.state

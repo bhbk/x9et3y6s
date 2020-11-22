@@ -1,7 +1,6 @@
 ﻿CREATE TABLE [dbo].[tbl_Role] (
     [Id]             UNIQUEIDENTIFIER   NOT NULL,
     [AudienceId]     UNIQUEIDENTIFIER   NOT NULL,
-    [ActorId]        UNIQUEIDENTIFIER   NULL,
     [Name]           NVARCHAR (128)     NOT NULL,
     [Description]    NVARCHAR (256)     NULL,
     [IsEnabled]      BIT                NOT NULL,
@@ -11,6 +10,8 @@
     CONSTRAINT [PK_tbl_Role] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_tbl_Role_AudienceID] FOREIGN KEY ([AudienceId]) REFERENCES [dbo].[tbl_Audience] ([Id])
 );
+
+
 
 
 

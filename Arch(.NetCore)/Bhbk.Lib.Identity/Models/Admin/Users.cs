@@ -5,8 +5,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 {
     public abstract class Users
     {
-        public Guid? ActorId { get; set; }
-
         [Required]
         public string UserName { get; set; }
 
@@ -62,7 +60,5 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public int AccessSuccessCount { get; set; }
 
         public bool PasswordConfirmed { get; set; }
-
-        public bool IsMultiFactor { get; set; }
     }
 }

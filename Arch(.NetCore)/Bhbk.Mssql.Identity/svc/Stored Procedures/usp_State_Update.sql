@@ -4,7 +4,7 @@ CREATE PROCEDURE [svc].[usp_State_Update]
     ,@IssuerId				UNIQUEIDENTIFIER
     ,@AudienceId			UNIQUEIDENTIFIER
     ,@UserId				UNIQUEIDENTIFIER
-    ,@StateValue			NVARCHAR (512) 
+    ,@StateValue			NVARCHAR (2048) 
     ,@StateType				NVARCHAR (64)
     ,@StateDecision			BIT
     ,@StateConsume			BIT

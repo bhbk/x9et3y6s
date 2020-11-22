@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -38,17 +38,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetIdentityGUID();
-
             var create = UoW.Roles.Create(Mapper.Map<tbl_Role>(model));
 
             UoW.Commit();
 
             var result = UoW.Roles.Get(x => x.Name == model.Name)
                 .SingleOrDefault();
-
-            if (result == null)
-                return StatusCode(StatusCodes.Status500InternalServerError);
 
             return Ok(Mapper.Map<RoleV1>(result));
         }
@@ -66,13 +61,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"roleID: { roleID }");
                 return NotFound(ModelState);
             }
-            else if (role.IsDeletable)
+            
+            if (!role.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.RoleImmutable.ToString(), $"Role:{role.Id}");
                 return BadRequest(ModelState);
             }
-
-            role.ActorId = GetIdentityGUID();
 
             UoW.Roles.Delete(role);
             UoW.Commit();
@@ -120,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
                     Total = UoW.Roles.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Role>, IQueryable<tbl_Role>>>>(
-                            QueryExpressionFactory.GetQueryExpression<tbl_Role>().ApplyPredicate(state)))
+                            QueryExpressionFactory.GetQueryExpression<tbl_Role>().ApplyPredicate(state))) 
                 };
 
                 return Ok(result);
@@ -173,8 +167,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.RoleImmutable.ToString(), $"Role:{role.Id}");
                 return BadRequest(ModelState);
             }
-
-            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Roles.Update(Mapper.Map<tbl_Role>(model));
 

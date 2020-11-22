@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Hashing;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives;
@@ -60,13 +60,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     || UoW.InstanceType == InstanceContext.End2EndTest)
                     issuer = UoW.Issuers.Get(x => x.Name == Conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                         .Select(i => i.Value).First()).SingleOrDefault();
-
-                else if (UoW.InstanceType == InstanceContext.SystemTest
-                    || UoW.InstanceType == InstanceContext.IntegrationTest)
-                    issuer = UoW.Issuers.Get(x => x.Name == Constants.TestIssuer).SingleOrDefault();
-
                 else
-                    throw new NotImplementedException();
+                    issuer = UoW.Issuers.Get(x => x.Name == Constants.TestIssuer).SingleOrDefault();
             }
             else
             {
@@ -102,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client_id}");
                 return NotFound(ModelState);
             }
-            else if (!audience.IsEnabled)
+            else if (audience.IsLockedOut)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
@@ -131,9 +126,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
 
             var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
@@ -340,7 +332,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client_id}");
                 return NotFound(ModelState);
             }
-            else if (!audience.IsEnabled)
+            else if (audience.IsLockedOut)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
@@ -362,9 +354,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
 
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
             var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -459,17 +448,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
-
             var audienceList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
+
             var audiences = new List<tbl_Audience>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
                 audiences = UoW.Audiences.Get(x => audienceList.Contains(x)
-                    && x.IsEnabled == true).ToList();
+                    && x.IsLockedOut == false).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
@@ -488,7 +475,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{entry}");
                         return NotFound(ModelState);
                     }
-                    else if (!audience.IsEnabled
+                    else if (audience.IsLockedOut
                         || !audienceList.Contains(audience))
                     {
                         ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
@@ -685,17 +672,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
-
             var clientList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
+
             var audiences = new List<tbl_Audience>();
 
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
                 audiences = UoW.Audiences.Get(x => clientList.Contains(x)
-                    && x.IsEnabled == true).ToList();
+                    && x.IsLockedOut == false).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
@@ -714,7 +699,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{entry}");
                         return NotFound(ModelState);
                     }
-                    else if (!audience.IsEnabled
+                    else if (audience.IsLockedOut
                         || !clientList.Contains(audience))
                     {
                         ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");

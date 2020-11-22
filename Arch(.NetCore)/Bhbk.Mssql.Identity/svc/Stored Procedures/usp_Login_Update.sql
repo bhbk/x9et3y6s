@@ -1,9 +1,9 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_Login_Update]
      @Id					UNIQUEIDENTIFIER 
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@Name					NVARCHAR (MAX) 
-    ,@Description			NVARCHAR (MAX)
+    ,@Name					NVARCHAR (128) 
+    ,@Description			NVARCHAR (256)
+	,@LoginKey				NVARCHAR (2048)
     ,@IsEnabled				BIT 
     ,@IsDeletable			BIT
 
@@ -18,9 +18,9 @@ BEGIN
         UPDATE [dbo].[tbl_Login]
         SET
              Id						= @Id
-            ,ActorId				= @ActorId
 	        ,Name					= @Name
 	        ,Description			= @Description
+			,LoginKey				= @LoginKey
 	        ,IsEnabled				= @IsEnabled
             ,IsDeletable			= @IsDeletable
             ,LastUpdatedUtc			= @LASTUPDATED

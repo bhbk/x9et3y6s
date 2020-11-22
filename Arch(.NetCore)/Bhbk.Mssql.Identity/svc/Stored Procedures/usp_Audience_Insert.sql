@@ -1,11 +1,9 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_Audience_Insert]
      @IssuerId				UNIQUEIDENTIFIER
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@Name					NVARCHAR (MAX) 
-    ,@Description			NVARCHAR (MAX)
+    ,@Name					NVARCHAR (128) 
+    ,@Description			NVARCHAR (256)
     ,@IsLockedOut   		BIT     
-    ,@IsEnabled 			BIT
     ,@IsDeletable			BIT
     ,@AccessFailedCount		INT  
     ,@AccessSuccessCount	INT  
@@ -26,11 +24,9 @@ BEGIN
 	        (
              Id         
 	        ,IssuerId
-            ,ActorId    
             ,Name           
             ,Description   
             ,IsLockedOut   
-            ,IsEnabled
             ,IsDeletable        
             ,AccessFailedCount  
             ,AccessSuccessCount  
@@ -43,11 +39,9 @@ BEGIN
 	        (
              @AUDIENCEID          
 	        ,@IssuerId
-            ,@ActorId   
             ,@Name           
             ,@Description       
             ,@IsLockedOut  
-            ,@IsEnabled
             ,@IsDeletable        
             ,@AccessFailedCount  
             ,@AccessSuccessCount  

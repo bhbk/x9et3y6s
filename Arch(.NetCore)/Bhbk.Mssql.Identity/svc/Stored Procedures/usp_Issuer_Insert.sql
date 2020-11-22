@@ -1,9 +1,8 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_Issuer_Insert]
-     @ActorId				UNIQUEIDENTIFIER
-    ,@Name					NVARCHAR (MAX) 
-    ,@Description			NVARCHAR (MAX)
-    ,@IssuerKey				NVARCHAR (MAX) 
+    @Name					NVARCHAR (128) 
+    ,@Description			NVARCHAR (256)
+    ,@IssuerKey				NVARCHAR (1024) 
     ,@IsEnabled				BIT 
     ,@IsDeletable			BIT
 
@@ -19,7 +18,6 @@ BEGIN
         INSERT INTO [dbo].[tbl_Issuer]
 	        (
              Id           
-            ,ActorId    
             ,Name           
             ,Description       
             ,IssuerKey       
@@ -30,7 +28,6 @@ BEGIN
         VALUES
 	        (
              @ISSUERID           
-            ,@ActorId    
             ,@Name           
             ,@Description       
             ,@IssuerKey       

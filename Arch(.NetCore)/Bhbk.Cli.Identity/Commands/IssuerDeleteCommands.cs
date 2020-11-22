@@ -29,8 +29,10 @@ namespace Bhbk.Cli.Identity.Commands
                     .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                var admin = new AdminService(conf);
-                admin.Grant = new ResourceOwnerGrantV2(conf);
+                var admin = new AdminService(conf)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf)
+                };
 
                 issuerName = ConsoleHelper.PromptForInput(CommandTypes.issuer);
                 issuer = admin.Issuer_GetV1(issuerName).Result;

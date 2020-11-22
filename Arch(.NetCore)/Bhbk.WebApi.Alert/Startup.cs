@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Alert
                 .Build();
 
             var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TSQL>()).CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);
@@ -59,12 +59,10 @@ namespace Bhbk.WebApi.Alert
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
             sc.AddSingleton<IAlertService, AlertService>(_ =>
             {
-                var alert = new AlertService
+                return new AlertService
                 {
                     Grant = new ClientCredentialGrantV2()
                 };
-
-                return alert;
             });
             sc.AddScoped<ITwilioService, TwilioService>();
             sc.AddScoped<ISendgridService, SendgridService>();
@@ -176,7 +174,7 @@ namespace Bhbk.WebApi.Alert
             * only for owin authentication configuration.
             */
 
-            var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+            var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
             var issuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
                 .Select(x => x.Value + ":" + conf["IdentityTenants:Salt"]);
@@ -191,7 +189,7 @@ namespace Bhbk.WebApi.Alert
              * check if issuer compatibility enabled. means no env salt.
              */
 
-            var legacyIssuer = seeds.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
+            var legacyIssuer = owin.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))

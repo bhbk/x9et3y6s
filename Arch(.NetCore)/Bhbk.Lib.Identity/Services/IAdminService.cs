@@ -5,14 +5,12 @@ using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Services
 {
     public interface IAdminService
     {
-        JwtSecurityToken Jwt { get; set; }
         AdminRepository Endpoints { get; }
         IOAuth2JwtGrant Grant { get; set; }
 

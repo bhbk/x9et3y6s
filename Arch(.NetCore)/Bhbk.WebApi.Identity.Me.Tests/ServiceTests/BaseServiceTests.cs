@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TSQL;
 using Bhbk.Lib.Identity.Domain.Authorize;
-using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Me.Controllers;
+using Bhbk.WebApi.Identity.Me.Tests.TestingTools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +27,7 @@ using System.Text;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
+[assembly: TestCollectionOrderer(CollectionOrdererHelper.TypeName, CollectionOrdererHelper.AssembyName)]
 namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 {
     public class BaseServiceTests : WebApplicationFactory<Startup>
@@ -37,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.SystemTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TSQL>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
@@ -48,10 +50,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                    new DefaultDataFactory(uow, mapper).Create();
-
-                    return uow;
+                    return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
                 });
                 sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
@@ -60,16 +59,19 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                  * only for owin authentication configuration.
                  */
 
-                var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                new DefaultDataFactory(seeds, mapper).Create();
+                var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
-                var issuers = seeds.Issuers.Get()
+                var tests = new TestDataFactory_TSQL(owin);
+                tests.CreateIssuers();
+                tests.CreateAudiences();
+
+                var issuers = owin.Issuers.Get()
                     .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
 
-                var issuerKeys = seeds.Issuers.Get()
+                var issuerKeys = owin.Issuers.Get()
                     .Select(x => x.IssuerKey);
 
-                var audiences = seeds.Audiences.Get()
+                var audiences = owin.Audiences.Get()
                     .Select(x => x.Name);
 
                 sc.AddControllers()

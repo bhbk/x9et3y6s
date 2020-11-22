@@ -2,9 +2,9 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Primitives;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
+using Bhbk.Lib.Identity.Domain.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
@@ -15,7 +15,6 @@ using Bhbk.Lib.QueryExpression.Exceptions;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,8 +23,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using System.Web;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
@@ -56,10 +55,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Users.AddToClaim(user, claim))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            UoW.Commit();
+            if (!UoW.Users.IsInClaim(user, claim))
+            {
+                UoW.Users.AddClaim(
+                    new tbl_UserClaim()
+                    {
+                        UserId = user.Id,
+                        ClaimId = claim.Id,
+                        IsDeletable = true,
+                    });
+                UoW.Commit();
+            }
 
             return NoContent();
         }
@@ -87,10 +93,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Users.AddToLogin(user, login))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            UoW.Commit();
+            if (!UoW.Users.IsInLogin(user, login))
+            {
+                UoW.Users.AddLogin(
+                    new tbl_UserLogin()
+                    {
+                        UserId = user.Id,
+                        LoginId = login.Id,
+                        IsDeletable = true,
+                    });
+                UoW.Commit();
+            }
 
             return NoContent();
         }
@@ -118,10 +131,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Users.AddToRole(user, role))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            UoW.Commit();
+            if (!UoW.Users.IsInRole(user, role))
+            {
+                UoW.Users.AddRole(
+                    new tbl_UserRole()
+                    {
+                        UserId = user.Id,
+                        RoleId = role.Id,
+                        IsDeletable = true,
+                    });
+                UoW.Commit();
+            }
 
             return NoContent();
         }
@@ -140,8 +160,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetIdentityGUID();
-
             var issuer = UoW.Issuers.Get(x => x.Id == model.IssuerId)
                 .SingleOrDefault();
 
@@ -153,10 +171,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             //ignore how these may be set in model...
             model.IsHumanBeing = true;
-            model.IsMultiFactor = false;
             model.EmailConfirmed = false;
-            model.PasswordConfirmed = false;
             model.PhoneNumberConfirmed = false;
+            model.PasswordConfirmed = false;
 
             if (!new ValidationHelper().ValidateEmail(model.UserName).Succeeded)
             {
@@ -168,15 +185,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             UoW.Commit();
 
-            if (UoW.InstanceType == InstanceContext.DeployedOrLocal)
+            if (UoW.InstanceType == InstanceContext.DeployedOrLocal
+                || UoW.InstanceType == InstanceContext.End2EndTest)
             {
                 var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.SettingTotpExpire).Single();
 
                 var code = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
-                    .Generate(result.UserName, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result));
+                    .Generate(result.UserName, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result.Id.ToString(), result.SecurityStamp));
 
-                var url = UrlFactory.GenerateConfirmEmailV1(Conf, result, code);
+                var url = UrlFactory.GenerateConfirmEmailV1(Conf, result.Id.ToString(), code);
                 var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
                 await alert.Enqueue_EmailV1(
@@ -189,7 +207,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         ToEmail = result.EmailAddress,
                         ToDisplay = $"{result.FirstName} {result.LastName}",
                         Subject = $"{issuer.Name} {Constants.MsgConfirmNewUserSubject}",
-                        Body = Templates.ConfirmNewUser(issuer, result, url)
+                        Body = Templates.ConfirmNewUser(Mapper.Map<IssuerV1>(issuer), Mapper.Map<UserV1>(result), url)
                     });
             }
 
@@ -210,14 +228,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetIdentityGUID();
-
             //ignore how these may be set in model...
             model.IsHumanBeing = false;
-            model.IsMultiFactor = false;
             model.EmailConfirmed = false;
-            model.PasswordConfirmed = false;
             model.PhoneNumberConfirmed = false;
+            model.PasswordConfirmed = false;
 
             if (!new ValidationHelper().ValidateEmail(model.UserName).Succeeded)
             {
@@ -246,13 +261,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (user.IsDeletable)
+            if (!user.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.UserImmutable.ToString(), $"User:{userID}");
                 return BadRequest(ModelState);
             }
-
-            user.ActorId = GetIdentityGUID();
 
             UoW.Users.Delete(user);
             UoW.Commit();
@@ -467,10 +480,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.ClaimNotFound.ToString(), $"Claim:{claimID}");
                 return NotFound(ModelState);
             }
-            else if (!UoW.Users.RemoveFromClaim(user, claim))
-                return StatusCode(StatusCodes.Status500InternalServerError);
 
-            UoW.Commit();
+            if (UoW.Users.IsInClaim(user, claim))
+            {
+                UoW.Users.RemoveClaim(
+                    new tbl_UserClaim()
+                    {
+                        UserId = user.Id,
+                        ClaimId = claim.Id,
+                    });
+                UoW.Commit();
+            }
 
             return NoContent();
         }
@@ -497,10 +517,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{loginID}");
                 return NotFound(ModelState);
             }
-            else if (!UoW.Users.RemoveFromLogin(user, login))
-                return StatusCode(StatusCodes.Status500InternalServerError);
 
-            UoW.Commit();
+            if (UoW.Users.IsInLogin(user, login))
+            {
+                UoW.Users.RemoveLogin(
+                    new tbl_UserLogin()
+                    {
+                        UserId = user.Id,
+                        LoginId = login.Id,
+                    });
+                UoW.Commit();
+            }
 
             return NoContent();
         }
@@ -527,10 +554,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
                 return NotFound(ModelState);
             }
-            else if (!UoW.Users.RemoveFromRole(user, role))
-                return StatusCode(StatusCodes.Status500InternalServerError);
 
-            UoW.Commit();
+            if (UoW.Users.IsInRole(user, role))
+            {
+                UoW.Users.RemoveRole(
+                    new tbl_UserRole()
+                    {
+                        UserId = user.Id,
+                        RoleId = role.Id,
+                    });
+                UoW.Commit();
+            }
 
             return NoContent();
         }
@@ -552,15 +586,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            user.ActorId = GetIdentityGUID();
-
             if (!UoW.Users.IsPasswordSet(user))
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"No password set for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetPasswordHash(user, null);
+            UoW.Users.SetPassword(user, null);
             UoW.Commit();
 
             return NoContent();
@@ -583,8 +615,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            user.ActorId = GetIdentityGUID();
-
             if (model.NewPassword != model.NewPasswordConfirm
                 || !new ValidationHelper().ValidatePassword(model.NewPassword).Succeeded)
             {
@@ -592,7 +622,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetPasswordHash(user, model.NewPassword);
+            UoW.Users.SetPassword(user, model.NewPassword);
             UoW.Commit();
 
             return NoContent();
@@ -621,8 +651,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.UserImmutable.ToString(), $"User:{user.Id}");
                 return BadRequest(ModelState);
             }
-
-            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Users.Update(Mapper.Map<tbl_User>(model));
 

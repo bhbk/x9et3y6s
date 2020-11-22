@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -35,8 +35,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.IssuerAlreadyExists.ToString(), $"Issuer:{model.Name}");
                 return BadRequest(ModelState);
             }
-
-            model.ActorId = GetIdentityGUID();
 
             var issuer = UoW.Issuers.Create(Mapper.Map<tbl_Issuer>(model));
 
@@ -94,13 +92,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{issuerID}");
                 return NotFound(ModelState);
             }
-            else if (issuer.IsDeletable)
+            
+            if (!issuer.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.IssuerImmutable.ToString(), $"Issuer:{issuerID}");
                 return BadRequest(ModelState);
             }
-
-            issuer.ActorId = GetIdentityGUID();
 
             var claims = UoW.Claims.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.IssuerId == issuer.Id).ToLambda());
@@ -138,7 +135,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{current}");
                 return NotFound(ModelState);
             }
-            else if (!audience.IsEnabled)
+            
+            if (audience.IsLockedOut)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{current}");
                 return BadRequest(ModelState);
@@ -237,14 +235,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{model.Id}");
                 return NotFound(ModelState);
             }
-            else if (issuer.IsDeletable
+            
+            if (issuer.IsDeletable
                 && issuer.IsDeletable != model.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.IssuerImmutable.ToString(), $"Issuer:{issuer.Id}");
                 return BadRequest(ModelState);
             }
-
-            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Issuers.Update(Mapper.Map<tbl_Issuer>(model));
 

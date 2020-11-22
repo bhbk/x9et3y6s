@@ -2,9 +2,8 @@
 CREATE PROCEDURE [svc].[usp_Role_Update]
      @Id					UNIQUEIDENTIFIER 
 	,@AudienceId			UNIQUEIDENTIFIER
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@Name					NVARCHAR (MAX) 
-    ,@Description			NVARCHAR (MAX)
+    ,@Name					NVARCHAR (128) 
+    ,@Description			NVARCHAR (256)
     ,@IsEnabled				BIT 
     ,@IsDeletable	    	BIT
 
@@ -20,7 +19,6 @@ BEGIN
         SET
              Id						= @Id
 	        ,AudienceId				= @AudienceId
-            ,ActorId				= @ActorId
 	        ,Name					= @Name
 	        ,Description			= @Description
 	        ,IsEnabled				= @IsEnabled

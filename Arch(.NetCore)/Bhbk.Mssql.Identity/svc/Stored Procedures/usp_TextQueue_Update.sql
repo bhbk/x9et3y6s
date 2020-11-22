@@ -2,7 +2,6 @@
 
 CREATE PROCEDURE [svc].[usp_TextQueue_Update]
      @Id					UNIQUEIDENTIFIER 
-    ,@ActorId				UNIQUEIDENTIFIER
     ,@FromId				UNIQUEIDENTIFIER
     ,@FromPhoneNumber       NVARCHAR (MAX) 
     ,@ToId					UNIQUEIDENTIFIER
@@ -19,7 +18,6 @@ BEGIN
         UPDATE [dbo].[tbl_TextQueue]
         SET
              Id						= @Id
-            ,ActorId				= @ActorId
             ,FromId					= @FromId
 	        ,FromPhoneNumber		= @FromPhoneNumber
             ,ToId					= @ToId

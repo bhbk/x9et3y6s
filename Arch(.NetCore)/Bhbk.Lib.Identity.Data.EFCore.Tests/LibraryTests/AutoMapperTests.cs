@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.LibraryTests
         public void Lib_AutoMapper_Profile_Success()
         {
             var Mapper = new MapperConfiguration(
-                    x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
+                    x => x.AddProfile<AutoMapperProfile_EFCore_TSQL>()).CreateMapper();
 
             Mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }
@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EFCore.Tests.LibraryTests
         public void Lib_AutoMapper_Profile_Success_Direct()
         {
             var Mapper = new MapperConfiguration(
-                    x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
+                    x => x.AddProfile<AutoMapperProfile_EFCore_TBL>()).CreateMapper();
 
             Mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }

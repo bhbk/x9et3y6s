@@ -6,8 +6,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 {
     public abstract class Logins
     {
-        public Guid? ActorId { get; set; }
-
         [Required]
         public string Name { get; set; }
 
@@ -16,11 +14,9 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string LoginKey { get; set; }
 
         [Required]
-        [DefaultValue(true)]
         public bool IsEnabled { get; set; }
 
         [Required]
-        [DefaultValue(false)]
         public bool IsDeletable { get; set; }
     }
 

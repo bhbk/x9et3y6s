@@ -1,5 +1,4 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_MOTD_Insert]
     @Author					NVARCHAR (MAX) 
     ,@Quote					NVARCHAR (MAX) 

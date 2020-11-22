@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TBL;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -84,14 +84,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TBL(uow);
+                data.Destroy();
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
@@ -115,14 +116,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TBL(uow);
+                data.Destroy();
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
@@ -146,14 +148,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TBL(uow);
+                data.Destroy();
+                data.CreateAudiences();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -177,14 +179,15 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TBL(uow);
+                data.Destroy();
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -214,8 +217,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TBL(uow);
+                data.Destroy();
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -224,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
-                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
+                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_State>(new StateV1()
@@ -267,8 +272,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TBL(uow);
+                data.Destroy();
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -277,7 +284,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
-                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
+                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_State>(new StateV1()
@@ -320,8 +327,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TBL(uow);
+                data.Destroy();
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -330,7 +339,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
-                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
+                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_State>(new StateV1()
@@ -373,8 +382,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TBL(uow);
+                data.Destroy();
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -383,7 +394,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
-                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
+                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_State>(new StateV1()
@@ -428,8 +439,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TBL(uow);
+                data.Destroy();
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -438,7 +451,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == Constants.SettingAccessExpire).Single();
 
-                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user);
+                var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
                     mapper.Map<tbl_State>(new StateV1()

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
@@ -10,7 +10,7 @@ namespace Bhbk.WebApi.Alert.Services
      */
     public class TwilioService : ITwilioService
     {
-        public async ValueTask<MessageResource> TryTextHandoff(string sid, string token, tbl_TextQueue model)
+        public async ValueTask<MessageResource> TryTextHandoff(string sid, string token, uvw_TextQueue model)
         {
             TwilioClient.Init(sid, token);
 

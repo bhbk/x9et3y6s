@@ -2,7 +2,6 @@
 
 CREATE PROCEDURE [svc].[usp_EmailQueue_Update]
      @Id					UNIQUEIDENTIFIER 
-    ,@ActorId				UNIQUEIDENTIFIER
     ,@FromId				UNIQUEIDENTIFIER
     ,@FromEmail             NVARCHAR (MAX) 
     ,@FromDisplay           NVARCHAR (MAX) 
@@ -24,7 +23,6 @@ BEGIN
         UPDATE [dbo].[tbl_EmailQueue]
         SET
              Id						= @Id
-            ,ActorId				= @ActorId
             ,FromId					= @FromId
 	        ,FromEmail				= @FromEmail
 	        ,FromDisplay			= @FromDisplay

@@ -1,8 +1,7 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Common.Services;
+﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TSQL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Alert;
@@ -38,8 +37,10 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new AlertService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
                 var result = await service.Endpoints.Enqueue_EmailV1(Base64.CreateString(8), new EmailV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -64,24 +65,26 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new AlertService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TSQL(uow);
+                data.Destroy();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
                 var result = await service.Enqueue_EmailV1(
@@ -109,8 +112,10 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new AlertService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
                 var result = await service.Endpoints.Enqueue_TextV1(Base64.CreateString(8), new TextV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -135,26 +140,28 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new AlertService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TSQL(uow);
+                data.Destroy();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                user.PhoneNumber = NumberAs.CreateString(9);
+                user.PhoneNumber = NumberAs.CreateString(11);
                 user.PhoneNumberConfirmed = true;
 
                 uow.Users.Update(user);

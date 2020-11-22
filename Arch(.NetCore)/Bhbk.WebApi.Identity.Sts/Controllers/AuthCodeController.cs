@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -119,9 +119,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
-
             var authorize = new Uri(string.Format("{0}/{1}/{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "authorize"));
             var redirect = new Uri(input.redirect_uri);
 
@@ -158,7 +155,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             UoW.Commit();
 
-            return RedirectPermanent(UrlFactory.GenerateAuthCodeV2(authorize, redirect, state).AbsoluteUri);
+            return RedirectPermanent(
+                UrlFactory.GenerateAuthCodeV2(authorize, redirect, issuer.Id.ToString(), audience.Id.ToString(), user.Id.ToString(), state.StateValue).AbsoluteUri);
         }
 
         [Route("v2/acg"), HttpGet]
@@ -226,9 +224,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
-
             var audienceList = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                     .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == user.Id))).ToLambda());
             var audiences = new List<tbl_Audience>();
@@ -236,7 +231,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check if client is single, multiple or undefined...
             if (string.IsNullOrEmpty(input.client))
                 audiences = UoW.Audiences.Get(x => audienceList.Contains(x)
-                    && x.IsEnabled == true).ToList();
+                    && x.IsLockedOut == false).ToList();
             else
             {
                 foreach (string entry in input.client.Split(","))
@@ -255,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                         return NotFound(ModelState);
                     }
-                    else if (!audience.IsEnabled
+                    else if (audience.IsLockedOut
                         || !audienceList.Contains(audience))
                     {
                         ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
@@ -298,7 +293,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check that payload can be decrypted and validated...
-            if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(user.SecurityStamp, input.code, user))
+            if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(user.SecurityStamp, input.code, user.Id.ToString(), user.SecurityStamp))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.code}");
                 return BadRequest(ModelState);

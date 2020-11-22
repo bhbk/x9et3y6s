@@ -1,6 +1,5 @@
 ﻿CREATE TABLE [dbo].[tbl_EmailQueue] (
     [Id]           UNIQUEIDENTIFIER   NOT NULL,
-    [ActorId]      UNIQUEIDENTIFIER   NULL,
     [FromId]       UNIQUEIDENTIFIER   NULL,
     [FromEmail]    VARCHAR (128)      NOT NULL,
     [FromDisplay]  VARCHAR (128)      NULL,
@@ -15,6 +14,8 @@
     CONSTRAINT [PK_tbl_EmailQueue] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_tbl_EmailQueue_UserID] FOREIGN KEY ([FromId]) REFERENCES [dbo].[tbl_User] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
 
 
 

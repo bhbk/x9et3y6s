@@ -1,8 +1,7 @@
 ﻿
 
 CREATE PROCEDURE [svc].[usp_EmailQueue_Insert]
-     @ActorId				UNIQUEIDENTIFIER
-    ,@FromId				UNIQUEIDENTIFIER
+    @FromId				UNIQUEIDENTIFIER
     ,@FromEmail             NVARCHAR (MAX) 
     ,@FromDisplay           NVARCHAR (MAX) 
     ,@ToId					UNIQUEIDENTIFIER
@@ -24,7 +23,6 @@ BEGIN
         INSERT INTO [dbo].[tbl_EmailQueue]
 	        (
              Id           
-            ,ActorId    
             ,FromId    
 			,FromEmail
 			,FromDisplay
@@ -39,7 +37,6 @@ BEGIN
         VALUES
 	        (
              @EMAILID          
-            ,@ActorId    
             ,@FromId    
             ,@FromEmail           
             ,@FromDisplay  

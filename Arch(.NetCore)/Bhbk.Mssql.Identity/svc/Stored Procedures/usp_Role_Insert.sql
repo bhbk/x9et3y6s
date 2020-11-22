@@ -1,9 +1,8 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_Role_Insert]
 	 @AudienceId			UNIQUEIDENTIFIER
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@Name					NVARCHAR (MAX) 
-    ,@Description			NVARCHAR (MAX)
+    ,@Name					NVARCHAR (128) 
+    ,@Description			NVARCHAR (256)
     ,@IsEnabled				BIT 
     ,@IsDeletable			BIT
 
@@ -20,7 +19,6 @@ BEGIN
 	        (
              Id           
 	        ,AudienceId
-            ,ActorId    
             ,Name           
             ,Description       
             ,IsEnabled     
@@ -31,7 +29,6 @@ BEGIN
 	        (
              @ROLEID         
 	        ,@AudienceId
-            ,@ActorId    
             ,@Name           
             ,@Description       
             ,@IsEnabled     

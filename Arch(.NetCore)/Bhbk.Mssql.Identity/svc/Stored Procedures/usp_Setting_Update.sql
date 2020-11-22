@@ -1,12 +1,11 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_Setting_Update]
      @Id					UNIQUEIDENTIFIER 
 	,@IssuerId				UNIQUEIDENTIFIER
 	,@AudienceId			UNIQUEIDENTIFIER
     ,@UserId				UNIQUEIDENTIFIER
-    ,@ConfigKey				NVARCHAR (MAX) 
-    ,@ConfigValue			NVARCHAR (MAX) 
+    ,@ConfigKey				NVARCHAR (128) 
+    ,@ConfigValue			NVARCHAR (1024) 
     ,@IsDeletable			BIT
 
 AS

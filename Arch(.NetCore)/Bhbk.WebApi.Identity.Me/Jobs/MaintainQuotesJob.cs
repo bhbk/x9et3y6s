@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -39,7 +39,8 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-                    if (uow.InstanceType == InstanceContext.DeployedOrLocal)
+                    if (uow.InstanceType == InstanceContext.DeployedOrLocal
+                        || uow.InstanceType == InstanceContext.End2EndTest)
                     {
                         var url = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                             && x.ConfigKey == Constants.SettingTheySaidSoUrl).Single();
@@ -79,21 +80,21 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
             return Task.CompletedTask;
         }
 
-        private void ProcessMOTDFail(HttpResponseMessage response)
+        private static void ProcessMOTDFail(HttpResponseMessage response)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
 
             Log.Error($"'{callPath}' fail on " + DateTime.UtcNow.ToString()
-                + Environment.NewLine + response.RequestMessage.ToString()
+                + Environment.NewLine + response.Content.ReadAsStringAsync().ConfigureAwait(false)
                 + Environment.NewLine + response.ToString());
         }
 
-        private void ProcessMOTDSuccess(IUnitOfWork uow, IMapper mapper, MOTDTssV1 quote)
+        private static void ProcessMOTDSuccess(IUnitOfWork uow, IMapper mapper, MOTDTssV1 quote)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var model = mapper.Map<tbl_MOTD>(quote);
+            var model = mapper.Map<uvw_MOTD>(quote);
 
-            var motds = uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
+            var motds = uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<uvw_MOTD>()
                 .Where(x => x.Author == model.Author && x.Quote == model.Quote)
                 .ToLambda());
 

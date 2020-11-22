@@ -54,10 +54,16 @@ namespace Bhbk.Lib.Identity.Grants
             _audienceSecret = conf["IdentityCredentials:AudienceSecret"];
         }
 
-        public JwtSecurityToken Jwt
+        public JwtSecurityToken AccessToken
         {
             get { return GetAsync().Result; }
             set { _access = value; }
+        }
+
+        public ValueTask<JwtSecurityToken> AccessTokenAsync
+        {
+            get { return GetAsync(); }
+            set { _access = value.Result; }
         }
 
         private async ValueTask<JwtSecurityToken> GetAsync()
@@ -74,7 +80,7 @@ namespace Bhbk.Lib.Identity.Grants
                 && _refresh.ValidFrom < DateTime.UtcNow
                 && _refresh.ValidTo > DateTime.UtcNow.AddSeconds(-60))
             {
-                HttpResponseMessage response = null;
+                HttpResponseMessage response;
                 FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                     {
                             new KeyValuePair<string, string>("issuer_id", _issuerName),
@@ -97,13 +103,13 @@ namespace Bhbk.Lib.Identity.Grants
                     return _access;
                 }
 
-                throw new HttpRequestException(response.ToString(),
-                    new Exception(response.RequestMessage.ToString()));
+                throw new HttpRequestException(response.RequestMessage.ToString(),
+                    new Exception(response.ToString()));
             }
 
             else
             {
-                HttpResponseMessage response = null;
+                HttpResponseMessage response;
                 FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
                     {
                             new KeyValuePair<string, string>("issuer_id", _issuerName),
@@ -126,8 +132,8 @@ namespace Bhbk.Lib.Identity.Grants
                     return _access;
                 }
 
-                throw new HttpRequestException(response.ToString(),
-                    new Exception(response.RequestMessage.ToString()));
+                throw new HttpRequestException(response.RequestMessage.ToString(),
+                    new Exception(response.ToString()));
             }
         }
     }

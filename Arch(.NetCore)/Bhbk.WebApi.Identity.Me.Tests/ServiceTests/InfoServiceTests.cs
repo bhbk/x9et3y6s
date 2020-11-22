@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Common.Services;
+﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TSQL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
-using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -14,7 +11,6 @@ using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -37,16 +33,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
-                new TestDataFactory(uow, mapper).CreateMOTD(3);
+                var data = new TestDataFactory_TSQL(uow);
+                data.CreateMOTDs();
 
                 var result = await service.Endpoints.Info_GetMOTDV1(Base64.CreateString(8));
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -60,23 +58,25 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
-                new TestDataFactory(uow, mapper).CreateMOTD(3);
+                var data = new TestDataFactory_TSQL(uow);
+                data.CreateMOTDs();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.Info_GetMOTDV1();
                 result.Should().BeAssignableTo<MOTDTssV1>();
@@ -89,22 +89,23 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
                 var result = await service.Endpoints.Info_UpdateCodeV1(Base64.CreateString(8), AlphaNumeric.CreateString(32), ActionType.Allow.ToString());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -117,39 +118,28 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
+                var data = new TestDataFactory_TSQL(uow);
+                data.Destroy();
+                data.CreateUserStates();
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
-
-                var state = uow.States.Create(
-                    mapper.Map<tbl_State>(new StateV1()
-                    {
-                        IssuerId = issuer.Id,
-                        AudienceId = audience.Id,
-                        UserId = user.Id,
-                        StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
-                        StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
-                    }));
-
-                uow.Commit();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var state = uow.States.GetAsNoTracking(x => x.UserId == user.Id).First();
 
                 var result = await service.Endpoints.Info_UpdateCodeV1(rop.RawData, state.StateValue, AlphaNumeric.CreateString(8));
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -163,39 +153,28 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
+                var data = new TestDataFactory_TSQL(uow);
+                data.Destroy();
+                data.CreateUserStates();
+
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
-
-                var state = uow.States.Create(
-                    mapper.Map<tbl_State>(new StateV1()
-                    {
-                        IssuerId = issuer.Id,
-                        AudienceId = audience.Id,
-                        UserId = user.Id,
-                        StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
-                        StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
-                    }));
-
-                uow.Commit();
+                var state = uow.States.GetAsNoTracking(x => x.UserId == user.Id).First();
 
                 var result = await service.Info_UpdateCodeV1(state.StateValue, ActionType.Allow.ToString());
                 result.Should().BeTrue();
@@ -204,39 +183,24 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new MeService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new MeService(instance.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                };
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Identity).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Jwt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
-
-                var state = uow.States.Create(
-                    mapper.Map<tbl_State>(new StateV1()
-                    {
-                        IssuerId = issuer.Id,
-                        AudienceId = audience.Id,
-                        UserId = user.Id,
-                        StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
-                        StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
-                    }));
-
-                uow.Commit();
+                var state = uow.States.GetAsNoTracking(x => x.UserId == user.Id).First();
 
                 var result = await service.Info_UpdateCodeV1(state.StateValue, ActionType.Deny.ToString());
                 result.Should().BeTrue();

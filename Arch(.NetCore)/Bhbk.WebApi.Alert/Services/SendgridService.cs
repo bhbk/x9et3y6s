@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
@@ -11,7 +11,7 @@ namespace Bhbk.WebApi.Alert.Services
      */
     public class SendgridService : ISendgridService
     {
-        public async ValueTask<Response> TryEmailHandoff(string apiKey, tbl_EmailQueue model)
+        public async ValueTask<Response> TryEmailHandoff(string apiKey, uvw_EmailQueue model)
         {
             var provider = new SendGridClient(apiKey);
             var msg = new SendGridMessage();

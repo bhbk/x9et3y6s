@@ -5,7 +5,6 @@ CREATE VIEW [svc].[uvw_EmailQueue]
 AS
 SELECT	
 	Id
-	,ActorId
 	,FromId
 	,FromEmail
 	,FromDisplay

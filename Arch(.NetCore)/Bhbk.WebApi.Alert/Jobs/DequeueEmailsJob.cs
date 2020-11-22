@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Bhbk.WebApi.Alert.Services;
@@ -63,7 +63,7 @@ namespace Bhbk.WebApi.Alert.Jobs
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
             var sendgridApiKey = conf["Jobs:DequeueEmails:SendgridApiKey"];
 
-            foreach (var msg in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>()
+            foreach (var msg in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>()
                 .Where(x => x.SendAtUtc < DateTime.UtcNow && x.DeliveredUtc.HasValue == false).ToLambda()))
             {
                 switch (uow.InstanceType)
@@ -76,8 +76,8 @@ namespace Bhbk.WebApi.Alert.Jobs
 
                             if (response.StatusCode == HttpStatusCode.Accepted)
                             {
-                                uow.EmailActivity.Create(
-                                    new tbl_EmailActivity()
+                                uow.EmailActivities.Create(
+                                    new uvw_EmailActivity()
                                     {
                                         Id = Guid.NewGuid(),
                                         EmailId = msg.Id,
@@ -93,8 +93,8 @@ namespace Bhbk.WebApi.Alert.Jobs
                             }
                             else
                             {
-                                uow.EmailActivity.Create(
-                                    new tbl_EmailActivity()
+                                uow.EmailActivities.Create(
+                                    new uvw_EmailActivity()
                                     {
                                         Id = Guid.NewGuid(),
                                         EmailId = msg.Id,

@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -36,8 +36,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetIdentityGUID();
-
             var result = UoW.Logins.Create(Mapper.Map<tbl_Login>(model));
 
             UoW.Commit();
@@ -58,13 +56,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login: { loginID }");
                 return NotFound(ModelState);
             }
-            else if (login.IsDeletable)
+            
+            if (!login.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.LoginImmutable.ToString(), $"Login:{login.Id}");
                 return BadRequest(ModelState);
             }
-
-            login.ActorId = GetIdentityGUID();
 
             UoW.Logins.Delete(login);
             UoW.Commit();
@@ -166,8 +163,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.LoginImmutable.ToString(), $"Login:{login.Id}");
                 return BadRequest(ModelState);
             }
-
-            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Logins.Update(Mapper.Map<tbl_Login>(model));
 

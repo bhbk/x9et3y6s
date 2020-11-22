@@ -2,10 +2,9 @@
 CREATE PROCEDURE [svc].[usp_Claim_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@IssuerId				UNIQUEIDENTIFIER
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@Subject               NVARCHAR (MAX) 
-    ,@Type					NVARCHAR (MAX)
-    ,@Value					NVARCHAR (MAX) 
+    ,@Subject               NVARCHAR (128) 
+    ,@Type					NVARCHAR (128)
+    ,@Value					NVARCHAR (256) 
     ,@ValueType             NVARCHAR (64) 
     ,@IsDeletable			BIT
 
@@ -21,7 +20,6 @@ BEGIN
         SET
              Id						= @Id
 	        ,IssuerId				= @IssuerId
-            ,ActorId				= @ActorId
 	        ,Subject				= @Subject
 	        ,Type					= @Type
 	        ,Value					= @Value

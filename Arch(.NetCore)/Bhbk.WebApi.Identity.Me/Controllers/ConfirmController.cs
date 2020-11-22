@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(email, token, user))
+            else if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(email, token, user.Id.ToString(), user.SecurityStamp))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(password, token, user))
+            else if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(password, token, user.Id.ToString(), user.SecurityStamp))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
@@ -77,7 +77,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!new TimeBasedTokenFactory(8, 10).Validate(phoneNumber, token, user))
+            else if (!new TimeBasedTokenFactory(8, 10).Validate(phoneNumber, token, user.Id.ToString()))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);

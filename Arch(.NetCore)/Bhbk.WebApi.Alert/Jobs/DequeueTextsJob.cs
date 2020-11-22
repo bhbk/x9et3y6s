@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Bhbk.WebApi.Alert.Services;
@@ -12,8 +12,10 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using Twilio.Exceptions;
 using System.Reflection;
+#if RELEASE
+using Twilio.Exceptions;
+#endif
 
 namespace Bhbk.WebApi.Alert.Jobs
 {
@@ -62,7 +64,7 @@ namespace Bhbk.WebApi.Alert.Jobs
             var twilioSid = conf["Jobs:DequeueTexts:TwilioSid"];
             var twilioToken = conf["Jobs:DequeueTexts:TwilioToken"];
 
-            foreach (var msg in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>()
+            foreach (var msg in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>()
                 .Where(x => x.SendAtUtc < DateTime.UtcNow && x.DeliveredUtc.HasValue == false).ToLambda()))
             {
                 switch (uow.InstanceType)
@@ -75,8 +77,8 @@ namespace Bhbk.WebApi.Alert.Jobs
                             {
                                 var response = twilio.TryTextHandoff(twilioSid, twilioToken, msg).Result;
 
-                                uow.TextActivity.Create(
-                                    new tbl_TextActivity()
+                                uow.TextActivities.Create(
+                                    new uvw_TextActivity()
                                     {
                                         Id = Guid.NewGuid(),
                                         TextId = msg.Id,
@@ -92,8 +94,8 @@ namespace Bhbk.WebApi.Alert.Jobs
                             }
                             catch (ApiException ex)
                             {
-                                uow.TextActivity.Create(
-                                    new tbl_TextActivity()
+                                uow.TextActivities.Create(
+                                    new uvw_TextActivity()
                                     {
                                         Id = Guid.NewGuid(),
                                         TextId = msg.Id,

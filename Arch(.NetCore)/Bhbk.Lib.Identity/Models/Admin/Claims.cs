@@ -6,8 +6,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 {
     public abstract class Claims
     {
-        public Guid? ActorId { get; set; }
-
         [Required]
         public Guid IssuerId { get; set; }
 
@@ -22,7 +20,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string ValueType { get; set; }
 
         [Required]
-        [DefaultValue(false)]
         public bool IsDeletable { get; set; }
     }
 

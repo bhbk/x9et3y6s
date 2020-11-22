@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Bhbk.Lib.Identity.Domain.Factories
 {
-    public class ValidationHelper
+    public class ValidationHelper : IValidationHelper
     {
         private readonly Regex _number = new Regex(@"[0-9]+");
         private readonly Regex _lower = new Regex(@"[a-z]+");

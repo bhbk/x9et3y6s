@@ -6,8 +6,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 {
     public abstract class Roles
     {
-        public Guid? ActorId { get; set; }
-
         [Required]
         public Guid AudienceId { get; set; }
 
@@ -17,11 +15,9 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string Description { get; set; }
 
         [Required]
-        [DefaultValue(true)]
         public bool IsEnabled { get; set; }
 
         [Required]
-        [DefaultValue(false)]
         public bool IsDeletable { get; set; }
     }
 

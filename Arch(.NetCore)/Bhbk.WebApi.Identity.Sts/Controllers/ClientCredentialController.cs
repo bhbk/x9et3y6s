@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Cryptography.Hashing;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
-            else if (!audience.IsEnabled
+            else if (audience.IsLockedOut
                 || !PBKDF2.Validate(audience.PasswordHashPBKDF2, input.client_secret))
             {
                 //adjust counter(s) for login failure...
@@ -99,9 +99,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
-
-            //no context for auth exists yet... so set actor id same as client id...
-            audience.ActorId = audience.Id;
 
             //adjust counter(s) for login success...
             UoW.Audiences.AccessSuccess(audience);
@@ -210,14 +207,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
-            else if (!audience.IsEnabled)
+            else if (audience.IsLockedOut)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
-
-            //no context for auth exists yet... so set actor id same as client id...
-            audience.ActorId = audience.Id;
 
             var cc_claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
             var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, cc_claims);

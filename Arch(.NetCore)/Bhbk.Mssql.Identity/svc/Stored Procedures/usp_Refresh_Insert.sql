@@ -3,7 +3,7 @@ CREATE PROCEDURE [svc].[usp_Refresh_Insert]
      @IssuerId				UNIQUEIDENTIFIER
     ,@AudienceId			UNIQUEIDENTIFIER
     ,@UserId				UNIQUEIDENTIFIER
-    ,@RefreshValue			NVARCHAR (512) 
+    ,@RefreshValue			NVARCHAR (2048) 
     ,@RefreshType			NVARCHAR (64)
     ,@IssuedUtc				DATETIMEOFFSET (7) 
     ,@ValidFromUtc			DATETIMEOFFSET (7)

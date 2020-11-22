@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
@@ -11,7 +11,6 @@ using Bhbk.Lib.QueryExpression.Exceptions;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -48,10 +47,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Audiences.AddToRole(audience, role))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            UoW.Commit();
+            if (!UoW.Audiences.IsInRole(audience, role))
+            {
+                UoW.Audiences.AddRole(
+                    new tbl_AudienceRole()
+                    {
+                        AudienceId = audience.Id,
+                        RoleId = role.Id,
+                        IsDeletable = true,
+                    });
+                UoW.Commit();
+            }
 
             return NoContent();
         }
@@ -70,8 +76,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.AudienceAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Audience:{model.Name}");
                 return BadRequest(ModelState);
             }
-
-            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Audiences.Create(Mapper.Map<tbl_Audience>(model));
 
@@ -93,13 +97,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{audienceID}");
                 return NotFound(ModelState);
             }
-            else if (audience.IsDeletable)
+            
+            if (!audience.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.AudienceImmutable.ToString(), $"Audience:{audienceID}");
                 return BadRequest(ModelState);
             }
-
-            audience.ActorId = GetIdentityGUID();
 
             UoW.Audiences.Delete(audience);
             UoW.Commit();
@@ -277,10 +280,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.RoleNotFound.ToString(), $"Role:{roleID}");
                 return NotFound(ModelState);
             }
-            else if (!UoW.Audiences.RemoveFromRole(audience, role))
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            UoW.Commit();
+            
+            if(UoW.Audiences.IsInRole(audience, role))
+            {
+                UoW.Audiences.RemoveRole(
+                    new tbl_AudienceRole()
+                    {
+                        AudienceId = audience.Id,
+                        RoleId = role.Id,
+                    });
+                UoW.Commit();
+            }
 
             return NoContent();
         }
@@ -302,15 +312,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            audience.ActorId = GetIdentityGUID();
-
             if (!UoW.Audiences.IsPasswordSet(audience))
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"No password set for audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
-            UoW.Audiences.SetPasswordHash(audience, null);
+            UoW.Audiences.SetPassword(audience, null);
             UoW.Commit();
 
             return NoContent();
@@ -333,8 +341,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            audience.ActorId = GetIdentityGUID();
-
             if (model.NewPassword != model.NewPasswordConfirm
                 || !new ValidationHelper().ValidatePassword(model.NewPassword).Succeeded)
             {
@@ -342,7 +348,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Audiences.SetPasswordHash(audience, model.NewPassword);
+            UoW.Audiences.SetPassword(audience, model.NewPassword);
             UoW.Commit();
 
             return NoContent();
@@ -371,8 +377,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.AudienceImmutable.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
-
-            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Audiences.Update(Mapper.Map<tbl_Audience>(model));
 

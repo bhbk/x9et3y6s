@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Exceptions;
@@ -24,10 +24,9 @@ namespace Bhbk.WebApi.Alert.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = null;
             model.FromId = null;
 
-            var email = Mapper.Map<tbl_EmailQueue>(model);
+            var email = Mapper.Map<uvw_EmailQueue>(model);
 
             UoW.EmailQueue.Create(email);
             UoW.Commit();
@@ -47,12 +46,12 @@ namespace Bhbk.WebApi.Alert.Controllers
                 {
                     Data = Mapper.Map<IEnumerable<EmailV1>>(
                         UoW.Audiences.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_EmailQueue>, IQueryable<tbl_EmailQueue>>>>(
-                                QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>().ApplyState(state)))),
+                            Mapper.MapExpression<Expression<Func<IQueryable<uvw_EmailQueue>, IQueryable<uvw_EmailQueue>>>>(
+                                QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>().ApplyState(state)))),
 
                     Total = UoW.Audiences.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_EmailQueue>, IQueryable<tbl_EmailQueue>>>>(
-                            QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>().ApplyPredicate(state)))
+                        Mapper.MapExpression<Expression<Func<IQueryable<uvw_EmailQueue>, IQueryable<uvw_EmailQueue>>>>(
+                            QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);
@@ -70,10 +69,9 @@ namespace Bhbk.WebApi.Alert.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.ActorId = null;
             model.FromId = null;
 
-            var text = Mapper.Map<tbl_TextQueue>(model);
+            var text = Mapper.Map<uvw_TextQueue>(model);
 
             UoW.TextQueue.Create(text);
             UoW.Commit();
@@ -93,12 +91,12 @@ namespace Bhbk.WebApi.Alert.Controllers
                 {
                     Data = Mapper.Map<IEnumerable<EmailV1>>(
                         UoW.Audiences.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_TextQueue>, IQueryable<tbl_TextQueue>>>>(
-                                QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>().ApplyState(state)))),
+                            Mapper.MapExpression<Expression<Func<IQueryable<uvw_TextQueue>, IQueryable<uvw_TextQueue>>>>(
+                                QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>().ApplyState(state)))),
 
                     Total = UoW.Audiences.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_TextQueue>, IQueryable<tbl_TextQueue>>>>(
-                            QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>().ApplyPredicate(state)))
+                        Mapper.MapExpression<Expression<Func<IQueryable<uvw_TextQueue>, IQueryable<uvw_TextQueue>>>>(
+                            QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>().ApplyPredicate(state)))
                 };
 
                 return Ok(result);

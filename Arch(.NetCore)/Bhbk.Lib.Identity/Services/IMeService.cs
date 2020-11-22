@@ -4,14 +4,12 @@ using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Repositories;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Services
 {
     public interface IMeService
     {
-        JwtSecurityToken Jwt { get; set; }
         MeRepository Endpoints { get; }
         IOAuth2JwtGrant Grant { get; set; }
 

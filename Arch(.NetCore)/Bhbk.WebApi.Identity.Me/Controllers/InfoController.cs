@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
@@ -7,7 +7,6 @@ using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -44,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (skip == 1)
                 skip = 0;
 
-            var motd = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
+            var motd = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<uvw_MOTD>()
                 .OrderBy("id").Skip(skip).Take(1).ToLambda())
                 .SingleOrDefault();
 
@@ -80,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
+            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<uvw_State>()
                 .Where(x => x.UserId == user.Id).ToLambda());
             UoW.Commit();
 
@@ -99,7 +98,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
+            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<uvw_State>()
                 .Where(x => x.Id == code.Id).ToLambda());
             UoW.Commit();
 
@@ -113,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (!Enum.TryParse<ActionType>(actionValue, true, out actionType))
             {
-                ModelState.AddModelError(MessageType.StateInvalid.ToString(), $"User action:{actionValue}");
+                ModelState.AddModelError(MessageType.StateInvalid.ToString(), $"Action:{actionValue}");
                 return BadRequest(ModelState);
             }
 
@@ -121,13 +120,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             if (state == null)
             {
-                ModelState.AddModelError(MessageType.StateNotFound.ToString(), $"User code:{codeValue}");
+                ModelState.AddModelError(MessageType.StateNotFound.ToString(), $"Code:{codeValue}");
                 return NotFound(ModelState);
             }
-            else if (state.StateDecision.HasValue
+            
+            if (state.StateDecision.HasValue
                 && state.StateDecision.Value == false)
             {
-                ModelState.AddModelError(MessageType.StateDenied.ToString(), $"User code:{codeValue}");
+                ModelState.AddModelError(MessageType.StateDenied.ToString(), $"Code:{codeValue}");
                 return BadRequest(ModelState);
             }
 
@@ -149,10 +149,18 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
+            if(state.UserId != user.Id)
+            {
+                ModelState.AddModelError(MessageType.StateInvalid.ToString(), $"Code:{codeValue} User:{user.Id}");
+                return BadRequest(ModelState);
+            }
+
             if (string.Equals(actionValue, ActionType.Allow.ToString(), StringComparison.OrdinalIgnoreCase))
                 state.StateDecision = true;
+
             else if (string.Equals(actionValue, ActionType.Deny.ToString(), StringComparison.OrdinalIgnoreCase))
                 state.StateDecision = false;
+
             else
                 throw new NotImplementedException();
 
@@ -165,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/refresh"), HttpGet]
         public IActionResult GetRefreshesV1()
         {
-            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+            var expr = QueryExpressionFactory.GetQueryExpression<uvw_Refresh>()
                 .Where(x => x.UserId == GetIdentityGUID()).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
@@ -190,9 +198,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<uvw_Refresh>()
                 .Where(x => x.UserId == user.Id).ToLambda());
-
             UoW.Commit();
 
             return NoContent();
@@ -201,7 +208,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/refresh/{refreshID}/revoke"), HttpDelete]
         public IActionResult DeleteRefreshV1([FromRoute] Guid refreshID)
         {
-            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+            var expr = QueryExpressionFactory.GetQueryExpression<uvw_Refresh>()
                 .Where(x => x.UserId == GetIdentityGUID() && x.Id == refreshID).ToLambda();
 
             if (!UoW.Refreshes.Exists(expr))
@@ -242,35 +249,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            user.ActorId = GetIdentityGUID();
-
-            UoW.Users.SetPasswordHash(user, model.NewPassword);
-            UoW.Commit();
-
-            return NoContent();
-        }
-
-        [Route("v1/set-multi-factor/{statusValue}"), HttpPut]
-        public IActionResult SetTwoFactorV1([FromRoute] bool statusValue)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
-
-            if (user == null)
-            {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
-                return NotFound(ModelState);
-            }
-            else if (!user.IsHumanBeing
-                || user.IsMultiFactor == statusValue)
-            {
-                ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
-                return BadRequest(ModelState);
-            }
-
-            UoW.Users.SetMultiFactorEnabled(user, statusValue);
+            UoW.Users.SetPassword(user, model.NewPassword);
             UoW.Commit();
 
             return NoContent();
@@ -297,10 +276,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Users.Update(Mapper.Map<tbl_User>(model));
-
-            if (result == null)
-                return StatusCode(StatusCodes.Status500InternalServerError);
+            var result = UoW.Users.Update(Mapper.Map<uvw_User>(model));
 
             UoW.Commit();
 

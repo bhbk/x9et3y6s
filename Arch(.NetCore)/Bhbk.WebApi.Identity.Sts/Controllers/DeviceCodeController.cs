@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -101,6 +101,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingTotpExpire).Single();
+
             var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == Constants.SettingPollingMax).Single();
 
@@ -113,7 +114,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 issuer = issuer.Id.ToString(),
                 client = audience.Id.ToString(),
                 verification_url = authorize.AbsoluteUri,
-                user_code = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user),
+                user_code = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString()),
                 device_code = nonce,
                 interval = uint.Parse(polling.ConfigValue),
             };
@@ -177,7 +178,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.AudienceNotFound.ToString(), $"Audience:{input.client}");
                 return NotFound(ModelState);
             }
-            else if (!audience.IsEnabled)
+            else if (audience.IsLockedOut)
             {
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
@@ -241,10 +242,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            //no context for auth exists yet... so set actor id same as user id...
-            user.ActorId = user.Id;
-
-            if (!new TimeBasedTokenFactory(8, 10).Validate(user.SecurityStamp, input.user_code, user))
+            if (!new TimeBasedTokenFactory(8, 10).Validate(user.SecurityStamp, input.user_code, user.Id.ToString()))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.user_code}");
                 return BadRequest(ModelState);

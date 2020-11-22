@@ -1,14 +1,16 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_User_Update]
      @Id					UNIQUEIDENTIFIER 
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@UserName				NVARCHAR (MAX) 
-    ,@EmailAddress			NVARCHAR (MAX)
-    ,@FirstName				NVARCHAR (MAX)
-    ,@LastName				NVARCHAR (MAX) 
+    ,@UserName				NVARCHAR (256) 
+    ,@EmailAddress			NVARCHAR (256)
+    ,@EmailConfirmed   		BIT     
+    ,@FirstName				NVARCHAR (128)
+    ,@LastName				NVARCHAR (128) 
     ,@PhoneNumber			NVARCHAR (16)
-    ,@IsLockedOut   		BIT     
+    ,@PhoneNumberConfirmed	BIT     
+	,@PasswordConfirmed		BIT
     ,@IsHumanBeing			BIT
+    ,@IsLockedOut   		BIT     
     ,@IsDeletable			BIT
     ,@LockoutEndUtc			DATETIMEOFFSET (7)
 
@@ -23,15 +25,17 @@ BEGIN
         UPDATE [dbo].[tbl_User]
         SET
              Id						= @Id
-            ,ActorId				= @ActorId
             ,UserName				= @UserName
 	        ,EmailAddress			= @EmailAddress
+			,EmailConfirmed			= @EmailConfirmed
             ,FirstName				= @FirstName
             ,LastName				= @LastName
             ,PhoneNumber			= @PhoneNumber
+			,PhoneNumberConfirmed	= @PhoneNumberConfirmed
+			,PasswordConfirmed		= @PasswordConfirmed
             ,LastUpdatedUtc			= @LASTUPDATED
-            ,IsLockedOut			= @IsLockedOut
             ,IsHumanBeing			= @IsHumanBeing
+            ,IsLockedOut			= @IsLockedOut
             ,IsDeletable			= @IsDeletable
             ,LockoutEndUtc	    	= @LockoutEndUtc
         WHERE Id = @Id

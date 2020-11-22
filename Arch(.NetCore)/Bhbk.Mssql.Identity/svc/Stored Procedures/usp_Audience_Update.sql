@@ -2,11 +2,9 @@
 CREATE PROCEDURE [svc].[usp_Audience_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@IssuerId				UNIQUEIDENTIFIER
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@Name					NVARCHAR (MAX) 
-    ,@Description			NVARCHAR (MAX)
+    ,@Name					NVARCHAR (128) 
+    ,@Description			NVARCHAR (256)
     ,@IsLockedOut		    BIT     
-    ,@IsEnabled 			BIT
     ,@IsDeletable			BIT
     ,@AccessFailedCount		INT  
     ,@AccessSuccessCount	INT  
@@ -25,12 +23,10 @@ BEGIN
         UPDATE [dbo].[tbl_Audience]
         SET
              Id						= @Id
-            ,ActorId				= @ActorId
             ,IssuerId				= @IssuerId
 	        ,Name					= @Name
 	        ,Description			= @Description
             ,IsLockedOut			= @IsLockedOut
-            ,IsEnabled              = @IsEnabled
             ,IsDeletable			= @IsDeletable
             ,AccessFailedCount		= @AccessFailedCount
             ,AccessSuccessCount		= @AccessSuccessCount

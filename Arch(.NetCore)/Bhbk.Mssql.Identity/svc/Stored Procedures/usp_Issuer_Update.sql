@@ -1,10 +1,9 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_Issuer_Update]
      @Id					UNIQUEIDENTIFIER 
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@Name					NVARCHAR (MAX) 
-    ,@Description			NVARCHAR (MAX)
-    ,@IssuerKey				NVARCHAR (MAX) 
+    ,@Name					NVARCHAR (128) 
+    ,@Description			NVARCHAR (256)
+    ,@IssuerKey				NVARCHAR (1024) 
     ,@IsEnabled				BIT 
     ,@IsDeletable			BIT
 
@@ -19,7 +18,6 @@ BEGIN
         UPDATE [dbo].[tbl_Issuer]
         SET
              Id						= @Id
-            ,ActorId				= @ActorId
 	        ,Name					= @Name
 	        ,Description			= @Description
 	        ,IssuerKey				= @IssuerKey

@@ -1,9 +1,9 @@
 ﻿
-CREATE VIEW [svc].uvw_User
+
+CREATE VIEW [svc].[uvw_User]
 AS
 SELECT
     Id
-    ,ActorId
     ,UserName
     ,EmailAddress
     ,EmailConfirmed
@@ -16,7 +16,6 @@ SELECT
     ,PasswordHashSHA256
     ,PasswordConfirmed
     ,SecurityStamp
-    ,IsMultiFactor
     ,IsHumanBeing
     ,IsDeletable
     ,IsLockedOut

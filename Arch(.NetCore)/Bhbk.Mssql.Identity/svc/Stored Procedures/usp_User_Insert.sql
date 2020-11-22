@@ -1,10 +1,9 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_User_Insert]
-    @ActorId            UNIQUEIDENTIFIER
-    ,@UserName          NVARCHAR (MAX) 
-    ,@EmailAddress      NVARCHAR (MAX)
-    ,@FirstName         NVARCHAR (MAX)
-    ,@LastName          NVARCHAR (MAX) 
+    @UserName          NVARCHAR (256) 
+    ,@EmailAddress      NVARCHAR (256)
+    ,@FirstName         NVARCHAR (128)
+    ,@LastName          NVARCHAR (128) 
     ,@PhoneNumber       NVARCHAR (16)
     ,@IsHumanBeing      BIT
     ,@IsLockedOut       BIT     
@@ -23,7 +22,6 @@ BEGIN
         INSERT INTO [dbo].[tbl_User]
 	        (
              Id           
-            ,ActorId    
             ,UserName  
 	        ,EmailAddress
             ,EmailConfirmed       
@@ -32,7 +30,6 @@ BEGIN
             ,PhoneNumber      
             ,PhoneNumberConfirmed  
             ,IsHumanBeing         
-            ,IsMultiFactor 
             ,IsLockedOut      
             ,IsDeletable        
             ,AccessFailedCount  
@@ -46,7 +43,6 @@ BEGIN
         VALUES
 	        (
              @USERID       
-            ,@ActorId    
             ,@UserName         
 	        ,@EmailAddress
             ,'FALSE'     
@@ -55,7 +51,6 @@ BEGIN
             ,@PhoneNumber      
             ,'FALSE'     
             ,@IsHumanBeing         
-            ,'FALSE'     
             ,@IsLockedOut      
             ,@IsDeletable        
             ,0

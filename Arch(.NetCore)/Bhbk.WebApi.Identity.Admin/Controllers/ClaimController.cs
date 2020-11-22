@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -38,8 +38,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            model.ActorId = GetIdentityGUID();
-
             var result = UoW.Claims.Create(Mapper.Map<tbl_Claim>(model));
 
             UoW.Commit();
@@ -62,13 +60,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (claim.IsDeletable)
+            if (!claim.IsDeletable)
             {
                 ModelState.AddModelError(MessageType.ClaimImmutable.ToString(), $"Claim:{claimID}");
                 return BadRequest(ModelState);
             }
-
-            claim.ActorId = GetIdentityGUID();
 
             UoW.Claims.Delete(claim);
             UoW.Commit();
@@ -148,8 +144,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 ModelState.AddModelError(MessageType.ClaimImmutable.ToString(), $"Claim:{claim.Id}");
                 return BadRequest(ModelState);
             }
-
-            model.ActorId = GetIdentityGUID();
 
             var result = UoW.Claims.Update(Mapper.Map<tbl_Claim>(model));
 

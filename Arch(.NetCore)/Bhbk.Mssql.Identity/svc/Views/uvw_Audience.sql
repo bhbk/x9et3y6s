@@ -4,7 +4,6 @@ AS
 SELECT
 	Id
 	,IssuerId
-	,ActorId
 	,Name
 	,Description
 	,ConcurrencyStamp
@@ -12,7 +11,6 @@ SELECT
 	,PasswordHashSHA256
 	,SecurityStamp
 	,IsLockedOut
-	,IsEnabled
 	,IsDeletable
 	,AccessFailedCount
 	,AccessSuccessCount

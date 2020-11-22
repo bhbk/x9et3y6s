@@ -30,8 +30,10 @@ namespace Bhbk.Cli.Identity.Commands
                     .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                var admin = new AdminService(conf);
-                admin.Grant = new ResourceOwnerGrantV2(conf);
+                var admin = new AdminService(conf)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf)
+                };
 
                 _issuerName = ConsoleHelper.PromptForInput(CommandTypes.issuer);
                 issuer = admin.Issuer_GetV1(_issuerName).Result;
@@ -55,7 +57,8 @@ namespace Bhbk.Cli.Identity.Commands
                     {
                         IssuerId = issuer.Id,
                         Name = _audienceName,
-                        IsEnabled = true,
+                        IsLockedOut = false,
+                        IsDeletable = true,
                     }).Result;
 
                     if (audience != null)

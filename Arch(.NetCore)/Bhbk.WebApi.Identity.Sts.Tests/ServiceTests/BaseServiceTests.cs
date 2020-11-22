@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TBL;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Profiles;
@@ -9,6 +9,7 @@ using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Sts.Controllers;
+using Bhbk.WebApi.Identity.Sts.Tests.TestingTools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +27,7 @@ using System.Text;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
+[assembly: TestCollectionOrderer(CollectionOrdererHelper.TypeName, CollectionOrdererHelper.AssembyName)]
 namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 {
     public class BaseServiceTests : WebApplicationFactory<Startup>
@@ -37,7 +39,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.SystemTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
@@ -49,7 +51,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
                     var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                    new DefaultDataFactory(uow, mapper).Create();
+
+                    var data = new DefaultDataFactory_TBL(uow);
+                    data.CreateSettings();
+                    data.CreateAudienceRoles();
+                    data.CreateUserLogins();
+                    data.CreateUserRoles();
 
                     return uow;
                 });
@@ -60,16 +67,19 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                  * only for owin authentication configuration.
                  */
 
-                var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                new DefaultDataFactory(seeds, mapper).Create();
+                var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
-                var issuers = seeds.Issuers.Get()
+                var data = new DefaultDataFactory_TBL(owin);
+                data.CreateIssuers();
+                data.CreateAudiences();
+
+                var issuers = owin.Issuers.Get()
                     .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
 
-                var issuerKeys = seeds.Issuers.Get()
+                var issuerKeys = owin.Issuers.Get()
                     .Select(x => x.IssuerKey);
 
-                var audiences = seeds.Audiences.Get()
+                var audiences = owin.Audiences.Get()
                     .Select(x => x.Name);
 
                 sc.AddControllers()

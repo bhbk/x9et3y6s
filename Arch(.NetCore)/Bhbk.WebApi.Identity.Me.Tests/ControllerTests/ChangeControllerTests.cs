@@ -1,8 +1,7 @@
-﻿using AutoMapper;
-using Bhbk.Lib.Common.Services;
+﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TSQL;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;
@@ -13,8 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using Xunit;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
 {
@@ -30,7 +29,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -42,8 +40,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TSQL(uow);
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -71,7 +69,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -81,8 +78,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TSQL(uow);
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -110,7 +108,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -120,8 +117,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TSQL(uow);
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -148,7 +146,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -158,8 +155,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TSQL(uow);
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
@@ -186,7 +184,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -198,13 +195,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TSQL(uow);
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
-                var newPhone = NumberAs.CreateString(10);
+                var newPhone = NumberAs.CreateString(11);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -227,7 +225,6 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -239,13 +236,14 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
 
-                new TestDataFactory(uow, mapper).Destroy();
-                new TestDataFactory(uow, mapper).Create();
+                var data = new TestDataFactory_TSQL(uow);
+                data.CreateAudiences();
+                data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
-                var newPhone = NumberAs.CreateString(10);
+                var newPhone = NumberAs.CreateString(11);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 

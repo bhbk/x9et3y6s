@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
-using Bhbk.Lib.Identity.Data.EFCore.Models_DIRECT;
+﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.Configuration;
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Alert.Jobs
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
             var expire = int.Parse(conf["Jobs:MaintainEmails:ExpireDelay"]);
 
-            foreach (var entry in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>()
+            foreach (var entry in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>()
                 .Where(x => x.CreatedUtc < DateTime.UtcNow.AddSeconds(-(expire))).ToLambda()))
             {
                 Log.Warning($"'{callPath}' is deleting email (ID=" + entry.Id.ToString() + ") that was created on " 

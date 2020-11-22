@@ -2,9 +2,8 @@
 
 CREATE PROCEDURE [svc].[usp_Url_Insert]
 	@AudienceId				UNIQUEIDENTIFIER
-    ,@ActorId				UNIQUEIDENTIFIER
-    ,@UrlHost				NVARCHAR (MAX) 
-    ,@UrlPath				NVARCHAR (MAX) 
+    ,@UrlHost				NVARCHAR (1024) 
+    ,@UrlPath				NVARCHAR (1024) 
     ,@IsEnabled				BIT 
     ,@IsDeletable			BIT
 
@@ -21,7 +20,6 @@ BEGIN
 	        (
              Id           
 	        ,AudienceId
-            ,ActorId    
             ,UrlHost 
             ,UrlPath       
             ,IsEnabled     
@@ -32,7 +30,6 @@ BEGIN
 	        (
              @URLID         
 	        ,@AudienceId
-            ,@ActorId    
             ,@UrlHost
             ,@UrlPath       
             ,@IsEnabled     

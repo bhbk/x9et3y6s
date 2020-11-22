@@ -6,8 +6,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 {
     public abstract class Audiences
     {
-        public Guid? ActorId { get; set; }
-
         [Required]
         public Guid IssuerId { get; set; }
 
@@ -21,15 +19,9 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string Description { get; set; }
 
         [Required]
-        [DefaultValue(true)]
         public bool IsLockedOut { get; set; }
 
         [Required]
-        [DefaultValue(true)]
-        public bool IsEnabled { get; set; }
-
-        [Required]
-        [DefaultValue(false)]
         public bool IsDeletable { get; set; }
 
         public string ConcurrencyStamp { get; set; }

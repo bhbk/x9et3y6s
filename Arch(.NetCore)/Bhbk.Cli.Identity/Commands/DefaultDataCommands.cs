@@ -1,10 +1,8 @@
-﻿using AutoMapper;
-using Bhbk.Lib.CommandLine.IO;
+﻿using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_DIRECT;
+using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
 using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Domain.Profiles;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -42,9 +40,8 @@ namespace Bhbk.Cli.Identity.Commands
                     .Build();
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);
-                var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_DIRECT>()).CreateMapper();
                 var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                var data = new DefaultDataFactory(uow, mapper);
+                var data = new DefaultDataFactory_TSQL(uow);
 
                 if (_create)
                 {
@@ -52,7 +49,15 @@ namespace Bhbk.Cli.Identity.Commands
                     Console.WriteLine("\tPress key to create default data...");
                     Console.ReadKey();
 
-                    data.Create();
+                    data.CreateSettings();
+                    data.CreateIssuers();
+                    data.CreateAudiences();
+                    data.CreateAudienceRoles();
+                    data.CreateRoles();
+                    data.CreateLogins();
+                    data.CreateUsers();
+                    data.CreateUserLogins();
+                    data.CreateUserRoles();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();
