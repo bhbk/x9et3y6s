@@ -36,7 +36,11 @@ BEGIN
             ,@CREATEDUTC         
 	        );
 
-        SELECT * FROM [svc].[uvw_Role] WHERE [svc].[uvw_Role].Id = @ROLEID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Role]
+            WHERE Id = @ROLEID
 
     END TRY
 

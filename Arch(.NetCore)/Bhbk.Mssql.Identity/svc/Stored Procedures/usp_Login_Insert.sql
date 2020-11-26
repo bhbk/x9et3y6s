@@ -36,7 +36,11 @@ BEGIN
             ,@IsDeletable        
 	        );
 
-        SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @LOGINID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Login]
+            WHERE Id = @LOGINID
 
     END TRY
 

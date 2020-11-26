@@ -1,13 +1,10 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_EmailQueue_Insert]
-    @FromId				UNIQUEIDENTIFIER
-    ,@FromEmail             NVARCHAR (MAX) 
-    ,@FromDisplay           NVARCHAR (MAX) 
-    ,@ToId					UNIQUEIDENTIFIER
-    ,@ToEmail               NVARCHAR (MAX) 
-    ,@ToDisplay             NVARCHAR (MAX) 
-    ,@Subject               NVARCHAR (MAX) 
+    @FromEmail             NVARCHAR (320) 
+    ,@FromDisplay           NVARCHAR (512) 
+    ,@ToEmail               NVARCHAR (320) 
+    ,@ToDisplay             NVARCHAR (512) 
+    ,@Subject               NVARCHAR (1024) 
     ,@Body      			NVARCHAR (MAX)
     ,@SendAtUtc             DATETIMEOFFSET (7) 
 
@@ -23,33 +20,35 @@ BEGIN
         INSERT INTO [dbo].[tbl_EmailQueue]
 	        (
              Id           
-            ,FromId    
 			,FromEmail
 			,FromDisplay
-			,ToId
 			,ToEmail
 			,ToDisplay
             ,Subject           
             ,Body 
+			,IsCancelled
 			,CreatedUtc
             ,SendAtUtc           
 	        )
         VALUES
 	        (
              @EMAILID          
-            ,@FromId    
             ,@FromEmail           
             ,@FromDisplay  
-            ,@ToId 
             ,@ToEmail
 			,@ToDisplay
 			,@Subject
 			,@Body
+			,'FALSE'
             ,@CREATEDUTC           
             ,@SendAtUtc        
 	        );
 
-        SELECT * FROM [svc].[uvw_EmailQueue] WHERE [svc].[uvw_EmailQueue].Id = @EMAILID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_EmailQueue]
+            WHERE Id = @EMAILID
 
     END TRY
 

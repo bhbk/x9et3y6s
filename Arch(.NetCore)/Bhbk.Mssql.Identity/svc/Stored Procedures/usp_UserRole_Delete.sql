@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE   PROCEDURE [svc].[usp_UserRole_Delete]
     @UserID uniqueidentifier
 	,@RoleID uniqueidentifier
@@ -11,8 +9,8 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_UserRole] 
-			WHERE [svc].[uvw_UserRole].UserId = @UserID AND [svc].[uvw_UserRole].RoleId = @RoleID 
+        SELECT * FROM [dbo].[tbl_UserRole] 
+			WHERE UserId = @UserID AND RoleId = @RoleID 
 
         DELETE [dbo].[tbl_UserRole]
 	        WHERE UserId = @UserID AND RoleId = @RoleID

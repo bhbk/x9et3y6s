@@ -36,7 +36,11 @@ BEGIN
             ,@CREATEDUTC          
 	        );
 
-        SELECT * FROM [svc].[uvw_Issuer] WHERE [svc].[uvw_Issuer].Id = @ISSUERID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Issuer]
+            WHERE Id = @ISSUERID
 
     END TRY
 

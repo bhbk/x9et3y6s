@@ -5,14 +5,10 @@ namespace Bhbk.Lib.Identity.Models.Alert
 {
     public abstract class Emails
     {
-        public Guid? FromId { get; set; }
-
         [DataType(DataType.EmailAddress)]
         public string FromEmail { get; set; }
 
         public string FromDisplay { get; set; }
-
-        public Guid? ToId { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
@@ -23,7 +19,11 @@ namespace Bhbk.Lib.Identity.Models.Alert
         [Required]
         public string Subject { get; set; }
 
+        [Required]
         public string Body { get; set; }
+
+        [Required]
+        public bool IsCancelled { get; set; }
 
         [Required]
         public DateTimeOffset CreatedUtc { get; set; }

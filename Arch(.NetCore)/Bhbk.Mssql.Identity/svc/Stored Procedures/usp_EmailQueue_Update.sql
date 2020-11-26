@@ -2,15 +2,9 @@
 
 CREATE PROCEDURE [svc].[usp_EmailQueue_Update]
      @Id					UNIQUEIDENTIFIER 
-    ,@FromId				UNIQUEIDENTIFIER
-    ,@FromEmail             NVARCHAR (MAX) 
-    ,@FromDisplay           NVARCHAR (MAX) 
-    ,@ToId					UNIQUEIDENTIFIER
-    ,@ToEmail               NVARCHAR (MAX) 
-    ,@ToDisplay             NVARCHAR (MAX) 
-    ,@Subject               NVARCHAR (MAX) 
-    ,@Body      			NVARCHAR (MAX)
+    ,@IsCancelled			BIT
     ,@SendAtUtc             DATETIMEOFFSET (7) 
+    ,@DeliveredUtc			DATETIMEOFFSET (7) 
 
 AS
 BEGIN
@@ -18,23 +12,19 @@ BEGIN
 
 	BEGIN TRY
 
-        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
-
         UPDATE [dbo].[tbl_EmailQueue]
         SET
              Id						= @Id
-            ,FromId					= @FromId
-	        ,FromEmail				= @FromEmail
-	        ,FromDisplay			= @FromDisplay
-            ,ToId					= @ToId
-            ,ToEmail				= @ToEmail
-            ,ToDisplay				= @ToDisplay
-            ,Subject				= @Subject
-            ,Body       			= @Body
+			,IsCancelled			= @IsCancelled
             ,SendAtUtc				= @SendAtUtc
+			,DeliveredUtc			= @DeliveredUtc
         WHERE Id = @Id
 
-        SELECT * FROM [svc].[uvw_EmailQueue] WHERE [svc].[uvw_EmailQueue].Id = @Id
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_EmailQueue]
+            WHERE Id = @Id 
 
     END TRY
 

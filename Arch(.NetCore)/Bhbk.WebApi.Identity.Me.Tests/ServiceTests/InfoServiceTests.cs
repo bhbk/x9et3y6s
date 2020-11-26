@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TSQL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Me;
@@ -43,7 +43,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.CreateMOTDs();
 
                 var result = await service.Endpoints.Info_GetMOTDV1(Base64.CreateString(8));
@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.CreateMOTDs();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
@@ -128,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateUserStates();
 
@@ -163,7 +163,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateUserStates();
 

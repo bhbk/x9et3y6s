@@ -5,13 +5,9 @@ namespace Bhbk.Lib.Identity.Models.Alert
 {
     public abstract class Texts
     {
-        public Guid? FromId { get; set; }
-
         [DataType(DataType.PhoneNumber)]
         //[RegularExpression("^\\+[1-9]\\d{1,14}$")]
         public string FromPhoneNumber { get; set; }
-
-        public Guid? ToId { get; set; }
 
         [Required]
         [DataType(DataType.PhoneNumber)]
@@ -20,6 +16,9 @@ namespace Bhbk.Lib.Identity.Models.Alert
 
         [Required]
         public string Body { get; set; }
+
+        [Required]
+        public bool IsCancelled { get; set; }
 
         [Required]
         public DateTimeOffset CreatedUtc { get; set; }

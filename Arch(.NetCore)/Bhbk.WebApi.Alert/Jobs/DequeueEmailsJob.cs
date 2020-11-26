@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Models_TSQL;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Bhbk.WebApi.Alert.Services;
@@ -64,7 +64,8 @@ namespace Bhbk.WebApi.Alert.Jobs
             var sendgridApiKey = conf["Jobs:DequeueEmails:SendgridApiKey"];
 
             foreach (var msg in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>()
-                .Where(x => x.SendAtUtc < DateTime.UtcNow && x.DeliveredUtc.HasValue == false).ToLambda()))
+                .Where(x => x.SendAtUtc < DateTime.UtcNow 
+                    && x.DeliveredUtc.HasValue == false && x.IsCancelled == false).ToLambda()))
             {
                 switch (uow.InstanceType)
                 {
@@ -79,11 +80,9 @@ namespace Bhbk.WebApi.Alert.Jobs
                                 uow.EmailActivities.Create(
                                     new uvw_EmailActivity()
                                     {
-                                        Id = Guid.NewGuid(),
                                         EmailId = msg.Id,
                                         SendgridId = response.Headers.GetValues("X-MESSAGE-ID").Single(),
                                         SendgridStatus = response.StatusCode.ToString(),
-                                        StatusAtUtc = DateTime.UtcNow,
                                     });
 
                                 msg.DeliveredUtc = DateTime.UtcNow;
@@ -96,10 +95,8 @@ namespace Bhbk.WebApi.Alert.Jobs
                                 uow.EmailActivities.Create(
                                     new uvw_EmailActivity()
                                     {
-                                        Id = Guid.NewGuid(),
                                         EmailId = msg.Id,
                                         SendgridStatus = response.StatusCode.ToString(),
-                                        StatusAtUtc = DateTime.UtcNow,
                                     });
 
                                 Log.Warning($"'{callPath}' hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +

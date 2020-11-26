@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;

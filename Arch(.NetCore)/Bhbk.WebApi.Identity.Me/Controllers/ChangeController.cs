@@ -61,10 +61,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             await alert.Enqueue_EmailV1(
                 new EmailV1()
                 {
-                    FromId = user.Id,
                     FromEmail = user.EmailAddress,
                     FromDisplay = $"{user.FirstName} {user.LastName}",
-                    ToId = user.Id,
                     ToEmail = user.EmailAddress,
                     ToDisplay = $"{user.FirstName} {user.LastName}",
                     Subject = Constants.MsgConfirmEmailSubject,
@@ -116,10 +114,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             await alert.Enqueue_EmailV1(
                 new EmailV1()
                 {
-                    FromId = user.Id,
                     FromEmail = user.EmailAddress,
                     FromDisplay = $"{user.FirstName} {user.LastName}",
-                    ToId = user.Id,
                     ToEmail = user.EmailAddress,
                     ToDisplay = $"{user.FirstName} {user.LastName}",
                     Subject = Constants.MsgConfirmPasswordSubject,
@@ -167,9 +163,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             await alert.Enqueue_TextV1(
                 new TextV1()
                 {
-                    FromId = user.Id,
                     FromPhoneNumber = model.NewPhoneNumber,
-                    ToId = user.Id,
                     ToPhoneNumber = model.NewPhoneNumber,
                     Body = token
                 });

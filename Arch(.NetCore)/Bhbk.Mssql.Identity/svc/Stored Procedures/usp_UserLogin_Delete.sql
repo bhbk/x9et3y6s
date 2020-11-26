@@ -1,7 +1,4 @@
 ﻿
-
-
-
 CREATE   PROCEDURE [svc].[usp_UserLogin_Delete]
     @UserID uniqueidentifier
 	,@LoginID uniqueidentifier
@@ -12,8 +9,8 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_UserLogin] 
-			WHERE [svc].[uvw_UserLogin].UserId = @UserID AND [svc].[uvw_UserLogin].LoginId = @LoginID 
+        SELECT * FROM [dbo].[tbl_UserLogin] 
+			WHERE UserId = @UserID AND LoginId = @LoginID 
 
         DELETE [dbo].[tbl_UserLogin]
 	        WHERE UserId = @UserID AND LoginId = @LoginID

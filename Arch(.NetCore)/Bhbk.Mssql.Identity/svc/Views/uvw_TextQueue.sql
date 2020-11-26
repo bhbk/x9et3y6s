@@ -1,15 +1,12 @@
 ﻿
-
-
 CREATE VIEW [svc].[uvw_TextQueue]
 AS
 SELECT
 	Id
-	,FromId
 	,FromPhoneNumber
-	,ToId
 	,ToPhoneNumber
 	,Body
+	,IsCancelled
 	,CreatedUtc
 	,SendAtUtc
 	,DeliveredUtc

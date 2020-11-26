@@ -1,5 +1,4 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_Url_Insert]
 	@AudienceId				UNIQUEIDENTIFIER
     ,@UrlHost				NVARCHAR (1024) 
@@ -37,7 +36,11 @@ BEGIN
             ,@CREATEDUTC         
 	        );
 
-        SELECT * FROM [svc].[uvw_Url] WHERE [svc].[uvw_Url].Id = @URLID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Url]
+            WHERE Id = @URLID
 
     END TRY
 

@@ -8,34 +8,36 @@ BEGIN
 
 	BEGIN TRY
 
-		DECLARE @AUDIENCEID uniqueidentifier = 
-			(SELECT TOP(1) Id FROM [dbo].[tbl_Audience] WHERE IssuerId = @ID)
+		SELECT * FROM [dbo].[tbl_Issuer]
+			WHERE Id = @ID
 
-		SELECT * FROM [svc].[uvw_Issuer] WHERE [svc].[uvw_Issuer].Id = @ID
+		DECLARE @AUDIENCEID uniqueidentifier = 
+			(SELECT TOP(1) Id FROM [dbo].[tbl_Audience] 
+				WHERE IssuerId = @ID)
 
         DELETE [dbo].[tbl_Activity]
-        WHERE AudienceId = @AUDIENCEID
+	        WHERE AudienceId = @AUDIENCEID
 
 		DELETE [dbo].[tbl_Claim]
-		WHERE IssuerId = @ID
+			WHERE IssuerId = @ID
 
 		DELETE [dbo].[tbl_Refresh]
-		WHERE IssuerId = @ID
+			WHERE IssuerId = @ID
 
 		DELETE [dbo].[tbl_Setting]
-		WHERE IssuerId = @ID
+			WHERE IssuerId = @ID
 
 		DELETE [dbo].[tbl_State]
-		WHERE IssuerId = @ID
+			WHERE IssuerId = @ID
 
 		DELETE [dbo].[tbl_Role]
-		WHERE AudienceId = @AUDIENCEID
+			WHERE AudienceId = @AUDIENCEID
 
 		DELETE [dbo].[tbl_Audience]
-		WHERE IssuerId = @ID
+			WHERE IssuerId = @ID
 
 		DELETE [dbo].[tbl_Issuer]
-		WHERE Id = @ID
+			WHERE Id = @ID
 
     END TRY
 

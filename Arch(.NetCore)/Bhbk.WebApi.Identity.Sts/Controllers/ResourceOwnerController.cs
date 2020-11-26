@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Hashing;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives;

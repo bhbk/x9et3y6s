@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_EmailActivity_Delete]
     @ID uniqueidentifier
 
@@ -10,10 +8,11 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_EmailActivity] WHERE [svc].[uvw_EmailActivity].Id = @ID
+        SELECT * FROM [dbo].[tbl_EmailActivity]
+            WHERE Id = @ID
 
         DELETE [dbo].[tbl_EmailActivity]
-        WHERE Id = @ID
+            WHERE Id = @ID
 
     END TRY
 

@@ -25,7 +25,11 @@ BEGIN
             ,IsDeletable			= @IsDeletable
         WHERE Id = @Id
 
-        SELECT * FROM [svc].[uvw_Setting] WHERE [svc].[uvw_Setting].Id = @Id
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Setting]
+            WHERE Id = @Id
 
     END TRY
 

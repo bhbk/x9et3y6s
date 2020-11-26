@@ -1,10 +1,7 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_TextQueue_Insert]
-    @FromId		    		UNIQUEIDENTIFIER
-    ,@FromPhoneNumber       NVARCHAR (MAX) 
-    ,@ToId					UNIQUEIDENTIFIER
-    ,@ToPhoneNumber         NVARCHAR (MAX) 
+    @FromPhoneNumber       NVARCHAR (15) 
+    ,@ToPhoneNumber         NVARCHAR (15) 
     ,@Body					NVARCHAR (MAX)
     ,@SendAtUtc             DATETIMEOFFSET (7) 
 
@@ -20,27 +17,29 @@ BEGIN
         INSERT INTO [dbo].[tbl_TextQueue]
 	        (
              Id           
-            ,FromId    
 			,FromPhoneNumber
-			,ToId
 			,ToPhoneNumber
             ,Body 
+			,IsCancelled
 			,CreatedUtc
             ,SendAtUtc           
 	        )
         VALUES
 	        (
              @TEXTID          
-            ,@FromId    
             ,@FromPhoneNumber       
-            ,@ToId 
             ,@ToPhoneNumber
 			,@Body
+			,'FALSE'
             ,@CREATEDUTC           
             ,@SendAtUtc        
 	        );
 
-        SELECT * FROM [svc].[uvw_TextQueue] WHERE [svc].[uvw_TextQueue].Id = @TEXTID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_TextQueue]
+            WHERE Id = @TEXTID
 
     END TRY
 

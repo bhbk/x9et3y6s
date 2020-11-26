@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_Url_Delete]
     @ID uniqueidentifier
 
@@ -10,10 +8,11 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_Url] WHERE [svc].[uvw_Url].Id = @ID
+        SELECT * FROM [dbo].[tbl_Url]
+            WHERE Id = @ID
 
         DELETE [dbo].[tbl_Url]
-        WHERE Id = @ID
+            WHERE Id = @ID
 
     END TRY
 

@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TSQL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Alert;
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateUsers();
 
@@ -90,9 +90,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var result = await service.Enqueue_EmailV1(
                     new EmailV1()
                     {
-                        FromId = user.Id,
                         FromEmail = user.EmailAddress,
-                        ToId = testUser.Id,
                         ToEmail = testUser.EmailAddress,
                         Subject = Constants.TestEmailSubject + "-" + Base64.CreateString(4),
                         Body = Constants.TestEmailContent + "-" + Base64.CreateString(4)
@@ -150,7 +148,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateUsers();
 
@@ -171,9 +169,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var result = await service.Enqueue_TextV1(
                     new TextV1()
                     {
-                        FromId = user.Id,
                         FromPhoneNumber = user.PhoneNumber,
-                        ToId = testUser.Id,
                         ToPhoneNumber = testUser.PhoneNumber,
                         Body = Constants.TestTextContent,
                     });

@@ -1,7 +1,8 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
+using Bhbk.Lib.Identity.Data.Models_TSQL;
+using Bhbk.Lib.Identity.Domain.Validators;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Exceptions;
@@ -24,7 +25,11 @@ namespace Bhbk.WebApi.Alert.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.FromId = null;
+            if (!EmailAddressValidator.IsValidFormat(model.ToEmail))
+            {
+                ModelState.AddModelError(MessageType.EmailInvalid.ToString(), model.ToEmail);
+                return BadRequest(ModelState);
+            }
 
             var email = Mapper.Map<uvw_EmailQueue>(model);
 
@@ -69,7 +74,11 @@ namespace Bhbk.WebApi.Alert.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            model.FromId = null;
+            if (!PhoneNumberValidator.IsValidFormat(model.ToPhoneNumber))
+            {
+                ModelState.AddModelError(MessageType.PhoneNumberInvalid.ToString(), model.ToPhoneNumber);
+                return BadRequest(ModelState);
+            }
 
             var text = Mapper.Map<uvw_TextQueue>(model);
 

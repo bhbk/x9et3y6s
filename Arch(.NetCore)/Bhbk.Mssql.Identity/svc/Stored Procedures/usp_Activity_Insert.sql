@@ -45,7 +45,11 @@ BEGIN
             ,@CREATEDUTC        
 	        );
 
-        SELECT * FROM [svc].[uvw_Activity] WHERE [svc].[uvw_Activity].Id = @ACTIVITYID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Activity]
+            WHERE Id = @ACTIVITYID
 
     END TRY
 

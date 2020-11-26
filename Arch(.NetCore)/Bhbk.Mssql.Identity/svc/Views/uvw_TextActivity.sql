@@ -1,8 +1,4 @@
 ﻿
-
-
-
-
 CREATE VIEW [svc].[uvw_TextActivity]
 AS
 SELECT	

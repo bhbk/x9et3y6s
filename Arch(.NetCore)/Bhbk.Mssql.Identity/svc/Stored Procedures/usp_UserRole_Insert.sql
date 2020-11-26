@@ -27,8 +27,11 @@ BEGIN
             ,@CREATEDUTC         
 	        );
 
-        SELECT * FROM [svc].[uvw_UserRole] 
-			WHERE [svc].[uvw_UserRole].UserId = @UserID AND [svc].[uvw_UserRole].RoleId = @RoleID 
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_UserRole] 
+			WHERE UserId = @UserID AND RoleId = @RoleID 
 
     END TRY
 

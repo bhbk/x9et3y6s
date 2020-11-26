@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Identity.Data.EF6.Models_TBL;
+using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
@@ -69,8 +69,7 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
                 .ForMember(dest => dest.SendAtUtc, src => src.MapFrom(val => val.SendAtUtc == default ? DateTime.UtcNow : val.SendAtUtc))
-                .ForMember(dest => dest.tbl_EmailActivity, src => src.Ignore())
-                .ForMember(dest => dest.tbl_User, src => src.Ignore());
+                .ForMember(dest => dest.tbl_EmailActivity, src => src.Ignore());
 
             CreateMap<tbl_EmailQueue, EmailV1>();
 
@@ -185,8 +184,7 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
                 .ForMember(dest => dest.SendAtUtc, src => src.MapFrom(val => val.SendAtUtc == default ? DateTime.UtcNow : val.SendAtUtc))
-                .ForMember(dest => dest.tbl_TextActivity, src => src.Ignore())
-                .ForMember(dest => dest.tbl_User, src => src.Ignore());
+                .ForMember(dest => dest.tbl_TextActivity, src => src.Ignore());
 
             CreateMap<tbl_TextQueue, TextV1>();
 
@@ -216,8 +214,6 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Activity, src => src.Ignore())
-                .ForMember(dest => dest.tbl_EmailQueue, src => src.Ignore())
-                .ForMember(dest => dest.tbl_TextQueue, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refresh, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Setting, src => src.Ignore())
                 .ForMember(dest => dest.tbl_State, src => src.Ignore())

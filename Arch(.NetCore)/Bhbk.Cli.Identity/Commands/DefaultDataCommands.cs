@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;

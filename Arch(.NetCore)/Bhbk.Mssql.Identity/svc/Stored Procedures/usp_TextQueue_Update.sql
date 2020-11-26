@@ -2,12 +2,9 @@
 
 CREATE PROCEDURE [svc].[usp_TextQueue_Update]
      @Id					UNIQUEIDENTIFIER 
-    ,@FromId				UNIQUEIDENTIFIER
-    ,@FromPhoneNumber       NVARCHAR (MAX) 
-    ,@ToId					UNIQUEIDENTIFIER
-    ,@ToPhoneNumber         NVARCHAR (MAX) 
-    ,@Body	                NVARCHAR (MAX) 
+    ,@IsCancelled			BIT
     ,@SendAtUtc             DATETIMEOFFSET (7) 
+    ,@DeliveredUtc			DATETIMEOFFSET (7) 
 
 AS
 BEGIN
@@ -18,15 +15,16 @@ BEGIN
         UPDATE [dbo].[tbl_TextQueue]
         SET
              Id						= @Id
-            ,FromId					= @FromId
-	        ,FromPhoneNumber		= @FromPhoneNumber
-            ,ToId					= @ToId
-            ,ToPhoneNumber			= @ToPhoneNumber
-            ,Body					= @Body
+			,IsCancelled			= @IsCancelled
             ,SendAtUtc				= @SendAtUtc
+			,DeliveredUtc			= @DeliveredUtc
         WHERE Id = @Id
 
-        SELECT * FROM [svc].[uvw_TextQueue] WHERE [svc].[uvw_TextQueue].Id = @Id
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_TextQueue]
+            WHERE Id = @Id
 
     END TRY
 

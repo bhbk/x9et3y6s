@@ -1,5 +1,4 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_MOTD_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@Author				NVARCHAR (MAX) 
@@ -32,7 +31,11 @@ BEGIN
             ,TssBackground			= @TssBackground
         WHERE Id = @Id
 
-        SELECT * FROM [svc].[uvw_MOTD] WHERE [svc].[uvw_MOTD].Id = @Id
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_MOTD]
+            WHERE Id = @Id
 
     END TRY
 

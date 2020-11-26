@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TSQL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Primitives;
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateEmails();
 
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateTexts();
 

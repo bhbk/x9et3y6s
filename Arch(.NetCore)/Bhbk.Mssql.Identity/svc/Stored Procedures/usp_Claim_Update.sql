@@ -28,7 +28,11 @@ BEGIN
             ,LastUpdatedUtc			= @LASTUPDATED
         WHERE Id = @Id
 
-        SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @Id
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Claim] 
+            WHERE Id = @Id
 
     END TRY
 

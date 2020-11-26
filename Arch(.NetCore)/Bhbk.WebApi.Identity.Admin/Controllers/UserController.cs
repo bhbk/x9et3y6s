@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Primitives;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -200,10 +200,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 await alert.Enqueue_EmailV1(
                     new EmailV1()
                     {
-                        FromId = result.Id,
                         FromEmail = result.EmailAddress,
                         FromDisplay = $"{result.FirstName} {result.LastName}",
-                        ToId = result.Id,
                         ToEmail = result.EmailAddress,
                         ToDisplay = $"{result.FirstName} {result.LastName}",
                         Subject = $"{issuer.Name} {Constants.MsgConfirmNewUserSubject}",

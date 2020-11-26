@@ -27,8 +27,11 @@ BEGIN
             ,@CREATEDUTC         
 	        );
 
-        SELECT * FROM [svc].[uvw_UserLogin] 
-			WHERE [svc].[uvw_UserLogin].UserId = @UserID AND [svc].[uvw_UserLogin].LoginId = @LoginID 
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_UserLogin] 
+			WHERE UserId = @UserID AND LoginId = @LoginID 
 
     END TRY
 

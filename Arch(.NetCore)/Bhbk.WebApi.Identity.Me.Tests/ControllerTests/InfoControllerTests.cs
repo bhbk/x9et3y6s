@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Models_TSQL;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TSQL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.CreateAudiences();
                 data.CreateUsers();
 
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 controller.ControllerContext.HttpContext = new DefaultHttpContext();
                 controller.ControllerContext.HttpContext.RequestServices = _factory.Server.Host.Services;
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.CreateUserRefreshes();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.CreateAudiences();
                 data.CreateUsers();
 
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.CreateUserRefreshes();
 
                 var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
@@ -177,7 +177,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.CreateAudiences();
                 data.CreateUsers();
 
@@ -216,7 +216,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
                 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.CreateAudiences();
                 data.CreateUsers();
 
@@ -256,7 +256,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
 
-                var data = new TestDataFactory_TSQL(uow);
+                var data = new TestDataFactory(uow);
                 data.CreateAudiences();
                 data.CreateUsers();
 

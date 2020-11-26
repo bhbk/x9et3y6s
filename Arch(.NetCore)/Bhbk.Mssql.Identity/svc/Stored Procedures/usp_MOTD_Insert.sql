@@ -45,7 +45,11 @@ BEGIN
 			,@TssBackground
 			);
 
-		SELECT * FROM [svc].[uvw_MOTD] WHERE [svc].[uvw_MOTD].Id = @MOTDID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+		SELECT * FROM [dbo].[tbl_MOTD]
+			WHERE Id = @MOTDID
 
     END TRY
 

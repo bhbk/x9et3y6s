@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
+﻿using Bhbk.Lib.Identity.Data.Models_TSQL;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;

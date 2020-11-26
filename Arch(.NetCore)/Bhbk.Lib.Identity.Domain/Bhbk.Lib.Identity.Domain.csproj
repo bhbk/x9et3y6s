@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bhbk.Lib.Identity.Data.EF6\Bhbk.Lib.Identity.Data.EF6.csproj" />
-    <ProjectReference Include="..\Bhbk.Lib.Identity.Data.EFCore\Bhbk.Lib.Identity.Data.EFCore.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Data_EF6\Bhbk.Lib.Identity.Data_EF6.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Data\Bhbk.Lib.Identity.Data.csproj" />
   </ItemGroup>
 
 </Project>

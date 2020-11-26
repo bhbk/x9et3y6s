@@ -42,7 +42,11 @@ BEGIN
 	        ,@ValidToUtc
 	        );
 
-        SELECT * FROM [svc].[uvw_Refresh] WHERE [svc].[uvw_Refresh].Id = @REFRESHID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Refresh]
+            WHERE Id = @REFRESHID
 
     END TRY
 

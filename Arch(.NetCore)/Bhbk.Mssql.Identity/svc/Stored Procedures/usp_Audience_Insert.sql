@@ -51,7 +51,11 @@ BEGIN
             ,@CREATEDUTC         
 	        );
 
-        SELECT * FROM [svc].[uvw_Audience] WHERE [svc].[uvw_Audience].Id = @AUDIENCEID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Audience]
+            WHERE Id = @AUDIENCEID
 
     END TRY
 

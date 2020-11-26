@@ -39,7 +39,11 @@ BEGIN
             ,@IsDeletable        
 	        );
 
-        SELECT * FROM [svc].[uvw_Claim] WHERE [svc].[uvw_Claim].Id = @CLAIMID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Claim]
+            WHERE Id = @CLAIMID
 
     END TRY
 

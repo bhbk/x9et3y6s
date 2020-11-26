@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives;
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                     RequestServices = _factory.Server.Host.Services
                 };
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUrls();

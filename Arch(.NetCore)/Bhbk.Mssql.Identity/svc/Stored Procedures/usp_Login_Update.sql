@@ -26,7 +26,11 @@ BEGIN
             ,LastUpdatedUtc			= @LASTUPDATED
         WHERE Id = @Id
 
-        SELECT * FROM [svc].[uvw_Login] WHERE [svc].[uvw_Login].Id = @Id
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_Login]
+            WHERE Id = @Id
 
     END TRY
 

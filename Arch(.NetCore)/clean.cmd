@@ -19,22 +19,22 @@ powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Forc
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
 popd
 
-pushd Bhbk.Lib.Identity.Data.EF6
+pushd Bhbk.Lib.Identity.Data
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
 popd
 
-pushd Bhbk.Lib.Identity.Data.EF6.Tests
+pushd Bhbk.Lib.Identity.Data.Tests
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
 popd
 
-pushd Bhbk.Lib.Identity.Data.EFCore
+pushd Bhbk.Lib.Identity.Data_EF6
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
 popd
 
-pushd Bhbk.Lib.Identity.Data.EFCore.Tests
+pushd Bhbk.Lib.Identity.Data_EF6.Tests
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
 popd

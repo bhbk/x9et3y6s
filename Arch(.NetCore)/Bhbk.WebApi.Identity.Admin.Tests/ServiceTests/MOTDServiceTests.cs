@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Me;
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateMOTDs();
 
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
                 };
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateMOTDs();
 

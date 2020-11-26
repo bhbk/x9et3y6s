@@ -8,25 +8,26 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_Audience] WHERE [svc].[uvw_Audience].Id = @ID
+        SELECT * FROM [dbo].[tbl_Audience]
+            WHERE Id = @ID
 
         DELETE [dbo].[tbl_Activity]
-        WHERE AudienceId = @ID
+            WHERE AudienceId = @ID
 
         DELETE [dbo].[tbl_Refresh]
-        WHERE AudienceId = @ID
+            WHERE AudienceId = @ID
 
         DELETE [dbo].[tbl_Setting]
-        WHERE AudienceId = @ID
+            WHERE AudienceId = @ID
 
         DELETE [dbo].[tbl_State]
-        WHERE AudienceId = @ID
+            WHERE AudienceId = @ID
 
         DELETE [dbo].[tbl_Role]
-        WHERE AudienceId = @ID
+            WHERE AudienceId = @ID
 
         DELETE [dbo].[tbl_Audience]
-        WHERE Id = @ID
+            WHERE Id = @ID
 
     END TRY
 

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TSQL;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
@@ -61,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ServiceTests
 
                 var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
-                var tests = new TestDataFactory_TSQL(owin);
+                var tests = new TestDataFactory(owin);
                 tests.CreateIssuers();
                 tests.CreateAudiences();
 

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
+using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;

@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Models_TSQL;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Bhbk.WebApi.Alert.Services;
@@ -65,7 +65,8 @@ namespace Bhbk.WebApi.Alert.Jobs
             var twilioToken = conf["Jobs:DequeueTexts:TwilioToken"];
 
             foreach (var msg in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>()
-                .Where(x => x.SendAtUtc < DateTime.UtcNow && x.DeliveredUtc.HasValue == false).ToLambda()))
+                .Where(x => x.SendAtUtc < DateTime.UtcNow
+                    && x.DeliveredUtc.HasValue == false && x.IsCancelled == false).ToLambda()))
             {
                 switch (uow.InstanceType)
                 {
@@ -80,11 +81,9 @@ namespace Bhbk.WebApi.Alert.Jobs
                                 uow.TextActivities.Create(
                                     new uvw_TextActivity()
                                     {
-                                        Id = Guid.NewGuid(),
                                         TextId = msg.Id,
                                         TwilioSid = response.Sid,
                                         TwilioStatus = response.Status.ToString(),
-                                        StatusAtUtc = DateTime.UtcNow,
                                     });
 
                                 msg.DeliveredUtc = DateTime.UtcNow;
@@ -97,11 +96,9 @@ namespace Bhbk.WebApi.Alert.Jobs
                                 uow.TextActivities.Create(
                                     new uvw_TextActivity()
                                     {
-                                        Id = Guid.NewGuid(),
                                         TextId = msg.Id,
                                         TwilioStatus = ex.Code.ToString(),
                                         TwilioMessage = ex.Message,
-                                        StatusAtUtc = DateTime.UtcNow,
                                     });
 
                                 Log.Warning($"'{callPath}' hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider failed. " +

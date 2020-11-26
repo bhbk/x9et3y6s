@@ -1,5 +1,4 @@
 ﻿
-
 CREATE PROCEDURE [svc].[usp_MOTD_Delete]
     @ID uniqueidentifier
 
@@ -9,10 +8,11 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_MOTD] WHERE [svc].[uvw_MOTD].Id = @ID
+        SELECT * FROM [dbo].[tbl_MOTD]
+            WHERE Id = @ID
 
         DELETE [dbo].[tbl_MOTD]
-        WHERE Id = @ID
+            WHERE Id = @ID
 
     END TRY
 

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Models_TSQL;
 using Bhbk.Lib.Identity.Models.Me;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.QueryExpression.Extensions;

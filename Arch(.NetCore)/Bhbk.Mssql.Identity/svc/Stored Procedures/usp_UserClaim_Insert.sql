@@ -27,8 +27,11 @@ BEGIN
             ,@CREATEDUTC         
 	        );
 
-        SELECT * FROM [svc].[uvw_UserClaim] 
-			WHERE [svc].[uvw_UserClaim].UserId = @UserID AND [svc].[uvw_UserClaim].ClaimId = @ClaimID 
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_UserClaim] 
+			WHERE UserId = @UserID AND ClaimId = @ClaimID 
 
     END TRY
 

@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
+﻿using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
+using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.EFCore.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
-using Bhbk.Lib.Identity.Data.EFCore.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
+using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
@@ -153,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
 
@@ -184,7 +184,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
@@ -217,7 +217,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
@@ -272,7 +272,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
@@ -327,7 +327,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
@@ -382,7 +382,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
@@ -439,7 +439,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var service = new StsService(instance.InstanceType, owin);
 
-                var data = new TestDataFactory_TBL(uow);
+                var data = new TestDataFactory(uow);
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();

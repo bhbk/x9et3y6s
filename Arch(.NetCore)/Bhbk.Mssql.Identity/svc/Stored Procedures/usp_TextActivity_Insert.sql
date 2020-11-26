@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_TextActivity_Insert]
      @TextId				UNIQUEIDENTIFIER
     ,@TwilioSid	            NVARCHAR (50) 
@@ -35,7 +33,11 @@ BEGIN
             ,@STATUSATUTC 
 	        );
 
-        SELECT * FROM [svc].[uvw_TextActivity] WHERE [svc].[uvw_TextActivity].Id = @ACTIVITYID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_TextActivity] 
+            WHERE Id = @ACTIVITYID
 
     END TRY
 

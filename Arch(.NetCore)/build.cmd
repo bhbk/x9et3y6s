@@ -6,13 +6,13 @@ rem powershell -command "& { get-date -format yyyy.M.d.HHmm | out-file -filepath
 set /p VERSION=< .\version.tmp
 
 rem build and test .net framework assemblies...
-nuget restore Bhbk.Lib.Identity.Data.EF6\Bhbk.Lib.Identity.Data.EF6.csproj -SolutionDirectory . -Verbosity quiet
+nuget restore Bhbk.Lib.Identity.Data_EF6\Bhbk.Lib.Identity.Data_EF6.csproj -SolutionDirectory . -Verbosity quiet
 
 rem build and test .net standard/core assemblies...
 dotnet restore Bhbk.Identity.sln --verbosity quiet
 dotnet build Bhbk.Identity.sln --configuration Release --verbosity quiet /p:platform=x64
-rem dotnet test Bhbk.Lib.Identity.Data.EF6.Tests\Bhbk.Lib.Identity.Data.EF6.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
-rem dotnet test Bhbk.Lib.Identity.Data.EFCore.Tests\Bhbk.Lib.Identity.Data.EFCore.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
+rem dotnet test Bhbk.Lib.Identity.Data_EF6.Tests\Bhbk.Lib.Identity.Data_EF6.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
+rem dotnet test Bhbk.Lib.Identity.Data.Tests\Bhbk.Lib.Identity.Data.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
 rem dotnet test Bhbk.WebApi.Alert.Tests\Bhbk.WebApi.Alert.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
 rem dotnet test Bhbk.WebApi.Identity.Admin.Tests\Bhbk.WebApi.Identity.Admin.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\
 rem dotnet test Bhbk.WebApi.Identity.Me.Tests\Bhbk.WebApi.Identity.Me.Tests.csproj --configuration Release /p:CollectCoverage=true /p:CoverletOutput=bin\Release\

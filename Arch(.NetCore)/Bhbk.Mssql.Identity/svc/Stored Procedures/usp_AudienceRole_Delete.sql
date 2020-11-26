@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE   PROCEDURE [svc].[usp_AudienceRole_Delete]
     @AudienceID uniqueidentifier
 	,@RoleID uniqueidentifier
@@ -11,8 +9,8 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_AudienceRole] 
-			WHERE [svc].[uvw_AudienceRole].AudienceId = @AudienceID AND [svc].[uvw_AudienceRole].RoleId = @RoleID 
+        SELECT * FROM [dbo].[tbl_AudienceRole] 
+			WHERE AudienceId = @AudienceID AND RoleId = @RoleID 
 
         DELETE [dbo].[tbl_AudienceRole]
 	        WHERE AudienceId = @AudienceID AND RoleId = @RoleID

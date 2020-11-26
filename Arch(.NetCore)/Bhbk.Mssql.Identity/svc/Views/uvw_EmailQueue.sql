@@ -1,18 +1,15 @@
 ﻿
-
-
 CREATE VIEW [svc].[uvw_EmailQueue]
 AS
 SELECT	
 	Id
-	,FromId
 	,FromEmail
 	,FromDisplay
-	,ToId
 	,ToEmail
 	,ToDisplay
 	,Subject
 	,Body
+	,IsCancelled
 	,CreatedUtc
 	,SendAtUtc
 	,DeliveredUtc

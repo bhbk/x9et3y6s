@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_TextActivity_Delete]
     @ID uniqueidentifier
 
@@ -10,10 +8,11 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_TextActivity] WHERE [svc].[uvw_TextActivity].Id = @ID
+        SELECT * FROM [dbo].[tbl_TextActivity]
+            WHERE Id = @ID
 
         DELETE [dbo].[tbl_TextActivity]
-        WHERE Id = @ID
+            WHERE Id = @ID
 
     END TRY
 

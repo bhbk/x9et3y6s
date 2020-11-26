@@ -34,7 +34,11 @@ BEGIN
             ,LastPollingUtc			= @LastPollingUtc
         WHERE Id = @Id
 
-        SELECT * FROM [svc].[uvw_State] WHERE [svc].[uvw_State].Id = @Id
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_State] 
+            WHERE Id = @Id
 
     END TRY
 

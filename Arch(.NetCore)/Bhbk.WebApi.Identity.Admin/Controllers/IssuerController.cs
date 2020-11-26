@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.EFCore.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;

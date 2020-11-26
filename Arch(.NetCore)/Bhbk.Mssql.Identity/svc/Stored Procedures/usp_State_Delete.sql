@@ -8,10 +8,11 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_State] WHERE [svc].[uvw_State].Id = @ID
+        SELECT * FROM [dbo].[tbl_State]
+            WHERE Id = @ID
 
         DELETE [dbo].[tbl_State]
-        WHERE Id = @ID
+            WHERE Id = @ID
 
     END TRY
 

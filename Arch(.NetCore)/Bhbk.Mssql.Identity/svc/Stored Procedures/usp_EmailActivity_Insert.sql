@@ -1,6 +1,4 @@
 ﻿
-
-
 CREATE PROCEDURE [svc].[usp_EmailActivity_Insert]
      @EmailId				UNIQUEIDENTIFIER
     ,@SendgridId            NVARCHAR (50) 
@@ -32,7 +30,11 @@ BEGIN
             ,@STATUSATUTC 
 	        );
 
-        SELECT * FROM [svc].[uvw_EmailActivity] WHERE [svc].[uvw_EmailActivity].Id = @ACTIVITYID
+		IF @@ROWCOUNT != 1
+			THROW 51000, 'ERROR', 1;
+
+        SELECT * FROM [dbo].[tbl_EmailActivity]
+            WHERE Id = @ACTIVITYID
 
     END TRY
 

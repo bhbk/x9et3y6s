@@ -8,22 +8,23 @@ BEGIN
 
 	BEGIN TRY
 
-        SELECT * FROM [svc].[uvw_User] WHERE [svc].[uvw_User].Id = @ID
+        SELECT * FROM [dbo].[tbl_User] 
+            WHERE Id = @ID
 
         DELETE [dbo].[tbl_Activity]
-        WHERE UserId = @ID
+            WHERE UserId = @ID
 
         DELETE [dbo].[tbl_Refresh]
-        WHERE UserId = @ID
+            WHERE UserId = @ID
 
         DELETE [dbo].[tbl_Setting]
-        WHERE UserId = @ID
+            WHERE UserId = @ID
 
         DELETE [dbo].[tbl_State]
-        WHERE UserId = @ID
+            WHERE UserId = @ID
 
         DELETE [dbo].[tbl_User]
-        WHERE Id = @ID
+            WHERE Id = @ID
 
     END TRY
 
