@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="Bhbk.Lib.Common" Version="2020.11.21.2300" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2020.11.25.1900" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="5.0.1" />
@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bhbk.Lib.Identity.Data_EF6\Bhbk.Lib.Identity.Data_EF6.csproj" />
     <ProjectReference Include="..\Bhbk.Lib.Identity.Data\Bhbk.Lib.Identity.Data.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Data_EF6\Bhbk.Lib.Identity.Data_EF6.csproj" />
   </ItemGroup>
 
 </Project>

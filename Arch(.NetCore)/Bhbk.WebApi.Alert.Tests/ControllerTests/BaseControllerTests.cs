@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.WebApi.Alert.Controllers;
 using Microsoft.AspNetCore.Hosting;
@@ -21,7 +21,7 @@ namespace Bhbk.WebApi.Alert.Tests.ControllerTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.IntegrationTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TSQL>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {

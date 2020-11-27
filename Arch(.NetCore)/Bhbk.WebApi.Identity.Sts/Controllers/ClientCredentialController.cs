@@ -104,7 +104,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             UoW.Audiences.AccessSuccess(audience);
 
             var cc_claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
-            var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, cc_claims);
+            var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audience.Name, cc_claims);
 
             UoW.Activities.Create(
                 Mapper.Map<tbl_Activity>(new ActivityV1()
@@ -115,7 +115,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             var rt_claims = UoW.Audiences.GenerateRefreshClaims(issuer, audience);
-            var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+            var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -144,7 +144,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
                 client = audience.Name,
-                issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
+                issuer = issuer.Name + ":" + Conf["IdentityTenant:Salt"],
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
@@ -214,10 +214,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var cc_claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
-            var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, cc_claims);
+            var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audience.Name, cc_claims);
 
             var rt_claims = UoW.Audiences.GenerateRefreshClaims(issuer, audience);
-            var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+            var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -246,7 +246,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
                 client = audience.Name,
-                issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
+                issuer = issuer.Name + ":" + Conf["IdentityTenant:Salt"],
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 

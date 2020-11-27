@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Primitives;
 using Bhbk.WebApi.Identity.Me.Controllers;

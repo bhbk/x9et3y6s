@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 data.CreateAudiences();
 
                 var issuers = owin.Issuers.Get()
-                    .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
+                    .Select(x => x.Name + ":" + conf["IdentityTenant:Salt"]);
 
                 var issuerKeys = owin.Issuers.Get()
                     .Select(x => x.IssuerKey);

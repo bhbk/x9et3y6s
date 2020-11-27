@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Me
                 .Build();
 
             var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TSQL>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);
@@ -110,13 +110,13 @@ namespace Bhbk.WebApi.Identity.Me
 
             var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
-            var issuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
-                .Select(x => x.Value + ":" + conf["IdentityTenants:Salt"]);
+            var issuers = conf.GetSection("IdentityTenant:AllowedIssuers").GetChildren()
+                .Select(x => x.Value + ":" + conf["IdentityTenant:Salt"]);
 
-            var issuerKeys = conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren()
+            var issuerKeys = conf.GetSection("IdentityTenant:AllowedIssuerKeys").GetChildren()
                 .Select(x => x.Value);
 
-            var audiences = conf.GetSection("IdentityTenants:AllowedAudiences").GetChildren()
+            var audiences = conf.GetSection("IdentityTenant:AllowedAudiences").GetChildren()
                 .Select(x => x.Value);
 
             /*
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Me
                 && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
-                issuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                issuers = conf.GetSection("IdentityTenant:AllowedIssuers").GetChildren()
                 .Select(x => x.Value).Concat(issuers);
 
             sc.AddLogging(opt =>

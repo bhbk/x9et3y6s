@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.Models_TSQL;
+﻿using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.Configuration;

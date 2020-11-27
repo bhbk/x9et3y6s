@@ -49,9 +49,9 @@ namespace Bhbk.Lib.Identity.Grants
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            _issuerName = conf["IdentityCredentials:IssuerName"];
-            _audienceName = conf["IdentityCredentials:AudienceName"];
-            _audienceSecret = conf["IdentityCredentials:AudienceSecret"];
+            _issuerName = conf["IdentityCredential:IssuerName"];
+            _audienceName = conf["IdentityCredential:AudienceName"];
+            _audienceSecret = conf["IdentityCredential:AudienceSecret"];
         }
 
         public JwtSecurityToken AccessToken

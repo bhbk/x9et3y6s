@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Alert;
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 result = await service.Endpoints.Enqueue_EmailV1(rop.RawData, new EmailV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
                 var result = await service.Enqueue_EmailV1(
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 result = await service.Endpoints.Enqueue_TextV1(rop.RawData, new TextV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -157,7 +157,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 user.PhoneNumber = NumberAs.CreateString(11);
                 user.PhoneNumberConfirmed = true;

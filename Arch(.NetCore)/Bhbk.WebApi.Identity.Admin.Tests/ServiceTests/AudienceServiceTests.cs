@@ -61,7 +61,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testAudience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var testRole = uow.Roles.Create(
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 result = await service.Endpoints.Audience_CreateV1(rop.RawData, new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -137,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.Endpoints.Audience_CreateV1(rop.RawData, new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -166,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.Audience_CreateV1(
                     new AudienceV1()
@@ -212,7 +212,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 result = await service.Endpoints.Audience_DeleteV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -237,7 +237,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.Endpoints.Audience_DeleteV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -266,7 +266,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testAudience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 testAudience.IsDeletable = false;
@@ -305,7 +305,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testAudience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
@@ -339,12 +339,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 for (int i = 0; i < 3; i++)
                 {
                     var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                    var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                    var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                     uow.Refreshes.Create(
                         mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -386,10 +386,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -439,7 +439,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testAudience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
@@ -465,7 +465,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Normal).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 int take = 2;
                 var state = new DataStateV1()
@@ -506,12 +506,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 for (int i = 0; i < 3; i++)
                 {
                     var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                    var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                    var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                     uow.Refreshes.Create(
                         mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -556,7 +556,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testAudience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var testRole = uow.Roles.Get(x => x.Name == Constants.TestRole).Single();
@@ -594,7 +594,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testAudience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
@@ -628,7 +628,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testAudience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
                 var testAudiencePassword = new PasswordAddV1()
@@ -672,7 +672,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 result = await service.Endpoints.Audience_UpdateV1(rop.RawData, new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -697,7 +697,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var result = await service.Endpoints.Audience_UpdateV1(rop.RawData, new AudienceV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
@@ -731,7 +731,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
-                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, rop_claims);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testAudience = uow.Audiences.GetAsNoTracking(x => x.Name == Constants.TestAudience).Single();
                 testAudience.Description += "(Updated)";

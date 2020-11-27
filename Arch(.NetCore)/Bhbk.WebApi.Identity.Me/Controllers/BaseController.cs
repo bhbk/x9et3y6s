@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

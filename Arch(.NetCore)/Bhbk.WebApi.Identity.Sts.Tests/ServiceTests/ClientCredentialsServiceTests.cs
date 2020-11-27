@@ -246,7 +246,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(Constants.TestIssuer);
-                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenant:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);
@@ -277,7 +277,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -328,7 +328,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -378,7 +378,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -429,7 +429,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -481,7 +481,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Audiences.Clock = DateTime.UtcNow.AddYears(1);
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -531,7 +531,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Audiences.Clock = DateTime.UtcNow.AddYears(-1);
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -583,7 +583,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
-                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenants:Salt"], audience.Name, rt_claims);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
                     mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -615,7 +615,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(Constants.TestIssuer);
-                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenant:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);

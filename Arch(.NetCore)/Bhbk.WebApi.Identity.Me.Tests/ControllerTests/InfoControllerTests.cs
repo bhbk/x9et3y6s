@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
-using Bhbk.Lib.Identity.Data.Models_TSQL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure;
+using Bhbk.Lib.Identity.Data.Models;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;

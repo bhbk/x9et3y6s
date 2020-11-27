@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models_TSQL;
+using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Domain.Validators;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Primitives.Enums;

@@ -49,10 +49,10 @@ namespace Bhbk.Lib.Identity.Grants
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            _issuerName = conf["IdentityCredentials:IssuerName"];
-            _audienceNames = conf["IdentityCredentials:AudienceName"];
-            _userName = conf["IdentityCredentials:UserName"];
-            _userPass = conf["IdentityCredentials:UserPass"];
+            _issuerName = conf["IdentityCredential:IssuerName"];
+            _audienceNames = conf["IdentityCredential:AudienceName"];
+            _userName = conf["IdentityCredential:UserName"];
+            _userPass = conf["IdentityCredential:UserPass"];
         }
 
         public JwtSecurityToken AccessToken

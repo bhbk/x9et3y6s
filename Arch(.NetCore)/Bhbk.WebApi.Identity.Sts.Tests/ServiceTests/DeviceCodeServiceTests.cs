@@ -493,7 +493,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
                 iss.Value.Split(':')[0].Should().Be(Constants.TestIssuer);
-                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenants:Salt"]);
+                iss.Value.Split(':')[1].Should().Be(conf["IdentityTenant:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
                     .Subtract(DateTime.UtcNow).TotalSeconds);

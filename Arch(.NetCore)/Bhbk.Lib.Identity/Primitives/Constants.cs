@@ -81,7 +81,7 @@ namespace Bhbk.Lib.Identity.Primitives
         public const string TestMotdAuthor = "MOTDTestsAuthor";
         public const string TestRole = "RoleTests";
         public const string TestTextContent = "TextTestsContent";
-        public const string TestUser = "testuser1@local";
+        public const string TestUser = "testuser1@localhost.localdomain";
         public const string TestUserPhoneNumber = "+12223334444";
         public const string TestUserPassCurrent = "te$tUserPa$$word01!";
         public const string TestUserPassNew = "te$tUserPa$$word01!new";

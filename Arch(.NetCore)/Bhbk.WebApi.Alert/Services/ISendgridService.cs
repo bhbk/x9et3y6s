@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.Models_TSQL;
+﻿using Bhbk.Lib.Identity.Data.Models;
 using SendGrid;
 using System.Threading.Tasks;
 

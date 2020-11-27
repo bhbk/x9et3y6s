@@ -303,7 +303,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             UoW.Users.AccessSuccess(user);
 
             var ac_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var ac = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), ac_claims);
+            var ac = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audiences.Select(x => x.Name).ToList(), ac_claims);
 
             UoW.Activities.Create(
                 Mapper.Map<tbl_Activity>(new ActivityV1()
@@ -314,7 +314,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
+            var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
 
             UoW.Refreshes.Create(
                 Mapper.Map<tbl_Refresh>(new RefreshV1()
@@ -344,7 +344,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 refresh_token = rt.RawData,
                 user = user.UserName,
                 client = audiences.Select(x => x.Name).ToList(),
-                issuer = issuer.Name + ":" + Conf["IdentityTenants:Salt"],
+                issuer = issuer.Name + ":" + Conf["IdentityTenant:Salt"],
                 expires_in = (int)(new DateTimeOffset(ac.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 

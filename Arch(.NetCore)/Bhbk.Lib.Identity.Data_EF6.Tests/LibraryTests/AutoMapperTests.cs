@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.LibraryTests
         public void Lib_AutoMapper_Profile_Success()
         {
             var Mapper = new MapperConfiguration(
-                    x => x.AddProfile<AutoMapperProfile_EF6_TSQL>()).CreateMapper();
+                    x => x.AddProfile<AutoMapperProfile_EF6>()).CreateMapper();
 
             Mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }

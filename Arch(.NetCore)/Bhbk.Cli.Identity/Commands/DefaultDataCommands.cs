@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Factories;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +41,7 @@ namespace Bhbk.Cli.Identity.Commands
 
                 var instance = new ContextService(InstanceContext.DeployedOrLocal);
                 var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
-                var data = new DefaultDataFactory_TSQL(uow);
+                var data = new DefaultDataFactory(uow);
 
                 if (_create)
                 {

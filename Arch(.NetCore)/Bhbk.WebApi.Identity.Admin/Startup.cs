@@ -131,13 +131,13 @@ namespace Bhbk.WebApi.Identity.Admin
 
             var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
-            var issuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
-                .Select(x => x.Value + ":" + conf["IdentityTenants:Salt"]);
+            var issuers = conf.GetSection("IdentityTenant:AllowedIssuers").GetChildren()
+                .Select(x => x.Value + ":" + conf["IdentityTenant:Salt"]);
 
-            var issuerKeys = conf.GetSection("IdentityTenants:AllowedIssuerKeys").GetChildren()
+            var issuerKeys = conf.GetSection("IdentityTenant:AllowedIssuerKeys").GetChildren()
                 .Select(x => x.Value);
 
-            var audiences = conf.GetSection("IdentityTenants:AllowedAudiences").GetChildren()
+            var audiences = conf.GetSection("IdentityTenant:AllowedAudiences").GetChildren()
                 .Select(x => x.Value);
 
             /*
@@ -148,7 +148,7 @@ namespace Bhbk.WebApi.Identity.Admin
                 && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
-                issuers = conf.GetSection("IdentityTenants:AllowedIssuers").GetChildren()
+                issuers = conf.GetSection("IdentityTenant:AllowedIssuers").GetChildren()
                 .Select(x => x.Value).Concat(issuers);
 
             sc.AddLogging(opt =>

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Infrastructure_TSQL;
+using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Profiles;
@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.SystemTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TSQL>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 {
                     var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
-                    var data = new DefaultDataFactory_TSQL(uow);
+                    var data = new DefaultDataFactory(uow);
                     data.CreateSettings();
                     data.CreateUserLogins();
                     data.CreateUserRoles();
@@ -68,12 +68,12 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
 
                 var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
 
-                var data = new DefaultDataFactory_TSQL(owin);
+                var data = new DefaultDataFactory(owin);
                 data.CreateIssuers();
                 data.CreateAudiences();
 
                 var issuers = owin.Issuers.Get()
-                    .Select(x => x.Name + ":" + conf["IdentityTenants:Salt"]);
+                    .Select(x => x.Name + ":" + conf["IdentityTenant:Salt"]);
 
                 var issuerKeys = owin.Issuers.Get()
                     .Select(x => x.IssuerKey);

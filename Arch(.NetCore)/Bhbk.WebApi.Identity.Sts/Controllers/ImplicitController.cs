@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //no refresh token as part of this flow...
             var imp_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var imp = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenants:Salt"], new List<string>() { audience.Name }, imp_claims);
+            var imp = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, imp_claims);
 
             UoW.Activities.Create(
                 Mapper.Map<tbl_Activity>(new ActivityV1()

@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.TestingTools
              * tests that use the in-memory sql provider run before the tests that use the normal sql provider.
              */
 
-            return testCollections.OrderBy(collection => collection.DisplayName);
+            return testCollections.OrderByDescending(collection => collection.DisplayName);
         }
     }
 }

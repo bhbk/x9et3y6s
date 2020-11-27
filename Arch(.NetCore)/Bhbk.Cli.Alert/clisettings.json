@@ -7,13 +7,13 @@
       "Microsoft": "Information"
     }
   },
-  "IdentityCredentials": {
+  "IdentityCredential": {
     "IssuerName": "Bhbk",
     "AudienceName": "",
     "UserName": "identity@system.ochap.local",
     "UserPass": "pa$$word01!"
   },
-  "AlertUrls": {
+  "IdentityAlertUrls": {
     "BaseApiUrl": "https://localhost:44374",
     "BaseApiPath": "api/alert"
   },

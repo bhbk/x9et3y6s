@@ -55,7 +55,7 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure_TBL
                             .UseSqlServer(connection)
                             .UseLoggerFactory(_logger)
                             .EnableSensitiveDataLogging();
-#elif RELEASE
+#else
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .UseSqlServer(connection);
 #endif
@@ -71,7 +71,7 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure_TBL
                             .UseInMemoryDatabase(":InMemory:")
                             .UseLoggerFactory(_logger)
                             .EnableSensitiveDataLogging();
-#elif RELEASE
+#else
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
                             .UseInMemoryDatabase(":InMemory:");
 #endif

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.Models_TSQL;
+﻿using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
