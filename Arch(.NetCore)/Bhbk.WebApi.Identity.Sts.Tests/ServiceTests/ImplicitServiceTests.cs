@@ -3,7 +3,7 @@ using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
 using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,10 +66,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
-                var url = new Uri(Constants.TestUriLink);
+                var url = new Uri(TestDefaultConstants.UriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Endpoints.Implicit_AuthV2(
                     new ImplicitV2()
@@ -104,10 +104,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
-                var url = new Uri(Constants.TestUriLink);
+                var url = new Uri(TestDefaultConstants.UriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Endpoints.Implicit_AuthV2(
                     new ImplicitV2()
@@ -142,11 +142,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
-                var url = new Uri(Constants.TestUriLink);
+                var url = new Uri(TestDefaultConstants.UriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Endpoints.Implicit_AuthV2(
                     new ImplicitV2()
@@ -181,11 +181,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
-                var url = new Uri(Constants.TestUriLink);
+                var url = new Uri(TestDefaultConstants.UriLink);
                 var state = Base64.CreateString(8);
                 var imp = await service.Endpoints.Implicit_AuthV2(
                     new ImplicitV2()

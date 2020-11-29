@@ -1,9 +1,9 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
-using Bhbk.Cli.Identity.Primiitives.Enums;
 using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -44,7 +44,7 @@ namespace Bhbk.Cli.Identity.Commands
 
                 try
                 {
-                    userName = ConsoleHelper.PromptForInput(CommandTypes.user);
+                    userName = InputFactory.PromptForInput(CommandTypes.user);
                     user = admin.User_GetV1(userName).Result;
                 }
                 catch (Exception) { }
@@ -94,7 +94,7 @@ namespace Bhbk.Cli.Identity.Commands
                         throw new ConsoleHelpAsException("FAILED create user \"" + userName + "\"");
                 }
 
-                loginName = Constants.DefaultLogin;
+                loginName = DefaultConstants.LoginName;
                 login = admin.Login_GetV1(loginName).Result;
 
                 if (login != null)

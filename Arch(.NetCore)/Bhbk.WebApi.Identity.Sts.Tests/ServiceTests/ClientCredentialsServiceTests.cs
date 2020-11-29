@@ -7,8 +7,9 @@ using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.QueryExpression.Extensions;
 using FluentAssertions;
@@ -94,8 +95,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 audience.IsLockedOut = true;
 
@@ -108,7 +109,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = issuer.Id.ToString(),
                         client = audience.Id.ToString(),
                         grant_type = "client_secret",
-                        client_secret = Constants.TestAudiencePassCurrent,
+                        client_secret = TestDefaultConstants.AudiencePassCurrent,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -127,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
 
                 var cc = await service.Endpoints.ClientCredential_AuthV2(
                     new ClientCredentialV2()
@@ -135,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = issuer.Id.ToString(),
                         client = Guid.NewGuid().ToString(),
                         grant_type = "client_secret",
-                        client_secret = Constants.TestAudiencePassCurrent,
+                        client_secret = TestDefaultConstants.AudiencePassCurrent,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -158,8 +159,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 issuer.IsEnabled = false;
 
@@ -172,7 +173,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = issuer.Id.ToString(),
                         client = audience.Id.ToString(),
                         grant_type = "client_secret",
-                        client_secret = Constants.TestAudiencePassCurrent,
+                        client_secret = TestDefaultConstants.AudiencePassCurrent,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -191,7 +192,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 var cc = await service.Endpoints.ClientCredential_AuthV2(
                     new ClientCredentialV2()
@@ -199,7 +200,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = Guid.NewGuid().ToString(),
                         client = audience.Id.ToString(),
                         grant_type = "client_secret",
-                        client_secret = Constants.TestAudiencePassCurrent,
+                        client_secret = TestDefaultConstants.AudiencePassCurrent,
                     });
                 cc.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 cc.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -224,11 +225,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                    && x.ConfigKey == SettingsConstants.AccessExpire).Single();
 
                 var result = await service.ClientCredential_GrantV2(
                     new ClientCredentialV2()
@@ -236,7 +237,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         issuer = issuer.Id.ToString(),
                         client = audience.Id.ToString(),
                         grant_type = "client_secret",
-                        client_secret = Constants.TestAudiencePassCurrent,
+                        client_secret = TestDefaultConstants.AudiencePassCurrent,
                     });
                 result.Should().BeAssignableTo<ClientJwtV2>();
 
@@ -245,7 +246,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var jwt = auth.Parse(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                iss.Value.Split(':')[0].Should().Be(Constants.TestIssuer);
+                iss.Value.Split(':')[0].Should().Be(TestDefaultConstants.IssuerName);
                 iss.Value.Split(':')[1].Should().Be(conf["IdentityTenant:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))
@@ -273,8 +274,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
@@ -324,8 +325,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
@@ -374,8 +375,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
@@ -425,8 +426,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
@@ -475,8 +476,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 uow.Audiences.Clock = DateTime.UtcNow.AddYears(1);
 
@@ -525,8 +526,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 uow.Audiences.Clock = DateTime.UtcNow.AddYears(-1);
 
@@ -579,8 +580,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateAudienceRoles();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
@@ -598,7 +599,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 uow.Commit();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                    && x.ConfigKey == SettingsConstants.AccessExpire).Single();
                 var result = await service.ClientCredential_RefreshV2(
                     new RefreshTokenV2()
                     {
@@ -614,7 +615,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var jwt = auth.Parse(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                iss.Value.Split(':')[0].Should().Be(Constants.TestIssuer);
+                iss.Value.Split(':')[0].Should().Be(TestDefaultConstants.IssuerName);
                 iss.Value.Split(':')[1].Should().Be(conf["IdentityTenant:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))

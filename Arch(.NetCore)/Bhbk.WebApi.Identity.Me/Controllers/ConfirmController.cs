@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,7 @@ using System.Linq.Dynamic.Core;
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("confirm")]
-    [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+    [Authorize(Policy = DefaultConstants.OAuth2ROPGrants)]
     public class ConfirmController : BaseController
     {
         [Route("v1/email/{userID:guid}"), HttpPut]

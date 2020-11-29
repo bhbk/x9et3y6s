@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -65,6 +65,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bhbk.Lib.Identity.Domain\Bhbk.Lib.Identity.Domain.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Primitives\Bhbk.Lib.Identity.Primitives.csproj" />
   </ItemGroup>
 
 </Project>

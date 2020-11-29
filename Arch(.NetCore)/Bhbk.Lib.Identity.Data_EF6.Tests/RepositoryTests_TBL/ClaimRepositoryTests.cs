@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -34,17 +34,17 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             data.CreateClaims();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
-                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
             var result = UoW.Claims.Create(
                 Mapper.Map<tbl_Claim>(new ClaimV1()
                 {
                     IssuerId = issuer.Id,
-                    Subject = Constants.TestClaimSubject,
-                    Type = Constants.TestClaim,
+                    Subject = TestDefaultConstants.ClaimSubject,
+                    Type = TestDefaultConstants.ClaimName,
                     Value = AlphaNumeric.CreateString(8),
-                    ValueType = Constants.TestClaimValueType,
+                    ValueType = TestDefaultConstants.ClaimValueType,
                     IsDeletable = true,
                 }));
             UoW.Commit();
@@ -70,7 +70,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             data.CreateClaims();
 
             var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
-                .Where(x => x.Type == Constants.TestClaim).ToLambda())
+                .Where(x => x.Type == TestDefaultConstants.ClaimName).ToLambda())
                 .Single();
 
             UoW.Claims.Delete(claim);
@@ -107,7 +107,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             data.CreateClaims();
 
             var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
-                .Where(x => x.Type == Constants.TestClaim).ToLambda())
+                .Where(x => x.Type == TestDefaultConstants.ClaimName).ToLambda())
                 .Single();
             claim.Value += "(Updated)";
 

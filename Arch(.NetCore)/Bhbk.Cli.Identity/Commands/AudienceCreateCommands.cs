@@ -1,8 +1,8 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
-using Bhbk.Cli.Identity.Primiitives.Enums;
 using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -35,7 +35,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Grant = new ResourceOwnerGrantV2(conf)
                 };
 
-                _issuerName = ConsoleHelper.PromptForInput(CommandTypes.issuer);
+                _issuerName = InputFactory.PromptForInput(CommandTypes.issuer);
                 issuer = admin.Issuer_GetV1(_issuerName).Result;
 
                 if (issuer == null)
@@ -43,7 +43,7 @@ namespace Bhbk.Cli.Identity.Commands
 
                 try
                 {
-                    _audienceName = ConsoleHelper.PromptForInput(CommandTypes.audience);
+                    _audienceName = InputFactory.PromptForInput(CommandTypes.audience);
                     audience = admin.Audience_GetV1(_audienceName).Result;
                 }
                 catch (Exception) { }

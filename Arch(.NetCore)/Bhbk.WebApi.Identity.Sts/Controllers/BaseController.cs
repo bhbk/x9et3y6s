@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
 using Bhbk.Lib.Identity.Factories;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +12,9 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Identity.Sts.Controllers
 {
-    [Authorize(Roles = Constants.DefaultRoleForUser_Identity + ", " + Constants.DefaultRoleForAdmin_Identity)]
+    [Authorize(Roles = DefaultConstants.RoleForViewers_Identity + ", "
+        + DefaultConstants.RoleForUsers_Identity + ", "
+        + DefaultConstants.RoleForAdmins_Identity)]
     public class BaseController : Controller
     {
         protected IOAuth2JwtFactory Auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IOAuth2JwtFactory>(); }

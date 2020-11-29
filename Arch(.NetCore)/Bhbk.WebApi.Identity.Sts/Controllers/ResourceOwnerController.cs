@@ -3,8 +3,9 @@ using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.AspNetCore.Authorization;
@@ -40,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if issuer compatibility mode enabled.
             var legacyIssuer = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).Single();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyIssuer).Single();
 
             if (!bool.Parse(legacyIssuer.ConfigValue)
                 && string.IsNullOrEmpty(input.issuer_id))
@@ -61,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     issuer = UoW.Issuers.Get(x => x.Name == Conf.GetSection("IdentityTenant:AllowedIssuers").GetChildren()
                         .Select(i => i.Value).First()).SingleOrDefault();
                 else
-                    issuer = UoW.Issuers.Get(x => x.Name == Constants.TestIssuer).SingleOrDefault();
+                    issuer = UoW.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).SingleOrDefault();
             }
             else
             {
@@ -136,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.End2EndTest:
                     {
                         //check if login provider is local...
-                        if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(DefaultConstants.LoginName, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -166,8 +167,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.IntegrationTest:
                     {
                         //check if login provider is local or test...
-                        if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(Constants.TestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(DefaultConstants.LoginName, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(TestDefaultConstants.LoginName, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -501,7 +502,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.End2EndTest:
                     {
                         //check if login provider is local...
-                        if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(DefaultConstants.LoginName, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -531,8 +532,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.IntegrationTest:
                     {
                         //check if login provider is local or test...
-                        if (logins.Where(x => x.Name.Equals(Constants.DefaultLogin, StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(Constants.TestLogin, StringComparison.OrdinalIgnoreCase)).Any())
+                        if (logins.Where(x => x.Name.Equals(DefaultConstants.LoginName, StringComparison.OrdinalIgnoreCase)).Any()
+                            || logins.Where(x => x.Name.StartsWith(TestDefaultConstants.LoginName, StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))

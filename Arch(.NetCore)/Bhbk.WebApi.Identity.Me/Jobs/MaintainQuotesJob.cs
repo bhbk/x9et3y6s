@@ -3,7 +3,7 @@ using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,10 +43,10 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
                         || uow.InstanceType == InstanceContext.End2EndTest)
                     {
                         var url = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                            && x.ConfigKey == Constants.SettingTheySaidSoUrl).Single();
+                            && x.ConfigKey == SettingsConstants.TheySaidSoUrl).Single();
 
                         var key = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                            && x.ConfigKey == Constants.SettingTheySaidSoLicense).Single();
+                            && x.ConfigKey == SettingsConstants.TheySaidSoLicense).Single();
 
                         using (var http = new HttpClient())
                         {

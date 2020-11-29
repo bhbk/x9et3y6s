@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Cryptography.Hashing;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using ManyConsole;
 using System;
-using Bhbk.Cli.Identity.Primiitives.Enums;
 
 namespace Bhbk.Cli.Identity.Commands
 {

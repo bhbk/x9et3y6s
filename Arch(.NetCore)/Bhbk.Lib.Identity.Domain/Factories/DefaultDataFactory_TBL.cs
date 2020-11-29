@@ -3,7 +3,7 @@ using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
 using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using System;
@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
               */
 
             foundAudience_Alert = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                .Where(x => x.Name == Constants.DefaultAudience_Alert).ToLambda())
+                .Where(x => x.Name == DefaultConstants.Audience_Alert).ToLambda())
                 .SingleOrDefault();
 
             if (foundAudience_Alert == null)
@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Audience>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        Name = Constants.DefaultAudience_Alert,
+                        Name = DefaultConstants.Audience_Alert,
                         IsLockedOut = false,
                         IsDeletable = false,
                     }));
@@ -56,7 +56,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
 
             foundAudience_Identity = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                .Where(x => x.Name == Constants.DefaultAudience_Identity).ToLambda())
+                .Where(x => x.Name == DefaultConstants.Audience_Identity).ToLambda())
                 .SingleOrDefault();
 
             if (foundAudience_Identity == null)
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Audience>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        Name = Constants.DefaultAudience_Identity,
+                        Name = DefaultConstants.Audience_Identity,
                         IsLockedOut = false,
                         IsDeletable = false,
                     }));
@@ -79,13 +79,13 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
             if (!_uow.Audiences.IsPasswordSet(foundAudience_Alert))
             {
-                _uow.Audiences.SetPassword(foundAudience_Alert, Constants.DefaultAudiencePassword_Alert);
+                _uow.Audiences.SetPassword(foundAudience_Alert, DefaultConstants.AudiencePassword_Alert);
                 _uow.Commit();
             }
 
             if (!_uow.Audiences.IsPasswordSet(foundAudience_Identity))
             {
-                _uow.Audiences.SetPassword(foundAudience_Identity, Constants.DefaultAudiencePassword_Identity);
+                _uow.Audiences.SetPassword(foundAudience_Identity, DefaultConstants.AudiencePassword_Identity);
                 _uow.Commit();
             }
         }
@@ -142,7 +142,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             foundIssuer = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
-                .Where(x => x.Name == Constants.DefaultIssuer).ToLambda())
+                .Where(x => x.Name == DefaultConstants.IssuerName).ToLambda())
                 .SingleOrDefault();
 
             if (foundIssuer == null)
@@ -150,8 +150,8 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                 foundIssuer = _uow.Issuers.Create(
                     _mapper.Map<tbl_Issuer>(new IssuerV1()
                     {
-                        Name = Constants.DefaultIssuer,
-                        IssuerKey = Constants.DefaultIssuerKey,
+                        Name = DefaultConstants.IssuerName,
+                        IssuerKey = DefaultConstants.IssuerKey,
                         IsEnabled = true,
                         IsDeletable = false,
                     }));
@@ -162,7 +162,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.SettingAccessExpire,
+                        ConfigKey = SettingsConstants.AccessExpire,
                         ConfigValue = 600.ToString(),
                         IsDeletable = true,
                     }));
@@ -171,7 +171,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.SettingRefreshExpire,
+                        ConfigKey = SettingsConstants.RefreshExpire,
                         ConfigValue = 86400.ToString(),
                         IsDeletable = true,
                     }));
@@ -180,7 +180,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.SettingTotpExpire,
+                        ConfigKey = SettingsConstants.TotpExpire,
                         ConfigValue = 600.ToString(),
                         IsDeletable = true,
                     }));
@@ -189,7 +189,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.SettingPollingMax,
+                        ConfigKey = SettingsConstants.PollingMax,
                         ConfigValue = 10.ToString(),
                         IsDeletable = true,
                     }));
@@ -205,7 +205,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             foundLogin = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.Name == Constants.DefaultLogin).ToLambda())
+                .Where(x => x.Name == DefaultConstants.LoginName).ToLambda())
                 .SingleOrDefault();
 
             if (foundLogin == null)
@@ -213,8 +213,8 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                 foundLogin = _uow.Logins.Create(
                     _mapper.Map<tbl_Login>(new LoginV1()
                     {
-                        Name = Constants.DefaultLogin,
-                        LoginKey = Constants.DefaultLoginKey,
+                        Name = DefaultConstants.LoginName,
+                        LoginKey = DefaultConstants.LoginKey,
                         IsEnabled = true,
                         IsDeletable = false,
                     }));
@@ -234,7 +234,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             foundRoleForAdmin_Alert = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.Name == Constants.DefaultRoleForAdmin_Alert).ToLambda())
+                .Where(x => x.Name == DefaultConstants.RoleForAdmins_Alert).ToLambda())
                 .SingleOrDefault();
 
             if (foundRoleForAdmin_Alert == null)
@@ -243,7 +243,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience_Alert.Id,
-                        Name = Constants.DefaultRoleForAdmin_Alert,
+                        Name = DefaultConstants.RoleForAdmins_Alert,
                         IsEnabled = true,
                         IsDeletable = false,
                     }));
@@ -252,7 +252,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
 
             foundRoleForUser_Alert = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.Name == Constants.DefaultRoleForUser_Alert).ToLambda())
+                .Where(x => x.Name == DefaultConstants.RoleForUsers_Alert).ToLambda())
                 .SingleOrDefault();
 
             if (foundRoleForUser_Alert == null)
@@ -261,7 +261,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience_Alert.Id,
-                        Name = Constants.DefaultRoleForUser_Alert,
+                        Name = DefaultConstants.RoleForUsers_Alert,
                         IsEnabled = true,
                         IsDeletable = false,
                     }));
@@ -270,7 +270,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
 
             foundRoleForAdmin_Identity = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.Name == Constants.DefaultRoleForAdmin_Identity).ToLambda())
+                .Where(x => x.Name == DefaultConstants.RoleForAdmins_Identity).ToLambda())
                 .SingleOrDefault();
 
             if (foundRoleForAdmin_Identity == null)
@@ -279,7 +279,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience_Identity.Id,
-                        Name = Constants.DefaultRoleForAdmin_Identity,
+                        Name = DefaultConstants.RoleForAdmins_Identity,
                         IsEnabled = true,
                         IsDeletable = false,
                     }));
@@ -288,7 +288,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
 
             foundRoleForUser_Identity = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.Name == Constants.DefaultRoleForUser_Identity).ToLambda())
+                .Where(x => x.Name == DefaultConstants.RoleForUsers_Identity).ToLambda())
                 .SingleOrDefault();
 
             if (foundRoleForUser_Identity == null)
@@ -297,7 +297,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     _mapper.Map<tbl_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience_Identity.Id,
-                        Name = Constants.DefaultRoleForUser_Identity,
+                        Name = DefaultConstants.RoleForUsers_Identity,
                         IsEnabled = true,
                         IsDeletable = false,
                     }));
@@ -313,14 +313,14 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             foundGlobalLegacyClaims = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalLegacyClaims).SingleOrDefault();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyClaims).SingleOrDefault();
 
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
-                        ConfigKey = Constants.SettingGlobalLegacyClaims,
+                        ConfigKey = SettingsConstants.GlobalLegacyClaims,
                         ConfigValue = "true",
                         IsDeletable = false,
                     }));
@@ -329,14 +329,14 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
 
             foundGlobalLegacyIssuer = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).SingleOrDefault();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyIssuer).SingleOrDefault();
 
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
-                        ConfigKey = Constants.SettingGlobalLegacyIssuer,
+                        ConfigKey = SettingsConstants.GlobalLegacyIssuer,
                         ConfigValue = "true",
                         IsDeletable = false,
                     }));
@@ -345,14 +345,14 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
 
             foundGlobalTotpExpire = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalTotpExpire).SingleOrDefault();
+                && x.ConfigKey == SettingsConstants.GlobalTotpExpire).SingleOrDefault();
 
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
-                        ConfigKey = Constants.SettingGlobalTotpExpire,
+                        ConfigKey = SettingsConstants.GlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
                         IsDeletable = false,
                     }));
@@ -368,7 +368,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             foundAdmin = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.UserName == Constants.DefaultUser_Admin).ToLambda())
+                .Where(x => x.UserName == DefaultConstants.UserName_Admin).ToLambda())
                 .SingleOrDefault();
 
             if (foundAdmin == null)
@@ -376,14 +376,14 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                 foundAdmin = _uow.Users.Create(
                     _mapper.Map<tbl_User>(new UserV1()
                     {
-                        UserName = Constants.DefaultUser_Admin,
-                        Email = Constants.DefaultUser_Admin,
-                        FirstName = Constants.DefaultUserFirstName_Admin,
-                        LastName = Constants.DefaultUserLastName_Admin,
+                        UserName = DefaultConstants.UserName_Admin,
+                        Email = DefaultConstants.UserName_Admin,
+                        FirstName = DefaultConstants.UserFirstName_Admin,
+                        LastName = DefaultConstants.UserLastName_Admin,
                         IsHumanBeing = true,
                         IsLockedOut = false,
                         IsDeletable = false,
-                    }), Constants.DefaultUserPass_Admin);
+                    }), DefaultConstants.UserPass_Admin);
 
                 _uow.Users.SetConfirmedEmail(foundAdmin, true);
                 _uow.Users.SetConfirmedPhoneNumber(foundAdmin, true);
@@ -393,7 +393,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
 
             foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.UserName == Constants.DefaultUser_Normal).ToLambda())
+                .Where(x => x.UserName == DefaultConstants.UserName_Normal).ToLambda())
                 .SingleOrDefault();
 
             if (foundUser == null)
@@ -401,14 +401,14 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                 foundUser = _uow.Users.Create(
                     _mapper.Map<tbl_User>(new UserV1()
                     {
-                        UserName = Constants.DefaultUser_Normal,
-                        Email = Constants.DefaultUser_Normal,
-                        FirstName = Constants.DefaultUserFirstName_Normal,
-                        LastName = Constants.DefaultUserLastName_Normal,
+                        UserName = DefaultConstants.UserName_Normal,
+                        Email = DefaultConstants.UserName_Normal,
+                        FirstName = DefaultConstants.UserFirstName_Normal,
+                        LastName = DefaultConstants.UserLastName_Normal,
                         IsHumanBeing = true,
                         IsLockedOut = false,
                         IsDeletable = false,
-                    }), Constants.DefaultUserPass_Normal);
+                    }), DefaultConstants.UserPass_Normal);
 
                 _uow.Users.SetConfirmedEmail(foundUser, true);
                 _uow.Users.SetConfirmedPhoneNumber(foundUser, true);
@@ -540,7 +540,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             _uow.Users.Delete(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.UserName == Constants.DefaultUser_Admin || x.UserName == Constants.DefaultUser_Normal).ToLambda());
+                .Where(x => x.UserName == DefaultConstants.UserName_Admin || x.UserName == DefaultConstants.UserName_Normal).ToLambda());
             _uow.Commit();
 
             /*
@@ -548,8 +548,8 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             _uow.Roles.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.Name == Constants.DefaultRoleForAdmin_Alert || x.Name == Constants.DefaultRoleForUser_Alert
-                    || x.Name == Constants.DefaultRoleForAdmin_Identity || x.Name == Constants.DefaultRoleForUser_Identity).ToLambda());
+                .Where(x => x.Name == DefaultConstants.RoleForAdmins_Alert || x.Name == DefaultConstants.RoleForUsers_Alert
+                    || x.Name == DefaultConstants.RoleForAdmins_Identity || x.Name == DefaultConstants.RoleForUsers_Identity).ToLambda());
             _uow.Commit();
 
             /*
@@ -557,7 +557,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             _uow.Logins.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.Name == Constants.DefaultLogin).ToLambda());
+                .Where(x => x.Name == DefaultConstants.LoginName).ToLambda());
             _uow.Commit();
 
             /*
@@ -565,7 +565,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             _uow.Audiences.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                .Where(x => x.Name == Constants.DefaultAudience_Alert || x.Name == Constants.DefaultAudience_Identity).ToLambda());
+                .Where(x => x.Name == DefaultConstants.Audience_Alert || x.Name == DefaultConstants.Audience_Identity).ToLambda());
             _uow.Commit();
 
             /*
@@ -573,7 +573,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
              */
 
             _uow.Issuers.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
-                .Where(x => x.Name == Constants.DefaultIssuer).ToLambda());
+                .Where(x => x.Name == DefaultConstants.IssuerName).ToLambda());
             _uow.Commit();
         }
     }

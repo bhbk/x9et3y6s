@@ -1,10 +1,10 @@
-﻿using Bhbk.Cli.Identity.Primiitives.Enums;
+﻿using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.CommandLine.IO;
 using System;
 
 namespace Bhbk.Cli.Identity.Helpers
 {
-    internal static class ConsoleHelper
+    internal static class InputFactory
     {
         internal static string PromptForInput(CommandTypes cmd)
         {

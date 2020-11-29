@@ -1,9 +1,9 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
-using Bhbk.Cli.Identity.Primiitives.Enums;
 using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -35,7 +35,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Grant = new ResourceOwnerGrantV2()
                 };
 
-                audienceName = ConsoleHelper.PromptForInput(CommandTypes.audience);
+                audienceName = InputFactory.PromptForInput(CommandTypes.audience);
                 user = admin.Audience_GetV1(audienceName).AsTask().Result;
 
                 if (user != null)
@@ -44,7 +44,7 @@ namespace Bhbk.Cli.Identity.Commands
                 else
                     throw new ConsoleHelpAsException("FAILED find audience \"" + audienceName + "\"");
 
-                var password = ConsoleHelper.PromptForInput(CommandTypes.userpass);
+                var password = InputFactory.PromptForInput(CommandTypes.userpass);
 
                 if (admin.Audience_SetPasswordV1(user.Id,
                     new PasswordAddV1()

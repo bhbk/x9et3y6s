@@ -3,7 +3,7 @@ using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -100,10 +100,10 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingTotpExpire).Single();
+                && x.ConfigKey == SettingsConstants.TotpExpire).Single();
 
             var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingPollingMax).Single();
+                && x.ConfigKey == SettingsConstants.PollingMax).Single();
 
             var authorize = new Uri(string.Format("{0}/{1}/{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "authorize"));
             var nonce = Base64.CreateString(32);
@@ -185,7 +185,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingPollingMax).Single();
+                && x.ConfigKey == SettingsConstants.PollingMax).Single();
 
             //check if state is valid...
             var state = UoW.States.Get(x => x.StateValue == input.device_code

@@ -3,8 +3,9 @@ using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
 using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.WebApi.Identity.Sts.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -51,14 +52,14 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 data.CreateUsers();
                 data.CreateUserStates();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                    && x.ConfigKey == SettingsConstants.AccessExpire).Single();
 
-                var url = new Uri(Constants.TestUriLink);
+                var url = new Uri(TestDefaultConstants.UriLink);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == StateType.User.ToString() && x.StateConsume == false
@@ -101,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 var jwt = auth.Parse(result);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                iss.Value.Split(':')[0].Should().Be(Constants.TestIssuer);
+                iss.Value.Split(':')[0].Should().Be(TestDefaultConstants.IssuerName);
                 iss.Value.Split(':')[1].Should().Be(conf["IdentityTenant:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))

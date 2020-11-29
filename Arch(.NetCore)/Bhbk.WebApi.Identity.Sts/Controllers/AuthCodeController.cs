@@ -3,7 +3,7 @@ using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
@@ -138,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingTotpExpire).Single();
+                && x.ConfigKey == SettingsConstants.TotpExpire).Single();
 
             var state = UoW.States.Create(
                 Mapper.Map<tbl_State>(new StateV1()

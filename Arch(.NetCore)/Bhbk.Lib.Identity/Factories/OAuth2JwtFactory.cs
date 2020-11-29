@@ -1,5 +1,4 @@
-﻿using Bhbk.Lib.Identity.Primitives.Enums;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,6 +8,13 @@ using System.Text;
 
 namespace Bhbk.Lib.Identity.Factories
 {
+    public enum AudienceType
+    {
+        user_agent,
+        native,
+        server,
+    }
+
     public class OAuth2JwtFactory : IOAuth2JwtFactory
     {
         public const string _authType = "JWT";

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Factories;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Threading.Tasks;

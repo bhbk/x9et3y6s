@@ -8,8 +8,9 @@ using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -94,8 +95,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 var ask = await service.Endpoints.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
@@ -126,8 +127,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 var ask = await service.Endpoints.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
@@ -157,8 +158,8 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
 
                 var ask = await service.Endpoints.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
@@ -189,9 +190,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 var ask = await service.DeviceCode_AskV2(
                     new DeviceCodeAskV2()
@@ -222,12 +223,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                    && x.ConfigKey == SettingsConstants.AccessExpire).Single();
 
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
@@ -277,12 +278,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                    && x.ConfigKey == SettingsConstants.AccessExpire).Single();
 
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
@@ -332,12 +333,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                    && x.ConfigKey == SettingsConstants.AccessExpire).Single();
 
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
@@ -387,12 +388,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                    && x.ConfigKey == SettingsConstants.AccessExpire).Single();
 
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
@@ -444,12 +445,12 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                    && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                    && x.ConfigKey == SettingsConstants.AccessExpire).Single();
 
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
@@ -492,7 +493,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var jwt = auth.Parse(result.access_token);
 
                 var iss = jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Iss).SingleOrDefault();
-                iss.Value.Split(':')[0].Should().Be(Constants.TestIssuer);
+                iss.Value.Split(':')[0].Should().Be(TestDefaultConstants.IssuerName);
                 iss.Value.Split(':')[1].Should().Be(conf["IdentityTenant:Salt"]);
 
                 var exp = Math.Round(DateTimeOffset.FromUnixTimeSeconds(long.Parse(jwt.Claims.Where(x => x.Type == JwtRegisteredClaimNames.Exp).SingleOrDefault().Value))

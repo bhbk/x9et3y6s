@@ -4,7 +4,7 @@ using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Tests.RepositoryTests;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -46,9 +46,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == DefaultConstants.Audience_Alert).Single();
+                var user = uow.Users.Get(x => x.UserName == DefaultConstants.UserName_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -79,9 +79,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 data.Destroy();
                 data.CreateEmails();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == DefaultConstants.Audience_Alert).Single();
+                var user = uow.Users.Get(x => x.UserName == DefaultConstants.UserName_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -113,9 +113,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == DefaultConstants.Audience_Alert).Single();
+                var user = uow.Users.Get(x => x.UserName == DefaultConstants.UserName_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -146,9 +146,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 data.Destroy();
                 data.CreateTexts();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == DefaultConstants.Audience_Alert).Single();
+                var user = uow.Users.Get(x => x.UserName == DefaultConstants.UserName_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);

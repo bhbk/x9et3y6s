@@ -44,6 +44,16 @@ powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Forc
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
 popd
 
+pushd Bhbk.Lib.Identity.Primitives
+powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
+powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
+popd
+
+pushd Bhbk.Lib.Identity.Primitives.Tests
+powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
+powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"
+popd
+
 pushd Bhbk.Mssql.Identity
 powershell -command "& { if (Test-Path .\bin) { Remove-Item .\bin -Recurse -Force } }"
 powershell -command "& { if (Test-Path .\obj) { Remove-Item .\obj -Recurse -Force } }"

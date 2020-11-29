@@ -1,11 +1,11 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.Identity.Domain.Factories;
-using Bhbk.Lib.Identity.Domain.Primitives;
+using Bhbk.Lib.Identity.Domain.Templates;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -21,7 +21,7 @@ using System.Web;
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("change")]
-    [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+    [Authorize(Policy = DefaultConstants.OAuth2ROPGrants)]
     public class ChangeController : BaseController
     {
         [Route("v1/email"), HttpPut]
@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalTotpExpire).Single();
+                && x.ConfigKey == SettingsConstants.GlobalTotpExpire).Single();
 
             string token = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
                 .Generate(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user.Id.ToString(), user.SecurityStamp));
@@ -65,8 +65,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     FromDisplay = $"{user.FirstName} {user.LastName}",
                     ToEmail = user.EmailAddress,
                     ToDisplay = $"{user.FirstName} {user.LastName}",
-                    Subject = Constants.MsgConfirmEmailSubject,
-                    Body = Templates.ConfirmEmail(Mapper.Map<UserV1>(user), url)
+                    Subject = MessageConstants.ConfirmEmailSubject,
+                    Body = Email.ConfirmEmail(Mapper.Map<UserV1>(user), url)
                 });
 
             return NoContent();
@@ -99,7 +99,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
 
             var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalTotpExpire).Single();
+                && x.ConfigKey == SettingsConstants.GlobalTotpExpire).Single();
 
             string token = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
                 .Generate(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user.Id.ToString(), user.SecurityStamp));
@@ -118,8 +118,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     FromDisplay = $"{user.FirstName} {user.LastName}",
                     ToEmail = user.EmailAddress,
                     ToDisplay = $"{user.FirstName} {user.LastName}",
-                    Subject = Constants.MsgConfirmPasswordSubject,
-                    Body = Templates.ConfirmPassword(Mapper.Map<UserV1>(user), url)
+                    Subject = MessageConstants.ConfirmPasswordSubject,
+                    Body = Email.ConfirmPassword(Mapper.Map<UserV1>(user), url)
                 });
 
             return NoContent();

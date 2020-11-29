@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -33,14 +33,14 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             data.CreateRoles();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                .Where(x => x.Name == Constants.TestAudience).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
 
             var result = UoW.Roles.Create(
                 Mapper.Map<tbl_Role>(new RoleV1()
                 {
                     AudienceId = audience.Id,
-                    Name = Constants.TestRole,
+                    Name = TestDefaultConstants.RoleName,
                     IsEnabled = true,
                     IsDeletable = true,
                 }));
@@ -67,7 +67,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             data.CreateRoles();
 
             var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.Name == Constants.TestRole).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.RoleName).ToLambda())
                 .Single();
 
             UoW.Roles.Delete(role);
@@ -104,7 +104,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             data.CreateRoles();
 
             var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.Name == Constants.TestRole).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.RoleName).ToLambda())
                 .Single();
             role.Name += "(Updated)";
 

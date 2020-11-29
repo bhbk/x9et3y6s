@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             data.CreateAudiences();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                .Where(x => x.Name == Constants.TestAudience).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
 
             var result = UoW.Activities.Create(

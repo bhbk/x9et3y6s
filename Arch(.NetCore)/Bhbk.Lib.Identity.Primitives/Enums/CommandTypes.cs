@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Bhbk.Cli.Identity.Primiitives.Enums
+namespace Bhbk.Lib.Identity.Primitives.Enums
 {
-    internal enum CommandTypes
+    public enum CommandTypes
     {
         audience,
         issuer,
@@ -11,10 +11,5 @@ namespace Bhbk.Cli.Identity.Primiitives.Enums
         rolemap,
         user,
         userpass
-    }
-
-    internal enum HashTypes
-    {
-        PBKDF2,
     }
 }

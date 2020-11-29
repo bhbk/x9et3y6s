@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -35,15 +35,15 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
             data.CreateUserStates();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
-                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                .Where(x => x.Name == Constants.TestAudience).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.UserName == Constants.TestUser).ToLambda())
+                .Where(x => x.UserName == TestDefaultConstants.UserName).ToLambda())
                 .Single();
 
             var result = UoW.States.Create(
@@ -116,7 +116,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
             data.CreateUserStates();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.UserName == Constants.TestUser).ToLambda())
+                .Where(x => x.UserName == TestDefaultConstants.UserName).ToLambda())
                 .Single();
 
             var state = UoW.States.Get(QueryExpressionFactory.GetQueryExpression<tbl_State>()

@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Data_EF6.Models;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -33,14 +33,14 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateAudiences();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
-                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
             var result = UoW.Audiences.Create(
                 Mapper.Map<uvw_Audience>(new AudienceV1()
                 {
                     IssuerId = issuer.Id,
-                    Name = Constants.TestAudience,
+                    Name = TestDefaultConstants.AudienceName,
                     IsLockedOut = false,
                     IsDeletable = true,
                 }));
@@ -67,7 +67,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateAudiences();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
-                .Where(x => x.Name == Constants.TestAudience).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
 
             UoW.Audiences.Delete(audience);
@@ -104,7 +104,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateAudiences();
 
             var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
-                .Where(x => x.Name == Constants.TestAudience).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
             audience.Name += "(Updated)";
 

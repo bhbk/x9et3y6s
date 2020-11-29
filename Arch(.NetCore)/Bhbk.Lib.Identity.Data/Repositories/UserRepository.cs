@@ -4,7 +4,7 @@ using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.DataAccess.EFCore.Extensions;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -113,7 +113,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                 new SqlParameter("EmailAddress", SqlDbType.NVarChar) { Value = (object)user.EmailAddress ?? DBNull.Value },
                 new SqlParameter("FirstName", SqlDbType.NVarChar) { Value = user.FirstName },
                 new SqlParameter("LastName", SqlDbType.NVarChar) { Value = user.LastName },
-                new SqlParameter("PhoneNumber", SqlDbType.NVarChar) { Value = user.PhoneNumber },
+                new SqlParameter("PhoneNumber", SqlDbType.NVarChar) { Value = (object)user.PhoneNumber ?? DBNull.Value },
                 new SqlParameter("IsHumanBeing", SqlDbType.Bit) { Value = user.IsHumanBeing },
                 new SqlParameter("IsLockedOut", SqlDbType.Bit) { Value = user.IsLockedOut },
                 new SqlParameter("IsDeletable", SqlDbType.Bit) { Value = user.IsDeletable },
@@ -196,7 +196,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public List<Claim> GenerateAccessClaims(uvw_User user)
         {
             var legacyClaims = _context.Set<uvw_Setting>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalLegacyClaims).Single();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
 
@@ -251,10 +251,10 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public List<Claim> GenerateAccessClaims(uvw_Issuer issuer, uvw_User user)
         {
             var expire = _context.Set<uvw_Setting>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                && x.ConfigKey == SettingsConstants.AccessExpire).Single();
 
             var legacyClaims = _context.Set<uvw_Setting>().Where(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalLegacyClaims).Single();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyClaims).Single();
 
             var claims = new List<Claim>();
 
@@ -309,7 +309,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public List<Claim> GenerateRefreshClaims(uvw_Issuer issuer, uvw_User user)
         {
             var expire = _context.Set<uvw_Setting>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingRefreshExpire).Single();
+                && x.ConfigKey == SettingsConstants.RefreshExpire).Single();
 
             var claims = new List<Claim>();
 
@@ -519,12 +519,12 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             {
                 new SqlParameter("Id", SqlDbType.UniqueIdentifier) { Value = user.Id },
                 new SqlParameter("UserName", SqlDbType.NVarChar) { Value = user.UserName },
-                new SqlParameter("EmailAddress", SqlDbType.NVarChar) { Value = user.EmailAddress },
+                new SqlParameter("EmailAddress", SqlDbType.NVarChar) { Value = (object)user.EmailAddress ?? DBNull.Value },
                 new SqlParameter("EmailConfirmed", SqlDbType.Bit) { Value = user.EmailConfirmed },
                 new SqlParameter("FirstName", SqlDbType.NVarChar) { Value = user.FirstName },
                 new SqlParameter("LastName", SqlDbType.NVarChar) { Value = user.LastName },
-                new SqlParameter("PhoneNumber", SqlDbType.NVarChar) { Value = user.PhoneNumber },
-                new SqlParameter("PhoneNumberConfirmed", SqlDbType.Bit) { Value = user.PhoneNumberConfirmed },
+                new SqlParameter("PhoneNumber", SqlDbType.NVarChar) { Value = (object)user.PhoneNumber ?? DBNull.Value },
+                new SqlParameter("PhoneNumberConfirmed", SqlDbType.Bit) { Value = user.PhoneNumberConfirmed.HasValue ? (object)user.PhoneNumberConfirmed.Value : DBNull.Value },
                 new SqlParameter("PasswordConfirmed", SqlDbType.Bit) { Value = user.PasswordConfirmed },
                 new SqlParameter("IsHumanBeing", SqlDbType.Bit) { Value = user.IsHumanBeing },
                 new SqlParameter("IsLockedOut", SqlDbType.Bit) { Value = user.IsLockedOut },

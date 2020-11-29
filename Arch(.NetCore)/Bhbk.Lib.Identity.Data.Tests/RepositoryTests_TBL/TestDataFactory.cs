@@ -7,8 +7,9 @@ using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using System;
@@ -52,7 +53,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             foundAudience = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                .Where(x => x.Name == Constants.TestAudience).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .SingleOrDefault();
 
             if (foundAudience == null)
@@ -61,7 +62,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     _mapper.Map<tbl_Audience>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        Name = Constants.TestAudience,
+                        Name = TestDefaultConstants.AudienceName,
                         IsLockedOut = false,
                         IsDeletable = true,
                     }));
@@ -85,7 +86,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
 
             if (!_uow.Audiences.IsPasswordSet(foundAudience))
             {
-                _uow.Audiences.SetPassword(foundAudience, Constants.TestAudiencePassCurrent);
+                _uow.Audiences.SetPassword(foundAudience, TestDefaultConstants.AudiencePassCurrent);
                 _uow.Commit();
             }
         }
@@ -153,7 +154,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             foundClaim = _uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
-                .Where(x => x.Type == Constants.TestClaim).ToLambda())
+                .Where(x => x.Type == TestDefaultConstants.ClaimName).ToLambda())
                 .SingleOrDefault();
 
             if (foundClaim == null)
@@ -162,10 +163,10 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     _mapper.Map<tbl_Claim>(new ClaimV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        Subject = Constants.TestClaimSubject,
-                        Type = Constants.TestClaim,
+                        Subject = TestDefaultConstants.ClaimSubject,
+                        Type = TestDefaultConstants.ClaimName,
                         Value = AlphaNumeric.CreateString(8),
-                        ValueType = Constants.TestClaimValueType,
+                        ValueType = TestDefaultConstants.ClaimValueType,
                         IsDeletable = true,
                     }));
 
@@ -206,7 +207,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             foundIssuer = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
-                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .SingleOrDefault();
 
             if (foundIssuer == null)
@@ -214,8 +215,8 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                 foundIssuer = _uow.Issuers.Create(
                     _mapper.Map<tbl_Issuer>(new IssuerV1()
                     {
-                        Name = Constants.TestIssuer,
-                        IssuerKey = Constants.TestIssuerKey,
+                        Name = TestDefaultConstants.IssuerName,
+                        IssuerKey = TestDefaultConstants.IssuerKey,
                         IsEnabled = true,
                         IsDeletable = true,
                     }));
@@ -226,7 +227,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.SettingAccessExpire,
+                        ConfigKey = SettingsConstants.AccessExpire,
                         ConfigValue = 600.ToString(),
                         IsDeletable = true,
                     }));
@@ -235,7 +236,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.SettingRefreshExpire,
+                        ConfigKey = SettingsConstants.RefreshExpire,
                         ConfigValue = 86400.ToString(),
                         IsDeletable = true,
                     }));
@@ -244,7 +245,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.SettingTotpExpire,
+                        ConfigKey = SettingsConstants.TotpExpire,
                         ConfigValue = 600.ToString(),
                         IsDeletable = true,
                     }));
@@ -253,7 +254,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
-                        ConfigKey = Constants.SettingPollingMax,
+                        ConfigKey = SettingsConstants.PollingMax,
                         ConfigValue = 10.ToString(),
                         IsDeletable = true,
                     }));
@@ -269,7 +270,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             foundLogin = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.Name == Constants.TestLogin).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.LoginName).ToLambda())
                 .SingleOrDefault();
 
             if (foundLogin == null)
@@ -277,7 +278,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                 foundLogin = _uow.Logins.Create(
                     _mapper.Map<tbl_Login>(new LoginV1()
                     {
-                        Name = Constants.TestLogin,
+                        Name = TestDefaultConstants.LoginName,
                         LoginKey = AlphaNumeric.CreateString(16),
                         IsDeletable = true,
                     }));
@@ -296,7 +297,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     _mapper.Map<tbl_MOTD>(new MOTDTssV1()
                     {
                         globalId = Guid.NewGuid(),
-                        author = Constants.TestMotdAuthor,
+                        author = TestDefaultConstants.MOTDAuthor,
                         quote = "Quote-" + Base64.CreateString(4),
                         length = 666.ToString(),
                         id = AlphaNumeric.CreateString(8),
@@ -321,7 +322,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             foundRole = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.Name == Constants.TestRole).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.RoleName).ToLambda())
                 .SingleOrDefault();
 
             if (foundRole == null)
@@ -330,7 +331,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     _mapper.Map<tbl_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience.Id,
-                        Name = Constants.TestRole,
+                        Name = TestDefaultConstants.RoleName,
                         IsEnabled = true,
                         IsDeletable = true,
                     }));
@@ -346,14 +347,14 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             foundGlobalLegacyClaims = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalLegacyClaims).SingleOrDefault();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyClaims).SingleOrDefault();
 
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
-                        ConfigKey = Constants.SettingGlobalLegacyClaims,
+                        ConfigKey = SettingsConstants.GlobalLegacyClaims,
                         ConfigValue = "true",
                         IsDeletable = true,
                     }));
@@ -362,14 +363,14 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
             }
 
             foundGlobalLegacyIssuer = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).SingleOrDefault();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyIssuer).SingleOrDefault();
 
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
-                        ConfigKey = Constants.SettingGlobalLegacyIssuer,
+                        ConfigKey = SettingsConstants.GlobalLegacyIssuer,
                         ConfigValue = "true",
                         IsDeletable = true,
                     }));
@@ -378,14 +379,14 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
             }
 
             foundGlobalTotpExpire = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalTotpExpire).SingleOrDefault();
+                && x.ConfigKey == SettingsConstants.GlobalTotpExpire).SingleOrDefault();
 
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
-                        ConfigKey = Constants.SettingGlobalTotpExpire,
+                        ConfigKey = SettingsConstants.GlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
                         IsDeletable = true,
                     }));
@@ -408,8 +409,8 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                 _uow.TextQueue.Create(
                     _mapper.Map<tbl_TextQueue>(new TextV1()
                     {
-                        FromPhoneNumber = Constants.TestUserPhoneNumber,
-                        ToPhoneNumber = Constants.TestUserPhoneNumber,
+                        FromPhoneNumber = TestDefaultConstants.UserPhoneNumber,
+                        ToPhoneNumber = TestDefaultConstants.UserPhoneNumber,
                         Body = "Body-" + Base64.CreateString(32),
                         CreatedUtc = now,
                         SendAtUtc = now,
@@ -428,7 +429,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              * create test client urls
              */
 
-            var url = new Uri(Constants.TestUriLink);
+            var url = new Uri(TestDefaultConstants.UriLink);
 
             foundAudienceUrl = _uow.Urls.Get(QueryExpressionFactory.GetQueryExpression<tbl_Url>()
                 .Where(x => x.AudienceId == foundAudience.Id
@@ -458,7 +459,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.UserName == Constants.TestUser).ToLambda())
+                .Where(x => x.UserName == TestDefaultConstants.UserName).ToLambda())
                 .SingleOrDefault();
 
             if (foundUser == null)
@@ -466,15 +467,15 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                 foundUser = _uow.Users.Create(
                     _mapper.Map<tbl_User>(new UserV1()
                     {
-                        UserName = Constants.TestUser,
-                        Email = Constants.TestUser,
+                        UserName = TestDefaultConstants.UserName,
+                        Email = TestDefaultConstants.UserName,
                         PhoneNumber = NumberAs.CreateString(11),
                         FirstName = "First-" + AlphaNumeric.CreateString(4),
                         LastName = "Last-" + AlphaNumeric.CreateString(4),
                         IsHumanBeing = true,
                         IsLockedOut = false,
                         IsDeletable = true,
-                    }), Constants.TestUserPassCurrent);
+                    }), TestDefaultConstants.UserPassCurrent);
 
                 _uow.Commit();
 
@@ -656,7 +657,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             var motds = _uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
-                .Where(x => x.Author.Contains(Constants.TestMotdAuthor)).ToLambda());
+                .Where(x => x.Author.Contains(TestDefaultConstants.MOTDAuthor)).ToLambda());
 
             if (motds.Count() > 0)
             {
@@ -693,7 +694,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             var users = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.UserName.Contains(Constants.TestUser)).ToLambda());
+                .Where(x => x.UserName.Contains(TestDefaultConstants.UserName)).ToLambda());
 
             if (users.Count() > 0)
             {
@@ -706,7 +707,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             var roles = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
-                .Where(x => x.Name.Contains(Constants.TestRole)).ToLambda());
+                .Where(x => x.Name.Contains(TestDefaultConstants.RoleName)).ToLambda());
 
             if (roles.Count() > 0)
             {
@@ -719,7 +720,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             var logins = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.Name.Contains(Constants.TestLogin)).ToLambda());
+                .Where(x => x.Name.Contains(TestDefaultConstants.LoginName)).ToLambda());
 
             if (logins.Count() > 0)
             {
@@ -732,7 +733,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             var claims = _uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
-                .Where(x => x.Type.Contains(Constants.TestClaim)).ToLambda());
+                .Where(x => x.Type.Contains(TestDefaultConstants.ClaimName)).ToLambda());
 
             if (claims.Count() > 0)
             {
@@ -745,7 +746,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             var audiences = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
-                .Where(x => x.Name.Contains(Constants.TestAudience)).ToLambda());
+                .Where(x => x.Name.Contains(TestDefaultConstants.AudienceName)).ToLambda());
 
             if (audiences.Count() > 0)
             {
@@ -758,7 +759,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
              */
 
             var issuers = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
-                .Where(x => x.Name.Contains(Constants.TestIssuer)).ToLambda());
+                .Where(x => x.Name.Contains(TestDefaultConstants.IssuerName)).ToLambda());
 
             if (issuers.Count() > 0)
             {

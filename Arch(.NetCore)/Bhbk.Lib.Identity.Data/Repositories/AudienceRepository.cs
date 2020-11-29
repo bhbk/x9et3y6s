@@ -4,7 +4,7 @@ using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.DataAccess.EFCore.Extensions;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
 using Bhbk.Lib.Identity.Data.Models;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -155,7 +155,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public List<Claim> GenerateAccessClaims(uvw_Issuer issuer, uvw_Audience audience)
         {
             var expire = _context.Set<uvw_Setting>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingAccessExpire).Single();
+                && x.ConfigKey == SettingsConstants.AccessExpire).Single();
 
             var claims = new List<Claim>();
 
@@ -189,7 +189,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public List<Claim> GenerateRefreshClaims(uvw_Issuer issuer, uvw_Audience audience)
         {
             var expire = _context.Set<uvw_Setting>().Where(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingRefreshExpire).Single();
+                && x.ConfigKey == SettingsConstants.RefreshExpire).Single();
 
             var claims = new List<Claim>();
 

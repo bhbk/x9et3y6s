@@ -6,7 +6,7 @@ using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using Bhbk.WebApi.Identity.Admin.Tests.TestingTools;
@@ -46,7 +46,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 sc.AddSingleton<IConfiguration>(conf);
                 sc.AddSingleton<IContextService>(instance);
                 sc.AddSingleton<IMapper>(mapper);
-                sc.AddSingleton<IAuthorizationHandler, IdentityUserssAuthorize>();
+                sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
@@ -120,11 +120,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 });
                 sc.AddAuthorization(opt =>
                 {
-                    opt.AddPolicy(Constants.DefaultPolicyForHumans, humans =>
+                    opt.AddPolicy(DefaultConstants.OAuth2ROPGrants, humans =>
                     {
                         humans.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                     });
-                    opt.AddPolicy(Constants.DefaultPolicyForServices, servers =>
+                    opt.AddPolicy(DefaultConstants.OAuth2CCGrants, servers =>
                     {
                         servers.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                     });

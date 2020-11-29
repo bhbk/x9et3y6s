@@ -1,13 +1,10 @@
-﻿using Bhbk.Lib.Identity.Data.Models_TBL;
-using Bhbk.Lib.Identity.Models.Admin;
+﻿using Bhbk.Lib.Identity.Models.Admin;
 using System;
 
-namespace Bhbk.Lib.Identity.Domain.Primitives
+namespace Bhbk.Lib.Identity.Domain.Templates
 {
-    public class Templates
+    public class Email
     {
-        #region Templates
-
         /*
          * https://htmlformatter.com
          * https://www.freeformatter.com/java-dotnet-escape.html
@@ -166,7 +163,7 @@ namespace Bhbk.Lib.Identity.Domain.Primitives
             "</html>";
         }
 
-        public static string Implicit(tbl_Issuer issuer, tbl_Audience audience, tbl_User user, Uri link)
+        public static string ImplicitGrant(IssuerV1 issuer, AudienceV1 audience, UserV1 user, Uri link)
         {
             /*
              * use http://rendera.herokuapp.com/ to test template before format...
@@ -214,7 +211,5 @@ namespace Bhbk.Lib.Identity.Domain.Primitives
             "  </body>" +
             "</html>";
         }
-
-        #endregion
     }
 }

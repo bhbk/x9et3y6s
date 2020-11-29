@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -34,14 +34,14 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             data.CreateTexts();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
-                .Where(x => x.UserName == Constants.TestUser).ToLambda())
+                .Where(x => x.UserName == TestDefaultConstants.UserName).ToLambda())
                 .First();
 
             var result = UoW.TextQueue.Create(
                 Mapper.Map<uvw_TextQueue>(new TextV1()
                 {
-                    FromPhoneNumber = Constants.TestUserPhoneNumber,
-                    ToPhoneNumber = Constants.TestUserPhoneNumber,
+                    FromPhoneNumber = TestDefaultConstants.UserPhoneNumber,
+                    ToPhoneNumber = TestDefaultConstants.UserPhoneNumber,
                     Body = "Body-" + Base64.CreateString(32),
                     SendAtUtc = DateTime.UtcNow,
                 }));

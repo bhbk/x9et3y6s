@@ -28,16 +28,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Data\Bhbk.Lib.Identity.Data.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Domain\Bhbk.Lib.Identity.Domain.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Primitives.Tests\Bhbk.Lib.Identity.Primitives.Tests.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Primitives\Bhbk.Lib.Identity.Primitives.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Generator></Generator>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Bhbk.Lib.Identity.Data\Bhbk.Lib.Identity.Data.csproj" />
-    <ProjectReference Include="..\Bhbk.Lib.Identity.Domain\Bhbk.Lib.Identity.Domain.csproj" />
-    <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" />
   </ItemGroup>
 
 </Project>

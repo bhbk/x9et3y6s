@@ -1,8 +1,8 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
-using Bhbk.Cli.Identity.Primiitives.Enums;
 using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -36,7 +36,7 @@ namespace Bhbk.Cli.Identity.Commands
 
                 try
                 {
-                    loginName = ConsoleHelper.PromptForInput(CommandTypes.login);
+                    loginName = InputFactory.PromptForInput(CommandTypes.login);
                     login = admin.Login_GetV1(loginName).Result;
                 }
                 catch (Exception) { }

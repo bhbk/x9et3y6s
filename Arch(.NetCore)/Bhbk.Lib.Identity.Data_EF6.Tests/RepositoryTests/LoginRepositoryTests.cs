@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Data_EF6.Models;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -35,8 +35,8 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             var result = UoW.Logins.Create(
                 Mapper.Map<uvw_Login>(new LoginV1()
                 {
-                    Name = Constants.TestLogin,
-                    LoginKey = Constants.TestLoginKey,
+                    Name = TestDefaultConstants.LoginName,
+                    LoginKey = TestDefaultConstants.LoginKey,
                     IsDeletable = true,
                 }));
             UoW.Commit();
@@ -62,7 +62,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateLogins();
 
             var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<uvw_Login>()
-                .Where(x => x.Name == Constants.TestLogin).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.LoginName).ToLambda())
                 .Single();
 
             UoW.Logins.Delete(login);
@@ -99,7 +99,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateLogins();
 
             var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<uvw_Login>()
-                .Where(x => x.Name == Constants.TestLogin).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.LoginName).ToLambda())
                 .Single();
             login.Name += "(Updated)";
 

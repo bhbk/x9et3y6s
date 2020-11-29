@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -35,8 +35,8 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             var result = UoW.Issuers.Create(
                 Mapper.Map<tbl_Issuer>(new IssuerV1()
                 {
-                    Name = Constants.TestIssuer,
-                    IssuerKey = Constants.TestIssuerKey,
+                    Name = TestDefaultConstants.IssuerName,
+                    IssuerKey = TestDefaultConstants.IssuerKey,
                     IsEnabled = true,
                     IsDeletable = true,
                 }));
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             data.CreateIssuers();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
-                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
             UoW.Claims.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
@@ -118,7 +118,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
             data.CreateIssuers();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
-                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
             issuer.Name += "(Updated)";
 

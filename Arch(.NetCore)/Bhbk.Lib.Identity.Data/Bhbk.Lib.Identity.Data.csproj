@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Primitives\Bhbk.Lib.Identity.Primitives.csproj" />
     <ProjectReference Include="..\Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj" />
   </ItemGroup>
 

@@ -3,7 +3,7 @@ using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Exceptions;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -23,8 +23,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     public class LoginController : BaseController
     {
         [Route("v1"), HttpPost]
-        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
-        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
+        [Authorize(Policy = DefaultConstants.OAuth2ROPGrants)]
+        [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult CreateV1([FromBody] LoginV1 model)
         {
             if (!ModelState.IsValid)
@@ -44,8 +44,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
-        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
+        [Authorize(Policy = DefaultConstants.OAuth2ROPGrants)]
+        [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid loginID)
         {
             var login = UoW.Logins.Get(x => x.Id == loginID)
@@ -141,8 +141,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
-        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
+        [Authorize(Policy = DefaultConstants.OAuth2ROPGrants)]
+        [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult UpdateV1([FromBody] LoginV1 model)
         {
             if (!ModelState.IsValid)

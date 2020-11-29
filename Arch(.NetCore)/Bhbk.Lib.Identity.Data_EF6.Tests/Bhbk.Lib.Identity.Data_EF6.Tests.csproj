@@ -24,6 +24,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Bhbk.Lib.Identity.Data_EF6\Bhbk.Lib.Identity.Data_EF6.csproj" />
     <ProjectReference Include="..\Bhbk.Lib.Identity.Domain\Bhbk.Lib.Identity.Domain.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Primitives.Tests\Bhbk.Lib.Identity.Primitives.Tests.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.Primitives\Bhbk.Lib.Identity.Primitives.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,8 @@ using Bhbk.Lib.Identity.Data.Tests.RepositoryTests;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -46,9 +47,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == DefaultConstants.Audience_Alert).Single();
+                var user = uow.Users.Get(x => x.UserName == DefaultConstants.UserName_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -79,21 +80,21 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 data.Destroy();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == DefaultConstants.Audience_Alert).Single();
+                var user = uow.Users.Get(x => x.UserName == DefaultConstants.UserName_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var testUser = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
                 var result = await service.Enqueue_EmailV1(
                     new EmailV1()
                     {
                         FromEmail = user.EmailAddress,
                         ToEmail = testUser.EmailAddress,
-                        Subject = Constants.TestEmailSubject + "-" + Base64.CreateString(4),
-                        Body = Constants.TestEmailContent + "-" + Base64.CreateString(4)
+                        Subject = TestDefaultConstants.EmailSubject + "-" + Base64.CreateString(4),
+                        Body = TestDefaultConstants.EmailContent + "-" + Base64.CreateString(4)
                     });
                 result.Should().BeTrue();
             }
@@ -119,9 +120,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == DefaultConstants.Audience_Alert).Single();
+                var user = uow.Users.Get(x => x.UserName == DefaultConstants.UserName_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -152,9 +153,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 data.Destroy();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.DefaultIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.DefaultAudience_Alert).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.DefaultUser_Admin).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == DefaultConstants.Audience_Alert).Single();
+                var user = uow.Users.Get(x => x.UserName == DefaultConstants.UserName_Admin).Single();
 
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
@@ -165,13 +166,13 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 uow.Users.Update(user);
                 uow.Commit();
 
-                var testUser = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var testUser = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
                 var result = await service.Enqueue_TextV1(
                     new TextV1()
                     {
                         FromPhoneNumber = user.PhoneNumber,
                         ToPhoneNumber = testUser.PhoneNumber,
-                        Body = Constants.TestTextContent,
+                        Body = TestDefaultConstants.TextContent,
                     });
                 result.Should().BeTrue();
             }

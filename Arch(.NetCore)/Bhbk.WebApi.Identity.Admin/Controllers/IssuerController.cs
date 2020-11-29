@@ -3,7 +3,7 @@ using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Exceptions;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -23,8 +23,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     public class IssuerController : BaseController
     {
         [Route("v1"), HttpPost]
-        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
-        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
+        [Authorize(Policy = DefaultConstants.OAuth2ROPGrants)]
+        [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult CreateV1([FromBody] IssuerV1 model)
         {
             if (!ModelState.IsValid)
@@ -42,7 +42,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 Mapper.Map<tbl_Setting>(new SettingV1()
                 {
                     IssuerId = issuer.Id,
-                    ConfigKey = Constants.SettingAccessExpire,
+                    ConfigKey = SettingsConstants.AccessExpire,
                     ConfigValue = 600.ToString(),
                     IsDeletable = true,
                 }));
@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 Mapper.Map<tbl_Setting>(new SettingV1()
                 {
                     IssuerId = issuer.Id,
-                    ConfigKey = Constants.SettingRefreshExpire,
+                    ConfigKey = SettingsConstants.RefreshExpire,
                     ConfigValue = 86400.ToString(),
                     IsDeletable = true,
                 }));
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 Mapper.Map<tbl_Setting>(new SettingV1()
                 {
                     IssuerId = issuer.Id,
-                    ConfigKey = Constants.SettingTotpExpire,
+                    ConfigKey = SettingsConstants.TotpExpire,
                     ConfigValue = 600.ToString(),
                     IsDeletable = true,
                 }));
@@ -69,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 Mapper.Map<tbl_Setting>(new SettingV1()
                 {
                     IssuerId = issuer.Id,
-                    ConfigKey = Constants.SettingPollingMax,
+                    ConfigKey = SettingsConstants.PollingMax,
                     ConfigValue = 10.ToString(),
                     IsDeletable = true,
                 }));
@@ -80,8 +80,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
-        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
-        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
+        [Authorize(Policy = DefaultConstants.OAuth2ROPGrants)]
+        [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid issuerID)
         {
             var issuer = UoW.Issuers.Get(x => x.Id == issuerID)
@@ -124,7 +124,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1/keys"), HttpPost]
-        [Authorize(Policy = Constants.DefaultPolicyForServices)]
+        [Authorize(Policy = DefaultConstants.OAuth2CCGrants)]
         public IActionResult GetKeysV1([FromBody] List<string> model)
         {
             var current = GetIdentityGUID();
@@ -219,8 +219,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
 
         [Route("v1"), HttpPut]
-        [Authorize(Policy = Constants.DefaultPolicyForHumans)]
-        [Authorize(Roles = Constants.DefaultRoleForAdmin_Identity)]
+        [Authorize(Policy = DefaultConstants.OAuth2ROPGrants)]
+        [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult UpdateV1([FromBody] IssuerV1 model)
         {
             if (!ModelState.IsValid)

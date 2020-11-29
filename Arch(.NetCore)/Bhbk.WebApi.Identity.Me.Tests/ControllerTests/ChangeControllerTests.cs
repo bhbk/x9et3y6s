@@ -3,7 +3,7 @@ using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Infrastructure;
 using Bhbk.Lib.Identity.Data.Tests.RepositoryTests;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.WebApi.Identity.Me.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -43,10 +43,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 var data = new TestDataFactory(uow);
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
-                var newEmail = Base64.CreateString(4) + "-" + Constants.TestUser;
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
+                var newEmail = Base64.CreateString(4) + "-" + TestDefaultConstants.UserName;
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -82,10 +82,10 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
-                var newEmail = Base64.CreateString(4) + "-" + Constants.TestUser;
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
+                var newEmail = Base64.CreateString(4) + "-" + TestDefaultConstants.UserName;
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -121,9 +121,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
@@ -131,8 +131,8 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 {
                     EntityId = user.Id,
                     CurrentPassword = Base64.CreateString(16),
-                    NewPassword = Constants.TestUserPassNew,
-                    NewPasswordConfirm = Constants.TestUserPassNew
+                    NewPassword = TestDefaultConstants.UserPassNew,
+                    NewPasswordConfirm = TestDefaultConstants.UserPassNew
                 };
 
                 var result = await controller.ChangePasswordV1(model) as BadRequestObjectResult;
@@ -159,18 +159,18 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
 
                 var model = new PasswordChangeV1()
                 {
                     EntityId = user.Id,
-                    CurrentPassword = Constants.TestUserPassCurrent,
-                    NewPassword = Constants.TestUserPassNew,
-                    NewPasswordConfirm = Constants.TestUserPassNew
+                    CurrentPassword = TestDefaultConstants.UserPassCurrent,
+                    NewPassword = TestDefaultConstants.UserPassNew,
+                    NewPasswordConfirm = TestDefaultConstants.UserPassNew
                 };
 
                 var result = await controller.ChangePasswordV1(model) as OkObjectResult;
@@ -199,9 +199,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
                 var newPhone = NumberAs.CreateString(11);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);
@@ -240,9 +240,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 data.CreateAudiences();
                 data.CreateUsers();
 
-                var issuer = uow.Issuers.Get(x => x.Name == Constants.TestIssuer).Single();
-                var audience = uow.Audiences.Get(x => x.Name == Constants.TestAudience).Single();
-                var user = uow.Users.Get(x => x.UserName == Constants.TestUser).Single();
+                var issuer = uow.Issuers.Get(x => x.Name == TestDefaultConstants.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == TestDefaultConstants.AudienceName).Single();
+                var user = uow.Users.Get(x => x.UserName == TestDefaultConstants.UserName).Single();
                 var newPhone = NumberAs.CreateString(11);
 
                 controller.SetIdentity(issuer.Id, audience.Id, user.Id);

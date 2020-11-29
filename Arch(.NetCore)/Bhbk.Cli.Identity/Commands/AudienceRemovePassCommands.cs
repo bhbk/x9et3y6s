@@ -1,8 +1,8 @@
 ﻿using Bhbk.Cli.Identity.Helpers;
-using Bhbk.Cli.Identity.Primiitives.Enums;
 using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Services;
 using ManyConsole;
 using Microsoft.Extensions.Configuration;
@@ -34,7 +34,7 @@ namespace Bhbk.Cli.Identity.Commands
                     Grant = new ResourceOwnerGrantV2(conf)
                 };
 
-                audienceName = ConsoleHelper.PromptForInput(CommandTypes.audience);
+                audienceName = InputFactory.PromptForInput(CommandTypes.audience);
                 audience = admin.Audience_GetV1(audienceName).Result;
 
                 if (audience != null)

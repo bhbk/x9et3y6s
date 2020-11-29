@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data_EF6.Models;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -36,8 +36,8 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             var result = UoW.Users.Create(
                 Mapper.Map<uvw_User>(new UserV1()
                 {
-                    UserName = Constants.TestUser,
-                    Email = Constants.TestUser,
+                    UserName = TestDefaultConstants.UserName,
+                    Email = TestDefaultConstants.UserName,
                     PhoneNumber = NumberAs.CreateString(9),
                     FirstName = "First-" + Base64.CreateString(4),
                     LastName = "Last-" + Base64.CreateString(4),
@@ -68,7 +68,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateUsers();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
-                .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
+                .Where(x => x.UserName == TestDefaultConstants.UserName).ToLambda()).Single();
 
             UoW.Users.Delete(user);
             UoW.Commit();
@@ -104,7 +104,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateUsers();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
-                .Where(x => x.UserName == Constants.TestUser).ToLambda()).Single();
+                .Where(x => x.UserName == TestDefaultConstants.UserName).ToLambda()).Single();
             user.FirstName += "(Updated)";
             user.LastName += "(Updated)";
 

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Primitives.Enums;
+﻿using Bhbk.Lib.Identity.Factories;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Domain.Authorize
 {
-    public class IdentityUserssAuthorize : AuthorizationHandler<IdentityUsersAuthorizeRequirement>
+    public class IdentityUsersAuthorize : AuthorizationHandler<IdentityUsersAuthorizeRequirement>
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IdentityUsersAuthorizeRequirement requirement)
         {

@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
             var result = UoW.MOTDs.Create(
                 Mapper.Map<tbl_MOTD>(new MOTDTssV1
                 {
-                    author = Constants.TestMotdAuthor,
+                    author = TestDefaultConstants.MOTDAuthor,
                     quote = "Quote-" + Base64.CreateString(4),
                 }));
             UoW.Commit();
@@ -61,7 +61,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
             data.CreateMOTDs();
 
             var MOTD = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
-                .Where(x => x.Author == Constants.TestMotdAuthor).ToLambda())
+                .Where(x => x.Author == TestDefaultConstants.MOTDAuthor).ToLambda())
                 .First();
 
             UoW.MOTDs.Delete(MOTD);
@@ -98,7 +98,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
             data.CreateMOTDs();
 
             var MOTD = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
-                .Where(x => x.Author == Constants.TestMotdAuthor).ToLambda())
+                .Where(x => x.Author == TestDefaultConstants.MOTDAuthor).ToLambda())
                 .First();
             MOTD.Quote += "(Updated)";
 

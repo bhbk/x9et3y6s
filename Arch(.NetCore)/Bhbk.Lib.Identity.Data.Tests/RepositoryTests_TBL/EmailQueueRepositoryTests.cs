@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Identity.Data.Models_TBL;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
             data.CreateEmails();
 
             var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
-                .Where(x => x.UserName == Constants.TestUser).ToLambda())
+                .Where(x => x.UserName == TestDefaultConstants.UserName).ToLambda())
                 .First();
 
             var result = UoW.EmailQueue.Create(

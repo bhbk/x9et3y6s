@@ -2,35 +2,6 @@
 
 namespace Bhbk.Lib.Identity.Primitives.Enums
 {
-    //https://tools.ietf.org/html/rfc6749#section-2.1
-    public enum AudienceType
-    {
-        user_agent,
-        native,
-        server,
-    }
-
-    public enum ActionType
-    {
-        Allow,
-        Deny,
-    }
-
-    public enum LoginType
-    {
-        CreateAudienceAccessTokenV1,
-        CreateAudienceAccessTokenV2,
-        CreateAudienceRefreshTokenV1,
-        CreateAudienceRefreshTokenV2,
-        CreateUserAccessTokenV1Legacy,
-        CreateUserAccessTokenV1,
-        CreateUserAccessTokenV2,
-        CreateUserRefreshTokenV1,
-        CreateUserRefreshTokenV2,
-        BasicAuthV1,
-        BasicAuthV2,
-    }
-
     public enum MessageType
     {
         ActivityAleadyExists,
@@ -75,19 +46,5 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
         UserImmutable,
         UserInvalid,
         UserNotFound,
-    }
-
-    public enum RefreshType
-    {
-        Client,
-        Device,
-        User,
-    }
-
-    public enum StateType
-    {
-        Client,
-        Device,
-        User,
     }
 }

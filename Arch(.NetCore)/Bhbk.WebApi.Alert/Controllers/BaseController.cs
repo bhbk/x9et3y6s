@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Identity.Data.Infrastructure;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,9 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Alert.Controllers
 {
-    [Authorize(Roles = Constants.DefaultRoleForUser_Alert + ", " + Constants.DefaultRoleForAdmin_Alert)]
+    [Authorize(Roles = DefaultConstants.RoleForViewers_Alert + "," 
+        + DefaultConstants.RoleForUsers_Alert + ", " 
+        + DefaultConstants.RoleForAdmins_Alert)]
     public class BaseController : Controller
     {
         protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }

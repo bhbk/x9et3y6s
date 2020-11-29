@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Models.Admin;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using FluentAssertions;
@@ -35,8 +35,8 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             var result = UoW.Issuers.Create(
                 Mapper.Map<uvw_Issuer>(new IssuerV1()
                 {
-                    Name = Constants.TestIssuer,
-                    IssuerKey = Constants.TestIssuerKey,
+                    Name = TestDefaultConstants.IssuerName,
+                    IssuerKey = TestDefaultConstants.IssuerKey,
                     IsEnabled = true,
                     IsDeletable = false,
                 }));
@@ -63,7 +63,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             data.CreateIssuers();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
-                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
             UoW.Issuers.Delete(issuer);
@@ -100,7 +100,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             data.CreateIssuers();
 
             var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
-                .Where(x => x.Name == Constants.TestIssuer).ToLambda())
+                .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
             issuer.Name += "(Updated)";
 

@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
@@ -17,7 +17,7 @@ using System.Linq.Dynamic.Core;
 namespace Bhbk.WebApi.Identity.Me.Controllers
 {
     [Route("info")]
-    [Authorize(Policy = Constants.DefaultPolicyForHumans)]
+    [Authorize(Policy = DefaultConstants.OAuth2ROPGrants)]
     public class InfoController : BaseController
     {
         [Route("v1"), HttpGet]

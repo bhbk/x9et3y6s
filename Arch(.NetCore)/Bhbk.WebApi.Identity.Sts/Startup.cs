@@ -6,7 +6,7 @@ using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
-using Bhbk.Lib.Identity.Primitives;
+using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Services;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Sts.Jobs;
@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Sts
         public virtual void ConfigureServices(IServiceCollection sc)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var workerName = "StsWorker";
+            var workerName = "IdentityStsWorker";
 
             var conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);
             sc.AddSingleton<IMapper>(mapper);
-            sc.AddSingleton<IAuthorizationHandler, IdentityUserssAuthorize>();
+            sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
             {
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Sts
              */
 
             var legacyIssuer = seeds.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == Constants.SettingGlobalLegacyIssuer).Single();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyIssuer).Single();
 
             if (bool.Parse(legacyIssuer.ConfigValue))
                 issuers = conf.GetSection("IdentityTenant:AllowedIssuers").GetChildren()
@@ -195,11 +195,11 @@ namespace Bhbk.WebApi.Identity.Sts
             });
             sc.AddAuthorization(opt =>
             {
-                opt.AddPolicy(Constants.DefaultPolicyForHumans, humans =>
+                opt.AddPolicy(DefaultConstants.OAuth2ROPGrants, humans =>
                 {
                     humans.Requirements.Add(new IdentityUsersAuthorizeRequirement());
                 });
-                opt.AddPolicy(Constants.DefaultPolicyForServices, servers =>
+                opt.AddPolicy(DefaultConstants.OAuth2CCGrants, servers =>
                 {
                     servers.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                 });
