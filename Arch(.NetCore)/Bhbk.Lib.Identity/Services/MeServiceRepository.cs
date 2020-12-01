@@ -11,13 +11,13 @@ using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Repositories
+namespace Bhbk.Lib.Identity.Services
 {
-    public class MeRepository
+    public class MeServiceRepository
     {
         private readonly HttpClient _http;
 
-        public MeRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
+        public MeServiceRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
             if (instance == InstanceContext.DeployedOrLocal
                 || instance == InstanceContext.End2EndTest)

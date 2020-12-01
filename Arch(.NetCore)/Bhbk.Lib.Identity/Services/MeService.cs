@@ -2,7 +2,7 @@
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Repositories;
+using Bhbk.Lib.Identity.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Services
     public class MeService : IMeService
     {
         public IOAuth2JwtGrant Grant { get; set; }
-        public MeRepository Endpoints { get; }
+        public MeServiceRepository Endpoints { get; }
 
         public MeService()
             : this(InstanceContext.DeployedOrLocal, new HttpClient())
@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public MeService(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            Endpoints = new MeRepository(conf, instance, http);
+            Endpoints = new MeServiceRepository(conf, instance, http);
         }
 
         public async ValueTask<bool> Info_DeleteCodesV1()

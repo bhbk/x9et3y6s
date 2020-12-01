@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Repositories;
+using Bhbk.Lib.Identity.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Services
 {
     public interface IMeService
     {
-        MeRepository Endpoints { get; }
+        MeServiceRepository Endpoints { get; }
         IOAuth2JwtGrant Grant { get; set; }
 
         /*

@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Repositories;
+using Bhbk.Lib.Identity.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Net.Http;
@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Services
     public class StsService : IStsService
     {
         public IOAuth2JwtGrant Grant { get; set; }
-        public StsRepository Endpoints { get; }
+        public StsServiceRepository Endpoints { get; }
 
         public StsService()
             : this(InstanceContext.DeployedOrLocal, new HttpClient())
@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public StsService(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            Endpoints = new StsRepository(conf, instance, http);
+            Endpoints = new StsServiceRepository(conf, instance, http);
         }
 
         public async ValueTask<AuthCodeV1> AuthCode_AskV1(AuthCodeAskV1 model)

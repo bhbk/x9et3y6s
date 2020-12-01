@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Repositories;
+using Bhbk.Lib.Identity.Services;
 using System;
 using System.Threading.Tasks;
 
@@ -8,7 +8,7 @@ namespace Bhbk.Lib.Identity.Services
 {
     public interface IAlertService
     {
-        AlertRepository Endpoints { get; }
+        AlertServiceRepository Endpoints { get; }
         IOAuth2JwtGrant Grant { get; set; }
 
         ValueTask<bool> Dequeue_EmailV1(Guid emailID);

@@ -9,13 +9,13 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Bhbk.Lib.Identity.Repositories
+namespace Bhbk.Lib.Identity.Services
 {
-    public class StsRepository
+    public class StsServiceRepository
     {
         private readonly HttpClient _http;
 
-        public StsRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
+        public StsServiceRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
             if (instance == InstanceContext.DeployedOrLocal
                 || instance == InstanceContext.End2EndTest)

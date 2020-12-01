@@ -9,13 +9,13 @@ using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bhbk.Lib.Identity.Repositories
+namespace Bhbk.Lib.Identity.Services
 {
-    public class AlertRepository
+    public class AlertServiceRepository
     {
         private readonly HttpClient _http;
 
-        public AlertRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
+        public AlertServiceRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
             if (instance == InstanceContext.DeployedOrLocal
                 || instance == InstanceContext.End2EndTest)

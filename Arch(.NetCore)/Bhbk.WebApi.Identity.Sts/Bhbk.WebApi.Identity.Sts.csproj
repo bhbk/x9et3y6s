@@ -10,20 +10,12 @@
     <PackageTags>Bhbk WebApi Identity Sts</PackageTags>
     <PackageProjectUrl></PackageProjectUrl>
     <Version>1.0.0</Version>
-    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Platforms>AnyCPU</Platforms>
     <UserSecretsId>f09dcfbb-f35c-4a1e-a3b3-8ac775d88963</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,10 +25,10 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="4.1.0" />
-    <PackageReference Include="Bhbk.Lib.Common" Version="2020.11.25.1900" />
-    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2020.11.25.1900" />
-    <PackageReference Include="Bhbk.Lib.DataState" Version="2020.11.25.1900" />
-    <PackageReference Include="Bhbk.Lib.Hosting" Version="2020.11.25.1900" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2020.11.27.2100" />
+    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2020.11.27.2100" />
+    <PackageReference Include="Bhbk.Lib.DataState" Version="2020.11.27.2100" />
+    <PackageReference Include="Bhbk.Lib.Hosting" Version="2020.11.27.2100" />
     <PackageReference Include="CronExpressionDescriptor" Version="2.16.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.1" />

@@ -1,13 +1,13 @@
 ﻿using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Sts;
-using Bhbk.Lib.Identity.Repositories;
+using Bhbk.Lib.Identity.Services;
 using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.Services
 {
     public interface IStsService
     {
-        StsRepository Endpoints { get; }
+        StsServiceRepository Endpoints { get; }
         IOAuth2JwtGrant Grant { get; set; }
 
         /*

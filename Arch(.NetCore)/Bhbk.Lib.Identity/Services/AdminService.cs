@@ -3,7 +3,7 @@ using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Repositories;
+using Bhbk.Lib.Identity.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace Bhbk.Lib.Identity.Services
     public class AdminService : IAdminService
     {
         public IOAuth2JwtGrant Grant { get; set; }
-        public AdminRepository Endpoints { get; }
+        public AdminServiceRepository Endpoints { get; }
 
         public AdminService()
             : this(InstanceContext.DeployedOrLocal, new HttpClient())
@@ -32,7 +32,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public AdminService(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            Endpoints = new AdminRepository(conf, instance, http);
+            Endpoints = new AdminServiceRepository(conf, instance, http);
         }
 
         public async ValueTask<ActivityV1> Activity_GetV1(string activityValue)

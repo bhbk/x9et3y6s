@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Repositories;
+using Bhbk.Lib.Identity.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Net.Http;
@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Services
     public class AlertService : IAlertService
     {
         public IOAuth2JwtGrant Grant { get; set; }
-        public AlertRepository Endpoints { get; }
+        public AlertServiceRepository Endpoints { get; }
 
         public AlertService()
             : this(InstanceContext.DeployedOrLocal, new HttpClient())
@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Services
 
         public AlertService(IConfiguration conf, InstanceContext instance, HttpClient http)
         {
-            Endpoints = new AlertRepository(conf, instance, http);
+            Endpoints = new AlertServiceRepository(conf, instance, http);
         }
 
         public async ValueTask<bool> Dequeue_EmailV1(Guid emailID)
