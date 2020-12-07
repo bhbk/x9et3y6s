@@ -11,20 +11,18 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-#if RELEASE
 using System.Net;
-#endif
-using System.Threading.Tasks;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Alert.Jobs
 {
     [DisallowConcurrentExecution]
-    public class DequeueEmailsJob : IJob
+    public class EmailDequeueJob : IJob
     {
         private readonly IServiceScopeFactory _factory;
 
-        public DequeueEmailsJob(IServiceScopeFactory factory) => _factory = factory;
+        public EmailDequeueJob(IServiceScopeFactory factory) => _factory = factory;
 
         public Task Execute(IJobExecutionContext context)
         {
@@ -45,7 +43,7 @@ namespace Bhbk.WebApi.Alert.Jobs
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());
+                 Log.Fatal(ex, $"'{callPath}' failed on {Dns.GetHostName().ToUpper()}");
             }
             finally
             {
@@ -61,7 +59,7 @@ namespace Bhbk.WebApi.Alert.Jobs
         private void DoDequeueWork(IConfiguration conf, IUnitOfWork uow, ISendgridService sendgrid)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var sendgridApiKey = conf["Jobs:DequeueEmails:SendgridApiKey"];
+            var sendgridApiKey = conf["Jobs:EmailDequeue:SendgridApiKey"];
 
             foreach (var msg in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>()
                 .Where(x => x.SendAtUtc < DateTime.UtcNow 

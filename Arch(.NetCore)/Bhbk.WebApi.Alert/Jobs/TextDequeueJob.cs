@@ -11,8 +11,9 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
+using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 #if RELEASE
 using Twilio.Exceptions;
 #endif
@@ -20,11 +21,11 @@ using Twilio.Exceptions;
 namespace Bhbk.WebApi.Alert.Jobs
 {
     [DisallowConcurrentExecution]
-    public class DequeueTextsJob : IJob
+    public class TextDequeueJob : IJob
     {
         private readonly IServiceScopeFactory _factory;
 
-        public DequeueTextsJob(IServiceScopeFactory factory) => _factory = factory;
+        public TextDequeueJob(IServiceScopeFactory factory) => _factory = factory;
 
         public Task Execute(IJobExecutionContext context)
         {
@@ -45,7 +46,7 @@ namespace Bhbk.WebApi.Alert.Jobs
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());
+                 Log.Fatal(ex, $"'{callPath}' failed on {Dns.GetHostName().ToUpper()}");
             }
             finally
             {
@@ -61,8 +62,8 @@ namespace Bhbk.WebApi.Alert.Jobs
         private void DoDequeueWork(IConfiguration conf, IUnitOfWork uow, ITwilioService twilio)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var twilioSid = conf["Jobs:DequeueTexts:TwilioSid"];
-            var twilioToken = conf["Jobs:DequeueTexts:TwilioToken"];
+            var twilioSid = conf["Jobs:TextDequeue:TwilioSid"];
+            var twilioToken = conf["Jobs:TextDequeue:TwilioToken"];
 
             foreach (var msg in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>()
                 .Where(x => x.SendAtUtc < DateTime.UtcNow

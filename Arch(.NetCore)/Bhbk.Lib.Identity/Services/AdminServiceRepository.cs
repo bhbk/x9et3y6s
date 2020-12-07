@@ -480,12 +480,5 @@ namespace Bhbk.Lib.Identity.Services
             return await _http.PutAsync("user/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
-
-        public async ValueTask<HttpResponseMessage> User_VerifyV1(string jwt, Guid userID)
-        {
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
-
-            return await _http.GetAsync("user/v1/" + userID.ToString() + "/verify");
-        }
     }
 }

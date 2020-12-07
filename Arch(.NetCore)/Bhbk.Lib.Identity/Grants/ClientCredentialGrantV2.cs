@@ -18,16 +18,12 @@ namespace Bhbk.Lib.Identity.Grants
         private readonly string _issuerName, _audienceNames, _audienceSecret;
 
         public ClientCredentialGrantV2()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient())
+            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(), 
+                  InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
         public ClientCredentialGrantV2(IConfiguration conf)
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
-        { }
-
-        public ClientCredentialGrantV2(InstanceContext instance, HttpClient http)
-            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(),
-                  instance, http)
         { }
 
         public ClientCredentialGrantV2(IConfiguration conf, InstanceContext instance, HttpClient http)

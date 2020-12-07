@@ -1,7 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Alert;
-using Bhbk.Lib.Identity.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Net.Http;
@@ -15,16 +14,12 @@ namespace Bhbk.Lib.Identity.Services
         public AlertServiceRepository Endpoints { get; }
 
         public AlertService()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient())
+            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(), 
+                  InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
         public AlertService(IConfiguration conf)
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
-        { }
-
-        public AlertService(InstanceContext instance, HttpClient http)
-            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(),
-                  instance, http)
         { }
 
         public AlertService(IConfiguration conf, InstanceContext instance, HttpClient http)

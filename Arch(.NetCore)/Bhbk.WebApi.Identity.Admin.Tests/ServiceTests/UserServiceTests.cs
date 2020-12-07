@@ -48,9 +48,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -96,9 +96,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -144,9 +144,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -191,9 +191,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var result = await service.Endpoints.User_CreateV1(Base64.CreateString(8), new UserV1());
@@ -224,9 +224,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -253,9 +253,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -292,9 +292,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -336,9 +336,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var result = await service.Endpoints.User_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
@@ -365,9 +365,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -404,9 +404,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -442,9 +442,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -483,9 +483,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -530,9 +530,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -560,9 +560,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -604,9 +604,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -632,9 +632,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -660,9 +660,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -689,9 +689,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -737,9 +737,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
@@ -765,9 +765,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -806,9 +806,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -845,9 +845,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -884,9 +884,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -918,9 +918,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -958,9 +958,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var result = await service.Endpoints.User_UpdateV1(Base64.CreateString(8), new UserV1());
@@ -991,8 +991,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin);
-                service.Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin);
+                var service = new AdminService(conf, instance.InstanceType, owin);
+                service.Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin);
 
                 var issuer = uow.Issuers.Get(x => x.Name == DefaultConstants.IssuerName).Single();
                 var audience = uow.Audiences.Get(x => x.Name == DefaultConstants.Audience_Identity).Single();
@@ -1019,9 +1019,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AdminService(instance.InstanceType, owin)
+                var service = new AdminService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);

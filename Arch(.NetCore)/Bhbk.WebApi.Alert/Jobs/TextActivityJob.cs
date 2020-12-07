@@ -9,17 +9,18 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Alert.Jobs
 {
     [DisallowConcurrentExecution]
-    public class MaintainEmailsJob : IJob
+    public class TextActivityJob : IJob
     {
         private readonly IServiceScopeFactory _factory;
 
-        public MaintainEmailsJob(IServiceScopeFactory factory) => _factory = factory;
+        public TextActivityJob(IServiceScopeFactory factory) => _factory = factory;
 
         public Task Execute(IJobExecutionContext context)
         {
@@ -38,7 +39,7 @@ namespace Bhbk.WebApi.Alert.Jobs
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());
+                 Log.Fatal(ex, $"'{callPath}' failed on {Dns.GetHostName().ToUpper()}");
             }
             finally
             {
@@ -54,15 +55,15 @@ namespace Bhbk.WebApi.Alert.Jobs
         private static void DoCleanupWork(IConfiguration conf, IUnitOfWork uow)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var expire = int.Parse(conf["Jobs:MaintainEmails:ExpireDelay"]);
+            var expire = int.Parse(conf["Jobs:TextActivity:ExpireDelay"]);
 
-            foreach (var entry in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>()
+            foreach (var entry in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>()
                 .Where(x => x.CreatedUtc < DateTime.UtcNow.AddSeconds(-(expire))).ToLambda()))
             {
-                Log.Warning($"'{callPath}' is deleting email (ID=" + entry.Id.ToString() + ") that was created on " 
+                Log.Warning($"'{callPath}' is deleting text (ID=" + entry.Id.ToString() + ") that was created on "
                     + entry.CreatedUtc.ToLocalTime());
 
-                uow.EmailQueue.Delete(entry);
+                uow.TextQueue.Delete(entry);
             }
 
             uow.Commit();

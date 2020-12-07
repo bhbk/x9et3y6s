@@ -18,16 +18,12 @@ namespace Bhbk.Lib.Identity.Grants
         private readonly string _issuerName, _audienceNames, _userName, _userPass;
 
         public ResourceOwnerGrantV2()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient())
+            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(), 
+                  InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
         public ResourceOwnerGrantV2(IConfiguration conf)
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
-        { }
-
-        public ResourceOwnerGrantV2(InstanceContext instance, HttpClient http)
-            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(),
-                  instance, http)
         { }
 
         public ResourceOwnerGrantV2(IConfiguration conf, InstanceContext instance, HttpClient http)

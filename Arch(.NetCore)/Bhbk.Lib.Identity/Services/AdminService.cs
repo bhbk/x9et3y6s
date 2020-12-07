@@ -3,7 +3,6 @@ using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
-using Bhbk.Lib.Identity.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -18,16 +17,12 @@ namespace Bhbk.Lib.Identity.Services
         public AdminServiceRepository Endpoints { get; }
 
         public AdminService()
-            : this(InstanceContext.DeployedOrLocal, new HttpClient())
+            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(), 
+                  InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
         public AdminService(IConfiguration conf)
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
-        { }
-
-        public AdminService(InstanceContext instance, HttpClient http)
-            : this(new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build(),
-                  instance, http)
         { }
 
         public AdminService(IConfiguration conf, InstanceContext instance, HttpClient http)
@@ -690,17 +685,6 @@ namespace Bhbk.Lib.Identity.Services
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsAsync<UserV1>().ConfigureAwait(false);
-
-            throw new HttpRequestException(response.RequestMessage.ToString(),
-                new Exception(response.ToString()));
-        }
-
-        public async ValueTask<bool> User_VerifyV1(Guid userID)
-        {
-            var response = await Endpoints.User_VerifyV1(Grant.AccessToken.RawData, userID);
-
-            if (response.IsSuccessStatusCode)
-                return true;
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));

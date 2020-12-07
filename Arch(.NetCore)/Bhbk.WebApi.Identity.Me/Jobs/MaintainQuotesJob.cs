@@ -13,6 +13,7 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -67,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());
+                 Log.Fatal(ex, $"'{callPath}' failed on {Dns.GetHostName().ToUpper()}");
             }
             finally
             {

@@ -37,9 +37,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(instance.InstanceType, owin)
+                var service = new AlertService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var result = await service.Endpoints.Dequeue_EmailV1(Base64.CreateString(8), Guid.NewGuid());
@@ -70,9 +70,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(instance.InstanceType, owin)
+                var service = new AlertService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);
@@ -104,9 +104,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(instance.InstanceType, owin)
+                var service = new AlertService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var result = await service.Endpoints.Dequeue_TextV1(Base64.CreateString(8), Guid.NewGuid());
@@ -137,9 +137,9 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new AlertService(instance.InstanceType, owin)
+                var service = new AlertService(conf, instance.InstanceType, owin)
                 {
-                    Grant = new ResourceOwnerGrantV2(instance.InstanceType, owin)
+                    Grant = new ResourceOwnerGrantV2(conf, instance.InstanceType, owin)
                 };
 
                 var data = new TestDataFactory(uow);

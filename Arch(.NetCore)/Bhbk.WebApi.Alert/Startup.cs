@@ -77,15 +77,15 @@ namespace Bhbk.WebApi.Alert
 
                 //https://www.freeformatter.com/cron-expression-generator-quartz.html
 
-                if (bool.Parse(conf["Jobs:MaintainEmails:Enable"]))
+                if (bool.Parse(conf["Jobs:EmailActivity:Enable"]))
                 {
-                    var jobKey = new JobKey(typeof(MaintainEmailsJob).Name, workerName);
-                    jobs.AddJob<MaintainEmailsJob>(opt => opt
+                    var jobKey = new JobKey(typeof(EmailActivityJob).Name, workerName);
+                    jobs.AddJob<EmailActivityJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:MaintainEmails:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:EmailActivity:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
@@ -98,15 +98,15 @@ namespace Bhbk.WebApi.Alert
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:MaintainTexts:Enable"]))
+                if (bool.Parse(conf["Jobs:EmailDequeue:Enable"]))
                 {
-                    var jobKey = new JobKey(typeof(MaintainTextsJob).Name, workerName);
-                    jobs.AddJob<MaintainTextsJob>(opt => opt
+                    var jobKey = new JobKey(typeof(EmailDequeueJob).Name, workerName);
+                    jobs.AddJob<EmailDequeueJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:MaintainTexts:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:EmailDequeue:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
@@ -119,15 +119,15 @@ namespace Bhbk.WebApi.Alert
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:DequeueEmails:Enable"]))
+                if (bool.Parse(conf["Jobs:TextActivity:Enable"]))
                 {
-                    var jobKey = new JobKey(typeof(DequeueEmailsJob).Name, workerName);
-                    jobs.AddJob<DequeueEmailsJob>(opt => opt
+                    var jobKey = new JobKey(typeof(TextActivityJob).Name, workerName);
+                    jobs.AddJob<TextActivityJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:DequeueEmails:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:TextActivity:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt
@@ -140,15 +140,15 @@ namespace Bhbk.WebApi.Alert
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:DequeueTexts:Enable"]))
+                if (bool.Parse(conf["Jobs:TextDequeue:Enable"]))
                 {
-                    var jobKey = new JobKey(typeof(DequeueTextsJob).Name, workerName);
-                    jobs.AddJob<DequeueTextsJob>(opt => opt
+                    var jobKey = new JobKey(typeof(TextDequeueJob).Name, workerName);
+                    jobs.AddJob<TextDequeueJob>(opt => opt
                         .StoreDurably()
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:DequeueTexts:Schedules").GetChildren()
+                    foreach (var cron in conf.GetSection("Jobs:TextDequeue:Schedules").GetChildren()
                         .Select(x => x.Value).ToList())
                     {
                         jobs.AddTrigger(opt => opt

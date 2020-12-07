@@ -6,6 +6,7 @@ using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.Identity.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -29,9 +30,10 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(instance.InstanceType, owin);
+                var service = new StsService(conf, instance.InstanceType, owin);
 
                 var imp = await service.Endpoints.Implicit_AuthV1(
                     new ImplicitV1()
@@ -56,10 +58,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(instance.InstanceType, owin);
+                var service = new StsService(conf, instance.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -94,10 +97,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(instance.InstanceType, owin);
+                var service = new StsService(conf, instance.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -132,10 +136,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(instance.InstanceType, owin);
+                var service = new StsService(conf, instance.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -171,10 +176,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(instance.InstanceType, owin);
+                var service = new StsService(conf, instance.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
