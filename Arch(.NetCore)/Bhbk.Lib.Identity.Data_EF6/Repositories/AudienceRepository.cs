@@ -5,7 +5,7 @@ using System;
 
 namespace Bhbk.Lib.Identity.Data_EF6.Repositories
 {
-    public class AudienceRepository : GenericRepository<uvw_Audience>
+    public class AudienceRepository : GenericRepository<E_Audience>
     {
         private IClockService _clock;
 

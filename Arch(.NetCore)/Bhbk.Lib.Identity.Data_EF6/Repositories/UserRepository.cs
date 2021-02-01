@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Repositories
      * https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1
      */
 
-    public class UserRepository : GenericRepository<uvw_User>
+    public class UserRepository : GenericRepository<E_User>
     {
         private IClockService _clock;
 

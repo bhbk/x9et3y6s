@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.States.Create(new uvw_State());
+                UoW.States.Create(new E_State());
                 UoW.Commit();
             });
         }
@@ -34,33 +34,33 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateUserStates();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<E_Issuer>()
                 .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<E_Audience>()
                 .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<E_User>()
                 .Where(x => x.UserName == TestDefaultConstants.UserName).ToLambda())
                 .Single();
 
             var result = UoW.States.Create(
-                Mapper.Map<uvw_State>(new StateV1()
+                Mapper.Map<E_State>(new StateV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
                     UserId = user.Id,
                     StateValue = AlphaNumeric.CreateString(32),
-                    StateType = StateType.Device.ToString(),
+                    StateType = ConsumerType.Device.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                 }));
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_State>();
+            result.Should().BeAssignableTo<E_State>();
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.States.Delete(new uvw_State());
+                UoW.States.Delete(new E_State());
                 UoW.Commit();
             });
         }
@@ -94,7 +94,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateUserStates();
 
             var results = UoW.States.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_State>>();
+            results.Should().BeAssignableTo<IEnumerable<E_State>>();
             results.Count().Should().Be(UoW.States.Count());
         }
 
@@ -103,7 +103,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.States.Update(new uvw_State());
+                UoW.States.Update(new E_State());
                 UoW.Commit();
             });
         }
@@ -115,11 +115,11 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateUserStates();
 
-            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<uvw_User>()
+            var user = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<E_User>()
                 .Where(x => x.UserName == TestDefaultConstants.UserName).ToLambda())
                 .Single();
 
-            var state = UoW.States.Get(QueryExpressionFactory.GetQueryExpression<uvw_State>()
+            var state = UoW.States.Get(QueryExpressionFactory.GetQueryExpression<E_State>()
                 .Where(x => x.UserId == user.Id).ToLambda())
                 .First();
 
@@ -128,7 +128,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             var result = UoW.States.Update(state);
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_State>();
+            result.Should().BeAssignableTo<E_State>();
         }
     }
 }

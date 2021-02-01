@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
@@ -16,7 +16,7 @@ using System;
 using System.Data;
 using System.Linq;
 
-namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
+namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_Tbl
 {
     public class TestDataFactory : IDisposable
     {
@@ -69,12 +69,12 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
 
                 _uow.Commit();
 
-                _uow.Activities.Create(
-                    _mapper.Map<tbl_Activity>(new ActivityV1()
+                _uow.AuthActivity.Create(
+                    _mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         AudienceId = foundAudience.Id,
-                        ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                        IsDeletable = true,
+                        LoginType = GrantFlowType.ClientCredentialV2.ToString(),
+                        LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
                 _uow.Commit();
@@ -108,7 +108,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
-                    RefreshType = RefreshType.Client.ToString(),
+                    RefreshType = ConsumerType.Client.ToString(),
                     RefreshValue = AlphaNumeric.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
@@ -222,7 +222,14 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     }));
 
                 _uow.Commit();
+            }
 
+            var foundAccessExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.AccessExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundAccessExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
@@ -232,6 +239,15 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                         IsDeletable = true,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundRefreshExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.RefreshExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundRefreshExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
@@ -241,6 +257,15 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                         IsDeletable = true,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundTotpExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.TotpExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundTotpExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
@@ -250,6 +275,15 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                         IsDeletable = true,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundPollingMax = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.PollingMax).ToLambda())
+                .SingleOrDefault();
+
+            if (foundPollingMax == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
@@ -479,12 +513,12 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
 
                 _uow.Commit();
 
-                _uow.Activities.Create(
-                    _mapper.Map<tbl_Activity>(new ActivityV1()
+                _uow.AuthActivity.Create(
+                    _mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = foundUser.Id,
-                        ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        IsDeletable = true,
+                        LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
+                        LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
                 _uow.Users.SetConfirmedEmail(foundUser, true);
@@ -570,7 +604,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
                     UserId = foundUser.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = AlphaNumeric.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
@@ -628,7 +662,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     AudienceId = foundAudience.Id,
                     UserId = foundUser.Id,
                     StateValue = AlphaNumeric.CreateString(32),
-                    StateType = StateType.Device.ToString(),
+                    StateType = ConsumerType.Device.ToString(),
                     StateConsume = true,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
@@ -641,7 +675,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
                     AudienceId = foundAudience.Id,
                     UserId = foundUser.Id,
                     StateValue = AlphaNumeric.CreateString(32),
-                    StateType = StateType.User.ToString(),
+                    StateType = ConsumerType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),

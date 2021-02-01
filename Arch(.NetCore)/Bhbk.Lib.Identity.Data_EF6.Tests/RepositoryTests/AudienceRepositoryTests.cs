@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Audiences.Create(new uvw_Audience());
+                UoW.Audiences.Create(new E_Audience());
                 UoW.Commit();
             });
         }
@@ -32,12 +32,12 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateAudiences();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<E_Issuer>()
                 .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
             var result = UoW.Audiences.Create(
-                Mapper.Map<uvw_Audience>(new AudienceV1()
+                Mapper.Map<E_Audience>(new AudienceV1()
                 {
                     IssuerId = issuer.Id,
                     Name = TestDefaultConstants.AudienceName,
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
                 }));
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Audience>();
+            result.Should().BeAssignableTo<E_Audience>();
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Audiences.Delete(new uvw_Audience());
+                UoW.Audiences.Delete(new E_Audience());
                 UoW.Commit();
             });
         }
@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateAudiences();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<E_Audience>()
                 .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
 
@@ -82,7 +82,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateAudiences();
 
             var results = UoW.Audiences.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Audience>>();
+            results.Should().BeAssignableTo<IEnumerable<E_Audience>>();
             results.Count().Should().Be(UoW.Audiences.Count());
         }
 
@@ -91,7 +91,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Audiences.Update(new uvw_Audience());
+                UoW.Audiences.Update(new E_Audience());
                 UoW.Commit();
             });
         }
@@ -103,7 +103,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateAudiences();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<E_Audience>()
                 .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
             audience.Name += "(Updated)";
@@ -111,7 +111,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             var result = UoW.Audiences.Update(audience);
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Audience>();
+            result.Should().BeAssignableTo<E_Audience>();
         }
     }
 }

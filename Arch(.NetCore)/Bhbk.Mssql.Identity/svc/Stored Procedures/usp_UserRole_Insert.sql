@@ -10,6 +10,8 @@ BEGIN
 
 	BEGIN TRY
 
+    	BEGIN TRANSACTION;
+
         DECLARE @CREATEDUTC DATETIMEOFFSET (7) = GETUTCDATE()
 
         INSERT INTO [dbo].[tbl_UserRole]
@@ -31,11 +33,15 @@ BEGIN
 			THROW 51000, 'ERROR', 1;
 
         SELECT * FROM [dbo].[tbl_UserRole] 
-			WHERE UserId = @UserID AND RoleId = @RoleID 
+			WHERE UserId = @UserId AND RoleId = @RoleId 
+
+    	COMMIT TRANSACTION;
 
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

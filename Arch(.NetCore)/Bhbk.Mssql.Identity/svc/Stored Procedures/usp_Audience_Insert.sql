@@ -5,17 +5,15 @@ CREATE PROCEDURE [svc].[usp_Audience_Insert]
     ,@Description			NVARCHAR (256)
     ,@IsLockedOut   		BIT     
     ,@IsDeletable			BIT
-    ,@AccessFailedCount		INT  
-    ,@AccessSuccessCount	INT  
     ,@LockoutEndUtc			DATETIMEOFFSET (7)
-    ,@LastLoginSuccessUtc	DATETIMEOFFSET (7)
-    ,@LastLoginFailureUtc	DATETIMEOFFSET (7)
 
 AS
 BEGIN
 	SET NOCOUNT ON;
 
 	BEGIN TRY
+
+    	BEGIN TRANSACTION;
 
         DECLARE @AUDIENCEID UNIQUEIDENTIFIER = NEWID()
         DECLARE @CREATEDUTC DATETIMEOFFSET (7) = GETUTCDATE()
@@ -28,11 +26,7 @@ BEGIN
             ,Description   
             ,IsLockedOut   
             ,IsDeletable        
-            ,AccessFailedCount  
-            ,AccessSuccessCount  
             ,LockoutEndUtc        
-            ,LastLoginSuccessUtc 
-            ,LastLoginFailureUtc  
             ,CreatedUtc           
 	        )
         VALUES
@@ -43,11 +37,7 @@ BEGIN
             ,@Description       
             ,@IsLockedOut  
             ,@IsDeletable        
-            ,@AccessFailedCount  
-            ,@AccessSuccessCount  
             ,@LockoutEndUtc        
-            ,@LastLoginSuccessUtc 
-            ,@LastLoginFailureUtc  
             ,@CREATEDUTC         
 	        );
 
@@ -57,9 +47,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_Audience]
             WHERE Id = @AUDIENCEID
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

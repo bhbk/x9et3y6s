@@ -5,17 +5,17 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Data_EF6.Repositories
 {
-    public class RefreshRepository : GenericRepository<uvw_Refresh>
+    public class RefreshRepository : GenericRepository<E_Refresh>
     {
         public RefreshRepository(IdentityEntities context)
             : base(context) { }
 
-        public override uvw_Refresh Update(uvw_Refresh entity)
+        public override E_Refresh Update(E_Refresh entity)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<uvw_Refresh> Update(IEnumerable<uvw_Refresh> entities)
+        public override IEnumerable<E_Refresh> Update(IEnumerable<E_Refresh> entities)
         {
             throw new NotImplementedException();
         }

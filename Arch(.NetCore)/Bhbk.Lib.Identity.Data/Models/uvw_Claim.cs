@@ -15,6 +15,5 @@ namespace Bhbk.Lib.Identity.Data.Models
         public string ValueType { get; set; }
         public bool IsDeletable { get; set; }
         public DateTimeOffset CreatedUtc { get; set; }
-        public DateTimeOffset? LastUpdatedUtc { get; set; }
     }
 }

@@ -15,10 +15,10 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
         private readonly IdentityEntities _context;
         private readonly ILoggerFactory _logger;
         public InstanceContext InstanceType { get; private set; }
-        public ActivityRepository Activities { get; private set; }
         public AudienceRepository Audiences { get; private set; }
+        public AuthActivityRepository AuthActivity { get; private set; }
         public ClaimRepository Claims { get; private set; }
-        public EmailActivityRepository EmailActivities { get; private set; }
+        public EmailActivityRepository EmailActivity { get; private set; }
         public EmailQueueRepository EmailQueue { get; private set; }
         public IssuerRepository Issuers { get; private set; }
         public LoginRepository Logins { get; private set; }
@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
         public RoleRepository Roles { get; private set; }
         public SettingRepository Settings { get; private set; }
         public StateRepository States { get; private set; }
-        public TextActivityRepository TextActivities { get; private set; }
+        public TextActivityRepository TextActivity { get; private set; }
         public TextQueueRepository TextQueue { get; private set; }
         public UrlRepository Urls { get; private set; }
         public UserRepository Users { get; private set; }
@@ -80,10 +80,10 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
 
             InstanceType = instance.InstanceType;
 
-            Activities = new ActivityRepository(_context);
             Audiences = new AudienceRepository(_context, instance);
+            AuthActivity = new AuthActivityRepository(_context);
             Claims = new ClaimRepository(_context);
-            EmailActivities = new EmailActivityRepository(_context);
+            EmailActivity = new EmailActivityRepository(_context);
             EmailQueue = new EmailQueueRepository(_context);
             Issuers = new IssuerRepository(_context);
             Logins = new LoginRepository(_context);
@@ -92,7 +92,7 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
             Roles = new RoleRepository(_context);
             Settings = new SettingRepository(_context);
             States = new StateRepository(_context);
-            TextActivities = new TextActivityRepository(_context);
+            TextActivity = new TextActivityRepository(_context);
             TextQueue = new TextQueueRepository(_context);
             Urls = new UrlRepository(_context);
             Users = new UserRepository(_context, instance);

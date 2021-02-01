@@ -39,7 +39,8 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.SystemTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>())
+                .CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
@@ -50,7 +51,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                    var uow = new UnitOfWork(conf["Databases:IdentityEntities_EFCore"], instance);
 
                     var data = new DefaultDataFactory(uow);
                     data.CreateSettings();
@@ -66,7 +67,7 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                  * only for owin authentication configuration.
                  */
 
-                var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                var owin = new UnitOfWork(conf["Databases:IdentityEntities_EFCore"], instance);
 
                 var data = new DefaultDataFactory(owin);
                 data.CreateIssuers();
@@ -102,8 +103,6 @@ namespace Bhbk.WebApi.Alert.Tests.ServiceTests
                     jwt.IncludeErrorDetails = true;
                     jwt.TokenValidationParameters = new TokenValidationParameters
                     {
-                        //AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
-                        //ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                         ValidIssuers = issuers.ToArray(),
                         IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                         ValidAudiences = audiences.ToArray(),

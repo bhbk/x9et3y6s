@@ -47,14 +47,14 @@
     <Reference Include="Bhbk.Lib.DataAccess.EF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bhbk.Lib.DataAccess.EF.2020.11.27.2100\lib\net48\Bhbk.Lib.DataAccess.EF.dll</HintPath>
     </Reference>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.9.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
-      <HintPath>..\packages\Portable.BouncyCastle.1.8.9\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.10.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.10\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="CryptoHelper, Version=3.0.2.0, Culture=neutral, PublicKeyToken=646ad3faa20406ba, processorArchitecture=MSIL">
       <HintPath>..\packages\CryptoHelper.3.0.2\lib\netstandard2.0\CryptoHelper.dll</HintPath>
     </Reference>
-    <Reference Include="Effort, Version=2.2.10.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Effort.EF6.2.2.10\lib\net45\Effort.dll</HintPath>
+    <Reference Include="Effort, Version=2.2.13.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Effort.EF6.2.2.13\lib\net45\Effort.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
@@ -62,14 +62,14 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNetCore.Cryptography.Internal, Version=5.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.Internal.5.0.1\lib\net461\Microsoft.AspNetCore.Cryptography.Internal.dll</HintPath>
+    <Reference Include="Microsoft.AspNetCore.Cryptography.Internal, Version=5.0.5.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.Internal.5.0.5\lib\net461\Microsoft.AspNetCore.Cryptography.Internal.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation, Version=5.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.KeyDerivation.5.0.1\lib\net461\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll</HintPath>
+    <Reference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation, Version=5.0.5.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.KeyDerivation.5.0.5\lib\net461\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll</HintPath>
     </Reference>
     <Reference Include="NMemory, Version=3.0.0.0, Culture=neutral, PublicKeyToken=afc61983f100d280, processorArchitecture=MSIL">
-      <HintPath>..\packages\NMemory.3.1.1\lib\net45\NMemory.dll</HintPath>
+      <HintPath>..\packages\NMemory.3.1.2\lib\net45\NMemory.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -99,90 +99,69 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Infrastructure_TBL\IUnitOfWork.cs" />
-    <Compile Include="Infrastructure_TBL\UnitOfWork.cs" />
-    <Compile Include="Models_TBL\tbl_Activity.cs">
+    <Compile Include="Infrastructure_Tbl\IUnitOfWork.cs" />
+    <Compile Include="Infrastructure_Tbl\UnitOfWork.cs" />
+    <Compile Include="Models\E_Audience.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_Audience.cs">
+    <Compile Include="Models\E_AudienceRole.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_AudienceRole.cs">
+    <Compile Include="Models\E_AuthActivity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_Claim.cs">
+    <Compile Include="Models\E_Claim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_EmailActivity.cs">
+    <Compile Include="Models\E_EmailActivity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_EmailQueue.cs">
+    <Compile Include="Models\E_EmailQueue.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_Issuer.cs">
+    <Compile Include="Models\E_Issuer.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_Login.cs">
+    <Compile Include="Models\E_Login.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_MOTD.cs">
+    <Compile Include="Models\E_MOTD.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_Refresh.cs">
+    <Compile Include="Models\E_Refresh.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_Role.cs">
+    <Compile Include="Models\E_Role.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_RoleClaim.cs">
+    <Compile Include="Models\E_RoleClaim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_Setting.cs">
+    <Compile Include="Models\E_Setting.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_State.cs">
+    <Compile Include="Models\E_State.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_TextActivity.cs">
+    <Compile Include="Models\E_TextActivity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_TextQueue.cs">
+    <Compile Include="Models\E_TextQueue.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_Url.cs">
+    <Compile Include="Models\E_Url.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_User.cs">
+    <Compile Include="Models\E_User.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_UserClaim.cs">
+    <Compile Include="Models\E_UserClaim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_UserLogin.cs">
+    <Compile Include="Models\E_UserLogin.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\tbl_UserRole.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\IdentityEntities.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>IdentityEntities.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\IdentityEntities.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\IdentityEntities.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>IdentityEntities.edmx</DependentUpon>
-    </Compile>
-    <Compile Include="Models\usp_Activity_Delete_Result.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\usp_Activity_Insert_Result.cs">
+    <Compile Include="Models\E_UserRole.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\usp_AudiencePassword_Update_Result.cs">
@@ -201,6 +180,12 @@
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\usp_Audience_Update_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_AuthActivity_Delete_Result.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\usp_AuthActivity_Insert_Result.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\usp_Claim_Delete_Result.cs">
@@ -341,93 +326,111 @@
     <Compile Include="Models\usp_User_Update_Result.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Activity.cs">
+    <Compile Include="Models_Tbl\tbl_Audience.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Audience.cs">
+    <Compile Include="Models_Tbl\tbl_AudienceRole.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_AudienceRole.cs">
+    <Compile Include="Models_Tbl\tbl_AuthActivity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Claim.cs">
+    <Compile Include="Models_Tbl\tbl_Claim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_EmailActivity.cs">
+    <Compile Include="Models_Tbl\tbl_EmailActivity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_EmailQueue.cs">
+    <Compile Include="Models_Tbl\tbl_EmailQueue.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Issuer.cs">
+    <Compile Include="Models_Tbl\tbl_Issuer.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Login.cs">
+    <Compile Include="Models_Tbl\tbl_Login.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_MOTD.cs">
+    <Compile Include="Models_Tbl\tbl_MOTD.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Refresh.cs">
+    <Compile Include="Models_Tbl\tbl_Refresh.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Role.cs">
+    <Compile Include="Models_Tbl\tbl_Role.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Setting.cs">
+    <Compile Include="Models_Tbl\tbl_RoleClaim.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_State.cs">
+    <Compile Include="Models_Tbl\tbl_Setting.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_TextActivity.cs">
+    <Compile Include="Models_Tbl\tbl_State.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_TextQueue.cs">
+    <Compile Include="Models_Tbl\tbl_TextActivity.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_Url.cs">
+    <Compile Include="Models_Tbl\tbl_TextQueue.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_User.cs">
+    <Compile Include="Models_Tbl\tbl_Url.cs">
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\IdentityEntities.Context.cs">
+    <Compile Include="Models_Tbl\tbl_User.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_Tbl\tbl_UserClaim.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_Tbl\tbl_UserLogin.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_Tbl\tbl_UserRole.cs">
+      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\IdentityEntities.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\IdentityEntities.cs">
+    <Compile Include="Models\IdentityEntities.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\IdentityEntities.Designer.cs">
+    <Compile Include="Models\IdentityEntities.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models_TBL\IdentityEntitiesFactory.cs" />
-    <Compile Include="Models\uvw_UserClaim.cs">
+    <Compile Include="Models_Tbl\IdentityEntities.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IdentityEntities.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models_Tbl\IdentityEntities.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>IdentityEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_UserLogin.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
+    <Compile Include="Models_Tbl\IdentityEntities.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models\uvw_UserRole.cs">
-      <DependentUpon>IdentityEntities.tt</DependentUpon>
-    </Compile>
+    <Compile Include="Models_Tbl\IdentityEntitiesFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositories\ActivityRepository.cs" />
+    <Compile Include="Repositories\AuthActivityRepository.cs" />
     <Compile Include="Repositories\AudienceRepository.cs" />
     <Compile Include="Repositories\RefreshRespository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Infrastructure\IUnitOfWork.cs" />
     <Compile Include="Infrastructure\UnitOfWork.cs" />
-    <Compile Include="Repositories_TBL\ActivityRepository.cs" />
-    <Compile Include="Repositories_TBL\AudienceRepository.cs" />
-    <Compile Include="Repositories_TBL\RefreshRepository.cs" />
-    <Compile Include="Repositories_TBL\UserRepository.cs" />
+    <Compile Include="Repositories_Tbl\AuthActivityRepository.cs" />
+    <Compile Include="Repositories_Tbl\AudienceRepository.cs" />
+    <Compile Include="Repositories_Tbl\RefreshRepository.cs" />
+    <Compile Include="Repositories_Tbl\UserRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -439,11 +442,11 @@
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </None>
     <Compile Include="Models\IdentityEntitiesFactory.cs" />
-    <EntityDeploy Include="Models_TBL\IdentityEntities.edmx">
+    <EntityDeploy Include="Models_Tbl\IdentityEntities.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>IdentityEntities.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <None Include="Models_TBL\IdentityEntities.edmx.diagram">
+    <None Include="Models_Tbl\IdentityEntities.edmx.diagram">
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
     </None>
     <None Include="packages.config" />
@@ -469,12 +472,12 @@
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
       <LastGenOutput>IdentityEntities.cs</LastGenOutput>
     </Content>
-    <Content Include="Models_TBL\IdentityEntities.Context.tt">
+    <Content Include="Models_Tbl\IdentityEntities.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
       <LastGenOutput>IdentityEntities.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="Models_TBL\IdentityEntities.tt">
+    <Content Include="Models_Tbl\IdentityEntities.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>IdentityEntities.edmx</DependentUpon>
       <LastGenOutput>IdentityEntities.cs</LastGenOutput>

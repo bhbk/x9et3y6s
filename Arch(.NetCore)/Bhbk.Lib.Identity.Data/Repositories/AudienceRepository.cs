@@ -32,22 +32,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public uvw_Audience AccessFailed(uvw_Audience audience)
-        {
-            audience.LastLoginFailureUtc = Clock.UtcDateTime;
-            audience.AccessFailedCount++;
-
-            return Update(audience);
-        }
-
-        public uvw_Audience AccessSuccess(uvw_Audience audience)
-        {
-            audience.LastLoginSuccessUtc = Clock.UtcDateTime;
-            audience.AccessSuccessCount++;
-
-            return Update(audience);
-        }
-
         public uvw_AudienceRole AddRole(uvw_AudienceRole role)
         {
             var rvalue = new SqlParameter("ReturnValue", SqlDbType.Int) { Direction = ParameterDirection.Output };
@@ -75,17 +59,12 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                 new SqlParameter("Description", SqlDbType.NVarChar) { Value = (object)role.Description ?? DBNull.Value },
                 new SqlParameter("IsLockedOut", SqlDbType.Bit) { Value = role.IsLockedOut },
                 new SqlParameter("IsDeletable", SqlDbType.Bit) { Value = role.IsDeletable },
-                new SqlParameter("AccessFailedCount", SqlDbType.Int) { Value = role.AccessFailedCount },
-                new SqlParameter("AccessSuccessCount", SqlDbType.Int) { Value = role.AccessSuccessCount },
                 new SqlParameter("LockoutEndUtc", SqlDbType.DateTimeOffset) { Value = role.LockoutEndUtc.HasValue ? (object)role.LockoutEndUtc.Value : DBNull.Value },
-                new SqlParameter("LastLoginSuccessUtc", SqlDbType.DateTimeOffset) { Value = role.LastLoginSuccessUtc.HasValue ? (object)role.LastLoginSuccessUtc.Value : DBNull.Value },
-                new SqlParameter("LastLoginFailureUtc", SqlDbType.DateTimeOffset) { Value = role.LastLoginFailureUtc.HasValue ? (object)role.LockoutEndUtc.Value : DBNull.Value },
                 rvalue
             };
 
             return _context.SqlQuery<uvw_Audience>("EXEC @ReturnValue = [svc].[usp_Audience_Insert] "
-                + "@IssuerId, @Name, @Description, @IsLockedOut, @IsDeletable, "
-                + "@AccessFailedCount, @AccessSuccessCount, @LockoutEndUtc, @LastLoginSuccessUtc, @LastLoginFailureUtc", pvalues).Single();
+                + "@IssuerId, @Name, @Description, @IsLockedOut, @IsDeletable, @LockoutEndUtc", pvalues).Single();
         }
 
         public uvw_Audience Create(uvw_Audience audience, string password)
@@ -294,17 +273,12 @@ namespace Bhbk.Lib.Identity.Data.Repositories
                 new SqlParameter("Description", SqlDbType.NVarChar) { Value = (object)audience.Description ?? DBNull.Value },
                 new SqlParameter("IsLockedOut", SqlDbType.Bit) { Value = audience.IsLockedOut },
                 new SqlParameter("IsDeletable", SqlDbType.Bit) { Value = audience.IsDeletable },
-                new SqlParameter("AccessFailedCount", SqlDbType.Int) { Value = audience.AccessFailedCount },
-                new SqlParameter("AccessSuccessCount", SqlDbType.Int) { Value = audience.AccessSuccessCount },
                 new SqlParameter("LockoutEndUtc", SqlDbType.DateTimeOffset) { Value = audience.LockoutEndUtc.HasValue ? (object)audience.LockoutEndUtc.Value : DBNull.Value },
-                new SqlParameter("LastLoginSuccessUtc", SqlDbType.DateTimeOffset) { Value = audience.LastLoginSuccessUtc.HasValue ? (object)audience.LastLoginSuccessUtc.Value : DBNull.Value },
-                new SqlParameter("LastLoginFailureUtc", SqlDbType.DateTimeOffset) { Value = audience.LastLoginFailureUtc.HasValue ? (object)audience.LockoutEndUtc.Value : DBNull.Value },
                 rvalue
             };
 
             return _context.SqlQuery<uvw_Audience>("EXEC @ReturnValue = [svc].[usp_Audience_Update] "
-                + "@Id, @IssuerId, @Name, @Description, @IsLockedOut, @IsDeletable, "
-                + "@AccessFailedCount, @AccessSuccessCount, @LockoutEndUtc, @LastLoginSuccessUtc, @LastLoginFailureUtc", pvalues).Single();
+                + "@Id, @IssuerId, @Name, @Description, @IsLockedOut, @IsDeletable, @LockoutEndUtc", pvalues).Single();
         }
 
         public override IEnumerable<uvw_Audience> Update(IEnumerable<uvw_Audience> audiences)

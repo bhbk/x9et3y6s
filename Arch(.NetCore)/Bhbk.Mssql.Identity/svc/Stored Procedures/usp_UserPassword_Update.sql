@@ -10,6 +10,8 @@ BEGIN
 
 	BEGIN TRY
 
+    	BEGIN TRANSACTION;
+
         DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
 
         UPDATE [dbo].[tbl_User]
@@ -19,7 +21,6 @@ BEGIN
 			,PasswordHashPBKDF2		= @PasswordHashPBKDF2
 			,PasswordHashSHA256		= @PasswordHashSHA256
 			,SecurityStamp			= CAST(NEWID() AS nvarchar(36))
-            ,LastUpdatedUtc			= @LASTUPDATED
         WHERE Id = @Id
 
 		IF @@ROWCOUNT != 1
@@ -28,9 +29,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_User] 
             WHERE Id = @Id
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

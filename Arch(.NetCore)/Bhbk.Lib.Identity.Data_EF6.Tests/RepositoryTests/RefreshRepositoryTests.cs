@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Refreshes.Create(new uvw_Refresh());
+                UoW.Refreshes.Create(new E_Refresh());
                 UoW.Commit();
             });
         }
@@ -34,27 +34,27 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateAudienceRefreshes();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<E_Issuer>()
                 .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<E_Audience>()
                 .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
 
             var result = UoW.Refreshes.Create(
-                Mapper.Map<uvw_Refresh>(new RefreshV1()
+                Mapper.Map<E_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = Base64.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
                 }));
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Refresh>();
+            result.Should().BeAssignableTo<E_Refresh>();
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Refreshes.Delete(new uvw_Refresh());
+                UoW.Refreshes.Delete(new E_Refresh());
                 UoW.Commit();
             });
         }
@@ -88,7 +88,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateAudienceRefreshes();
 
             var results = UoW.Refreshes.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Refresh>>();
+            results.Should().BeAssignableTo<IEnumerable<E_Refresh>>();
             results.Count().Should().Be(UoW.Refreshes.Count());
         }
 
@@ -97,7 +97,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<NotImplementedException>(() =>
             {
-                UoW.Refreshes.Update(new uvw_Refresh());
+                UoW.Refreshes.Update(new E_Refresh());
                 UoW.Commit();
             });
         }

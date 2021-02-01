@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Logins.Create(new uvw_Login());
+                UoW.Logins.Create(new E_Login());
                 UoW.Commit();
             });
         }
@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateLogins();
 
             var result = UoW.Logins.Create(
-                Mapper.Map<uvw_Login>(new LoginV1()
+                Mapper.Map<E_Login>(new LoginV1()
                 {
                     Name = TestDefaultConstants.LoginName,
                     LoginKey = TestDefaultConstants.LoginKey,
@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
                 }));
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Login>();
+            result.Should().BeAssignableTo<E_Login>();
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Logins.Delete(new uvw_Login());
+                UoW.Logins.Delete(new E_Login());
                 UoW.Commit();
             });
         }
@@ -61,7 +61,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateLogins();
 
-            var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<uvw_Login>()
+            var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<E_Login>()
                 .Where(x => x.Name == TestDefaultConstants.LoginName).ToLambda())
                 .Single();
 
@@ -77,7 +77,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateLogins();
 
             var results = UoW.Logins.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Login>>();
+            results.Should().BeAssignableTo<IEnumerable<E_Login>>();
             results.Count().Should().Be(UoW.Logins.Count());
         }
 
@@ -86,7 +86,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Logins.Update(new uvw_Login());
+                UoW.Logins.Update(new E_Login());
                 UoW.Commit();
             });
         }
@@ -98,7 +98,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateLogins();
 
-            var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<uvw_Login>()
+            var login = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<E_Login>()
                 .Where(x => x.Name == TestDefaultConstants.LoginName).ToLambda())
                 .Single();
             login.Name += "(Updated)";
@@ -106,7 +106,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             var result = UoW.Logins.Update(login);
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Login>();
+            result.Should().BeAssignableTo<E_Login>();
         }
     }
 }

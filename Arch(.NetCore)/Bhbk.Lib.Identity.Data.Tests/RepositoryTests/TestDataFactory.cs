@@ -69,12 +69,12 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
 
                 _uow.Commit();
 
-                _uow.Activities.Create(
-                    _mapper.Map<uvw_Activity>(new ActivityV1()
+                _uow.AuthActivity.Create(
+                    _mapper.Map<uvw_AuthActivity>(new AuthActivityV1()
                     {
                         AudienceId = foundAudience.Id,
-                        ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                        IsDeletable = true,
+                        LoginType = GrantFlowType.ClientCredentialV2.ToString(),
+                        LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
                 _uow.Commit();
@@ -108,7 +108,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
-                    RefreshType = RefreshType.Client.ToString(),
+                    RefreshType = ConsumerType.Client.ToString(),
                     RefreshValue = AlphaNumeric.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
@@ -221,7 +221,14 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                     }));
 
                 _uow.Commit();
+            }
 
+            var foundAccessExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<uvw_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.AccessExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundAccessExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<uvw_Setting>(new SettingV1()
                     {
@@ -231,6 +238,15 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                         IsDeletable = true,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundRefreshExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<uvw_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.RefreshExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundRefreshExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<uvw_Setting>(new SettingV1()
                     {
@@ -240,6 +256,15 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                         IsDeletable = true,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundTotpExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<uvw_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.TotpExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundTotpExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<uvw_Setting>(new SettingV1()
                     {
@@ -249,6 +274,15 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                         IsDeletable = true,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundPollingMax = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<uvw_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.PollingMax).ToLambda())
+                .SingleOrDefault();
+
+            if (foundPollingMax == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<uvw_Setting>(new SettingV1()
                     {
@@ -478,12 +512,12 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
 
                 _uow.Commit();
 
-                _uow.Activities.Create(
-                    _mapper.Map<uvw_Activity>(new ActivityV1()
+                _uow.AuthActivity.Create(
+                    _mapper.Map<uvw_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = foundUser.Id,
-                        ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        IsDeletable = true,
+                        LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
+                        LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
                 _uow.Users.SetConfirmedEmail(foundUser, true);
@@ -567,7 +601,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
                     UserId = foundUser.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = AlphaNumeric.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
@@ -624,7 +658,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                     AudienceId = foundAudience.Id,
                     UserId = foundUser.Id,
                     StateValue = AlphaNumeric.CreateString(32),
-                    StateType = StateType.Device.ToString(),
+                    StateType = ConsumerType.Device.ToString(),
                     StateConsume = true,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
@@ -637,7 +671,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                     AudienceId = foundAudience.Id,
                     UserId = foundUser.Id,
                     StateValue = AlphaNumeric.CreateString(32),
-                    StateType = StateType.User.ToString(),
+                    StateType = ConsumerType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),

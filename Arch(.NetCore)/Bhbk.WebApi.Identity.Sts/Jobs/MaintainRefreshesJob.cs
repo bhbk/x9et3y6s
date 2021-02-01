@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+﻿using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Sts.Jobs
             }
 
             Log.Information($"'{callPath}' completed");
-            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
+            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.GetValueOrDefault().LocalDateTime}");
 
             return Task.CompletedTask;
         }

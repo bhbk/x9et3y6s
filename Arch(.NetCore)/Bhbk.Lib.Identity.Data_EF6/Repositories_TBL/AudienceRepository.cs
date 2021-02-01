@@ -1,11 +1,11 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataAccess.EF.Repositories;
-using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
+using Bhbk.Lib.Identity.Data_EF6.Models_Tbl;
 using System;
 using System.Data.Entity;
 using System.Linq;
 
-namespace Bhbk.Lib.Identity.Data_EF6.Repositories_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Repositories_Tbl
 {
     public class AudienceRepository : GenericRepository<tbl_Audience>
     {
@@ -34,7 +34,6 @@ namespace Bhbk.Lib.Identity.Data_EF6.Repositories_TBL
             entity.IssuerId = audience.IssuerId;
             entity.Name = audience.Name;
             entity.Description = audience.Description;
-            entity.LastUpdatedUtc = Clock.UtcDateTime;
             entity.IsDeletable = audience.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;

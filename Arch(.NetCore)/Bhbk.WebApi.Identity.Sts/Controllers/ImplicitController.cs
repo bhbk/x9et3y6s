@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data.Models_TBL;
+﻿using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if state is valid...
             var state = UoW.States.Get(x => x.StateValue == input.state
-                && x.StateType == StateType.User.ToString()
+                && x.StateType == ConsumerType.User.ToString()
                 && x.ValidFromUtc < DateTime.UtcNow
                 && x.ValidToUtc > DateTime.UtcNow).SingleOrDefault();
 
@@ -115,6 +115,16 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || state.StateConsume == true
                 || state.UserId != user.Id)
             {
+                UoW.AuthActivity.Create(
+                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                    {
+                        UserId = user.Id,
+                        LoginType = GrantFlowType.ImplicitV2.ToString(),
+                        LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                    }));
+
+                UoW.Commit();
+
                 ModelState.AddModelError(MessageType.StateInvalid.ToString(), $"User state:{input.state}");
                 return BadRequest(ModelState);
             }
@@ -140,19 +150,16 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             state.StateConsume = true;
             UoW.States.Update(state);
 
-            //adjust counter(s) for login success...
-            UoW.Users.AccessSuccess(user);
-
             //no refresh token as part of this flow...
             var imp_claims = UoW.Users.GenerateAccessClaims(issuer, user);
             var imp = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, imp_claims);
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.ImplicitV2.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             UoW.Commit();

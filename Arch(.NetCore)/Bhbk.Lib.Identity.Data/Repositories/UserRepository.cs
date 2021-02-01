@@ -39,22 +39,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
             set { _clock.UtcNow = value; }
         }
 
-        public uvw_User AccessFailed(uvw_User user)
-        {
-            user.LastLoginFailureUtc = Clock.UtcDateTime;
-            user.AccessFailedCount++;
-
-            return Update(user);
-        }
-
-        public uvw_User AccessSuccess(uvw_User user)
-        {
-            user.LastLoginSuccessUtc = Clock.UtcDateTime;
-            user.AccessSuccessCount++;
-
-            return Update(user);
-        }
-
         public uvw_UserClaim AddClaim(uvw_UserClaim claim)
         {
             var rvalue = new SqlParameter("ReturnValue", SqlDbType.Int) { Direction = ParameterDirection.Output };
@@ -449,7 +433,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public uvw_User SetConfirmedEmail(uvw_User user, bool confirmed)
         {
             user.EmailConfirmed = confirmed;
-            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             return Update(user);
         }
@@ -457,7 +440,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public uvw_User SetConfirmedPassword(uvw_User user, bool confirmed)
         {
             user.PasswordConfirmed = confirmed;
-            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             return Update(user);
         }
@@ -465,7 +447,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public uvw_User SetConfirmedPhoneNumber(uvw_User user, bool confirmed)
         {
             user.PhoneNumberConfirmed = confirmed;
-            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             return Update(user);
         }
@@ -473,7 +454,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories
         public uvw_User SetImmutable(uvw_User user, bool enabled)
         {
             user.IsDeletable = enabled;
-            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             return Update(user);
         }

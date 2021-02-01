@@ -3,7 +3,6 @@ using Bhbk.Lib.Identity.Data_EF6.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
-using Newtonsoft.Json;
 using System;
 using System.Linq;
 
@@ -17,73 +16,90 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
              * activity models
              */
 
-            CreateMap<ActivityV1, uvw_Activity>()
+            CreateMap<AuthActivityV1, E_AuthActivity>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
-                .ForMember(dest => dest.KeyValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.KeyValues)))
-                .ForMember(dest => dest.OriginalValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.OriginalValues)))
-                .ForMember(dest => dest.CurrentValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.CurrentValues)));
+                .ForMember(dest => dest.Audience, src => src.Ignore())
+                .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<uvw_Activity, ActivityV1>();
+            CreateMap<E_AuthActivity, AuthActivityV1>();
 
             /*
              * audience models
              */
 
-            CreateMap<AudienceV1, uvw_Audience>()
+            CreateMap<AudienceV1, E_Audience>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
-                .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore());
+                .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
+                .ForMember(dest => dest.AuthActivity, src => src.Ignore())
+                .ForMember(dest => dest.AudienceRoles, src => src.Ignore())
+                .ForMember(dest => dest.Issuer, src => src.Ignore())
+                .ForMember(dest => dest.Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.Settings, src => src.Ignore())
+                .ForMember(dest => dest.States, src => src.Ignore())
+                .ForMember(dest => dest.Urls, src => src.Ignore());
 
-            CreateMap<uvw_Audience, AudienceV1>();
+            CreateMap<E_Audience, AudienceV1>()
+                .ForMember(dest => dest.Roles, src => src.MapFrom(val => val.Roles));
 
             /*
              * claim models
              */
 
-            CreateMap<ClaimV1, uvw_Claim>()
+            CreateMap<ClaimV1, E_Claim>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
-                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc));
+                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
+                .ForMember(dest => dest.Issuer, src => src.Ignore())
+                .ForMember(dest => dest.RoleClaims, src => src.Ignore())
+                .ForMember(dest => dest.UserClaims, src => src.Ignore());
 
-            CreateMap<uvw_Claim, ClaimV1>();
+            CreateMap<E_Claim, ClaimV1>();
 
             /*
              * email models
              */
 
-            CreateMap<EmailV1, uvw_EmailQueue>()
+            CreateMap<EmailV1, E_EmailQueue>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
-                .ForMember(dest => dest.SendAtUtc, src => src.MapFrom(val => val.SendAtUtc == default ? DateTime.UtcNow : val.SendAtUtc));
+                .ForMember(dest => dest.SendAtUtc, src => src.MapFrom(val => val.SendAtUtc == default ? DateTime.UtcNow : val.SendAtUtc))
+                .ForMember(dest => dest.EmailActivity, src => src.Ignore());
 
-            CreateMap<uvw_EmailQueue, EmailV1>();
+            CreateMap<E_EmailQueue, EmailV1>();
 
             /*
              * issuer models
              */
 
-            CreateMap<IssuerV1, uvw_Issuer>()
+            CreateMap<IssuerV1, E_Issuer>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
-                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc));
+                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
+                .ForMember(dest => dest.Claims, src => src.Ignore())
+                .ForMember(dest => dest.Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.Settings, src => src.Ignore())
+                .ForMember(dest => dest.States, src => src.Ignore());
 
-            CreateMap<uvw_Issuer, IssuerV1>();
+            CreateMap<E_Issuer, IssuerV1>()
+                .ForMember(dest => dest.Audiences, src => src.MapFrom(val => val.Audiences));
 
             /*
              * login models
              */
 
-            CreateMap<LoginV1, uvw_Login>()
+            CreateMap<LoginV1, E_Login>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
-                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc));
+                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
+                .ForMember(dest => dest.UserLogins, src => src.Ignore());
 
-            CreateMap<uvw_Login, LoginV1>();
+            CreateMap<E_Login, LoginV1>();
 
             /*
              * message of the day models
              */
 
-            CreateMap<MOTDTssV1, uvw_MOTD>()
+            CreateMap<MOTDTssV1, E_MOTD>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.globalId == default ? Guid.NewGuid() : val.globalId))
                 .ForMember(dest => dest.Author, src => src.MapFrom(val => val.author))
                 .ForMember(dest => dest.Quote, src => src.MapFrom(val => val.quote))
@@ -95,7 +111,7 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.TssTags, src => src.MapFrom(val => string.Join(",", val.tags.Select(x => x))))
                 .ForMember(dest => dest.TssBackground, src => src.MapFrom(val => val.background));
 
-            CreateMap<uvw_MOTD, MOTDTssV1>()
+            CreateMap<E_MOTD, MOTDTssV1>()
                 .ForMember(dest => dest.globalId, src => src.MapFrom(val => val.Id))
                 .ForMember(dest => dest.author, src => src.MapFrom(val => val.Author))
                 .ForMember(dest => dest.quote, src => src.MapFrom(val => val.Quote))
@@ -111,75 +127,95 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
              * refresh models
              */
 
-            CreateMap<RefreshV1, uvw_Refresh>()
-                .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id));
+            CreateMap<RefreshV1, E_Refresh>()
+                .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
+                .ForMember(dest => dest.Audience, src => src.Ignore())
+                .ForMember(dest => dest.Issuer, src => src.Ignore())
+                .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<uvw_Refresh, RefreshV1>();
+            CreateMap<E_Refresh, RefreshV1>();
 
             /*
              * role models
              */
 
-            CreateMap<RoleV1, uvw_Role>()
+            CreateMap<RoleV1, E_Role>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
-                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc));
+                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
+                .ForMember(dest => dest.Audience, src => src.Ignore())
+                .ForMember(dest => dest.AudienceRoles, src => src.Ignore())
+                .ForMember(dest => dest.RoleClaims, src => src.Ignore())
+                .ForMember(dest => dest.UserRoles, src => src.Ignore());
 
-            CreateMap<uvw_Role, RoleV1>();
+            CreateMap<E_Role, RoleV1>();
 
             /*
              * setting models
              */
 
-            CreateMap<SettingV1, uvw_Setting>()
+            CreateMap<SettingV1, E_Setting>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
-                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc));
+                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
+                .ForMember(dest => dest.Audience, src => src.Ignore())
+                .ForMember(dest => dest.Issuer, src => src.Ignore())
+                .ForMember(dest => dest.User, src => src.Ignore());
 
             /*
              * state models
              */
 
-            CreateMap<StateV1, uvw_State>()
+            CreateMap<StateV1, E_State>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.IssuedUtc, src => src.MapFrom(val => val.IssuedUtc == default ? DateTime.UtcNow : val.IssuedUtc))
-                .ForMember(dest => dest.LastPollingUtc, src => src.Ignore());
+                .ForMember(dest => dest.LastPollingUtc, src => src.Ignore())
+                .ForMember(dest => dest.Audience, src => src.Ignore())
+                .ForMember(dest => dest.Issuer, src => src.Ignore())
+                .ForMember(dest => dest.User, src => src.Ignore());
 
             /*
              * text models
              */
 
-            CreateMap<TextV1, uvw_TextQueue>()
+            CreateMap<TextV1, E_TextQueue>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
-                .ForMember(dest => dest.SendAtUtc, src => src.MapFrom(val => val.SendAtUtc == default ? DateTime.UtcNow : val.SendAtUtc));
+                .ForMember(dest => dest.SendAtUtc, src => src.MapFrom(val => val.SendAtUtc == default ? DateTime.UtcNow : val.SendAtUtc))
+                .ForMember(dest => dest.TextActivity, src => src.Ignore());
 
-            CreateMap<uvw_TextQueue, TextV1>();
+            CreateMap<E_TextQueue, TextV1>();
 
             /*
              * url models
              */
 
-            CreateMap<UrlV1, uvw_Url>()
+            CreateMap<UrlV1, E_Url>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
-                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc));
+                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
+                .ForMember(dest => dest.Audience, src => src.Ignore());
 
-            CreateMap<uvw_Url, UrlV1>();
+            CreateMap<E_Url, UrlV1>();
 
             /*
              * user models
              */
 
-            CreateMap<UserV1, uvw_User>()
+            CreateMap<UserV1, E_User>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.EmailAddress, src => src.MapFrom(val => val.Email))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
-                .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => (val.AccessFailedCount == default) ? 0 : val.AccessFailedCount))
-                .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => (val.AccessSuccessCount == default) ? 0 : val.AccessSuccessCount))
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => val.ConcurrencyStamp == null ? Guid.NewGuid().ToString() : val.ConcurrencyStamp))
                 .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => val.SecurityStamp == null ? Guid.NewGuid().ToString() : val.SecurityStamp))
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
-                .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore());
+                .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
+                .ForMember(dest => dest.AuthActivity, src => src.Ignore())
+                .ForMember(dest => dest.Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.Settings, src => src.Ignore())
+                .ForMember(dest => dest.States, src => src.Ignore())
+                .ForMember(dest => dest.UserClaims, src => src.Ignore())
+                .ForMember(dest => dest.UserLogins, src => src.Ignore())
+                .ForMember(dest => dest.UserRoles, src => src.Ignore());
 
-            CreateMap<uvw_User, UserV1>()
+            CreateMap<E_User, UserV1>()
                 .ForMember(dest => dest.IssuerId, src => src.Ignore())
                 .ForMember(dest => dest.Email, src => src.MapFrom(val => val.EmailAddress));
         }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -106,7 +106,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Logins.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Login>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Login, object>>>() { x => x.tbl_UserLogins })),
+                                    new List<Expression<Func<tbl_Login, object>>>() 
+                                    {
+                                        x => x.tbl_UserLogins,
+                                    })),
 
                     Total = UoW.Logins.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(

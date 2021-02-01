@@ -1,7 +1,7 @@
 ﻿
 CREATE   PROCEDURE [svc].[usp_UserClaim_Delete]
-    @UserID uniqueidentifier
-	,@ClaimID uniqueidentifier
+    @UserId uniqueidentifier
+	,@ClaimId uniqueidentifier
 
 AS
 BEGIN
@@ -10,10 +10,10 @@ BEGIN
 	BEGIN TRY
 
         SELECT * FROM [dbo].[tbl_UserClaim] 
-			WHERE UserId = @UserID AND ClaimId = @ClaimID 
+			WHERE UserId = @UserId AND ClaimId = @ClaimId 
 
         DELETE [dbo].[tbl_UserClaim]
-	        WHERE UserId = @UserID AND ClaimId = @ClaimID
+	        WHERE UserId = @UserId AND ClaimId = @ClaimId
 
     END TRY
 

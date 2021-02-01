@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL
+namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests_Tbl
 {
-    [Collection("RepositoryTests_TBL")]
+    [Collection("RepositoryTests_Tbl")]
     public class UserRepositoryTests : BaseRepositoryTests
     {
         [Fact(Skip = "NotImplemented")]

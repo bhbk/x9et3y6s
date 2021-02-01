@@ -5,10 +5,10 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
 {
     public interface IUnitOfWork : IGenericUnitOfWork
     {
-        public ActivityRepository Activities { get; }
         public AudienceRepository Audiences { get; }
+        public AuthActivityRepository AuthActivity { get; }
         public ClaimRepository Claims { get; }
-        public EmailActivityRepository EmailActivities { get; }
+        public EmailActivityRepository EmailActivity { get; }
         public EmailQueueRepository EmailQueue { get; }
         public IssuerRepository Issuers { get; }
         public LoginRepository Logins { get; }
@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
         public RefreshRepository Refreshes { get; }
         public SettingRepository Settings { get; }
         public StateRepository States { get; }
-        public TextActivityRepository TextActivities { get; }
+        public TextActivityRepository TextActivity { get; }
         public TextQueueRepository TextQueue { get; }
         public UrlRepository Urls { get; }
         public UserRepository Users { get; }

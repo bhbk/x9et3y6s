@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.WebApi.Identity.Admin.Controllers;
 using Microsoft.AspNetCore.Hosting;
@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
                 sc.AddSingleton<IMapper>(mapper);
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                    return new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
                 });
 
                 sc.AddControllers()

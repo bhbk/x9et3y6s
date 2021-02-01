@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -152,14 +152,23 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IActionResult GetV1([FromRoute] string issuerValue)
         {
             Guid issuerID;
+            LambdaExpression expr = null;
             tbl_Issuer issuer = null;
 
             if (Guid.TryParse(issuerValue, out issuerID))
-                issuer = UoW.Issuers.Get(x => x.Id == issuerID)
-                    .SingleOrDefault();
+                expr = QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
+                    .Where(x => x.Id == issuerID).ToLambda();
             else
-                issuer = UoW.Issuers.Get(x => x.Name == issuerValue)
-                    .SingleOrDefault();
+                expr = QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
+                    .Where(x => x.Name == issuerValue).ToLambda();
+
+            issuer = UoW.Issuers.Get(expr,
+                new List<Expression<Func<tbl_Issuer, object>>>()
+                {
+                    x => x.tbl_Audiences,
+                    x => x.tbl_Claims,
+                })
+                .SingleOrDefault();
 
             if (issuer == null)
             {
@@ -184,7 +193,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Issuers.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Issuer>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Issuer, object>>>() { x => x.tbl_Audiences })),
+                                    new List<Expression<Func<tbl_Issuer, object>>>() 
+                                    {
+                                        x => x.tbl_Audiences,
+                                        x => x.tbl_Claims,
+                                    })),
 
                     Total = UoW.Issuers.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(

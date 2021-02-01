@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Factories;
@@ -44,7 +44,8 @@ namespace Bhbk.WebApi.Identity.Sts
                 .Build();
 
             var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>())
+                .CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
             sc.AddSingleton<IContextService>(instance);
@@ -53,7 +54,7 @@ namespace Bhbk.WebApi.Identity.Sts
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
             {
-                return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                return new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
             });
             sc.AddSingleton<IAlertService, AlertService>(_ =>
             {
@@ -129,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Sts
              * only for owin authentication configuration.
              */
 
-            var seeds = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+            var seeds = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
 
             var issuers = conf.GetSection("IdentityTenant:AllowedIssuers").GetChildren()
                 .Select(x => x.Value + ":" + conf["IdentityTenant:Salt"]);
@@ -178,8 +179,6 @@ namespace Bhbk.WebApi.Identity.Sts
 #endif
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
-                    //AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
-                    //ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                     ValidIssuers = issuers.ToArray(),
                     IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                     ValidAudiences = audiences.ToArray(),

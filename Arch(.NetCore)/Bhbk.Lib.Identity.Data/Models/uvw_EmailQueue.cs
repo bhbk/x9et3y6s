@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public string ToDisplay { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
-        public bool? IsCancelled { get; set; }
+        public bool IsCancelled { get; set; }
         public DateTimeOffset CreatedUtc { get; set; }
         public DateTimeOffset SendAtUtc { get; set; }
         public DateTimeOffset? DeliveredUtc { get; set; }

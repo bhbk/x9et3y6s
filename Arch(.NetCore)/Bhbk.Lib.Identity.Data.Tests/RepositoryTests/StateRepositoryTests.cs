@@ -53,7 +53,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                     AudienceId = audience.Id,
                     UserId = user.Id,
                     StateValue = AlphaNumeric.CreateString(32),
-                    StateType = StateType.Device.ToString(),
+                    StateType = ConsumerType.Device.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),

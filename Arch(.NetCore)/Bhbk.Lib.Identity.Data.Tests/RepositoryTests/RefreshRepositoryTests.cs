@@ -52,7 +52,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
                     UserId = user.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = Base64.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data_EF6.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
+using Bhbk.Lib.Identity.Data_EF6.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data_EF6.Models_Tbl;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -13,7 +13,7 @@ using System;
 using System.Data;
 using System.Linq;
 
-namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_Tbl
 {
     public class TestDataFactory : IDisposable
     {
@@ -64,12 +64,12 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
 
                 _uow.Commit();
 
-                _uow.Activities.Create(
-                    _mapper.Map<tbl_Activity>(new ActivityV1()
+                _uow.AuthActivity.Create(
+                    _mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         AudienceId = foundAudience.Id,
-                        ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                        IsDeletable = true,
+                        LoginType = GrantFlowType.ClientCredentialV2.ToString(),
+                        LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
                 _uow.Commit();
@@ -93,7 +93,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
-                    RefreshType = RefreshType.Client.ToString(),
+                    RefreshType = ConsumerType.Client.ToString(),
                     RefreshValue = AlphaNumeric.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
@@ -236,12 +236,12 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
 
                 _uow.Commit();
 
-                _uow.Activities.Create(
-                    _mapper.Map<tbl_Activity>(new ActivityV1()
+                _uow.AuthActivity.Create(
+                    _mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = foundUser.Id,
-                        ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                        IsDeletable = true,
+                        LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
+                        LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
                 _uow.Commit();
@@ -269,7 +269,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
                     UserId = foundUser.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = AlphaNumeric.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
@@ -300,7 +300,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
                     AudienceId = foundAudience.Id,
                     UserId = foundUser.Id,
                     StateValue = AlphaNumeric.CreateString(32),
-                    StateType = StateType.Device.ToString(),
+                    StateType = ConsumerType.Device.ToString(),
                     StateConsume = true,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),
@@ -313,7 +313,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
                     AudienceId = foundAudience.Id,
                     UserId = foundUser.Id,
                     StateValue = AlphaNumeric.CreateString(32),
-                    StateType = StateType.User.ToString(),
+                    StateType = ConsumerType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),

@@ -1,8 +1,8 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_Tbl;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Me;

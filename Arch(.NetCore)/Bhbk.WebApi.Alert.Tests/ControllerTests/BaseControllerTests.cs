@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Alert.Tests.ControllerTests
                 sc.AddSingleton<IMapper>(mapper);
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                    return new UnitOfWork(conf["Databases:IdentityEntities_EFCore"], instance);
                 });
 
                 sc.AddControllers()

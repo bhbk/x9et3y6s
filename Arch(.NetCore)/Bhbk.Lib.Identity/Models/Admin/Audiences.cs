@@ -1,5 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models.Admin
@@ -25,6 +25,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool IsDeletable { get; set; }
 
         public string ConcurrencyStamp { get; set; }
+
         public string SecurityStamp { get; set; }
 
         public DateTimeOffset CreatedUtc { get; set; }
@@ -35,16 +36,8 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public Guid Id { get; set; }
 
-        public DateTimeOffset? LastUpdatedUtc { get; set; }
-
         public Nullable<DateTimeOffset> LockoutEndUtc { get; set; }
 
-        public Nullable<DateTimeOffset> LastLoginFailureUtc { get; set; }
-
-        public Nullable<DateTimeOffset> LastLoginSuccessUtc { get; set; }
-
-        public int AccessFailedCount { get; set; }
-
-        public int AccessSuccessCount { get; set; }
+        public virtual ICollection<RoleV1> Roles { get; set; }
     }
 }

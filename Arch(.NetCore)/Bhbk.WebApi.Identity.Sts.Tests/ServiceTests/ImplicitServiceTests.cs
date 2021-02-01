@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_Tbl;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.Identity.Services;

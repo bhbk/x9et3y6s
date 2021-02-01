@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
+using Bhbk.Lib.Identity.Data_EF6.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Enums;
 using Bhbk.Lib.Identity.Primitives.Tests.Constants;
@@ -12,9 +12,9 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using Xunit;
 
-namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_Tbl
 {
-    [Collection("RepositoryTests_TBL")]
+    [Collection("RepositoryTests_Tbl")]
     public class RefreshRepositoryTests : BaseRepositoryTests
     {
         [Fact]
@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = Base64.CreateString(8),
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(60),

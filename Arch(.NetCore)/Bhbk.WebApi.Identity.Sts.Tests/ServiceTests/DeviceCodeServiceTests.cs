@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Models_TBL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_Tbl;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -246,7 +246,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
+                        StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
@@ -302,7 +302,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
+                        StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
@@ -358,7 +358,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
+                        StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
@@ -414,7 +414,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
+                        StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
@@ -471,7 +471,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                         AudienceId = audience.Id,
                         UserId = user.Id,
                         StateValue = AlphaNumeric.CreateString(32),
-                        StateType = StateType.Device.ToString(),
+                        StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
                         ValidFromUtc = DateTime.UtcNow,
                         ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),

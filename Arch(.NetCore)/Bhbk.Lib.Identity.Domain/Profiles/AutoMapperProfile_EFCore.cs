@@ -3,7 +3,6 @@ using Bhbk.Lib.Identity.Data.Models;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
-using Newtonsoft.Json;
 using System;
 using System.Linq;
 
@@ -17,14 +16,11 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
              * activity models
              */
 
-            CreateMap<ActivityV1, uvw_Activity>()
+            CreateMap<AuthActivityV1, uvw_AuthActivity>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
-                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
-                .ForMember(dest => dest.KeyValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.KeyValues)))
-                .ForMember(dest => dest.OriginalValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.OriginalValues)))
-                .ForMember(dest => dest.CurrentValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.CurrentValues)));
+                .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc));
 
-            CreateMap<uvw_Activity, ActivityV1>();
+            CreateMap<uvw_AuthActivity, AuthActivityV1>();
 
             /*
              * audience models
@@ -36,7 +32,8 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore());
 
-            CreateMap<uvw_Audience, AudienceV1>();
+            CreateMap<uvw_Audience, AudienceV1>()
+                .ForMember(dest => dest.Roles, src => src.Ignore());
 
             /*
              * claim models
@@ -67,7 +64,8 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc));
 
-            CreateMap<uvw_Issuer, IssuerV1>();
+            CreateMap<uvw_Issuer, IssuerV1>()
+                .ForMember(dest => dest.Audiences, src => src.Ignore());
 
             /*
              * login models
@@ -172,8 +170,6 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.EmailAddress, src => src.MapFrom(val => val.Email))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
-                .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => (val.AccessFailedCount == default) ? 0 : val.AccessFailedCount))
-                .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => (val.AccessSuccessCount == default) ? 0 : val.AccessSuccessCount))
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore());
 

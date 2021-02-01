@@ -12,19 +12,19 @@ namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure
     {
         private readonly IdentityEntities _context;
         public InstanceContext InstanceType { get; private set; }
-        public ActivityRepository Activities { get; private set; }
         public AudienceRepository Audiences { get; private set; }
-        public IGenericRepository<uvw_Claim> Claims { get; private set; }
-        public IGenericRepository<uvw_EmailQueue> EmailQueue { get; private set; }
-        public IGenericRepository<uvw_Issuer> Issuers { get; private set; }
-        public IGenericRepository<uvw_Login> Logins { get; private set; }
-        public IGenericRepository<uvw_MOTD> MOTDs { get; private set; }
+        public AuthActivityRepository AuthActivity { get; private set; }
+        public IGenericRepository<E_Claim> Claims { get; private set; }
+        public IGenericRepository<E_EmailQueue> EmailQueue { get; private set; }
+        public IGenericRepository<E_Issuer> Issuers { get; private set; }
+        public IGenericRepository<E_Login> Logins { get; private set; }
+        public IGenericRepository<E_MOTD> MOTDs { get; private set; }
         public RefreshRepository Refreshes { get; private set; }
-        public IGenericRepository<uvw_Role> Roles { get; private set; }
-        public IGenericRepository<uvw_Setting> Settings { get; private set; }
-        public IGenericRepository<uvw_State> States { get; private set; }
-        public IGenericRepository<uvw_TextQueue> TextQueue { get; private set; }
-        public IGenericRepository<uvw_Url> Urls { get; private set; }
+        public IGenericRepository<E_Role> Roles { get; private set; }
+        public IGenericRepository<E_Setting> Settings { get; private set; }
+        public IGenericRepository<E_State> States { get; private set; }
+        public IGenericRepository<E_TextQueue> TextQueue { get; private set; }
+        public IGenericRepository<E_Url> Urls { get; private set; }
         public UserRepository Users { get; private set; }
 
         public UnitOfWork(string connection)
@@ -61,19 +61,19 @@ namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure
 
             InstanceType = instance.InstanceType;
 
-            Activities = new ActivityRepository(_context);
             Audiences = new AudienceRepository(_context, instance);
-            Claims = new GenericRepository<uvw_Claim>(_context);
-            EmailQueue = new GenericRepository<uvw_EmailQueue>(_context);
-            Issuers = new GenericRepository<uvw_Issuer>(_context);
-            Logins = new GenericRepository<uvw_Login>(_context);
-            MOTDs = new GenericRepository<uvw_MOTD>(_context);
+            AuthActivity = new AuthActivityRepository(_context);
+            Claims = new GenericRepository<E_Claim>(_context);
+            EmailQueue = new GenericRepository<E_EmailQueue>(_context);
+            Issuers = new GenericRepository<E_Issuer>(_context);
+            Logins = new GenericRepository<E_Login>(_context);
+            MOTDs = new GenericRepository<E_MOTD>(_context);
             Refreshes = new RefreshRepository(_context);
-            Roles = new GenericRepository<uvw_Role>(_context);
-            Settings = new GenericRepository<uvw_Setting>(_context);
-            States = new GenericRepository<uvw_State>(_context);
-            TextQueue = new GenericRepository<uvw_TextQueue>(_context);
-            Urls = new GenericRepository<uvw_Url>(_context);
+            Roles = new GenericRepository<E_Role>(_context);
+            Settings = new GenericRepository<E_Setting>(_context);
+            States = new GenericRepository<E_State>(_context);
+            TextQueue = new GenericRepository<E_TextQueue>(_context);
+            Urls = new GenericRepository<E_Url>(_context);
             Users = new UserRepository(_context, instance);
         }
 

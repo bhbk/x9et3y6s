@@ -17,9 +17,9 @@ namespace Bhbk.Lib.Identity.Data.Models
         {
         }
 
-        public virtual DbSet<uvw_Activity> uvw_Activities { get; set; }
         public virtual DbSet<uvw_Audience> uvw_Audiences { get; set; }
         public virtual DbSet<uvw_AudienceRole> uvw_AudienceRoles { get; set; }
+        public virtual DbSet<uvw_AuthActivity> uvw_AuthActivities { get; set; }
         public virtual DbSet<uvw_Claim> uvw_Claims { get; set; }
         public virtual DbSet<uvw_EmailActivity> uvw_EmailActivities { get; set; }
         public virtual DbSet<uvw_EmailQueue> uvw_EmailQueues { get; set; }
@@ -28,6 +28,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public virtual DbSet<uvw_MOTD> uvw_MOTDs { get; set; }
         public virtual DbSet<uvw_Refresh> uvw_Refreshes { get; set; }
         public virtual DbSet<uvw_Role> uvw_Roles { get; set; }
+        public virtual DbSet<uvw_RoleClaim> uvw_RoleClaims { get; set; }
         public virtual DbSet<uvw_Setting> uvw_Settings { get; set; }
         public virtual DbSet<uvw_State> uvw_States { get; set; }
         public virtual DbSet<uvw_TextActivity> uvw_TextActivities { get; set; }
@@ -41,19 +42,6 @@ namespace Bhbk.Lib.Identity.Data.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
-
-            modelBuilder.Entity<uvw_Activity>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToView("uvw_Activity", "svc");
-
-                entity.Property(e => e.ActivityType)
-                    .IsRequired()
-                    .HasMaxLength(64);
-
-                entity.Property(e => e.TableName).HasMaxLength(256);
-            });
 
             modelBuilder.Entity<uvw_Audience>(entity =>
             {
@@ -81,6 +69,23 @@ namespace Bhbk.Lib.Identity.Data.Models
                 entity.HasNoKey();
 
                 entity.ToView("uvw_AudienceRole", "svc");
+            });
+
+            modelBuilder.Entity<uvw_AuthActivity>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("uvw_AuthActivity", "svc");
+
+                entity.Property(e => e.LocalEndpoint).HasMaxLength(128);
+
+                entity.Property(e => e.LoginOutcome).HasMaxLength(16);
+
+                entity.Property(e => e.LoginType)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.Property(e => e.RemoteEndpoint).HasMaxLength(128);
             });
 
             modelBuilder.Entity<uvw_Claim>(entity =>
@@ -250,6 +255,13 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .HasMaxLength(128);
             });
 
+            modelBuilder.Entity<uvw_RoleClaim>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("uvw_RoleClaim", "svc");
+            });
+
             modelBuilder.Entity<uvw_Setting>(entity =>
             {
                 entity.HasNoKey();
@@ -263,7 +275,7 @@ namespace Bhbk.Lib.Identity.Data.Models
 
                 entity.Property(e => e.ConfigValue)
                     .IsRequired()
-                    .HasMaxLength(256)
+                    .HasMaxLength(1024)
                     .IsUnicode(false);
             });
 
@@ -277,7 +289,7 @@ namespace Bhbk.Lib.Identity.Data.Models
                     .IsRequired()
                     .HasMaxLength(64);
 
-                entity.Property(e => e.StateValue).HasMaxLength(1024);
+                entity.Property(e => e.StateValue).HasMaxLength(2048);
             });
 
             modelBuilder.Entity<uvw_TextActivity>(entity =>

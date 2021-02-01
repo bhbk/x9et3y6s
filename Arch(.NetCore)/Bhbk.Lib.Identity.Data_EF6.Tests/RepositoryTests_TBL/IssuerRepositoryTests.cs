@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
+﻿using Bhbk.Lib.Identity.Data_EF6.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -10,9 +10,9 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using Xunit;
 
-namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_Tbl
 {
-    [Collection("RepositoryTests_TBL")]
+    [Collection("RepositoryTests_Tbl")]
     public class IssuerRepositoryTests : BaseRepositoryTests
     {
         [Fact]

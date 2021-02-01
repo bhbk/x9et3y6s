@@ -25,9 +25,10 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
+            Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>())
+                .CreateMapper();
 
-            UoW = new UnitOfWork(conf["Databases:IdentityEntities"],
+            UoW = new UnitOfWork(conf["Databases:IdentityEntities_EFCore"],
                 new ContextService(InstanceContext.IntegrationTest));
         }
     }

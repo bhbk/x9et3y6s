@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace Bhbk.Lib.Identity.Data.Models_TBL
+namespace Bhbk.Lib.Identity.Data.Models_Tbl
 {
     public partial class IdentityEntities : DbContext
     {
@@ -17,9 +17,9 @@ namespace Bhbk.Lib.Identity.Data.Models_TBL
         {
         }
 
-        public virtual DbSet<tbl_Activity> tbl_Activities { get; set; }
         public virtual DbSet<tbl_Audience> tbl_Audiences { get; set; }
         public virtual DbSet<tbl_AudienceRole> tbl_AudienceRoles { get; set; }
+        public virtual DbSet<tbl_AuthActivity> tbl_AuthActivities { get; set; }
         public virtual DbSet<tbl_Claim> tbl_Claims { get; set; }
         public virtual DbSet<tbl_EmailActivity> tbl_EmailActivities { get; set; }
         public virtual DbSet<tbl_EmailQueue> tbl_EmailQueues { get; set; }
@@ -42,32 +42,6 @@ namespace Bhbk.Lib.Identity.Data.Models_TBL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
-
-            modelBuilder.Entity<tbl_Activity>(entity =>
-            {
-                entity.ToTable("tbl_Activity");
-
-                entity.HasIndex(e => e.Id, "IX_tbl_Activity")
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.ActivityType)
-                    .IsRequired()
-                    .HasMaxLength(64);
-
-                entity.Property(e => e.TableName).HasMaxLength(256);
-
-                entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_Activities)
-                    .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_tbl_Activity_AudienceID");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_Activities)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_tbl_Activity_UserID");
-            });
 
             modelBuilder.Entity<tbl_Audience>(entity =>
             {
@@ -117,6 +91,38 @@ namespace Bhbk.Lib.Identity.Data.Models_TBL
                     .WithMany(p => p.tbl_AudienceRoles)
                     .HasForeignKey(d => d.RoleId)
                     .HasConstraintName("FK_tbl_AudienceRole_RoleID");
+            });
+
+            modelBuilder.Entity<tbl_AuthActivity>(entity =>
+            {
+                entity.ToTable("tbl_AuthActivity");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_AuthActivity")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.LocalEndpoint).HasMaxLength(128);
+
+                entity.Property(e => e.LoginOutcome)
+                    .IsRequired()
+                    .HasMaxLength(16);
+
+                entity.Property(e => e.LoginType)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.Property(e => e.RemoteEndpoint).HasMaxLength(128);
+
+                entity.HasOne(d => d.Audience)
+                    .WithMany(p => p.tbl_AuthActivities)
+                    .HasForeignKey(d => d.AudienceId)
+                    .HasConstraintName("FK_tbl_AuthActivity_AudienceID");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.tbl_AuthActivities)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_tbl_AuthActivity_UserID");
             });
 
             modelBuilder.Entity<tbl_Claim>(entity =>

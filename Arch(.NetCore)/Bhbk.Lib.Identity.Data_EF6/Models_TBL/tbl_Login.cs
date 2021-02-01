@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Models_Tbl
 {
     using System;
     using System.Collections.Generic;
@@ -27,7 +27,8 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
         public bool IsEnabled { get; set; }
         public bool IsDeletable { get; set; }
         public System.DateTimeOffset CreatedUtc { get; set; }
-        public Nullable<System.DateTimeOffset> LastUpdatedUtc { get; set; }
+        public System.DateTime VersionStartUtc { get; set; }
+        public System.DateTime VersionEndUtc { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tbl_UserLogin> tbl_UserLogin { get; set; }

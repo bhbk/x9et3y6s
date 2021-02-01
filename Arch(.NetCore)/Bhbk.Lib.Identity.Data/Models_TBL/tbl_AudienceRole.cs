@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace Bhbk.Lib.Identity.Data.Models_TBL
+namespace Bhbk.Lib.Identity.Data.Models_Tbl
 {
     public partial class tbl_AudienceRole
     {

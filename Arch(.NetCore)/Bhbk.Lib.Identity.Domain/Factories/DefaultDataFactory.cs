@@ -155,41 +155,75 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     }));
 
                 _uow.Commit();
+            }
 
+            var foundAccessExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<uvw_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.AccessExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundAccessExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.AccessExpire,
                         ConfigValue = 600.ToString(),
-                        IsDeletable = true,
+                        IsDeletable = false,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundRefreshExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<uvw_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.RefreshExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundRefreshExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.RefreshExpire,
                         ConfigValue = 86400.ToString(),
-                        IsDeletable = true,
+                        IsDeletable = false,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundTotpExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<uvw_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.TotpExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundTotpExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.TotpExpire,
                         ConfigValue = 600.ToString(),
-                        IsDeletable = true,
+                        IsDeletable = false,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundPollingMax = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<uvw_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.PollingMax).ToLambda())
+                .SingleOrDefault();
+
+            if (foundPollingMax == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.PollingMax,
                         ConfigValue = 10.ToString(),
-                        IsDeletable = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();

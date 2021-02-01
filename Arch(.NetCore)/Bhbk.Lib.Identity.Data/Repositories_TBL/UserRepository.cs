@@ -2,7 +2,7 @@
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Primitives.Constants;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 
-namespace Bhbk.Lib.Identity.Data.Repositories_TBL
+namespace Bhbk.Lib.Identity.Data.Repositories_Tbl
 {
     /*
      * moving away from microsoft constructs for identity implementation because of un-needed additional 
@@ -34,26 +34,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
         {
             get { return _clock.UtcNow; }
             set { _clock.UtcNow = value; }
-        }
-
-        public tbl_User AccessFailed(tbl_User user)
-        {
-            user.LastLoginFailureUtc = Clock.UtcDateTime;
-            user.AccessFailedCount++;
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            return _context.Entry(user).Entity;
-        }
-
-        public tbl_User AccessSuccess(tbl_User user)
-        {
-            user.LastLoginSuccessUtc = Clock.UtcDateTime;
-            user.AccessSuccessCount++;
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            return _context.Entry(user).Entity;
         }
 
         public tbl_UserClaim AddClaim(tbl_UserClaim claim)
@@ -107,7 +87,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
 
         public override tbl_User Delete(tbl_User user)
         {
-            var activity = _context.Set<tbl_Activity>()
+            var activity = _context.Set<tbl_AuthActivity>()
                 .Where(x => x.UserId == user.Id);
 
             var refreshes = _context.Set<tbl_Refresh>()
@@ -360,7 +340,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
         public tbl_User SetConfirmedEmail(tbl_User user, bool confirmed)
         {
             user.EmailConfirmed = confirmed;
-            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -370,7 +349,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
         public tbl_User SetConfirmedPassword(tbl_User user, bool confirmed)
         {
             user.PasswordConfirmed = confirmed;
-            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -380,7 +358,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
         public tbl_User SetConfirmedPhoneNumber(tbl_User user, bool confirmed)
         {
             user.PhoneNumberConfirmed = confirmed;
-            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -390,7 +367,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
         public tbl_User SetImmutable(tbl_User user, bool enabled)
         {
             user.IsDeletable = enabled;
-            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -418,7 +394,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
 
             user.ConcurrencyStamp = Guid.NewGuid().ToString();
             user.SecurityStamp = Guid.NewGuid().ToString();
-            user.LastUpdatedUtc = Clock.UtcDateTime;
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -441,7 +416,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
             entity.LastName = user.LastName;
             entity.IsLockedOut = user.IsLockedOut;
             entity.LockoutEndUtc = user.LockoutEndUtc.HasValue ? user.LockoutEndUtc.Value.ToUniversalTime() : user.LockoutEndUtc;
-            entity.LastUpdatedUtc = Clock.UtcDateTime;
             entity.IsDeletable = user.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;

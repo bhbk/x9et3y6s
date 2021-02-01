@@ -1,14 +1,14 @@
 ﻿using Bhbk.Lib.DataAccess.EF.Repositories;
 using Bhbk.Lib.DataAccess.EF.UnitOfWorks;
-using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
-using Bhbk.Lib.Identity.Data_EF6.Repositories_TBL;
+using Bhbk.Lib.Identity.Data_EF6.Models_Tbl;
+using Bhbk.Lib.Identity.Data_EF6.Repositories_Tbl;
 
-namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure_Tbl
 {
     public interface IUnitOfWork : IGenericUnitOfWork
     {
-        ActivityRepository Activities { get; }
         AudienceRepository Audiences { get; }
+        AuthActivityRepository AuthActivity { get; }
         IGenericRepository<tbl_Claim> Claims { get; }
         IGenericRepository<tbl_EmailQueue> EmailQueue { get; }
         IGenericRepository<tbl_Issuer> Issuers { get; }

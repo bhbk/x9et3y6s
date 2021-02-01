@@ -1,19 +1,19 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataAccess.EF.Repositories;
-using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
-using Bhbk.Lib.Identity.Data_EF6.Repositories_TBL;
+using Bhbk.Lib.Identity.Data_EF6.Models_Tbl;
+using Bhbk.Lib.Identity.Data_EF6.Repositories_Tbl;
 using System;
 using System.Diagnostics;
 
-namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure_Tbl
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
         private readonly IdentityEntities _context;
         public InstanceContext InstanceType { get; private set; }
-        public ActivityRepository Activities { get; private set; }
         public AudienceRepository Audiences { get; private set; }
+        public AuthActivityRepository AuthActivity { get; private set; }
         public IGenericRepository<tbl_Claim> Claims { get; private set; }
         public IGenericRepository<tbl_EmailQueue> EmailQueue { get; private set; }
         public IGenericRepository<tbl_Issuer> Issuers { get; private set; }
@@ -71,8 +71,8 @@ namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure_TBL
 
             InstanceType = instance.InstanceType;
 
-            Activities = new ActivityRepository(_context);
             Audiences = new AudienceRepository(_context, instance);
+            AuthActivity = new AuthActivityRepository(_context);
             Claims = new GenericRepository<tbl_Claim>(_context);
             EmailQueue = new GenericRepository<tbl_EmailQueue>(_context);
             Issuers = new GenericRepository<tbl_Issuer>(_context);

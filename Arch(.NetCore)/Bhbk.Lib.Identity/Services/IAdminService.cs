@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Services
         /*
          * activity
          */
-        ValueTask<DataStateV1Result<ActivityV1>> Activity_GetV1(DataStateV1 model);
+        ValueTask<DataStateV1Result<AuthActivityV1>> Activity_GetV1(DataStateV1 model);
 
         /*
          * audiences

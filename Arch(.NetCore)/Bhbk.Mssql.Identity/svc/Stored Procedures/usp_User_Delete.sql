@@ -1,6 +1,7 @@
 ﻿
+
 CREATE PROCEDURE [svc].[usp_User_Delete]
-    @ID uniqueidentifier
+    @Id uniqueidentifier
 
 AS
 BEGIN
@@ -9,22 +10,22 @@ BEGIN
 	BEGIN TRY
 
         SELECT * FROM [dbo].[tbl_User] 
-            WHERE Id = @ID
+            WHERE Id = @Id
 
-        DELETE [dbo].[tbl_Activity]
-            WHERE UserId = @ID
+        DELETE [dbo].[tbl_AuthActivity]
+            WHERE UserId = @Id
 
         DELETE [dbo].[tbl_Refresh]
-            WHERE UserId = @ID
+            WHERE UserId = @Id
 
         DELETE [dbo].[tbl_Setting]
-            WHERE UserId = @ID
+            WHERE UserId = @Id
 
         DELETE [dbo].[tbl_State]
-            WHERE UserId = @ID
+            WHERE UserId = @Id
 
         DELETE [dbo].[tbl_User]
-            WHERE Id = @ID
+            WHERE Id = @Id
 
     END TRY
 

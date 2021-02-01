@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Primitives.Constants
         public const string Audience_Identity = "Identity";
         public const string AudiencePassword_Identity = "eBr3r3N1L6JV9jewYJOS6fjZ7EJGeGcb";
         public const string IssuerName = "Local";
-        public const string IssuerKey = "x6ZFCKCAtuJ0uuunjbi26O6A2dHFFsf877qpdcqOXqZvjABAHkBjkbb29YNjD75B";
+        public const string IssuerKey = "Y+0Mglnk1BpwVy`$d@TLmP2;({h,/3!^l6w(!QB{ETJM=m/5&^|;LXHiu3}tb#Ar";
         public const string LoginName = "Local";
         public const string LoginKey = "yUrOgQ1RZefUZ5DnC153sLDy23hmSOwn";
         public const string OAuth2ROPGrants = "OAuth2ResourceOwnerPassword";

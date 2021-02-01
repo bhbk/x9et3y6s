@@ -15,10 +15,10 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
     using System.Data.Entity.Core.Objects;
     using System.Linq;
     
-    public partial class IdentityEntities : DbContext
+    public partial class IdentityEntities_EF6 : DbContext
     {
-        public IdentityEntities()
-            : base("name=IdentityEntities")
+        public IdentityEntities_EF6()
+            : base("name=IdentityEntities_EF6")
         {
         }
     
@@ -27,83 +27,38 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<uvw_AudienceRole> uvw_AudienceRole { get; set; }
-        public virtual DbSet<uvw_Claim> uvw_Claim { get; set; }
-        public virtual DbSet<uvw_Issuer> uvw_Issuer { get; set; }
-        public virtual DbSet<uvw_Login> uvw_Login { get; set; }
-        public virtual DbSet<uvw_MOTD> uvw_MOTD { get; set; }
-        public virtual DbSet<uvw_Refresh> uvw_Refresh { get; set; }
-        public virtual DbSet<uvw_Role> uvw_Role { get; set; }
-        public virtual DbSet<uvw_Setting> uvw_Setting { get; set; }
-        public virtual DbSet<uvw_State> uvw_State { get; set; }
-        public virtual DbSet<uvw_TextQueue> uvw_TextQueue { get; set; }
-        public virtual DbSet<uvw_Url> uvw_Url { get; set; }
-        public virtual DbSet<uvw_EmailQueue> uvw_EmailQueue { get; set; }
-        public virtual DbSet<uvw_UserRole> uvw_UserRole { get; set; }
-        public virtual DbSet<uvw_UserClaim> uvw_UserClaim { get; set; }
-        public virtual DbSet<uvw_UserLogin> uvw_UserLogin { get; set; }
-        public virtual DbSet<uvw_EmailActivity> uvw_EmailActivity { get; set; }
-        public virtual DbSet<uvw_TextActivity> uvw_TextActivity { get; set; }
-        public virtual DbSet<uvw_Audience> uvw_Audience { get; set; }
-        public virtual DbSet<uvw_User> uvw_User { get; set; }
-        public virtual DbSet<uvw_Activity> uvw_Activity { get; set; }
+        public virtual DbSet<E_Claim> E_Claim { get; set; }
+        public virtual DbSet<E_Issuer> E_Issuer { get; set; }
+        public virtual DbSet<E_Login> E_Login { get; set; }
+        public virtual DbSet<E_MOTD> E_MOTD { get; set; }
+        public virtual DbSet<E_Refresh> E_Refresh { get; set; }
+        public virtual DbSet<E_Role> E_Role { get; set; }
+        public virtual DbSet<E_Setting> E_Setting { get; set; }
+        public virtual DbSet<E_State> E_State { get; set; }
+        public virtual DbSet<E_TextQueue> E_TextQueue { get; set; }
+        public virtual DbSet<E_Url> E_Url { get; set; }
+        public virtual DbSet<E_EmailQueue> E_EmailQueue { get; set; }
+        public virtual DbSet<E_UserClaim> E_UserClaim { get; set; }
+        public virtual DbSet<E_UserLogin> E_UserLogin { get; set; }
+        public virtual DbSet<E_EmailActivity> E_EmailActivity { get; set; }
+        public virtual DbSet<E_TextActivity> E_TextActivity { get; set; }
+        public virtual DbSet<E_Audience> E_Audience { get; set; }
+        public virtual DbSet<E_User> E_User { get; set; }
+        public virtual DbSet<E_AuthActivity> E_AuthActivity { get; set; }
+        public virtual DbSet<E_RoleClaim> E_RoleClaim { get; set; }
+        public virtual DbSet<E_AudienceRole> E_AudienceRole { get; set; }
+        public virtual DbSet<E_UserRole> E_UserRole { get; set; }
     
-        public virtual ObjectResult<usp_Activity_Delete_Result> usp_Activity_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_Audience_Delete_Result> usp_Audience_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Activity_Delete_Result>("usp_Activity_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Delete_Result>("usp_Audience_Delete", idParameter);
         }
     
-        public virtual ObjectResult<usp_Activity_Insert_Result> usp_Activity_Insert(Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string activityType, string tableName, string keyValues, string originalValues, string currentValues, Nullable<bool> isDeletable)
-        {
-            var audienceIdParameter = audienceId.HasValue ?
-                new ObjectParameter("AudienceId", audienceId) :
-                new ObjectParameter("AudienceId", typeof(System.Guid));
-    
-            var userIdParameter = userId.HasValue ?
-                new ObjectParameter("UserId", userId) :
-                new ObjectParameter("UserId", typeof(System.Guid));
-    
-            var activityTypeParameter = activityType != null ?
-                new ObjectParameter("ActivityType", activityType) :
-                new ObjectParameter("ActivityType", typeof(string));
-    
-            var tableNameParameter = tableName != null ?
-                new ObjectParameter("TableName", tableName) :
-                new ObjectParameter("TableName", typeof(string));
-    
-            var keyValuesParameter = keyValues != null ?
-                new ObjectParameter("KeyValues", keyValues) :
-                new ObjectParameter("KeyValues", typeof(string));
-    
-            var originalValuesParameter = originalValues != null ?
-                new ObjectParameter("OriginalValues", originalValues) :
-                new ObjectParameter("OriginalValues", typeof(string));
-    
-            var currentValuesParameter = currentValues != null ?
-                new ObjectParameter("CurrentValues", currentValues) :
-                new ObjectParameter("CurrentValues", typeof(string));
-    
-            var isDeletableParameter = isDeletable.HasValue ?
-                new ObjectParameter("IsDeletable", isDeletable) :
-                new ObjectParameter("IsDeletable", typeof(bool));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Activity_Insert_Result>("usp_Activity_Insert", audienceIdParameter, userIdParameter, activityTypeParameter, tableNameParameter, keyValuesParameter, originalValuesParameter, currentValuesParameter, isDeletableParameter);
-        }
-    
-        public virtual ObjectResult<usp_Audience_Delete_Result> usp_Audience_Delete(Nullable<System.Guid> iD)
-        {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Delete_Result>("usp_Audience_Delete", iDParameter);
-        }
-    
-        public virtual ObjectResult<usp_Audience_Insert_Result> usp_Audience_Insert(Nullable<System.Guid> issuerId, string name, string description, Nullable<bool> isLockedOut, Nullable<bool> isDeletable, Nullable<int> accessFailedCount, Nullable<int> accessSuccessCount, Nullable<System.DateTimeOffset> lockoutEndUtc, Nullable<System.DateTimeOffset> lastLoginSuccessUtc, Nullable<System.DateTimeOffset> lastLoginFailureUtc)
+        public virtual ObjectResult<usp_Audience_Insert_Result> usp_Audience_Insert(Nullable<System.Guid> issuerId, string name, string description, Nullable<bool> isLockedOut, Nullable<bool> isDeletable, Nullable<System.DateTimeOffset> lockoutEndUtc)
         {
             var issuerIdParameter = issuerId.HasValue ?
                 new ObjectParameter("IssuerId", issuerId) :
@@ -125,30 +80,14 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
                 new ObjectParameter("IsDeletable", isDeletable) :
                 new ObjectParameter("IsDeletable", typeof(bool));
     
-            var accessFailedCountParameter = accessFailedCount.HasValue ?
-                new ObjectParameter("AccessFailedCount", accessFailedCount) :
-                new ObjectParameter("AccessFailedCount", typeof(int));
-    
-            var accessSuccessCountParameter = accessSuccessCount.HasValue ?
-                new ObjectParameter("AccessSuccessCount", accessSuccessCount) :
-                new ObjectParameter("AccessSuccessCount", typeof(int));
-    
             var lockoutEndUtcParameter = lockoutEndUtc.HasValue ?
                 new ObjectParameter("LockoutEndUtc", lockoutEndUtc) :
                 new ObjectParameter("LockoutEndUtc", typeof(System.DateTimeOffset));
     
-            var lastLoginSuccessUtcParameter = lastLoginSuccessUtc.HasValue ?
-                new ObjectParameter("LastLoginSuccessUtc", lastLoginSuccessUtc) :
-                new ObjectParameter("LastLoginSuccessUtc", typeof(System.DateTimeOffset));
-    
-            var lastLoginFailureUtcParameter = lastLoginFailureUtc.HasValue ?
-                new ObjectParameter("LastLoginFailureUtc", lastLoginFailureUtc) :
-                new ObjectParameter("LastLoginFailureUtc", typeof(System.DateTimeOffset));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Insert_Result>("usp_Audience_Insert", issuerIdParameter, nameParameter, descriptionParameter, isLockedOutParameter, isDeletableParameter, accessFailedCountParameter, accessSuccessCountParameter, lockoutEndUtcParameter, lastLoginSuccessUtcParameter, lastLoginFailureUtcParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Insert_Result>("usp_Audience_Insert", issuerIdParameter, nameParameter, descriptionParameter, isLockedOutParameter, isDeletableParameter, lockoutEndUtcParameter);
         }
     
-        public virtual ObjectResult<usp_Audience_Update_Result> usp_Audience_Update(Nullable<System.Guid> id, Nullable<System.Guid> issuerId, string name, string description, Nullable<bool> isLockedOut, Nullable<bool> isDeletable, Nullable<int> accessFailedCount, Nullable<int> accessSuccessCount, Nullable<System.DateTimeOffset> lockoutEndUtc, Nullable<System.DateTimeOffset> lastLoginSuccessUtc, Nullable<System.DateTimeOffset> lastLoginFailureUtc)
+        public virtual ObjectResult<usp_Audience_Update_Result> usp_Audience_Update(Nullable<System.Guid> id, Nullable<System.Guid> issuerId, string name, string description, Nullable<bool> isLockedOut, Nullable<bool> isDeletable, Nullable<System.DateTimeOffset> lockoutEndUtc)
         {
             var idParameter = id.HasValue ?
                 new ObjectParameter("Id", id) :
@@ -174,36 +113,20 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
                 new ObjectParameter("IsDeletable", isDeletable) :
                 new ObjectParameter("IsDeletable", typeof(bool));
     
-            var accessFailedCountParameter = accessFailedCount.HasValue ?
-                new ObjectParameter("AccessFailedCount", accessFailedCount) :
-                new ObjectParameter("AccessFailedCount", typeof(int));
-    
-            var accessSuccessCountParameter = accessSuccessCount.HasValue ?
-                new ObjectParameter("AccessSuccessCount", accessSuccessCount) :
-                new ObjectParameter("AccessSuccessCount", typeof(int));
-    
             var lockoutEndUtcParameter = lockoutEndUtc.HasValue ?
                 new ObjectParameter("LockoutEndUtc", lockoutEndUtc) :
                 new ObjectParameter("LockoutEndUtc", typeof(System.DateTimeOffset));
     
-            var lastLoginSuccessUtcParameter = lastLoginSuccessUtc.HasValue ?
-                new ObjectParameter("LastLoginSuccessUtc", lastLoginSuccessUtc) :
-                new ObjectParameter("LastLoginSuccessUtc", typeof(System.DateTimeOffset));
-    
-            var lastLoginFailureUtcParameter = lastLoginFailureUtc.HasValue ?
-                new ObjectParameter("LastLoginFailureUtc", lastLoginFailureUtc) :
-                new ObjectParameter("LastLoginFailureUtc", typeof(System.DateTimeOffset));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Update_Result>("usp_Audience_Update", idParameter, issuerIdParameter, nameParameter, descriptionParameter, isLockedOutParameter, isDeletableParameter, accessFailedCountParameter, accessSuccessCountParameter, lockoutEndUtcParameter, lastLoginSuccessUtcParameter, lastLoginFailureUtcParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Audience_Update_Result>("usp_Audience_Update", idParameter, issuerIdParameter, nameParameter, descriptionParameter, isLockedOutParameter, isDeletableParameter, lockoutEndUtcParameter);
         }
     
-        public virtual ObjectResult<usp_Claim_Delete_Result> usp_Claim_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_Claim_Delete_Result> usp_Claim_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Claim_Delete_Result>("usp_Claim_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Claim_Delete_Result>("usp_Claim_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_Claim_Insert_Result> usp_Claim_Insert(Nullable<System.Guid> issuerId, string subject, string type, string value, string valueType, Nullable<bool> isDeletable)
@@ -268,13 +191,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Claim_Update_Result>("usp_Claim_Update", idParameter, issuerIdParameter, subjectParameter, typeParameter, valueParameter, valueTypeParameter, isDeletableParameter);
         }
     
-        public virtual ObjectResult<usp_EmailQueue_Delete_Result> usp_EmailQueue_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_EmailQueue_Delete_Result> usp_EmailQueue_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Delete_Result>("usp_EmailQueue_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Delete_Result>("usp_EmailQueue_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_EmailQueue_Insert_Result> usp_EmailQueue_Insert(string fromEmail, string fromDisplay, string toEmail, string toDisplay, string subject, string body, Nullable<System.DateTimeOffset> sendAtUtc)
@@ -331,13 +254,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailQueue_Update_Result>("usp_EmailQueue_Update", idParameter, isCancelledParameter, sendAtUtcParameter, deliveredUtcParameter);
         }
     
-        public virtual ObjectResult<usp_Issuer_Delete_Result> usp_Issuer_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_Issuer_Delete_Result> usp_Issuer_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Issuer_Delete_Result>("usp_Issuer_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Issuer_Delete_Result>("usp_Issuer_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_Issuer_Insert_Result> usp_Issuer_Insert(string name, string description, string issuerKey, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
@@ -394,13 +317,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Issuer_Update_Result>("usp_Issuer_Update", idParameter, nameParameter, descriptionParameter, issuerKeyParameter, isEnabledParameter, isDeletableParameter);
         }
     
-        public virtual ObjectResult<usp_Login_Delete_Result> usp_Login_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_Login_Delete_Result> usp_Login_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Login_Delete_Result>("usp_Login_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Login_Delete_Result>("usp_Login_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_Login_Insert_Result> usp_Login_Insert(string name, string description, string loginKey, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
@@ -457,13 +380,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Login_Update_Result>("usp_Login_Update", idParameter, nameParameter, descriptionParameter, loginKeyParameter, isEnabledParameter, isDeletableParameter);
         }
     
-        public virtual ObjectResult<usp_MOTD_Delete_Result> usp_MOTD_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_MOTD_Delete_Result> usp_MOTD_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_MOTD_Delete_Result>("usp_MOTD_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_MOTD_Delete_Result>("usp_MOTD_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_MOTD_Insert_Result> usp_MOTD_Insert(string author, string quote, string tssId, string tssTitle, string tssCategory, Nullable<System.DateTime> tssDate, string tssTags, Nullable<int> tssLength, string tssBackground)
@@ -552,13 +475,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_MOTD_Update_Result>("usp_MOTD_Update", idParameter, authorParameter, quoteParameter, tssIdParameter, tssTitleParameter, tssCategoryParameter, tssDateParameter, tssTagsParameter, tssLengthParameter, tssBackgroundParameter);
         }
     
-        public virtual ObjectResult<usp_Refresh_Delete_Result> usp_Refresh_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_Refresh_Delete_Result> usp_Refresh_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Refresh_Delete_Result>("usp_Refresh_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Refresh_Delete_Result>("usp_Refresh_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_Refresh_Insert_Result> usp_Refresh_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string refreshValue, string refreshType, Nullable<System.DateTimeOffset> issuedUtc, Nullable<System.DateTimeOffset> validFromUtc, Nullable<System.DateTimeOffset> validToUtc)
@@ -598,13 +521,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Refresh_Insert_Result>("usp_Refresh_Insert", issuerIdParameter, audienceIdParameter, userIdParameter, refreshValueParameter, refreshTypeParameter, issuedUtcParameter, validFromUtcParameter, validToUtcParameter);
         }
     
-        public virtual ObjectResult<usp_Role_Delete_Result> usp_Role_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_Role_Delete_Result> usp_Role_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Role_Delete_Result>("usp_Role_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Role_Delete_Result>("usp_Role_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_Role_Insert_Result> usp_Role_Insert(Nullable<System.Guid> audienceId, string name, string description, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
@@ -661,13 +584,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Role_Update_Result>("usp_Role_Update", idParameter, audienceIdParameter, nameParameter, descriptionParameter, isEnabledParameter, isDeletableParameter);
         }
     
-        public virtual ObjectResult<usp_Setting_Delete_Result> usp_Setting_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_Setting_Delete_Result> usp_Setting_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Setting_Delete_Result>("usp_Setting_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Setting_Delete_Result>("usp_Setting_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_Setting_Insert_Result> usp_Setting_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string configKey, string configValue, Nullable<bool> isDeletable)
@@ -732,13 +655,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Setting_Update_Result>("usp_Setting_Update", idParameter, issuerIdParameter, audienceIdParameter, userIdParameter, configKeyParameter, configValueParameter, isDeletableParameter);
         }
     
-        public virtual ObjectResult<usp_State_Delete_Result> usp_State_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_State_Delete_Result> usp_State_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_State_Delete_Result>("usp_State_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_State_Delete_Result>("usp_State_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_State_Insert_Result> usp_State_Insert(Nullable<System.Guid> issuerId, Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string stateValue, string stateType, Nullable<bool> stateDecision, Nullable<bool> stateConsume, Nullable<System.DateTimeOffset> issuedUtc, Nullable<System.DateTimeOffset> validFromUtc, Nullable<System.DateTimeOffset> validToUtc, Nullable<System.DateTimeOffset> lastPollingUtc)
@@ -843,13 +766,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_State_Update_Result>("usp_State_Update", idParameter, issuerIdParameter, audienceIdParameter, userIdParameter, stateValueParameter, stateTypeParameter, stateDecisionParameter, stateConsumeParameter, issuedUtcParameter, validFromUtcParameter, validToUtcParameter, lastPollingUtcParameter);
         }
     
-        public virtual ObjectResult<usp_TextQueue_Delete_Result> usp_TextQueue_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_TextQueue_Delete_Result> usp_TextQueue_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextQueue_Delete_Result>("usp_TextQueue_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextQueue_Delete_Result>("usp_TextQueue_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_TextQueue_Insert_Result> usp_TextQueue_Insert(string fromPhoneNumber, string toPhoneNumber, string body, Nullable<System.DateTimeOffset> sendAtUtc)
@@ -894,13 +817,13 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextQueue_Update_Result>("usp_TextQueue_Update", idParameter, isCancelledParameter, sendAtUtcParameter, deliveredUtcParameter);
         }
     
-        public virtual ObjectResult<usp_Url_Delete_Result> usp_Url_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_Url_Delete_Result> usp_Url_Delete(Nullable<System.Guid> id)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Url_Delete_Result>("usp_Url_Delete", iDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Url_Delete_Result>("usp_Url_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_Url_Insert_Result> usp_Url_Insert(Nullable<System.Guid> audienceId, string urlHost, string urlPath, Nullable<bool> isEnabled, Nullable<bool> isDeletable)
@@ -957,13 +880,223 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_Url_Update_Result>("usp_Url_Update", idParameter, audienceIdParameter, urlHostParameter, urlPathParameter, isEnabledParameter, isDeletableParameter);
         }
     
-        public virtual ObjectResult<usp_User_Delete_Result> usp_User_Delete(Nullable<System.Guid> iD)
+        public virtual ObjectResult<usp_AudienceRole_Delete_Result> usp_AudienceRole_Delete(Nullable<System.Guid> audienceId, Nullable<System.Guid> roleId)
         {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_User_Delete_Result>("usp_User_Delete", iDParameter);
+            var roleIdParameter = roleId.HasValue ?
+                new ObjectParameter("RoleId", roleId) :
+                new ObjectParameter("RoleId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_AudienceRole_Delete_Result>("usp_AudienceRole_Delete", audienceIdParameter, roleIdParameter);
+        }
+    
+        public virtual ObjectResult<usp_AudienceRole_Insert_Result> usp_AudienceRole_Insert(Nullable<System.Guid> audienceId, Nullable<System.Guid> roleId, Nullable<bool> isDeletable)
+        {
+            var audienceIdParameter = audienceId.HasValue ?
+                new ObjectParameter("AudienceId", audienceId) :
+                new ObjectParameter("AudienceId", typeof(System.Guid));
+    
+            var roleIdParameter = roleId.HasValue ?
+                new ObjectParameter("RoleId", roleId) :
+                new ObjectParameter("RoleId", typeof(System.Guid));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_AudienceRole_Insert_Result>("usp_AudienceRole_Insert", audienceIdParameter, roleIdParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_UserRole_Delete_Result> usp_UserRole_Delete(Nullable<System.Guid> userId, Nullable<System.Guid> roleId)
+        {
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var roleIdParameter = roleId.HasValue ?
+                new ObjectParameter("RoleId", roleId) :
+                new ObjectParameter("RoleId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserRole_Delete_Result>("usp_UserRole_Delete", userIdParameter, roleIdParameter);
+        }
+    
+        public virtual ObjectResult<usp_UserRole_Insert_Result> usp_UserRole_Insert(Nullable<System.Guid> userId, Nullable<System.Guid> roleId, Nullable<bool> isDeletable)
+        {
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var roleIdParameter = roleId.HasValue ?
+                new ObjectParameter("RoleId", roleId) :
+                new ObjectParameter("RoleId", typeof(System.Guid));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserRole_Insert_Result>("usp_UserRole_Insert", userIdParameter, roleIdParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_UserClaim_Delete_Result> usp_UserClaim_Delete(Nullable<System.Guid> userId, Nullable<System.Guid> claimId)
+        {
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var claimIdParameter = claimId.HasValue ?
+                new ObjectParameter("ClaimId", claimId) :
+                new ObjectParameter("ClaimId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserClaim_Delete_Result>("usp_UserClaim_Delete", userIdParameter, claimIdParameter);
+        }
+    
+        public virtual ObjectResult<usp_UserClaim_Insert_Result> usp_UserClaim_Insert(Nullable<System.Guid> userId, Nullable<System.Guid> claimId, Nullable<bool> isDeletable)
+        {
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var claimIdParameter = claimId.HasValue ?
+                new ObjectParameter("ClaimId", claimId) :
+                new ObjectParameter("ClaimId", typeof(System.Guid));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserClaim_Insert_Result>("usp_UserClaim_Insert", userIdParameter, claimIdParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_UserLogin_Delete_Result> usp_UserLogin_Delete(Nullable<System.Guid> userId, Nullable<System.Guid> loginId)
+        {
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var loginIdParameter = loginId.HasValue ?
+                new ObjectParameter("LoginId", loginId) :
+                new ObjectParameter("LoginId", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserLogin_Delete_Result>("usp_UserLogin_Delete", userIdParameter, loginIdParameter);
+        }
+    
+        public virtual ObjectResult<usp_UserLogin_Insert_Result> usp_UserLogin_Insert(Nullable<System.Guid> userId, Nullable<System.Guid> loginId, Nullable<bool> isDeletable)
+        {
+            var userIdParameter = userId.HasValue ?
+                new ObjectParameter("UserId", userId) :
+                new ObjectParameter("UserId", typeof(System.Guid));
+    
+            var loginIdParameter = loginId.HasValue ?
+                new ObjectParameter("LoginId", loginId) :
+                new ObjectParameter("LoginId", typeof(System.Guid));
+    
+            var isDeletableParameter = isDeletable.HasValue ?
+                new ObjectParameter("IsDeletable", isDeletable) :
+                new ObjectParameter("IsDeletable", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserLogin_Insert_Result>("usp_UserLogin_Insert", userIdParameter, loginIdParameter, isDeletableParameter);
+        }
+    
+        public virtual ObjectResult<usp_EmailActivity_Delete_Result> usp_EmailActivity_Delete(Nullable<System.Guid> id)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailActivity_Delete_Result>("usp_EmailActivity_Delete", idParameter);
+        }
+    
+        public virtual ObjectResult<usp_EmailActivity_Insert_Result> usp_EmailActivity_Insert(Nullable<System.Guid> emailId, string sendgridId, string sendgridStatus)
+        {
+            var emailIdParameter = emailId.HasValue ?
+                new ObjectParameter("EmailId", emailId) :
+                new ObjectParameter("EmailId", typeof(System.Guid));
+    
+            var sendgridIdParameter = sendgridId != null ?
+                new ObjectParameter("SendgridId", sendgridId) :
+                new ObjectParameter("SendgridId", typeof(string));
+    
+            var sendgridStatusParameter = sendgridStatus != null ?
+                new ObjectParameter("SendgridStatus", sendgridStatus) :
+                new ObjectParameter("SendgridStatus", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailActivity_Insert_Result>("usp_EmailActivity_Insert", emailIdParameter, sendgridIdParameter, sendgridStatusParameter);
+        }
+    
+        public virtual ObjectResult<usp_TextActivity_Delete_Result> usp_TextActivity_Delete(Nullable<System.Guid> id)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextActivity_Delete_Result>("usp_TextActivity_Delete", idParameter);
+        }
+    
+        public virtual ObjectResult<usp_TextActivity_Insert_Result> usp_TextActivity_Insert(Nullable<System.Guid> textId, string twilioSid, string twilioStatus, string twilioMessage)
+        {
+            var textIdParameter = textId.HasValue ?
+                new ObjectParameter("TextId", textId) :
+                new ObjectParameter("TextId", typeof(System.Guid));
+    
+            var twilioSidParameter = twilioSid != null ?
+                new ObjectParameter("TwilioSid", twilioSid) :
+                new ObjectParameter("TwilioSid", typeof(string));
+    
+            var twilioStatusParameter = twilioStatus != null ?
+                new ObjectParameter("TwilioStatus", twilioStatus) :
+                new ObjectParameter("TwilioStatus", typeof(string));
+    
+            var twilioMessageParameter = twilioMessage != null ?
+                new ObjectParameter("TwilioMessage", twilioMessage) :
+                new ObjectParameter("TwilioMessage", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextActivity_Insert_Result>("usp_TextActivity_Insert", textIdParameter, twilioSidParameter, twilioStatusParameter, twilioMessageParameter);
+        }
+    
+        public virtual ObjectResult<usp_AudiencePassword_Update_Result> usp_AudiencePassword_Update(Nullable<System.Guid> id, string passwordHashPBKDF2, string passwordHashSHA256)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var passwordHashPBKDF2Parameter = passwordHashPBKDF2 != null ?
+                new ObjectParameter("PasswordHashPBKDF2", passwordHashPBKDF2) :
+                new ObjectParameter("PasswordHashPBKDF2", typeof(string));
+    
+            var passwordHashSHA256Parameter = passwordHashSHA256 != null ?
+                new ObjectParameter("PasswordHashSHA256", passwordHashSHA256) :
+                new ObjectParameter("PasswordHashSHA256", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_AudiencePassword_Update_Result>("usp_AudiencePassword_Update", idParameter, passwordHashPBKDF2Parameter, passwordHashSHA256Parameter);
+        }
+    
+        public virtual ObjectResult<usp_UserPassword_Update_Result> usp_UserPassword_Update(Nullable<System.Guid> id, string passwordHashPBKDF2, string passwordHashSHA256)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            var passwordHashPBKDF2Parameter = passwordHashPBKDF2 != null ?
+                new ObjectParameter("PasswordHashPBKDF2", passwordHashPBKDF2) :
+                new ObjectParameter("PasswordHashPBKDF2", typeof(string));
+    
+            var passwordHashSHA256Parameter = passwordHashSHA256 != null ?
+                new ObjectParameter("PasswordHashSHA256", passwordHashSHA256) :
+                new ObjectParameter("PasswordHashSHA256", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserPassword_Update_Result>("usp_UserPassword_Update", idParameter, passwordHashPBKDF2Parameter, passwordHashSHA256Parameter);
+        }
+    
+        public virtual ObjectResult<usp_User_Delete_Result> usp_User_Delete(Nullable<System.Guid> id)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_User_Delete_Result>("usp_User_Delete", idParameter);
         }
     
         public virtual ObjectResult<usp_User_Insert_Result> usp_User_Insert(string userName, string emailAddress, string firstName, string lastName, string phoneNumber, Nullable<bool> isHumanBeing, Nullable<bool> isLockedOut, Nullable<bool> isDeletable, Nullable<System.DateTimeOffset> lockoutEndUtc)
@@ -1064,214 +1197,47 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_User_Update_Result>("usp_User_Update", idParameter, userNameParameter, emailAddressParameter, emailConfirmedParameter, firstNameParameter, lastNameParameter, phoneNumberParameter, phoneNumberConfirmedParameter, passwordConfirmedParameter, isHumanBeingParameter, isLockedOutParameter, isDeletableParameter, lockoutEndUtcParameter);
         }
     
-        public virtual ObjectResult<usp_AudienceRole_Delete_Result> usp_AudienceRole_Delete(Nullable<System.Guid> audienceID, Nullable<System.Guid> roleID)
+        public virtual ObjectResult<usp_AuthActivity_Delete_Result> usp_AuthActivity_Delete(Nullable<System.Guid> id)
         {
-            var audienceIDParameter = audienceID.HasValue ?
-                new ObjectParameter("AudienceID", audienceID) :
-                new ObjectParameter("AudienceID", typeof(System.Guid));
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(System.Guid));
     
-            var roleIDParameter = roleID.HasValue ?
-                new ObjectParameter("RoleID", roleID) :
-                new ObjectParameter("RoleID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_AudienceRole_Delete_Result>("usp_AudienceRole_Delete", audienceIDParameter, roleIDParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_AuthActivity_Delete_Result>("usp_AuthActivity_Delete", idParameter);
         }
     
-        public virtual ObjectResult<usp_AudienceRole_Insert_Result> usp_AudienceRole_Insert(Nullable<System.Guid> audienceId, Nullable<System.Guid> roleId, Nullable<bool> isDeletable)
+        public virtual ObjectResult<usp_AuthActivity_Insert_Result> usp_AuthActivity_Insert(Nullable<System.Guid> audienceId, Nullable<System.Guid> userId, string loginType, string loginOutcome, string localEndpoint, string remoteEndpoint)
         {
             var audienceIdParameter = audienceId.HasValue ?
                 new ObjectParameter("AudienceId", audienceId) :
                 new ObjectParameter("AudienceId", typeof(System.Guid));
     
-            var roleIdParameter = roleId.HasValue ?
-                new ObjectParameter("RoleId", roleId) :
-                new ObjectParameter("RoleId", typeof(System.Guid));
-    
-            var isDeletableParameter = isDeletable.HasValue ?
-                new ObjectParameter("IsDeletable", isDeletable) :
-                new ObjectParameter("IsDeletable", typeof(bool));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_AudienceRole_Insert_Result>("usp_AudienceRole_Insert", audienceIdParameter, roleIdParameter, isDeletableParameter);
-        }
-    
-        public virtual ObjectResult<usp_UserRole_Delete_Result> usp_UserRole_Delete(Nullable<System.Guid> userID, Nullable<System.Guid> roleID)
-        {
-            var userIDParameter = userID.HasValue ?
-                new ObjectParameter("UserID", userID) :
-                new ObjectParameter("UserID", typeof(System.Guid));
-    
-            var roleIDParameter = roleID.HasValue ?
-                new ObjectParameter("RoleID", roleID) :
-                new ObjectParameter("RoleID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserRole_Delete_Result>("usp_UserRole_Delete", userIDParameter, roleIDParameter);
-        }
-    
-        public virtual ObjectResult<usp_UserRole_Insert_Result> usp_UserRole_Insert(Nullable<System.Guid> userId, Nullable<System.Guid> roleId, Nullable<bool> isDeletable)
-        {
             var userIdParameter = userId.HasValue ?
                 new ObjectParameter("UserId", userId) :
                 new ObjectParameter("UserId", typeof(System.Guid));
     
-            var roleIdParameter = roleId.HasValue ?
-                new ObjectParameter("RoleId", roleId) :
-                new ObjectParameter("RoleId", typeof(System.Guid));
+            var loginTypeParameter = loginType != null ?
+                new ObjectParameter("LoginType", loginType) :
+                new ObjectParameter("LoginType", typeof(string));
     
-            var isDeletableParameter = isDeletable.HasValue ?
-                new ObjectParameter("IsDeletable", isDeletable) :
-                new ObjectParameter("IsDeletable", typeof(bool));
+            var loginOutcomeParameter = loginOutcome != null ?
+                new ObjectParameter("LoginOutcome", loginOutcome) :
+                new ObjectParameter("LoginOutcome", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserRole_Insert_Result>("usp_UserRole_Insert", userIdParameter, roleIdParameter, isDeletableParameter);
+            var localEndpointParameter = localEndpoint != null ?
+                new ObjectParameter("LocalEndpoint", localEndpoint) :
+                new ObjectParameter("LocalEndpoint", typeof(string));
+    
+            var remoteEndpointParameter = remoteEndpoint != null ?
+                new ObjectParameter("RemoteEndpoint", remoteEndpoint) :
+                new ObjectParameter("RemoteEndpoint", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_AuthActivity_Insert_Result>("usp_AuthActivity_Insert", audienceIdParameter, userIdParameter, loginTypeParameter, loginOutcomeParameter, localEndpointParameter, remoteEndpointParameter);
         }
     
-        public virtual ObjectResult<usp_UserClaim_Delete_Result> usp_UserClaim_Delete(Nullable<System.Guid> userID, Nullable<System.Guid> claimID)
+        public virtual int usp_DoNothing()
         {
-            var userIDParameter = userID.HasValue ?
-                new ObjectParameter("UserID", userID) :
-                new ObjectParameter("UserID", typeof(System.Guid));
-    
-            var claimIDParameter = claimID.HasValue ?
-                new ObjectParameter("ClaimID", claimID) :
-                new ObjectParameter("ClaimID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserClaim_Delete_Result>("usp_UserClaim_Delete", userIDParameter, claimIDParameter);
-        }
-    
-        public virtual ObjectResult<usp_UserClaim_Insert_Result> usp_UserClaim_Insert(Nullable<System.Guid> userId, Nullable<System.Guid> claimId, Nullable<bool> isDeletable)
-        {
-            var userIdParameter = userId.HasValue ?
-                new ObjectParameter("UserId", userId) :
-                new ObjectParameter("UserId", typeof(System.Guid));
-    
-            var claimIdParameter = claimId.HasValue ?
-                new ObjectParameter("ClaimId", claimId) :
-                new ObjectParameter("ClaimId", typeof(System.Guid));
-    
-            var isDeletableParameter = isDeletable.HasValue ?
-                new ObjectParameter("IsDeletable", isDeletable) :
-                new ObjectParameter("IsDeletable", typeof(bool));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserClaim_Insert_Result>("usp_UserClaim_Insert", userIdParameter, claimIdParameter, isDeletableParameter);
-        }
-    
-        public virtual ObjectResult<usp_UserLogin_Delete_Result> usp_UserLogin_Delete(Nullable<System.Guid> userID, Nullable<System.Guid> loginID)
-        {
-            var userIDParameter = userID.HasValue ?
-                new ObjectParameter("UserID", userID) :
-                new ObjectParameter("UserID", typeof(System.Guid));
-    
-            var loginIDParameter = loginID.HasValue ?
-                new ObjectParameter("LoginID", loginID) :
-                new ObjectParameter("LoginID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserLogin_Delete_Result>("usp_UserLogin_Delete", userIDParameter, loginIDParameter);
-        }
-    
-        public virtual ObjectResult<usp_UserLogin_Insert_Result> usp_UserLogin_Insert(Nullable<System.Guid> userId, Nullable<System.Guid> loginId, Nullable<bool> isDeletable)
-        {
-            var userIdParameter = userId.HasValue ?
-                new ObjectParameter("UserId", userId) :
-                new ObjectParameter("UserId", typeof(System.Guid));
-    
-            var loginIdParameter = loginId.HasValue ?
-                new ObjectParameter("LoginId", loginId) :
-                new ObjectParameter("LoginId", typeof(System.Guid));
-    
-            var isDeletableParameter = isDeletable.HasValue ?
-                new ObjectParameter("IsDeletable", isDeletable) :
-                new ObjectParameter("IsDeletable", typeof(bool));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserLogin_Insert_Result>("usp_UserLogin_Insert", userIdParameter, loginIdParameter, isDeletableParameter);
-        }
-    
-        public virtual ObjectResult<usp_EmailActivity_Delete_Result> usp_EmailActivity_Delete(Nullable<System.Guid> iD)
-        {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailActivity_Delete_Result>("usp_EmailActivity_Delete", iDParameter);
-        }
-    
-        public virtual ObjectResult<usp_EmailActivity_Insert_Result> usp_EmailActivity_Insert(Nullable<System.Guid> emailId, string sendgridId, string sendgridStatus)
-        {
-            var emailIdParameter = emailId.HasValue ?
-                new ObjectParameter("EmailId", emailId) :
-                new ObjectParameter("EmailId", typeof(System.Guid));
-    
-            var sendgridIdParameter = sendgridId != null ?
-                new ObjectParameter("SendgridId", sendgridId) :
-                new ObjectParameter("SendgridId", typeof(string));
-    
-            var sendgridStatusParameter = sendgridStatus != null ?
-                new ObjectParameter("SendgridStatus", sendgridStatus) :
-                new ObjectParameter("SendgridStatus", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_EmailActivity_Insert_Result>("usp_EmailActivity_Insert", emailIdParameter, sendgridIdParameter, sendgridStatusParameter);
-        }
-    
-        public virtual ObjectResult<usp_TextActivity_Delete_Result> usp_TextActivity_Delete(Nullable<System.Guid> iD)
-        {
-            var iDParameter = iD.HasValue ?
-                new ObjectParameter("ID", iD) :
-                new ObjectParameter("ID", typeof(System.Guid));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextActivity_Delete_Result>("usp_TextActivity_Delete", iDParameter);
-        }
-    
-        public virtual ObjectResult<usp_TextActivity_Insert_Result> usp_TextActivity_Insert(Nullable<System.Guid> textId, string twilioSid, string twilioStatus, string twilioMessage)
-        {
-            var textIdParameter = textId.HasValue ?
-                new ObjectParameter("TextId", textId) :
-                new ObjectParameter("TextId", typeof(System.Guid));
-    
-            var twilioSidParameter = twilioSid != null ?
-                new ObjectParameter("TwilioSid", twilioSid) :
-                new ObjectParameter("TwilioSid", typeof(string));
-    
-            var twilioStatusParameter = twilioStatus != null ?
-                new ObjectParameter("TwilioStatus", twilioStatus) :
-                new ObjectParameter("TwilioStatus", typeof(string));
-    
-            var twilioMessageParameter = twilioMessage != null ?
-                new ObjectParameter("TwilioMessage", twilioMessage) :
-                new ObjectParameter("TwilioMessage", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_TextActivity_Insert_Result>("usp_TextActivity_Insert", textIdParameter, twilioSidParameter, twilioStatusParameter, twilioMessageParameter);
-        }
-    
-        public virtual ObjectResult<usp_AudiencePassword_Update_Result> usp_AudiencePassword_Update(Nullable<System.Guid> id, string passwordHashPBKDF2, string passwordHashSHA256)
-        {
-            var idParameter = id.HasValue ?
-                new ObjectParameter("Id", id) :
-                new ObjectParameter("Id", typeof(System.Guid));
-    
-            var passwordHashPBKDF2Parameter = passwordHashPBKDF2 != null ?
-                new ObjectParameter("PasswordHashPBKDF2", passwordHashPBKDF2) :
-                new ObjectParameter("PasswordHashPBKDF2", typeof(string));
-    
-            var passwordHashSHA256Parameter = passwordHashSHA256 != null ?
-                new ObjectParameter("PasswordHashSHA256", passwordHashSHA256) :
-                new ObjectParameter("PasswordHashSHA256", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_AudiencePassword_Update_Result>("usp_AudiencePassword_Update", idParameter, passwordHashPBKDF2Parameter, passwordHashSHA256Parameter);
-        }
-    
-        public virtual ObjectResult<usp_UserPassword_Update_Result> usp_UserPassword_Update(Nullable<System.Guid> id, string passwordHashPBKDF2, string passwordHashSHA256)
-        {
-            var idParameter = id.HasValue ?
-                new ObjectParameter("Id", id) :
-                new ObjectParameter("Id", typeof(System.Guid));
-    
-            var passwordHashPBKDF2Parameter = passwordHashPBKDF2 != null ?
-                new ObjectParameter("PasswordHashPBKDF2", passwordHashPBKDF2) :
-                new ObjectParameter("PasswordHashPBKDF2", typeof(string));
-    
-            var passwordHashSHA256Parameter = passwordHashSHA256 != null ?
-                new ObjectParameter("PasswordHashSHA256", passwordHashSHA256) :
-                new ObjectParameter("PasswordHashSHA256", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<usp_UserPassword_Update_Result>("usp_UserPassword_Update", idParameter, passwordHashPBKDF2Parameter, passwordHashSHA256Parameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("usp_DoNothing");
         }
     }
 }

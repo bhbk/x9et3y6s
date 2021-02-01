@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Me;
@@ -156,14 +156,24 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IActionResult GetV1([FromRoute] string audienceValue)
         {
             Guid audienceID;
+            LambdaExpression expr = null;
             tbl_Audience audience = null;
 
             if (Guid.TryParse(audienceValue, out audienceID))
-                audience = UoW.Audiences.Get(x => x.Id == audienceID)
-                    .SingleOrDefault();
+                expr = QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+                    .Where(x => x.Id == audienceID).ToLambda();
             else
-                audience = UoW.Audiences.Get(x => x.Name == audienceValue)
-                    .SingleOrDefault();
+                expr = QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+                    .Where(x => x.Name == audienceValue).ToLambda();
+
+            audience = UoW.Audiences.Get(expr,
+                new List<Expression<Func<tbl_Audience, object>>>()
+                {
+                    x => x.tbl_AudienceRoles,
+                    x => x.tbl_Roles,
+                    x => x.tbl_Urls,
+                })
+                .SingleOrDefault();
 
             if (audience == null)
             {
@@ -188,7 +198,12 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Audiences.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audience>, IQueryable<tbl_Audience>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Audience>().ApplyState(state)),
-                            new List<Expression<Func<tbl_Audience, object>>>() { x => x.tbl_Roles })),
+                                    new List<Expression<Func<tbl_Audience, object>>>() 
+                                    {
+                                        x => x.tbl_AudienceRoles,
+                                        x => x.tbl_Roles,
+                                        x => x.tbl_Urls,
+                                    })),
 
                     Total = UoW.Audiences.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audience>, IQueryable<tbl_Audience>>>>(

@@ -1,4 +1,6 @@
 ﻿
+
+
 CREATE VIEW [svc].[uvw_Issuer]
 AS
 SELECT
@@ -9,7 +11,6 @@ SELECT
 	,IsEnabled
 	,IsDeletable
 	,CreatedUtc
-	,LastUpdatedUtc
 
 FROM
 	[dbo].[tbl_Issuer]

@@ -16,6 +16,8 @@ BEGIN
 
 	BEGIN TRY
 
+    	BEGIN TRANSACTION;
+
         DECLARE @USERID UNIQUEIDENTIFIER = NEWID()
         DECLARE @CREATEDUTC DATETIMEOFFSET (7) = GETUTCDATE()
 
@@ -32,8 +34,6 @@ BEGIN
             ,IsHumanBeing         
             ,IsLockedOut      
             ,IsDeletable        
-            ,AccessFailedCount  
-            ,AccessSuccessCount  
             ,PasswordConfirmed
 	        ,ConcurrencyStamp
 	        ,SecurityStamp
@@ -53,8 +53,6 @@ BEGIN
             ,@IsHumanBeing         
             ,@IsLockedOut      
             ,@IsDeletable        
-            ,0
-            ,0  
             ,'FALSE'  
 	        ,CAST(NEWID() AS nvarchar(36))
 	        ,CAST(NEWID() AS nvarchar(36))
@@ -68,9 +66,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_User]
             WHERE Id = @USERID
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

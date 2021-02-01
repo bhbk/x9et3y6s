@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.LibraryTests
         }
 
         [Fact]
-        public void Lib_AutoMapper_Profile_Success_Direct()
+        public void Lib_AutoMapper_Profile_Success_TBL()
         {
             var Mapper = new MapperConfiguration(
                     x => x.AddProfile<AutoMapperProfile_EF6_TBL>()).CreateMapper();

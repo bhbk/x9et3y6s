@@ -1,9 +1,9 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.DataAccess.EF.Repositories;
-using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
+using Bhbk.Lib.Identity.Data_EF6.Models_Tbl;
 using System;
 
-namespace Bhbk.Lib.Identity.Data_EF6.Repositories_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Repositories_Tbl
 {
     /*
      * moving away from microsoft constructs for identity implementation because of un-needed additional 

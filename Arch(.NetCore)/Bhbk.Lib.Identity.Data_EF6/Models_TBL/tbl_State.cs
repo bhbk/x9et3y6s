@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Models_Tbl
 {
     using System;
     using System.Collections.Generic;
@@ -27,8 +27,8 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
         public System.DateTimeOffset IssuedUtc { get; set; }
         public System.DateTimeOffset LastPollingUtc { get; set; }
     
-        public virtual tbl_Issuer tbl_Issuer { get; set; }
         public virtual tbl_Audience tbl_Audience { get; set; }
+        public virtual tbl_Issuer tbl_Issuer { get; set; }
         public virtual tbl_User tbl_User { get; set; }
     }
 }

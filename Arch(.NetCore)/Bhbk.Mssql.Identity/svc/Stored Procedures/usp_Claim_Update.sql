@@ -14,7 +14,7 @@ BEGIN
 
 	BEGIN TRY
 
-        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
+    	BEGIN TRANSACTION;
 
         UPDATE [dbo].[tbl_Claim]
         SET
@@ -25,7 +25,6 @@ BEGIN
 	        ,Value					= @Value
 	        ,ValueType				= @ValueType
             ,IsDeletable			= @IsDeletable
-            ,LastUpdatedUtc			= @LASTUPDATED
         WHERE Id = @Id
 
 		IF @@ROWCOUNT != 1
@@ -34,9 +33,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_Claim] 
             WHERE Id = @Id
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

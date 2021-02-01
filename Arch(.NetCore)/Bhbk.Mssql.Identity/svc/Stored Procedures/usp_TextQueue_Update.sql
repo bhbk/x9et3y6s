@@ -12,6 +12,8 @@ BEGIN
 
 	BEGIN TRY
 
+    	BEGIN TRANSACTION;
+
         UPDATE [dbo].[tbl_TextQueue]
         SET
              Id						= @Id
@@ -26,9 +28,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_TextQueue]
             WHERE Id = @Id
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

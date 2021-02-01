@@ -1,6 +1,6 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_Issuer_Delete]
-    @ID uniqueidentifier
+    @Id uniqueidentifier
 
 AS
 BEGIN
@@ -9,35 +9,35 @@ BEGIN
 	BEGIN TRY
 
 		SELECT * FROM [dbo].[tbl_Issuer]
-			WHERE Id = @ID
+			WHERE Id = @Id
 
 		DECLARE @AUDIENCEID uniqueidentifier = 
 			(SELECT TOP(1) Id FROM [dbo].[tbl_Audience] 
-				WHERE IssuerId = @ID)
+				WHERE IssuerId = @Id)
 
-        DELETE [dbo].[tbl_Activity]
+        DELETE [dbo].[tbl_AuthActivity]
 	        WHERE AudienceId = @AUDIENCEID
 
 		DELETE [dbo].[tbl_Claim]
-			WHERE IssuerId = @ID
+			WHERE IssuerId = @Id
 
 		DELETE [dbo].[tbl_Refresh]
-			WHERE IssuerId = @ID
+			WHERE IssuerId = @Id
 
 		DELETE [dbo].[tbl_Setting]
-			WHERE IssuerId = @ID
+			WHERE IssuerId = @Id
 
 		DELETE [dbo].[tbl_State]
-			WHERE IssuerId = @ID
+			WHERE IssuerId = @Id
 
 		DELETE [dbo].[tbl_Role]
 			WHERE AudienceId = @AUDIENCEID
 
 		DELETE [dbo].[tbl_Audience]
-			WHERE IssuerId = @ID
+			WHERE IssuerId = @Id
 
 		DELETE [dbo].[tbl_Issuer]
-			WHERE Id = @ID
+			WHERE Id = @Id
 
     END TRY
 

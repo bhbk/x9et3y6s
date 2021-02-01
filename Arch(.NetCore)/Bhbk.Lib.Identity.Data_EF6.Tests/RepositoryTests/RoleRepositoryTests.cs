@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Roles.Create(new uvw_Role());
+                UoW.Roles.Create(new E_Role());
                 UoW.Commit();
             });
         }
@@ -32,12 +32,12 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateRoles();
 
-            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<uvw_Audience>()
+            var audience = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<E_Audience>()
                 .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
 
             var result = UoW.Roles.Create(
-                Mapper.Map<uvw_Role>(new RoleV1()
+                Mapper.Map<E_Role>(new RoleV1()
                 {
                     AudienceId = audience.Id,
                     Name = TestDefaultConstants.RoleName,
@@ -46,7 +46,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
                 }));
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Role>();
+            result.Should().BeAssignableTo<E_Role>();
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Roles.Delete(new uvw_Role());
+                UoW.Roles.Delete(new E_Role());
                 UoW.Commit();
             });
         }
@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateRoles();
 
-            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Role>()
+            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<E_Role>()
                 .Where(x => x.Name == TestDefaultConstants.RoleName).ToLambda())
                 .Single();
 
@@ -82,7 +82,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateRoles();
 
             var results = UoW.Roles.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Role>>();
+            results.Should().BeAssignableTo<IEnumerable<E_Role>>();
             results.Count().Should().Be(UoW.Roles.Count());
         }
 
@@ -91,7 +91,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Roles.Update(new uvw_Role());
+                UoW.Roles.Update(new E_Role());
                 UoW.Commit();
             });
         }
@@ -103,7 +103,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateRoles();
 
-            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<uvw_Role>()
+            var role = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<E_Role>()
                 .Where(x => x.Name == TestDefaultConstants.RoleName).ToLambda())
                 .Single();
             role.Name += "(Updated)";
@@ -111,7 +111,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             var result = UoW.Roles.Update(role);
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Role>();
+            result.Should().BeAssignableTo<E_Role>();
         }
     }
 }

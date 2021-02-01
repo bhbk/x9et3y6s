@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
 
             Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>()).CreateMapper();
 
-            UoW = new UnitOfWork(conf["Databases:IdentityEntities"],
+            UoW = new UnitOfWork(conf["Databases:IdentityEntities_EF6"],
                 new ContextService(InstanceContext.IntegrationTest));
         }
     }

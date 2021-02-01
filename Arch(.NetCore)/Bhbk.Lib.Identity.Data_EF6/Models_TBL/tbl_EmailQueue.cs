@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Models_Tbl
 {
     using System;
     using System.Collections.Generic;

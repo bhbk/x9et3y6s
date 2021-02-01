@@ -14,6 +14,8 @@ BEGIN
 
 	BEGIN TRY
 
+    	BEGIN TRANSACTION;
+
         UPDATE [dbo].[tbl_Setting]
         SET
              Id						= @Id
@@ -31,9 +33,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_Setting]
             WHERE Id = @Id
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

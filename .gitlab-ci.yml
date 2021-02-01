@@ -54,28 +54,28 @@ deploy:
   only:
     - dummy
   script:
-    - set VERSION=2020.11.27.2100
+    - set IDENTITYVERSION=2020.11.27.2100
     - pushd Arch(.NetCore)
     - nuget restore Bhbk.Lib.Identity.Data.EF6\Bhbk.Lib.Identity.Data.EF6.csproj -SolutionDirectory . -Verbosity quiet
     - dotnet restore Bhbk.Identity.sln --no-cache --verbosity quiet
     - dotnet build Bhbk.Identity.sln --configuration Release --verbosity quiet
-    - dotnet pack Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj -p:PackageVersion=%VERSION% --output . --configuration Release
+    - dotnet pack Bhbk.Lib.Identity\Bhbk.Lib.Identity.csproj -p:PackageVersion=%IDENTITYVERSION% --output . --configuration Release
     - dotnet publish Bhbk.Cli.Alert\Bhbk.Cli.Alert.csproj --output Bhbk.Cli.Alert\bin\Release\net5.0\publish\ --configuration Release
     - dotnet publish Bhbk.Cli.Identity\Bhbk.Cli.Identity.csproj --output Bhbk.Cli.Identity\bin\Release\net5.0\publish\ --configuration Release
     - dotnet publish Bhbk.WebApi.Alert\Bhbk.WebApi.Alert.csproj --output Bhbk.WebApi.Alert\bin\Release\net5.0\publish\ --configuration Release
     - dotnet publish Bhbk.WebApi.Identity.Admin\Bhbk.WebApi.Identity.Admin.csproj --output Bhbk.WebApi.Identity.Admin\bin\Release\net5.0\publish\ --configuration Release
     - dotnet publish Bhbk.WebApi.Identity.Me\Bhbk.WebApi.Identity.Me.csproj --output Bhbk.WebApi.Identity.Me\bin\Release\net5.0\publish\ --configuration Release
     - dotnet publish Bhbk.WebApi.Identity.Sts\Bhbk.WebApi.Identity.Sts.csproj --output Bhbk.WebApi.Identity.Sts\bin\Release\net5.0\publish\ --configuration Release
-    - dotnet octo pack --id=Bhbk.Cli.Alert --version=%VERSION% --basePath=Bhbk.Cli.Alert\bin\Release\net5.0\publish\ --outFolder=. --overwrite
-    - dotnet octo pack --id=Bhbk.Cli.Identity --version=%VERSION% --basePath=Bhbk.Cli.Identity\bin\Release\net5.0\publish\ --outFolder=. --overwrite
-    - dotnet octo pack --id=Bhbk.WebApi.Alert --version=%VERSION% --basePath=Bhbk.WebApi.Alert\bin\Release\net5.0\publish\ --outFolder=. --overwrite
-    - dotnet octo pack --id=Bhbk.WebApi.Identity.Admin --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Admin\bin\Release\net5.0\publish\ --outFolder=. --overwrite
-    - dotnet octo pack --id=Bhbk.WebApi.Identity.Me --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Me\bin\Release\net5.0\publish\ --outFolder=. --overwrite
-    - dotnet octo pack --id=Bhbk.WebApi.Identity.Sts --version=%VERSION% --basePath=Bhbk.WebApi.Identity.Sts\bin\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.Cli.Alert --version=%IDENTITYVERSION% --basePath=Bhbk.Cli.Alert\bin\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.Cli.Identity --version=%IDENTITYVERSION% --basePath=Bhbk.Cli.Identity\bin\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.WebApi.Alert --version=%IDENTITYVERSION% --basePath=Bhbk.WebApi.Alert\bin\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.WebApi.Identity.Admin --version=%IDENTITYVERSION% --basePath=Bhbk.WebApi.Identity.Admin\bin\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.WebApi.Identity.Me --version=%IDENTITYVERSION% --basePath=Bhbk.WebApi.Identity.Me\bin\Release\net5.0\publish\ --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.WebApi.Identity.Sts --version=%IDENTITYVERSION% --basePath=Bhbk.WebApi.Identity.Sts\bin\Release\net5.0\publish\ --outFolder=. --overwrite
     - popd
     - pushd Arch(Typescript)
-    - dotnet octo pack --id=Bhbk.WebUi.Identity --version=%VERSION% --basePath=Bhbk.WebUi.Identity\dist --outFolder=. --overwrite
+    - dotnet octo pack --id=Bhbk.WebUi.Identity --version=%IDENTITYVERSION% --basePath=Bhbk.WebUi.Identity\dist --outFolder=. --overwrite
     - popd
     - dotnet nuget push Arch(.NetCore)\*.nupkg --api-key %NUGET_FEED_KEY% --source %NUGET_FEED_URL%
     - dotnet nuget push Arch(Typescript)\*.nupkg --api-key %NUGET_FEED_KEY% --source %NUGET_FEED_URL%
-    - set VERSION=
+    - set IDENTITYVERSION=

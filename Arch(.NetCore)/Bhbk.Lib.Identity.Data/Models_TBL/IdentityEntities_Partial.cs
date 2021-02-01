@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace Bhbk.Lib.Identity.Data.Models_TBL
+namespace Bhbk.Lib.Identity.Data.Models_Tbl
 {
     public partial class IdentityEntities : DbContext
     {

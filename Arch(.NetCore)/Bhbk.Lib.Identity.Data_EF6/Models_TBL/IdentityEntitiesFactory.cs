@@ -3,7 +3,7 @@ using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 
-namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Models_Tbl
 {
     //https://docs.microsoft.com/en-us/aspnet/core/data/entity-framework-6?view=aspnetcore-3.1
     public class IdentityEntitiesFactory : IDbContextFactory<IdentityEntities>

@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Cryptography.Hashing;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Constants;
@@ -142,17 +142,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
                             {
-                                //adjust counter(s) for login failure...
-                                UoW.Users.AccessFailed(user);
+                                UoW.AuthActivity.Create(
+                                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                                    {
+                                        UserId = user.Id,
+                                        LoginType = GrantFlowType.ResourceOwnerPasswordV1.ToString(),
+                                        LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                                    }));
+
                                 UoW.Commit();
 
                                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                                 return BadRequest(ModelState);
-                            }
-                            else
-                            {
-                                //adjust counter(s) for login success...
-                                UoW.Users.AccessSuccess(user);
                             }
                         }
                         else
@@ -173,17 +174,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
                             {
-                                //adjust counter(s) for login failure...
-                                UoW.Users.AccessFailed(user);
+                                UoW.AuthActivity.Create(
+                                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                                    {
+                                        UserId = user.Id,
+                                        LoginType = GrantFlowType.ResourceOwnerPasswordV1.ToString(),
+                                        LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                                    }));
+
                                 UoW.Commit();
 
                                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                                 return BadRequest(ModelState);
-                            }
-                            else
-                            {
-                                //adjust counter(s) for login success...
-                                UoW.Users.AccessSuccess(user);
                             }
                         }
                         else
@@ -191,7 +193,6 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
                             return NotFound(ModelState);
                         }
-
                     }
                     break;
 
@@ -205,12 +206,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rop_claims = UoW.Users.GenerateAccessClaims(user);
                 var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, null, new List<string> { audience.Name }, rop_claims);
 
-                UoW.Activities.Create(
-                    Mapper.Map<tbl_Activity>(new ActivityV1()
+                UoW.AuthActivity.Create(
+                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = user.Id,
-                        ActivityType = LoginType.CreateUserAccessTokenV1Legacy.ToString(),
-                        IsDeletable = false
+                        LoginType = GrantFlowType.ResourceOwnerPasswordV1_Legacy.ToString(),
+                        LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
                 UoW.Commit();
@@ -229,12 +230,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
                 var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                UoW.Activities.Create(
-                    Mapper.Map<tbl_Activity>(new ActivityV1()
+                UoW.AuthActivity.Create(
+                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = user.Id,
-                        ActivityType = LoginType.CreateUserAccessTokenV1.ToString(),
-                        IsDeletable = false
+                        LoginType = GrantFlowType.ResourceOwnerPasswordV1.ToString(),
+                        LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
                 var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
@@ -245,19 +246,19 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
-                        RefreshType = RefreshType.User.ToString(),
+                        RefreshType = ConsumerType.User.ToString(),
                         RefreshValue = rt.RawData,
                         IssuedUtc = rt.ValidFrom,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
                     }));
 
-                UoW.Activities.Create(
-                    Mapper.Map<tbl_Activity>(new ActivityV1()
+                UoW.AuthActivity.Create(
+                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = user.Id,
-                        ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
-                        IsDeletable = false
+                        LoginType = GrantFlowType.RefreshTokenV1.ToString(),
+                        LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
                 UoW.Commit();
@@ -292,7 +293,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
                 return NotFound(ModelState);
             }
-            else if (!string.Equals(refresh.RefreshType, RefreshType.User.ToString(), StringComparison.OrdinalIgnoreCase)
+            else if (!string.Equals(refresh.RefreshType, ConsumerType.User.ToString(), StringComparison.OrdinalIgnoreCase)
                 || (refresh.ValidFromUtc >= DateTime.UtcNow || refresh.ValidToUtc <= DateTime.UtcNow))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
@@ -367,19 +368,19 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = rt.RawData,
                     IssuedUtc = rt.ValidFrom,
                     ValidFromUtc = rt.ValidFrom,
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.CreateUserRefreshTokenV1.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.RefreshTokenV1.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             UoW.Commit();
@@ -507,17 +508,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
                             {
-                                //adjust counter(s) for login failure...
-                                UoW.Users.AccessFailed(user);
+                                UoW.AuthActivity.Create(
+                                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                                    {
+                                        UserId = user.Id,
+                                        LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
+                                        LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                                    }));
+
                                 UoW.Commit();
 
                                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                                 return BadRequest(ModelState);
-                            }
-                            else
-                            {
-                                //adjust counter(s) for login success...
-                                UoW.Users.AccessSuccess(user);
                             }
                         }
                         else
@@ -538,17 +540,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                             //check that password is valid...
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
                             {
-                                //adjust counter(s) for login failure...
-                                UoW.Users.AccessFailed(user);
+                                UoW.AuthActivity.Create(
+                                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                                    {
+                                        UserId = user.Id,
+                                        LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
+                                        LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                                    }));
+
                                 UoW.Commit();
 
                                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"User:{user.Id}");
                                 return BadRequest(ModelState);
-                            }
-                            else
-                            {
-                                //adjust counter(s) for login success...
-                                UoW.Users.AccessSuccess(user);
                             }
                         }
                         else
@@ -567,12 +570,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var rop_claims = UoW.Users.GenerateAccessClaims(issuer, user);
             var rop = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audiences.Select(x => x.Name).ToList(), rop_claims);
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
@@ -583,19 +586,19 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = rt.RawData,
                     IssuedUtc = rt.ValidFrom,
                     ValidFromUtc = rt.ValidFrom,
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.RefreshTokenV2.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             UoW.Commit();
@@ -629,7 +632,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
                 return NotFound(ModelState);
             }
-            else if (!string.Equals(refresh.RefreshType, RefreshType.User.ToString(), StringComparison.OrdinalIgnoreCase)
+            else if (!string.Equals(refresh.RefreshType, ConsumerType.User.ToString(), StringComparison.OrdinalIgnoreCase)
                 || (refresh.ValidFromUtc >= DateTime.UtcNow || refresh.ValidToUtc <= DateTime.UtcNow))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
@@ -728,19 +731,19 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = rt.RawData,
                     IssuedUtc = rt.ValidFrom,
                     ValidFromUtc = rt.ValidFrom,
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.RefreshTokenV2.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             UoW.Commit();

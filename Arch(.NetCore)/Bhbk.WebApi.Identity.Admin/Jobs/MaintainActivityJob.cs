@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+﻿using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Microsoft.Extensions.Configuration;
@@ -37,16 +37,16 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                     var auditable = int.Parse(conf["Jobs:MaintainActivity:HoldAuditable"]);
                     var transient = int.Parse(conf["Jobs:MaintainActivity:HoldTransient"]);
 
-                    var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_Activity>()
-                        .Where(x => (x.CreatedUtc.AddSeconds(transient) < DateTime.UtcNow && x.IsDeletable == false)
-                            || (x.CreatedUtc.AddSeconds(auditable) < DateTime.UtcNow && x.IsDeletable == true)).ToLambda();
+                    var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>()
+                        .Where(x => (x.CreatedUtc.AddSeconds(transient) < DateTime.UtcNow)
+                            || (x.CreatedUtc.AddSeconds(auditable) < DateTime.UtcNow)).ToLambda();
 
-                    var expired = uow.Activities.Get(expiredExpr);
+                    var expired = uow.AuthActivity.Get(expiredExpr);
                     var expiredCount = expired.Count();
 
                     if (expired.Any())
                     {
-                        uow.Activities.Delete(expired);
+                        uow.AuthActivity.Delete(expired);
                         uow.Commit();
 
                         Log.Information($"'{callPath}' success on " + DateTime.UtcNow.ToString() + ". Delete " 
@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
             }
 
             Log.Information($"'{callPath}' completed");
-            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
+            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.GetValueOrDefault().LocalDateTime}");
 
             return Task.CompletedTask;
         }

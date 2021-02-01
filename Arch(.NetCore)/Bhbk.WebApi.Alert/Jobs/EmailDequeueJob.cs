@@ -51,7 +51,7 @@ namespace Bhbk.WebApi.Alert.Jobs
             }
 #if !RELEASE
             Log.Information($"'{callPath}' completed");
-            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
+            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.GetValueOrDefault().LocalDateTime}");
 #endif
             return Task.CompletedTask;
         }
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Alert.Jobs
 
                             if (response.StatusCode == HttpStatusCode.Accepted)
                             {
-                                uow.EmailActivities.Create(
+                                uow.EmailActivity.Create(
                                     new uvw_EmailActivity()
                                     {
                                         EmailId = msg.Id,
@@ -90,7 +90,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                             }
                             else
                             {
-                                uow.EmailActivities.Create(
+                                uow.EmailActivity.Create(
                                     new uvw_EmailActivity()
                                     {
                                         EmailId = msg.Id,

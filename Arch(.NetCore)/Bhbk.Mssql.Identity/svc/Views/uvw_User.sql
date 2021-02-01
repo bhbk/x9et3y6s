@@ -1,4 +1,5 @@
 ﻿
+
 CREATE VIEW [svc].[uvw_User]
 AS
 SELECT
@@ -18,13 +19,8 @@ SELECT
     ,IsHumanBeing
     ,IsDeletable
     ,IsLockedOut
-    ,AccessFailedCount
-    ,AccessSuccessCount
     ,LockoutEndUtc
-    ,LastLoginSuccessUtc
-    ,LastLoginFailureUtc
     ,CreatedUtc
-    ,LastUpdatedUtc
                          
 FROM
     [dbo].[tbl_User]

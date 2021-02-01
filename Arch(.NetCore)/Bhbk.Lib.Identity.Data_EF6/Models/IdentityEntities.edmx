@@ -6,32 +6,10 @@
     <edmx:StorageModels>
     <Schema Namespace="IdentityModels.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <!--Errors Found During Generation:
-warning 6002: The table/view 'BhbkIdentity.svc.uvw_Activity' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="uvw_Activity">
-          <Key>
-            <PropertyRef Name="Id" />
-            
-            
-            
-          </Key>
-          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="AudienceId" Type="uniqueidentifier" />
-          <Property Name="UserId" Type="uniqueidentifier" />
-          <Property Name="ActivityType" Type="nvarchar" MaxLength="64" Nullable="false" />
-          <Property Name="TableName" Type="nvarchar" MaxLength="256" />
-          <Property Name="KeyValues" Type="nvarchar(max)" />
-          <Property Name="OriginalValues" Type="nvarchar(max)" />
-          <Property Name="CurrentValues" Type="nvarchar(max)" />
-          <Property Name="IsDeletable" Type="bit" Nullable="false" />
-          <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-        </EntityType>
-        <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_Audience' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="uvw_Audience">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
             
             
             
@@ -48,13 +26,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Audience' does not have a pri
           <Property Name="SecurityStamp" Type="nvarchar" MaxLength="256" />
           <Property Name="IsLockedOut" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
-          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="int" Nullable="false" />
           <Property Name="LockoutEndUtc" Type="datetimeoffset" Precision="7" />
-          <Property Name="LastLoginSuccessUtc" Type="datetimeoffset" Precision="7" />
-          <Property Name="LastLoginFailureUtc" Type="datetimeoffset" Precision="7" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_AudienceRole' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -68,6 +41,23 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_AudienceRole' does not have a
           <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
+          <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_AuthActivity' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_AuthActivity">
+          <Key>
+            <PropertyRef Name="Id" />
+            
+            
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AudienceId" Type="uniqueidentifier" />
+          <Property Name="UserId" Type="uniqueidentifier" />
+          <Property Name="LoginType" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="LoginOutcome" Type="nvarchar" MaxLength="16" />
+          <Property Name="LocalEndpoint" Type="nvarchar" MaxLength="128" />
+          <Property Name="RemoteEndpoint" Type="nvarchar" MaxLength="128" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
@@ -91,7 +81,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Claim' does not have a primar
           <Property Name="ValueType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_EmailActivity' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -117,6 +106,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_EmailQueue' does not have a p
             
             
             
+            
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="FromEmail" Type="varchar" MaxLength="320" Nullable="false" />
@@ -125,7 +115,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_EmailQueue' does not have a p
           <Property Name="ToDisplay" Type="varchar" MaxLength="512" />
           <Property Name="Subject" Type="varchar" MaxLength="1024" Nullable="false" />
           <Property Name="Body" Type="varchar(max)" />
-          <Property Name="IsCancelled" Type="bit" />
+          <Property Name="IsCancelled" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
           <Property Name="SendAtUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
           <Property Name="DeliveredUtc" Type="datetimeoffset" Precision="7" />
@@ -148,7 +138,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Issuer' does not have a prima
           <Property Name="IsEnabled" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_Login' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -167,7 +156,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Login' does not have a primar
           <Property Name="IsEnabled" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_MOTD' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -228,7 +216,20 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Role' does not have a primary
           <Property Name="IsEnabled" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'BhbkIdentity.svc.uvw_RoleClaim' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="uvw_RoleClaim">
+          <Key>
+            <PropertyRef Name="RoleId" />
+            <PropertyRef Name="ClaimId" />
+            
+            
+          </Key>
+          <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ClaimId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IsDeletable" Type="bit" Nullable="false" />
+          <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_Setting' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -245,7 +246,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Setting' does not have a prim
           <Property Name="AudienceId" Type="uniqueidentifier" />
           <Property Name="UserId" Type="uniqueidentifier" />
           <Property Name="ConfigKey" Type="varchar" MaxLength="128" Nullable="false" />
-          <Property Name="ConfigValue" Type="varchar" MaxLength="256" Nullable="false" />
+          <Property Name="ConfigValue" Type="varchar" MaxLength="1024" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
         </EntityType>
@@ -266,7 +267,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_State' does not have a primar
           <Property Name="IssuerId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="AudienceId" Type="uniqueidentifier" />
           <Property Name="UserId" Type="uniqueidentifier" />
-          <Property Name="StateValue" Type="nvarchar" MaxLength="1024" />
+          <Property Name="StateValue" Type="nvarchar" MaxLength="2048" />
           <Property Name="StateType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="StateDecision" Type="bit" />
           <Property Name="StateConsume" Type="bit" Nullable="false" />
@@ -328,15 +329,12 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_Url' does not have a primary 
           <Property Name="IsEnabled" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="uvw_User">
           <Key>
             <PropertyRef Name="Id" />
-            
-            
             
             
             
@@ -365,13 +363,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_User' does not have a primary
           <Property Name="IsHumanBeing" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="IsLockedOut" Type="bit" Nullable="false" />
-          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="int" Nullable="false" />
           <Property Name="LockoutEndUtc" Type="datetimeoffset" Precision="7" />
-          <Property Name="LastLoginSuccessUtc" Type="datetimeoffset" Precision="7" />
-          <Property Name="LastLoginFailureUtc" Type="datetimeoffset" Precision="7" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserClaim' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -406,29 +399,14 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Key>
             <PropertyRef Name="UserId" />
             <PropertyRef Name="RoleId" />
-            
-            
           </Key>
           <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
         </EntityType>
-        <Function Name="usp_Activity_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
-        </Function>
-        <Function Name="usp_Activity_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="AudienceId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="ActivityType" Type="nvarchar" Mode="In" />
-          <Parameter Name="TableName" Type="nvarchar" Mode="In" />
-          <Parameter Name="KeyValues" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="OriginalValues" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="CurrentValues" Type="nvarchar(max)" Mode="In" />
-          <Parameter Name="IsDeletable" Type="bit" Mode="In" />
-        </Function>
         <Function Name="usp_Audience_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Audience_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
@@ -436,11 +414,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="Description" Type="nvarchar" Mode="In" />
           <Parameter Name="IsLockedOut" Type="bit" Mode="In" />
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
-          <Parameter Name="AccessFailedCount" Type="int" Mode="In" />
-          <Parameter Name="AccessSuccessCount" Type="int" Mode="In" />
           <Parameter Name="LockoutEndUtc" Type="datetimeoffset" Mode="In" />
-          <Parameter Name="LastLoginSuccessUtc" Type="datetimeoffset" Mode="In" />
-          <Parameter Name="LastLoginFailureUtc" Type="datetimeoffset" Mode="In" />
         </Function>
         <Function Name="usp_Audience_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
@@ -449,11 +423,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="Description" Type="nvarchar" Mode="In" />
           <Parameter Name="IsLockedOut" Type="bit" Mode="In" />
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
-          <Parameter Name="AccessFailedCount" Type="int" Mode="In" />
-          <Parameter Name="AccessSuccessCount" Type="int" Mode="In" />
           <Parameter Name="LockoutEndUtc" Type="datetimeoffset" Mode="In" />
-          <Parameter Name="LastLoginSuccessUtc" Type="datetimeoffset" Mode="In" />
-          <Parameter Name="LastLoginFailureUtc" Type="datetimeoffset" Mode="In" />
         </Function>
         <Function Name="usp_AudiencePassword_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
@@ -461,16 +431,27 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="PasswordHashSHA256" Type="nvarchar" Mode="In" />
         </Function>
         <Function Name="usp_AudienceRole_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="AudienceID" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="RoleID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="AudienceId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="RoleId" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_AudienceRole_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="AudienceId" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="RoleId" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
         </Function>
+        <Function Name="usp_AuthActivity_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
+        </Function>
+        <Function Name="usp_AuthActivity_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
+          <Parameter Name="AudienceId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="LoginType" Type="nvarchar" Mode="In" />
+          <Parameter Name="LoginOutcome" Type="nvarchar" Mode="In" />
+          <Parameter Name="LocalEndpoint" Type="nvarchar" Mode="In" />
+          <Parameter Name="RemoteEndpoint" Type="nvarchar" Mode="In" />
+        </Function>
         <Function Name="usp_Claim_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Claim_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
@@ -489,8 +470,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="ValueType" Type="nvarchar" Mode="In" />
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
         </Function>
+        <Function Name="usp_DoNothing" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc" />
         <Function Name="usp_EmailActivity_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_EmailActivity_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="EmailId" Type="uniqueidentifier" Mode="In" />
@@ -498,7 +480,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="SendgridStatus" Type="nvarchar" Mode="In" />
         </Function>
         <Function Name="usp_EmailQueue_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_EmailQueue_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="FromEmail" Type="nvarchar" Mode="In" />
@@ -516,7 +498,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="DeliveredUtc" Type="datetimeoffset" Mode="In" />
         </Function>
         <Function Name="usp_Issuer_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Issuer_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="Name" Type="nvarchar" Mode="In" />
@@ -534,7 +516,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
         </Function>
         <Function Name="usp_Login_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Login_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="Name" Type="nvarchar" Mode="In" />
@@ -552,7 +534,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
         </Function>
         <Function Name="usp_MOTD_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_MOTD_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="Author" Type="nvarchar(max)" Mode="In" />
@@ -578,7 +560,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="TssBackground" Type="nvarchar(max)" Mode="In" />
         </Function>
         <Function Name="usp_Refresh_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Refresh_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
@@ -591,7 +573,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="ValidToUtc" Type="datetimeoffset" Mode="In" />
         </Function>
         <Function Name="usp_Role_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Role_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="AudienceId" Type="uniqueidentifier" Mode="In" />
@@ -609,7 +591,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
         </Function>
         <Function Name="usp_Setting_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Setting_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
@@ -629,7 +611,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
         </Function>
         <Function Name="usp_State_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_State_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="IssuerId" Type="uniqueidentifier" Mode="In" />
@@ -659,7 +641,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="LastPollingUtc" Type="datetimeoffset" Mode="In" />
         </Function>
         <Function Name="usp_TextActivity_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_TextActivity_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="TextId" Type="uniqueidentifier" Mode="In" />
@@ -668,7 +650,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="TwilioMessage" Type="nvarchar" Mode="In" />
         </Function>
         <Function Name="usp_TextQueue_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_TextQueue_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="FromPhoneNumber" Type="nvarchar" Mode="In" />
@@ -683,7 +665,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="DeliveredUtc" Type="datetimeoffset" Mode="In" />
         </Function>
         <Function Name="usp_Url_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_Url_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="AudienceId" Type="uniqueidentifier" Mode="In" />
@@ -701,7 +683,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
         </Function>
         <Function Name="usp_User_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="ID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Id" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_User_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="UserName" Type="nvarchar" Mode="In" />
@@ -730,8 +712,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="LockoutEndUtc" Type="datetimeoffset" Mode="In" />
         </Function>
         <Function Name="usp_UserClaim_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="UserID" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="ClaimID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="ClaimId" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_UserClaim_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
@@ -739,8 +721,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
         </Function>
         <Function Name="usp_UserLogin_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="UserID" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="LoginID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="LoginId" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_UserLogin_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
@@ -753,8 +735,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="PasswordHashSHA256" Type="nvarchar" Mode="In" />
         </Function>
         <Function Name="usp_UserRole_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
-          <Parameter Name="UserID" Type="uniqueidentifier" Mode="In" />
-          <Parameter Name="RoleID" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="RoleId" Type="uniqueidentifier" Mode="In" />
         </Function>
         <Function Name="usp_UserRole_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="svc">
           <Parameter Name="UserId" Type="uniqueidentifier" Mode="In" />
@@ -762,20 +744,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Parameter Name="IsDeletable" Type="bit" Mode="In" />
         </Function>
         <EntityContainer Name="IdentityModelsStoreContainer">
-          <EntitySet Name="uvw_Activity" EntityType="Self.uvw_Activity" store:Type="Views" store:Schema="svc">
-            <DefiningQuery>SELECT 
-    [uvw_Activity].[Id] AS [Id], 
-    [uvw_Activity].[AudienceId] AS [AudienceId], 
-    [uvw_Activity].[UserId] AS [UserId], 
-    [uvw_Activity].[ActivityType] AS [ActivityType], 
-    [uvw_Activity].[TableName] AS [TableName], 
-    [uvw_Activity].[KeyValues] AS [KeyValues], 
-    [uvw_Activity].[OriginalValues] AS [OriginalValues], 
-    [uvw_Activity].[CurrentValues] AS [CurrentValues], 
-    [uvw_Activity].[IsDeletable] AS [IsDeletable], 
-    [uvw_Activity].[CreatedUtc] AS [CreatedUtc]
-    FROM [svc].[uvw_Activity] AS [uvw_Activity]</DefiningQuery>
-          </EntitySet>
           <EntitySet Name="uvw_Audience" EntityType="Self.uvw_Audience" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
     [uvw_Audience].[Id] AS [Id], 
@@ -788,13 +756,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
     [uvw_Audience].[SecurityStamp] AS [SecurityStamp], 
     [uvw_Audience].[IsLockedOut] AS [IsLockedOut], 
     [uvw_Audience].[IsDeletable] AS [IsDeletable], 
-    [uvw_Audience].[AccessFailedCount] AS [AccessFailedCount], 
-    [uvw_Audience].[AccessSuccessCount] AS [AccessSuccessCount], 
     [uvw_Audience].[LockoutEndUtc] AS [LockoutEndUtc], 
-    [uvw_Audience].[LastLoginSuccessUtc] AS [LastLoginSuccessUtc], 
-    [uvw_Audience].[LastLoginFailureUtc] AS [LastLoginFailureUtc], 
-    [uvw_Audience].[CreatedUtc] AS [CreatedUtc], 
-    [uvw_Audience].[LastUpdatedUtc] AS [LastUpdatedUtc]
+    [uvw_Audience].[CreatedUtc] AS [CreatedUtc]
     FROM [svc].[uvw_Audience] AS [uvw_Audience]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_AudienceRole" EntityType="Self.uvw_AudienceRole" store:Type="Views" store:Schema="svc">
@@ -805,6 +768,18 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
     [uvw_AudienceRole].[CreatedUtc] AS [CreatedUtc]
     FROM [svc].[uvw_AudienceRole] AS [uvw_AudienceRole]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="uvw_AuthActivity" EntityType="Self.uvw_AuthActivity" store:Type="Views" store:Schema="svc">
+            <DefiningQuery>SELECT 
+    [uvw_AuthActivity].[Id] AS [Id], 
+    [uvw_AuthActivity].[AudienceId] AS [AudienceId], 
+    [uvw_AuthActivity].[UserId] AS [UserId], 
+    [uvw_AuthActivity].[LoginType] AS [LoginType], 
+    [uvw_AuthActivity].[LoginOutcome] AS [LoginOutcome], 
+    [uvw_AuthActivity].[LocalEndpoint] AS [LocalEndpoint], 
+    [uvw_AuthActivity].[RemoteEndpoint] AS [RemoteEndpoint], 
+    [uvw_AuthActivity].[CreatedUtc] AS [CreatedUtc]
+    FROM [svc].[uvw_AuthActivity] AS [uvw_AuthActivity]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="uvw_Claim" EntityType="Self.uvw_Claim" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
     [uvw_Claim].[Id] AS [Id], 
@@ -814,8 +789,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
     [uvw_Claim].[Value] AS [Value], 
     [uvw_Claim].[ValueType] AS [ValueType], 
     [uvw_Claim].[IsDeletable] AS [IsDeletable], 
-    [uvw_Claim].[CreatedUtc] AS [CreatedUtc], 
-    [uvw_Claim].[LastUpdatedUtc] AS [LastUpdatedUtc]
+    [uvw_Claim].[CreatedUtc] AS [CreatedUtc]
     FROM [svc].[uvw_Claim] AS [uvw_Claim]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_EmailActivity" EntityType="Self.uvw_EmailActivity" store:Type="Views" store:Schema="svc">
@@ -850,8 +824,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
     [uvw_Issuer].[IssuerKey] AS [IssuerKey], 
     [uvw_Issuer].[IsEnabled] AS [IsEnabled], 
     [uvw_Issuer].[IsDeletable] AS [IsDeletable], 
-    [uvw_Issuer].[CreatedUtc] AS [CreatedUtc], 
-    [uvw_Issuer].[LastUpdatedUtc] AS [LastUpdatedUtc]
+    [uvw_Issuer].[CreatedUtc] AS [CreatedUtc]
     FROM [svc].[uvw_Issuer] AS [uvw_Issuer]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_Login" EntityType="Self.uvw_Login" store:Type="Views" store:Schema="svc">
@@ -862,8 +835,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
     [uvw_Login].[LoginKey] AS [LoginKey], 
     [uvw_Login].[IsEnabled] AS [IsEnabled], 
     [uvw_Login].[IsDeletable] AS [IsDeletable], 
-    [uvw_Login].[CreatedUtc] AS [CreatedUtc], 
-    [uvw_Login].[LastUpdatedUtc] AS [LastUpdatedUtc]
+    [uvw_Login].[CreatedUtc] AS [CreatedUtc]
     FROM [svc].[uvw_Login] AS [uvw_Login]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_MOTD" EntityType="Self.uvw_MOTD" store:Type="Views" store:Schema="svc">
@@ -901,9 +873,16 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
     [uvw_Role].[Description] AS [Description], 
     [uvw_Role].[IsEnabled] AS [IsEnabled], 
     [uvw_Role].[IsDeletable] AS [IsDeletable], 
-    [uvw_Role].[CreatedUtc] AS [CreatedUtc], 
-    [uvw_Role].[LastUpdatedUtc] AS [LastUpdatedUtc]
+    [uvw_Role].[CreatedUtc] AS [CreatedUtc]
     FROM [svc].[uvw_Role] AS [uvw_Role]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="uvw_RoleClaim" EntityType="Self.uvw_RoleClaim" store:Type="Views" store:Schema="svc">
+            <DefiningQuery>SELECT 
+    [uvw_RoleClaim].[RoleId] AS [RoleId], 
+    [uvw_RoleClaim].[ClaimId] AS [ClaimId], 
+    [uvw_RoleClaim].[IsDeletable] AS [IsDeletable], 
+    [uvw_RoleClaim].[CreatedUtc] AS [CreatedUtc]
+    FROM [svc].[uvw_RoleClaim] AS [uvw_RoleClaim]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_Setting" EntityType="Self.uvw_Setting" store:Type="Views" store:Schema="svc">
             <DefiningQuery>SELECT 
@@ -963,8 +942,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
     [uvw_Url].[UrlPath] AS [UrlPath], 
     [uvw_Url].[IsEnabled] AS [IsEnabled], 
     [uvw_Url].[IsDeletable] AS [IsDeletable], 
-    [uvw_Url].[CreatedUtc] AS [CreatedUtc], 
-    [uvw_Url].[LastUpdatedUtc] AS [LastUpdatedUtc]
+    [uvw_Url].[CreatedUtc] AS [CreatedUtc]
     FROM [svc].[uvw_Url] AS [uvw_Url]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_User" EntityType="Self.uvw_User" store:Type="Views" store:Schema="svc">
@@ -985,13 +963,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
     [uvw_User].[IsHumanBeing] AS [IsHumanBeing], 
     [uvw_User].[IsDeletable] AS [IsDeletable], 
     [uvw_User].[IsLockedOut] AS [IsLockedOut], 
-    [uvw_User].[AccessFailedCount] AS [AccessFailedCount], 
-    [uvw_User].[AccessSuccessCount] AS [AccessSuccessCount], 
     [uvw_User].[LockoutEndUtc] AS [LockoutEndUtc], 
-    [uvw_User].[LastLoginSuccessUtc] AS [LastLoginSuccessUtc], 
-    [uvw_User].[LastLoginFailureUtc] AS [LastLoginFailureUtc], 
-    [uvw_User].[CreatedUtc] AS [CreatedUtc], 
-    [uvw_User].[LastUpdatedUtc] AS [LastUpdatedUtc]
+    [uvw_User].[CreatedUtc] AS [CreatedUtc]
     FROM [svc].[uvw_User] AS [uvw_User]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="uvw_UserClaim" EntityType="Self.uvw_UserClaim" store:Type="Views" store:Schema="svc">
@@ -1023,33 +996,19 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="IdentityModels" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityContainer Name="IdentityEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="uvw_AudienceRole" EntityType="IdentityModels.uvw_AudienceRole" />
-          <EntitySet Name="uvw_Claim" EntityType="IdentityModels.uvw_Claim" />
-          <EntitySet Name="uvw_Issuer" EntityType="IdentityModels.uvw_Issuer" />
-          <EntitySet Name="uvw_Login" EntityType="IdentityModels.uvw_Login" />
-          <EntitySet Name="uvw_MOTD" EntityType="IdentityModels.uvw_MOTD" />
-          <EntitySet Name="uvw_Refresh" EntityType="IdentityModels.uvw_Refresh" />
-          <EntitySet Name="uvw_Role" EntityType="IdentityModels.uvw_Role" />
-          <EntitySet Name="uvw_Setting" EntityType="IdentityModels.uvw_Setting" />
-          <EntitySet Name="uvw_State" EntityType="IdentityModels.uvw_State" />
-          <EntitySet Name="uvw_TextQueue" EntityType="IdentityModels.uvw_TextQueue" />
-          <EntitySet Name="uvw_Url" EntityType="IdentityModels.uvw_Url" />
-          <FunctionImport Name="usp_Activity_Delete" ReturnType="Collection(IdentityModels.usp_Activity_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_Activity_Insert" ReturnType="Collection(IdentityModels.usp_Activity_Insert_Result)">
-            <Parameter Name="AudienceId" Mode="In" Type="Guid" />
-            <Parameter Name="UserId" Mode="In" Type="Guid" />
-            <Parameter Name="ActivityType" Mode="In" Type="String" />
-            <Parameter Name="TableName" Mode="In" Type="String" />
-            <Parameter Name="KeyValues" Mode="In" Type="String" />
-            <Parameter Name="OriginalValues" Mode="In" Type="String" />
-            <Parameter Name="CurrentValues" Mode="In" Type="String" />
-            <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
-          </FunctionImport>
+        <EntityContainer Name="IdentityEntities_EF6" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="E_Claim" EntityType="IdentityModels.E_Claim" />
+          <EntitySet Name="E_Issuer" EntityType="IdentityModels.E_Issuer" />
+          <EntitySet Name="E_Login" EntityType="IdentityModels.E_Login" />
+          <EntitySet Name="E_MOTD" EntityType="IdentityModels.E_MOTD" />
+          <EntitySet Name="E_Refresh" EntityType="IdentityModels.E_Refresh" />
+          <EntitySet Name="E_Role" EntityType="IdentityModels.E_Role" />
+          <EntitySet Name="E_Setting" EntityType="IdentityModels.E_Setting" />
+          <EntitySet Name="E_State" EntityType="IdentityModels.E_State" />
+          <EntitySet Name="E_TextQueue" EntityType="IdentityModels.E_TextQueue" />
+          <EntitySet Name="E_Url" EntityType="IdentityModels.E_Url" />
           <FunctionImport Name="usp_Audience_Delete" ReturnType="Collection(IdentityModels.usp_Audience_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Audience_Insert" ReturnType="Collection(IdentityModels.usp_Audience_Insert_Result)">
             <Parameter Name="IssuerId" Mode="In" Type="Guid" />
@@ -1057,11 +1016,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="Description" Mode="In" Type="String" />
             <Parameter Name="IsLockedOut" Mode="In" Type="Boolean" />
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
-            <Parameter Name="AccessFailedCount" Mode="In" Type="Int32" />
-            <Parameter Name="AccessSuccessCount" Mode="In" Type="Int32" />
             <Parameter Name="LockoutEndUtc" Mode="In" Type="DateTimeOffset" />
-            <Parameter Name="LastLoginSuccessUtc" Mode="In" Type="DateTimeOffset" />
-            <Parameter Name="LastLoginFailureUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
           <FunctionImport Name="usp_Audience_Update" ReturnType="Collection(IdentityModels.usp_Audience_Update_Result)">
             <Parameter Name="Id" Mode="In" Type="Guid" />
@@ -1070,14 +1025,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="Description" Mode="In" Type="String" />
             <Parameter Name="IsLockedOut" Mode="In" Type="Boolean" />
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
-            <Parameter Name="AccessFailedCount" Mode="In" Type="Int32" />
-            <Parameter Name="AccessSuccessCount" Mode="In" Type="Int32" />
             <Parameter Name="LockoutEndUtc" Mode="In" Type="DateTimeOffset" />
-            <Parameter Name="LastLoginSuccessUtc" Mode="In" Type="DateTimeOffset" />
-            <Parameter Name="LastLoginFailureUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
           <FunctionImport Name="usp_Claim_Delete" ReturnType="Collection(IdentityModels.usp_Claim_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Claim_Insert" ReturnType="Collection(IdentityModels.usp_Claim_Insert_Result)">
             <Parameter Name="IssuerId" Mode="In" Type="Guid" />
@@ -1097,7 +1048,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
           </FunctionImport>
           <FunctionImport Name="usp_EmailQueue_Delete" ReturnType="Collection(IdentityModels.usp_EmailQueue_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_EmailQueue_Insert" ReturnType="Collection(IdentityModels.usp_EmailQueue_Insert_Result)">
             <Parameter Name="FromEmail" Mode="In" Type="String" />
@@ -1115,7 +1066,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="DeliveredUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
           <FunctionImport Name="usp_Issuer_Delete" ReturnType="Collection(IdentityModels.usp_Issuer_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Issuer_Insert" ReturnType="Collection(IdentityModels.usp_Issuer_Insert_Result)">
             <Parameter Name="Name" Mode="In" Type="String" />
@@ -1133,7 +1084,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
           </FunctionImport>
           <FunctionImport Name="usp_Login_Delete" ReturnType="Collection(IdentityModels.usp_Login_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Login_Insert" ReturnType="Collection(IdentityModels.usp_Login_Insert_Result)">
             <Parameter Name="Name" Mode="In" Type="String" />
@@ -1151,7 +1102,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
           </FunctionImport>
           <FunctionImport Name="usp_MOTD_Delete" ReturnType="Collection(IdentityModels.usp_MOTD_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_MOTD_Insert" ReturnType="Collection(IdentityModels.usp_MOTD_Insert_Result)">
             <Parameter Name="Author" Mode="In" Type="String" />
@@ -1177,7 +1128,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="TssBackground" Mode="In" Type="String" />
           </FunctionImport>
           <FunctionImport Name="usp_Refresh_Delete" ReturnType="Collection(IdentityModels.usp_Refresh_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Refresh_Insert" ReturnType="Collection(IdentityModels.usp_Refresh_Insert_Result)">
             <Parameter Name="IssuerId" Mode="In" Type="Guid" />
@@ -1190,7 +1141,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="ValidToUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
           <FunctionImport Name="usp_Role_Delete" ReturnType="Collection(IdentityModels.usp_Role_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Role_Insert" ReturnType="Collection(IdentityModels.usp_Role_Insert_Result)">
             <Parameter Name="AudienceId" Mode="In" Type="Guid" />
@@ -1208,7 +1159,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
           </FunctionImport>
           <FunctionImport Name="usp_Setting_Delete" ReturnType="Collection(IdentityModels.usp_Setting_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Setting_Insert" ReturnType="Collection(IdentityModels.usp_Setting_Insert_Result)">
             <Parameter Name="IssuerId" Mode="In" Type="Guid" />
@@ -1228,7 +1179,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
           </FunctionImport>
           <FunctionImport Name="usp_State_Delete" ReturnType="Collection(IdentityModels.usp_State_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_State_Insert" ReturnType="Collection(IdentityModels.usp_State_Insert_Result)">
             <Parameter Name="IssuerId" Mode="In" Type="Guid" />
@@ -1258,7 +1209,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="LastPollingUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
           <FunctionImport Name="usp_TextQueue_Delete" ReturnType="Collection(IdentityModels.usp_TextQueue_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_TextQueue_Insert" ReturnType="Collection(IdentityModels.usp_TextQueue_Insert_Result)">
             <Parameter Name="FromPhoneNumber" Mode="In" Type="String" />
@@ -1273,7 +1224,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="DeliveredUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
           <FunctionImport Name="usp_Url_Delete" ReturnType="Collection(IdentityModels.usp_Url_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_Url_Insert" ReturnType="Collection(IdentityModels.usp_Url_Insert_Result)">
             <Parameter Name="AudienceId" Mode="In" Type="Guid" />
@@ -1290,8 +1241,134 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="IsEnabled" Mode="In" Type="Boolean" />
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
           </FunctionImport>
+          <EntitySet Name="E_EmailQueue" EntityType="IdentityModels.E_EmailQueue" />
+          <FunctionImport Name="usp_AudienceRole_Delete" ReturnType="Collection(IdentityModels.usp_AudienceRole_Delete_Result)">
+            <Parameter Name="AudienceId" Mode="In" Type="Guid" />
+            <Parameter Name="RoleId" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="usp_AudienceRole_Insert" ReturnType="Collection(IdentityModels.usp_AudienceRole_Insert_Result)">
+            <Parameter Name="AudienceId" Mode="In" Type="Guid" />
+            <Parameter Name="RoleId" Mode="In" Type="Guid" />
+            <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="usp_UserRole_Delete" ReturnType="Collection(IdentityModels.usp_UserRole_Delete_Result)">
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="RoleId" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="usp_UserRole_Insert" ReturnType="Collection(IdentityModels.usp_UserRole_Insert_Result)">
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="RoleId" Mode="In" Type="Guid" />
+            <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <EntitySet Name="E_UserClaim" EntityType="IdentityModels.E_UserClaim" />
+          <EntitySet Name="E_UserLogin" EntityType="IdentityModels.E_UserLogin" />
+          <FunctionImport Name="usp_UserClaim_Delete" ReturnType="Collection(IdentityModels.usp_UserClaim_Delete_Result)">
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="ClaimId" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="usp_UserClaim_Insert" ReturnType="Collection(IdentityModels.usp_UserClaim_Insert_Result)">
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="ClaimId" Mode="In" Type="Guid" />
+            <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="usp_UserLogin_Delete" ReturnType="Collection(IdentityModels.usp_UserLogin_Delete_Result)">
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="LoginId" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="usp_UserLogin_Insert" ReturnType="Collection(IdentityModels.usp_UserLogin_Insert_Result)">
+            <Parameter Name="UserId" Mode="In" Type="Guid" />
+            <Parameter Name="LoginId" Mode="In" Type="Guid" />
+            <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <EntitySet Name="E_EmailActivity" EntityType="IdentityModels.E_EmailActivity" />
+          <EntitySet Name="E_TextActivity" EntityType="IdentityModels.E_TextActivity" />
+          <FunctionImport Name="usp_EmailActivity_Delete" ReturnType="Collection(IdentityModels.usp_EmailActivity_Delete_Result)">
+          <Parameter Name="Id" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="usp_EmailActivity_Insert" ReturnType="Collection(IdentityModels.usp_EmailActivity_Insert_Result)">
+            <Parameter Name="EmailId" Mode="In" Type="Guid" />
+            <Parameter Name="SendgridId" Mode="In" Type="String" />
+            <Parameter Name="SendgridStatus" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="usp_TextActivity_Delete" ReturnType="Collection(IdentityModels.usp_TextActivity_Delete_Result)">
+          <Parameter Name="Id" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="usp_TextActivity_Insert" ReturnType="Collection(IdentityModels.usp_TextActivity_Insert_Result)">
+            <Parameter Name="TextId" Mode="In" Type="Guid" />
+            <Parameter Name="TwilioSid" Mode="In" Type="String" />
+            <Parameter Name="TwilioStatus" Mode="In" Type="String" />
+            <Parameter Name="TwilioMessage" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="usp_AudiencePassword_Update" ReturnType="Collection(IdentityModels.usp_AudiencePassword_Update_Result)">
+            <Parameter Name="Id" Mode="In" Type="Guid" />
+            <Parameter Name="PasswordHashPBKDF2" Mode="In" Type="String" />
+            <Parameter Name="PasswordHashSHA256" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="usp_UserPassword_Update" ReturnType="Collection(IdentityModels.usp_UserPassword_Update_Result)">
+            <Parameter Name="Id" Mode="In" Type="Guid" />
+            <Parameter Name="PasswordHashPBKDF2" Mode="In" Type="String" />
+            <Parameter Name="PasswordHashSHA256" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="E_Audience" EntityType="IdentityModels.E_Audience" />
+          <AssociationSet Name="Issuer_Audiences" Association="IdentityModels.Issuer_Audiences">
+            <End Role="E_Issuer" EntitySet="E_Issuer" />
+            <End Role="E_Audience" EntitySet="E_Audience" />
+          </AssociationSet>
+          <AssociationSet Name="Audience_Roles" Association="IdentityModels.Audience_Roles">
+            <End Role="E_Audience" EntitySet="E_Audience" />
+            <End Role="E_Role" EntitySet="E_Role" />
+          </AssociationSet>
+          <AssociationSet Name="Audience_Urls" Association="IdentityModels.Audience_Urls">
+            <End Role="E_Audience" EntitySet="E_Audience" />
+            <End Role="E_Url" EntitySet="E_Url" />
+          </AssociationSet>
+          <AssociationSet Name="Issuer_Refreshes" Association="IdentityModels.Issuer_Refreshes">
+            <End Role="E_Issuer" EntitySet="E_Issuer" />
+            <End Role="E_Refresh" EntitySet="E_Refresh" />
+          </AssociationSet>
+          <AssociationSet Name="Audience_Refreshes" Association="IdentityModels.Audience_Refreshes">
+            <End Role="E_Audience" EntitySet="E_Audience" />
+            <End Role="E_Refresh" EntitySet="E_Refresh" />
+          </AssociationSet>
+          <AssociationSet Name="Issuer_Claims" Association="IdentityModels.Issuer_Claims">
+            <End Role="E_Issuer" EntitySet="E_Issuer" />
+            <End Role="E_Claim" EntitySet="E_Claim" />
+          </AssociationSet>
+          <AssociationSet Name="Issuer_Settings" Association="IdentityModels.Issuer_Settings">
+            <End Role="E_Issuer" EntitySet="E_Issuer" />
+            <End Role="E_Setting" EntitySet="E_Setting" />
+          </AssociationSet>
+          <AssociationSet Name="Audience_Settings" Association="IdentityModels.Audience_Settings">
+            <End Role="E_Audience" EntitySet="E_Audience" />
+            <End Role="E_Setting" EntitySet="E_Setting" />
+          </AssociationSet>
+          <AssociationSet Name="EmailQueue_EmailActivity" Association="IdentityModels.EmailQueue_EmailActivity">
+            <End Role="E_EmailQueue" EntitySet="E_EmailQueue" />
+            <End Role="E_EmailActivity" EntitySet="E_EmailActivity" />
+          </AssociationSet>
+          <AssociationSet Name="TextQueue_TextActivity" Association="IdentityModels.TextQueue_TextActivity">
+            <End Role="E_TextQueue" EntitySet="E_TextQueue" />
+            <End Role="E_TextActivity" EntitySet="E_TextActivity" />
+          </AssociationSet>
+          <AssociationSet Name="Audience_States" Association="IdentityModels.Audience_States">
+            <End Role="E_Audience" EntitySet="E_Audience" />
+            <End Role="E_State" EntitySet="E_State" />
+          </AssociationSet>
+          <AssociationSet Name="Issuer_States" Association="IdentityModels.Issuer_States">
+            <End Role="E_Issuer" EntitySet="E_Issuer" />
+            <End Role="E_State" EntitySet="E_State" />
+          </AssociationSet>
+          <AssociationSet Name="Login_UserLogins" Association="IdentityModels.Login_UserLogins">
+            <End Role="E_Login" EntitySet="E_Login" />
+            <End Role="E_UserLogin" EntitySet="E_UserLogin" />
+          </AssociationSet>
+          <AssociationSet Name="Claim_UserClaim" Association="IdentityModels.Claim_UserClaim">
+            <End Role="E_Claim" EntitySet="E_Claim" />
+            <End Role="E_UserClaim" EntitySet="E_UserClaim" />
+          </AssociationSet>
+          <EntitySet Name="E_User" EntityType="IdentityModels.E_User" />
           <FunctionImport Name="usp_User_Delete" ReturnType="Collection(IdentityModels.usp_User_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="usp_User_Insert" ReturnType="Collection(IdentityModels.usp_User_Insert_Result)">
             <Parameter Name="UserName" Mode="In" Type="String" />
@@ -1319,90 +1396,76 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
             <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
             <Parameter Name="LockoutEndUtc" Mode="In" Type="DateTimeOffset" />
           </FunctionImport>
-          <EntitySet Name="uvw_EmailQueue" EntityType="IdentityModels.uvw_EmailQueue" />
-          <EntitySet Name="uvw_UserRole" EntityType="IdentityModels.uvw_UserRole" />
-          <FunctionImport Name="usp_AudienceRole_Delete" ReturnType="Collection(IdentityModels.usp_AudienceRole_Delete_Result)">
-            <Parameter Name="AudienceID" Mode="In" Type="Guid" />
-            <Parameter Name="RoleID" Mode="In" Type="Guid" />
+          <AssociationSet Name="User_Refreshes" Association="IdentityModels.User_Refreshes">
+            <End Role="E_User" EntitySet="E_User" />
+            <End Role="E_Refresh" EntitySet="E_Refresh" />
+          </AssociationSet>
+          <AssociationSet Name="User_States" Association="IdentityModels.User_States">
+            <End Role="E_User" EntitySet="E_User" />
+            <End Role="E_State" EntitySet="E_State" />
+          </AssociationSet>
+          <AssociationSet Name="User_Settings" Association="IdentityModels.User_Settings">
+            <End Role="E_User" EntitySet="E_User" />
+            <End Role="E_Setting" EntitySet="E_Setting" />
+          </AssociationSet>
+          <AssociationSet Name="User_UserClaims" Association="IdentityModels.User_UserClaims">
+            <End Role="E_User" EntitySet="E_User" />
+            <End Role="E_UserClaim" EntitySet="E_UserClaim" />
+          </AssociationSet>
+          <AssociationSet Name="User_UserLogins" Association="IdentityModels.User_UserLogins">
+            <End Role="E_User" EntitySet="E_User" />
+            <End Role="E_UserLogin" EntitySet="E_UserLogin" />
+          </AssociationSet>
+          <EntitySet Name="E_AuthActivity" EntityType="IdentityModels.E_AuthActivity" />
+          <AssociationSet Name="Audience_AuthActivity" Association="IdentityModels.Audience_AuthActivity">
+            <End Role="E_Audience" EntitySet="E_Audience" />
+            <End Role="E_AuthActivity" EntitySet="E_AuthActivity" />
+          </AssociationSet>
+          <AssociationSet Name="User_AuthActivity" Association="IdentityModels.User_AuthActivity">
+            <End Role="E_User" EntitySet="E_User" />
+            <End Role="E_AuthActivity" EntitySet="E_AuthActivity" />
+          </AssociationSet>
+          <FunctionImport Name="usp_AuthActivity_Delete" ReturnType="Collection(IdentityModels.usp_AuthActivity_Delete_Result)">
+          <Parameter Name="Id" Mode="In" Type="Guid" />
           </FunctionImport>
-          <FunctionImport Name="usp_AudienceRole_Insert" ReturnType="Collection(IdentityModels.usp_AudienceRole_Insert_Result)">
+          <FunctionImport Name="usp_AuthActivity_Insert" ReturnType="Collection(IdentityModels.usp_AuthActivity_Insert_Result)">
             <Parameter Name="AudienceId" Mode="In" Type="Guid" />
-            <Parameter Name="RoleId" Mode="In" Type="Guid" />
-            <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_UserRole_Delete" ReturnType="Collection(IdentityModels.usp_UserRole_Delete_Result)">
-            <Parameter Name="UserID" Mode="In" Type="Guid" />
-            <Parameter Name="RoleID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_UserRole_Insert" ReturnType="Collection(IdentityModels.usp_UserRole_Insert_Result)">
             <Parameter Name="UserId" Mode="In" Type="Guid" />
-            <Parameter Name="RoleId" Mode="In" Type="Guid" />
-            <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
+            <Parameter Name="LoginType" Mode="In" Type="String" />
+            <Parameter Name="LoginOutcome" Mode="In" Type="String" />
+            <Parameter Name="LocalEndpoint" Mode="In" Type="String" />
+            <Parameter Name="RemoteEndpoint" Mode="In" Type="String" />
           </FunctionImport>
-          <EntitySet Name="uvw_UserClaim" EntityType="IdentityModels.uvw_UserClaim" />
-          <EntitySet Name="uvw_UserLogin" EntityType="IdentityModels.uvw_UserLogin" />
-          <FunctionImport Name="usp_UserClaim_Delete" ReturnType="Collection(IdentityModels.usp_UserClaim_Delete_Result)">
-            <Parameter Name="UserID" Mode="In" Type="Guid" />
-            <Parameter Name="ClaimID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_UserClaim_Insert" ReturnType="Collection(IdentityModels.usp_UserClaim_Insert_Result)">
-            <Parameter Name="UserId" Mode="In" Type="Guid" />
-            <Parameter Name="ClaimId" Mode="In" Type="Guid" />
-            <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="usp_UserLogin_Delete" ReturnType="Collection(IdentityModels.usp_UserLogin_Delete_Result)">
-            <Parameter Name="UserID" Mode="In" Type="Guid" />
-            <Parameter Name="LoginID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_UserLogin_Insert" ReturnType="Collection(IdentityModels.usp_UserLogin_Insert_Result)">
-            <Parameter Name="UserId" Mode="In" Type="Guid" />
-            <Parameter Name="LoginId" Mode="In" Type="Guid" />
-            <Parameter Name="IsDeletable" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <EntitySet Name="uvw_EmailActivity" EntityType="IdentityModels.uvw_EmailActivity" />
-          <EntitySet Name="uvw_TextActivity" EntityType="IdentityModels.uvw_TextActivity" />
-          <FunctionImport Name="usp_EmailActivity_Delete" ReturnType="Collection(IdentityModels.usp_EmailActivity_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_EmailActivity_Insert" ReturnType="Collection(IdentityModels.usp_EmailActivity_Insert_Result)">
-            <Parameter Name="EmailId" Mode="In" Type="Guid" />
-            <Parameter Name="SendgridId" Mode="In" Type="String" />
-            <Parameter Name="SendgridStatus" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="usp_TextActivity_Delete" ReturnType="Collection(IdentityModels.usp_TextActivity_Delete_Result)">
-          <Parameter Name="ID" Mode="In" Type="Guid" />
-          </FunctionImport>
-          <FunctionImport Name="usp_TextActivity_Insert" ReturnType="Collection(IdentityModels.usp_TextActivity_Insert_Result)">
-            <Parameter Name="TextId" Mode="In" Type="Guid" />
-            <Parameter Name="TwilioSid" Mode="In" Type="String" />
-            <Parameter Name="TwilioStatus" Mode="In" Type="String" />
-            <Parameter Name="TwilioMessage" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="usp_AudiencePassword_Update" ReturnType="Collection(IdentityModels.usp_AudiencePassword_Update_Result)">
-            <Parameter Name="Id" Mode="In" Type="Guid" />
-            <Parameter Name="PasswordHashPBKDF2" Mode="In" Type="String" />
-            <Parameter Name="PasswordHashSHA256" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="usp_UserPassword_Update" ReturnType="Collection(IdentityModels.usp_UserPassword_Update_Result)">
-            <Parameter Name="Id" Mode="In" Type="Guid" />
-            <Parameter Name="PasswordHashPBKDF2" Mode="In" Type="String" />
-            <Parameter Name="PasswordHashSHA256" Mode="In" Type="String" />
-          </FunctionImport>
-          <EntitySet Name="uvw_Audience" EntityType="IdentityModels.uvw_Audience" />
-          <EntitySet Name="uvw_User" EntityType="IdentityModels.uvw_User" />
-          <EntitySet Name="uvw_Activity" EntityType="IdentityModels.uvw_Activity" />
-        </EntityContainer>
-        <EntityType Name="uvw_AudienceRole">
-          <Key>
-            <PropertyRef Name="AudienceId" />
-            <PropertyRef Name="RoleId" />
-          </Key>
-          <Property Name="AudienceId" Type="Guid" Nullable="false" />
-          <Property Name="RoleId" Type="Guid" Nullable="false" />
-          <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
-          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-        </EntityType>
-        <EntityType Name="uvw_Claim">
+          <EntitySet Name="E_RoleClaim" EntityType="IdentityModels.E_RoleClaim" />
+          <AssociationSet Name="Role_RoleClaim" Association="IdentityModels.Role_RoleClaim">
+            <End Role="E_Role" EntitySet="E_Role" />
+            <End Role="E_RoleClaim" EntitySet="E_RoleClaim" />
+          </AssociationSet>
+          <AssociationSet Name="Claim_RoleClaim" Association="IdentityModels.Claim_RoleClaim">
+            <End Role="E_Claim" EntitySet="E_Claim" />
+            <End Role="E_RoleClaim" EntitySet="E_RoleClaim" />
+          </AssociationSet>
+          <FunctionImport Name="usp_DoNothing" />
+          <EntitySet Name="E_AudienceRole" EntityType="IdentityModels.E_AudienceRole" />
+          <AssociationSet Name="Role_AudienceRoles" Association="IdentityModels.Role_AudienceRoles">
+            <End Role="E_Role" EntitySet="E_Role" />
+            <End Role="E_AudienceRole" EntitySet="E_AudienceRole" />
+          </AssociationSet>
+          <AssociationSet Name="Audience_AudienceRoles" Association="IdentityModels.Audience_AudienceRoles">
+            <End Role="E_Audience" EntitySet="E_Audience" />
+            <End Role="E_AudienceRole" EntitySet="E_AudienceRole" />
+          </AssociationSet>
+          <EntitySet Name="E_UserRole" EntityType="IdentityModels.E_UserRole" />
+          <AssociationSet Name="User_UserRoles" Association="IdentityModels.User_UserRoles">
+            <End Role="E_User" EntitySet="E_User" />
+            <End Role="E_UserRole" EntitySet="E_UserRole" />
+          </AssociationSet>
+          <AssociationSet Name="Role_UserRoles" Association="IdentityModels.Role_UserRoles">
+            <End Role="E_Role" EntitySet="E_Role" />
+            <End Role="E_UserRole" EntitySet="E_UserRole" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="E_Claim">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1414,9 +1477,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="ValueType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="Issuer" Relationship="IdentityModels.Issuer_Claims" FromRole="E_Claim" ToRole="E_Issuer" />
+          <NavigationProperty Name="RoleClaims" Relationship="IdentityModels.Claim_RoleClaim" FromRole="E_Claim" ToRole="E_RoleClaim" />
+          <NavigationProperty Name="UserClaims" Relationship="IdentityModels.Claim_UserClaim" FromRole="E_Claim" ToRole="E_UserClaim" />
         </EntityType>
-        <EntityType Name="uvw_Issuer">
+        <EntityType Name="E_Issuer">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1427,9 +1492,13 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="Audiences" Relationship="IdentityModels.Issuer_Audiences" FromRole="E_Issuer" ToRole="E_Audience" />
+          <NavigationProperty Name="Claims" Relationship="IdentityModels.Issuer_Claims" FromRole="E_Issuer" ToRole="E_Claim" />
+          <NavigationProperty Name="Refreshes" Relationship="IdentityModels.Issuer_Refreshes" FromRole="E_Issuer" ToRole="E_Refresh" />
+          <NavigationProperty Name="Settings" Relationship="IdentityModels.Issuer_Settings" FromRole="E_Issuer" ToRole="E_Setting" />
+          <NavigationProperty Name="States" Relationship="IdentityModels.Issuer_States" FromRole="E_Issuer" ToRole="E_State" />
         </EntityType>
-        <EntityType Name="uvw_Login">
+        <EntityType Name="E_Login">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1440,9 +1509,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="UserLogins" Relationship="IdentityModels.Login_UserLogins" FromRole="E_Login" ToRole="E_UserLogin" />
         </EntityType>
-        <EntityType Name="uvw_MOTD">
+        <EntityType Name="E_MOTD">
           <Key>
             <PropertyRef Name="Id" />
             <PropertyRef Name="Author" />
@@ -1459,7 +1528,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="TssTags" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
           <Property Name="TssBackground" Type="String" MaxLength="512" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="uvw_Refresh">
+        <EntityType Name="E_Refresh">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1472,8 +1541,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="ValidFromUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="ValidToUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="IssuedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Audience" Relationship="IdentityModels.Audience_Refreshes" FromRole="E_Refresh" ToRole="E_Audience" />
+          <NavigationProperty Name="Issuer" Relationship="IdentityModels.Issuer_Refreshes" FromRole="E_Refresh" ToRole="E_Issuer" />
+          <NavigationProperty Name="User" Relationship="IdentityModels.User_Refreshes" FromRole="E_Refresh" ToRole="E_User" />
         </EntityType>
-        <EntityType Name="uvw_Role">
+        <EntityType Name="E_Role">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1484,9 +1556,12 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="Audience" Relationship="IdentityModels.Audience_Roles" FromRole="E_Role" ToRole="E_Audience" />
+          <NavigationProperty Name="AudienceRoles" Relationship="IdentityModels.Role_AudienceRoles" FromRole="E_Role" ToRole="E_AudienceRole" />
+          <NavigationProperty Name="RoleClaims" Relationship="IdentityModels.Role_RoleClaim" FromRole="E_Role" ToRole="E_RoleClaim" />
+          <NavigationProperty Name="UserRoles" Relationship="IdentityModels.Role_UserRoles" FromRole="E_Role" ToRole="E_UserRole" />
         </EntityType>
-        <EntityType Name="uvw_Setting">
+        <EntityType Name="E_Setting">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1495,11 +1570,14 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="AudienceId" Type="Guid" />
           <Property Name="UserId" Type="Guid" />
           <Property Name="ConfigKey" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
-          <Property Name="ConfigValue" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="ConfigValue" Type="String" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Audience" Relationship="IdentityModels.Audience_Settings" FromRole="E_Setting" ToRole="E_Audience" />
+          <NavigationProperty Name="Issuer" Relationship="IdentityModels.Issuer_Settings" FromRole="E_Setting" ToRole="E_Issuer" />
+          <NavigationProperty Name="User" Relationship="IdentityModels.User_Settings" FromRole="E_Setting" ToRole="E_User" />
         </EntityType>
-        <EntityType Name="uvw_State">
+        <EntityType Name="E_State">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1507,7 +1585,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="IssuerId" Type="Guid" Nullable="false" />
           <Property Name="AudienceId" Type="Guid" />
           <Property Name="UserId" Type="Guid" />
-          <Property Name="StateValue" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="StateValue" Type="String" MaxLength="2048" FixedLength="false" Unicode="true" />
           <Property Name="StateType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
           <Property Name="StateDecision" Type="Boolean" />
           <Property Name="StateConsume" Type="Boolean" Nullable="false" />
@@ -1515,8 +1593,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="ValidToUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="IssuedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="LastPollingUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Audience" Relationship="IdentityModels.Audience_States" FromRole="E_State" ToRole="E_Audience" />
+          <NavigationProperty Name="Issuer" Relationship="IdentityModels.Issuer_States" FromRole="E_State" ToRole="E_Issuer" />
+          <NavigationProperty Name="User" Relationship="IdentityModels.User_States" FromRole="E_State" ToRole="E_User" />
         </EntityType>
-        <EntityType Name="uvw_TextQueue">
+        <EntityType Name="E_TextQueue">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1528,8 +1609,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="SendAtUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="DeliveredUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="TextActivity" Relationship="IdentityModels.TextQueue_TextActivity" FromRole="E_TextQueue" ToRole="E_TextActivity" />
         </EntityType>
-        <EntityType Name="uvw_Url">
+        <EntityType Name="E_Url">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -1540,32 +1622,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="Audience" Relationship="IdentityModels.Audience_Urls" FromRole="E_Url" ToRole="E_Audience" />
         </EntityType>
-        <ComplexType Name="usp_Activity_Delete_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="Guid" Name="AudienceId" Nullable="true" />
-          <Property Type="Guid" Name="UserId" Nullable="true" />
-          <Property Type="String" Name="ActivityType" Nullable="false" MaxLength="64" />
-          <Property Type="String" Name="TableName" Nullable="true" MaxLength="256" />
-          <Property Type="String" Name="KeyValues" Nullable="true" />
-          <Property Type="String" Name="OriginalValues" Nullable="true" />
-          <Property Type="String" Name="CurrentValues" Nullable="true" />
-          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
-          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
-        </ComplexType>
-        <ComplexType Name="usp_Activity_Insert_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="Guid" Name="AudienceId" Nullable="true" />
-          <Property Type="Guid" Name="UserId" Nullable="true" />
-          <Property Type="String" Name="ActivityType" Nullable="false" MaxLength="64" />
-          <Property Type="String" Name="TableName" Nullable="true" MaxLength="256" />
-          <Property Type="String" Name="KeyValues" Nullable="true" />
-          <Property Type="String" Name="OriginalValues" Nullable="true" />
-          <Property Type="String" Name="CurrentValues" Nullable="true" />
-          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
-          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
-        </ComplexType>
         <ComplexType Name="usp_Audience_Delete_Result">
           <Property Type="Guid" Name="Id" Nullable="false" />
           <Property Type="Guid" Name="IssuerId" Nullable="false" />
@@ -1977,82 +2035,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
           <Property Type="DateTimeOffset" Name="LastUpdatedUtc" Nullable="true" />
         </ComplexType>
-        <ComplexType Name="usp_User_Delete_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="String" Name="UserName" Nullable="false" MaxLength="128" />
-          <Property Type="String" Name="EmailAddress" Nullable="true" MaxLength="128" />
-          <Property Type="Boolean" Name="EmailConfirmed" Nullable="false" />
-          <Property Type="String" Name="FirstName" Nullable="false" MaxLength="128" />
-          <Property Type="String" Name="LastName" Nullable="false" MaxLength="128" />
-          <Property Type="String" Name="PhoneNumber" Nullable="true" MaxLength="16" />
-          <Property Type="Boolean" Name="PhoneNumberConfirmed" Nullable="true" />
-          <Property Type="String" Name="PasswordHashPBKDF2" Nullable="true" MaxLength="2048" />
-          <Property Type="String" Name="PasswordHashSHA256" Nullable="true" MaxLength="2048" />
-          <Property Type="Boolean" Name="PasswordConfirmed" Nullable="false" />
-          <Property Type="String" Name="ConcurrencyStamp" Nullable="false" MaxLength="1024" />
-          <Property Type="String" Name="SecurityStamp" Nullable="false" MaxLength="1024" />
-          <Property Type="Boolean" Name="IsHumanBeing" Nullable="false" />
-          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
-          <Property Type="Boolean" Name="IsLockedOut" Nullable="false" />
-          <Property Type="Int32" Name="AccessFailedCount" Nullable="false" />
-          <Property Type="Int32" Name="AccessSuccessCount" Nullable="false" />
-          <Property Type="DateTimeOffset" Name="LockoutEndUtc" Nullable="true" />
-          <Property Type="DateTimeOffset" Name="LastLoginSuccessUtc" Nullable="true" />
-          <Property Type="DateTimeOffset" Name="LastLoginFailureUtc" Nullable="true" />
-          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
-          <Property Type="DateTimeOffset" Name="LastUpdatedUtc" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="usp_User_Insert_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="String" Name="UserName" Nullable="false" MaxLength="128" />
-          <Property Type="String" Name="EmailAddress" Nullable="true" MaxLength="128" />
-          <Property Type="Boolean" Name="EmailConfirmed" Nullable="false" />
-          <Property Type="String" Name="FirstName" Nullable="false" MaxLength="128" />
-          <Property Type="String" Name="LastName" Nullable="false" MaxLength="128" />
-          <Property Type="String" Name="PhoneNumber" Nullable="true" MaxLength="16" />
-          <Property Type="Boolean" Name="PhoneNumberConfirmed" Nullable="true" />
-          <Property Type="String" Name="PasswordHashPBKDF2" Nullable="true" MaxLength="2048" />
-          <Property Type="String" Name="PasswordHashSHA256" Nullable="true" MaxLength="2048" />
-          <Property Type="Boolean" Name="PasswordConfirmed" Nullable="false" />
-          <Property Type="String" Name="ConcurrencyStamp" Nullable="false" MaxLength="1024" />
-          <Property Type="String" Name="SecurityStamp" Nullable="false" MaxLength="1024" />
-          <Property Type="Boolean" Name="IsHumanBeing" Nullable="false" />
-          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
-          <Property Type="Boolean" Name="IsLockedOut" Nullable="false" />
-          <Property Type="Int32" Name="AccessFailedCount" Nullable="false" />
-          <Property Type="Int32" Name="AccessSuccessCount" Nullable="false" />
-          <Property Type="DateTimeOffset" Name="LockoutEndUtc" Nullable="true" />
-          <Property Type="DateTimeOffset" Name="LastLoginSuccessUtc" Nullable="true" />
-          <Property Type="DateTimeOffset" Name="LastLoginFailureUtc" Nullable="true" />
-          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
-          <Property Type="DateTimeOffset" Name="LastUpdatedUtc" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="usp_User_Update_Result">
-          <Property Type="Guid" Name="Id" Nullable="false" />
-          <Property Type="String" Name="UserName" Nullable="false" MaxLength="128" />
-          <Property Type="String" Name="EmailAddress" Nullable="true" MaxLength="128" />
-          <Property Type="Boolean" Name="EmailConfirmed" Nullable="false" />
-          <Property Type="String" Name="FirstName" Nullable="false" MaxLength="128" />
-          <Property Type="String" Name="LastName" Nullable="false" MaxLength="128" />
-          <Property Type="String" Name="PhoneNumber" Nullable="true" MaxLength="16" />
-          <Property Type="Boolean" Name="PhoneNumberConfirmed" Nullable="true" />
-          <Property Type="String" Name="PasswordHashPBKDF2" Nullable="true" MaxLength="2048" />
-          <Property Type="String" Name="PasswordHashSHA256" Nullable="true" MaxLength="2048" />
-          <Property Type="Boolean" Name="PasswordConfirmed" Nullable="false" />
-          <Property Type="String" Name="ConcurrencyStamp" Nullable="false" MaxLength="1024" />
-          <Property Type="String" Name="SecurityStamp" Nullable="false" MaxLength="1024" />
-          <Property Type="Boolean" Name="IsHumanBeing" Nullable="false" />
-          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
-          <Property Type="Boolean" Name="IsLockedOut" Nullable="false" />
-          <Property Type="Int32" Name="AccessFailedCount" Nullable="false" />
-          <Property Type="Int32" Name="AccessSuccessCount" Nullable="false" />
-          <Property Type="DateTimeOffset" Name="LockoutEndUtc" Nullable="true" />
-          <Property Type="DateTimeOffset" Name="LastLoginSuccessUtc" Nullable="true" />
-          <Property Type="DateTimeOffset" Name="LastLoginFailureUtc" Nullable="true" />
-          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
-          <Property Type="DateTimeOffset" Name="LastUpdatedUtc" Nullable="true" />
-        </ComplexType>
-        <EntityType Name="uvw_EmailQueue">
+        <EntityType Name="E_EmailQueue">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -2063,20 +2046,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="ToDisplay" Type="String" MaxLength="512" FixedLength="false" Unicode="false" />
           <Property Name="Subject" Type="String" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="false" />
           <Property Name="Body" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="IsCancelled" Type="Boolean" />
+          <Property Name="IsCancelled" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="SendAtUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="DeliveredUtc" Type="DateTimeOffset" Precision="7" />
-        </EntityType>
-        <EntityType Name="uvw_UserRole">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="RoleId" />
-          </Key>
-          <Property Name="UserId" Type="Guid" Nullable="false" />
-          <Property Name="RoleId" Type="Guid" Nullable="false" />
-          <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
-          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="EmailActivity" Relationship="IdentityModels.EmailQueue_EmailActivity" FromRole="E_EmailQueue" ToRole="E_EmailActivity" />
         </EntityType>
         <ComplexType Name="usp_AudienceRole_Delete_Result">
           <Property Type="Guid" Name="AudienceId" Nullable="false" />
@@ -2102,7 +2076,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
           <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
         </ComplexType>
-        <EntityType Name="uvw_UserClaim">
+        <EntityType Name="E_UserClaim">
           <Key>
             <PropertyRef Name="UserId" />
             <PropertyRef Name="ClaimId" />
@@ -2111,8 +2085,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="ClaimId" Type="Guid" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Claim" Relationship="IdentityModels.Claim_UserClaim" FromRole="E_UserClaim" ToRole="E_Claim" />
+          <NavigationProperty Name="User" Relationship="IdentityModels.User_UserClaims" FromRole="E_UserClaim" ToRole="E_User" />
         </EntityType>
-        <EntityType Name="uvw_UserLogin">
+        <EntityType Name="E_UserLogin">
           <Key>
             <PropertyRef Name="UserId" />
             <PropertyRef Name="LoginId" />
@@ -2121,6 +2097,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="LoginId" Type="Guid" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="Login" Relationship="IdentityModels.Login_UserLogins" FromRole="E_UserLogin" ToRole="E_Login" />
+          <NavigationProperty Name="User" Relationship="IdentityModels.User_UserLogins" FromRole="E_UserLogin" ToRole="E_User" />
         </EntityType>
         <ComplexType Name="usp_UserClaim_Delete_Result">
           <Property Type="Guid" Name="UserId" Nullable="false" />
@@ -2146,7 +2124,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
           <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="true" />
         </ComplexType>
-        <EntityType Name="uvw_EmailActivity">
+        <EntityType Name="E_EmailActivity">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -2155,8 +2133,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="SendgridId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="SendgridStatus" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="StatusAtUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="EmailQueue" Relationship="IdentityModels.EmailQueue_EmailActivity" FromRole="E_EmailActivity" ToRole="E_EmailQueue" />
         </EntityType>
-        <EntityType Name="uvw_TextActivity">
+        <EntityType Name="E_TextActivity">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -2166,6 +2145,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="TwilioStatus" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="TwilioMessage" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="StatusAtUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="TextQueue" Relationship="IdentityModels.TextQueue_TextActivity" FromRole="E_TextActivity" ToRole="E_TextQueue" />
         </EntityType>
         <ComplexType Name="usp_EmailActivity_Delete_Result">
           <Property Type="Guid" Name="Id" Nullable="false" />
@@ -2241,7 +2221,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
           <Property Type="DateTimeOffset" Name="LastUpdatedUtc" Nullable="true" />
         </ComplexType>
-        <EntityType Name="uvw_Audience">
+        <EntityType Name="E_Audience">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -2255,15 +2235,186 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="SecurityStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="IsLockedOut" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
-          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
           <Property Name="LockoutEndUtc" Type="DateTimeOffset" Precision="7" />
-          <Property Name="LastLoginSuccessUtc" Type="DateTimeOffset" Precision="7" />
-          <Property Name="LastLoginFailureUtc" Type="DateTimeOffset" Precision="7" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="AudienceRoles" Relationship="IdentityModels.Audience_AudienceRoles" FromRole="E_Audience" ToRole="E_AudienceRole" />
+          <NavigationProperty Name="AuthActivity" Relationship="IdentityModels.Audience_AuthActivity" FromRole="E_Audience" ToRole="E_AuthActivity" />
+          <NavigationProperty Name="Issuer" Relationship="IdentityModels.Issuer_Audiences" FromRole="E_Audience" ToRole="E_Issuer" />
+          <NavigationProperty Name="Refreshes" Relationship="IdentityModels.Audience_Refreshes" FromRole="E_Audience" ToRole="E_Refresh" />
+          <NavigationProperty Name="Roles" Relationship="IdentityModels.Audience_Roles" FromRole="E_Audience" ToRole="E_Role" />
+          <NavigationProperty Name="Settings" Relationship="IdentityModels.Audience_Settings" FromRole="E_Audience" ToRole="E_Setting" />
+          <NavigationProperty Name="States" Relationship="IdentityModels.Audience_States" FromRole="E_Audience" ToRole="E_State" />
+          <NavigationProperty Name="Urls" Relationship="IdentityModels.Audience_Urls" FromRole="E_Audience" ToRole="E_Url" />
         </EntityType>
-        <EntityType Name="uvw_User">
+        <Association Name="Issuer_Audiences">
+          <End Type="IdentityModels.E_Issuer" Role="E_Issuer" Multiplicity="1" />
+          <End Type="IdentityModels.E_Audience" Role="E_Audience" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Issuer">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Audience">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Audience_Roles">
+          <End Type="IdentityModels.E_Audience" Role="E_Audience" Multiplicity="1" />
+          <End Type="IdentityModels.E_Role" Role="E_Role" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Role">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Audience_Urls">
+          <End Type="IdentityModels.E_Audience" Role="E_Audience" Multiplicity="1" />
+          <End Type="IdentityModels.E_Url" Role="E_Url" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Url">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Issuer_Refreshes">
+          <End Type="IdentityModels.E_Issuer" Role="E_Issuer" Multiplicity="1" />
+          <End Type="IdentityModels.E_Refresh" Role="E_Refresh" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Issuer">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Refresh">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Audience_Refreshes">
+          <End Type="IdentityModels.E_Audience" Role="E_Audience" Multiplicity="0..1" />
+          <End Type="IdentityModels.E_Refresh" Role="E_Refresh" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Refresh">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Issuer_Claims">
+          <End Type="IdentityModels.E_Issuer" Role="E_Issuer" Multiplicity="1" />
+          <End Type="IdentityModels.E_Claim" Role="E_Claim" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Issuer">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Claim">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Issuer_Settings">
+          <End Type="IdentityModels.E_Issuer" Role="E_Issuer" Multiplicity="0..1" />
+          <End Type="IdentityModels.E_Setting" Role="E_Setting" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Issuer">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Setting">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Audience_Settings">
+          <End Type="IdentityModels.E_Audience" Role="E_Audience" Multiplicity="0..1" />
+          <End Type="IdentityModels.E_Setting" Role="E_Setting" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Setting">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="EmailQueue_EmailActivity">
+          <End Type="IdentityModels.E_EmailQueue" Role="E_EmailQueue" Multiplicity="1" />
+          <End Type="IdentityModels.E_EmailActivity" Role="E_EmailActivity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_EmailQueue">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_EmailActivity">
+              <PropertyRef Name="EmailId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="TextQueue_TextActivity">
+          <End Type="IdentityModels.E_TextQueue" Role="E_TextQueue" Multiplicity="1" />
+          <End Type="IdentityModels.E_TextActivity" Role="E_TextActivity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_TextQueue">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_TextActivity">
+              <PropertyRef Name="TextId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Audience_States">
+          <End Type="IdentityModels.E_Audience" Role="E_Audience" Multiplicity="0..1" />
+          <End Type="IdentityModels.E_State" Role="E_State" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_State">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Issuer_States">
+          <End Type="IdentityModels.E_Issuer" Role="E_Issuer" Multiplicity="1" />
+          <End Type="IdentityModels.E_State" Role="E_State" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Issuer">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_State">
+              <PropertyRef Name="IssuerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Login_UserLogins">
+          <End Type="IdentityModels.E_Login" Role="E_Login" Multiplicity="1" />
+          <End Type="IdentityModels.E_UserLogin" Role="E_UserLogin" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Login">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_UserLogin">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Claim_UserClaim">
+          <End Type="IdentityModels.E_Claim" Role="E_Claim" Multiplicity="1" />
+          <End Type="IdentityModels.E_UserClaim" Role="E_UserClaim" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Claim">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_UserClaim">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="E_User">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -2281,66 +2432,333 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
           <Property Name="PasswordConfirmed" Type="Boolean" Nullable="false" />
           <Property Name="SecurityStamp" Type="String" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="true" />
           <Property Name="IsHumanBeing" Type="Boolean" Nullable="false" />
-          <Property Name="IsLockedOut" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
-          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
+          <Property Name="IsLockedOut" Type="Boolean" Nullable="false" />
           <Property Name="LockoutEndUtc" Type="DateTimeOffset" Precision="7" />
-          <Property Name="LastLoginSuccessUtc" Type="DateTimeOffset" Precision="7" />
-          <Property Name="LastLoginFailureUtc" Type="DateTimeOffset" Precision="7" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="AuthActivity" Relationship="IdentityModels.User_AuthActivity" FromRole="E_User" ToRole="E_AuthActivity" />
+          <NavigationProperty Name="Refreshes" Relationship="IdentityModels.User_Refreshes" FromRole="E_User" ToRole="E_Refresh" />
+          <NavigationProperty Name="Settings" Relationship="IdentityModels.User_Settings" FromRole="E_User" ToRole="E_Setting" />
+          <NavigationProperty Name="States" Relationship="IdentityModels.User_States" FromRole="E_User" ToRole="E_State" />
+          <NavigationProperty Name="UserClaims" Relationship="IdentityModels.User_UserClaims" FromRole="E_User" ToRole="E_UserClaim" />
+          <NavigationProperty Name="UserLogins" Relationship="IdentityModels.User_UserLogins" FromRole="E_User" ToRole="E_UserLogin" />
+          <NavigationProperty Name="UserRoles" Relationship="IdentityModels.User_UserRoles" FromRole="E_User" ToRole="E_UserRole" />
         </EntityType>
-        <EntityType Name="uvw_Activity">
+        <ComplexType Name="usp_User_Delete_Result">
+          <Property Type="Guid" Name="Id" Nullable="false" />
+          <Property Type="String" Name="UserName" Nullable="false" MaxLength="128" />
+          <Property Type="String" Name="EmailAddress" Nullable="true" MaxLength="128" />
+          <Property Type="Boolean" Name="EmailConfirmed" Nullable="false" />
+          <Property Type="String" Name="FirstName" Nullable="false" MaxLength="128" />
+          <Property Type="String" Name="LastName" Nullable="false" MaxLength="128" />
+          <Property Type="String" Name="PhoneNumber" Nullable="true" MaxLength="16" />
+          <Property Type="Boolean" Name="PhoneNumberConfirmed" Nullable="true" />
+          <Property Type="String" Name="ConcurrencyStamp" Nullable="false" MaxLength="1024" />
+          <Property Type="String" Name="PasswordHashPBKDF2" Nullable="true" MaxLength="2048" />
+          <Property Type="String" Name="PasswordHashSHA256" Nullable="true" MaxLength="2048" />
+          <Property Type="Boolean" Name="PasswordConfirmed" Nullable="false" />
+          <Property Type="String" Name="SecurityStamp" Nullable="false" MaxLength="1024" />
+          <Property Type="Boolean" Name="IsHumanBeing" Nullable="false" />
+          <Property Type="Boolean" Name="IsLockedOut" Nullable="false" />
+          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
+          <Property Type="Int32" Name="AccessFailedCount" Nullable="false" />
+          <Property Type="Int32" Name="AccessSuccessCount" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="LockoutEndUtc" Nullable="true" />
+          <Property Type="DateTimeOffset" Name="LastLoginSuccessUtc" Nullable="true" />
+          <Property Type="DateTimeOffset" Name="LastLoginFailureUtc" Nullable="true" />
+          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="LastUpdatedUtc" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="usp_User_Insert_Result">
+          <Property Type="Guid" Name="Id" Nullable="false" />
+          <Property Type="String" Name="UserName" Nullable="false" MaxLength="128" />
+          <Property Type="String" Name="EmailAddress" Nullable="true" MaxLength="128" />
+          <Property Type="Boolean" Name="EmailConfirmed" Nullable="false" />
+          <Property Type="String" Name="FirstName" Nullable="false" MaxLength="128" />
+          <Property Type="String" Name="LastName" Nullable="false" MaxLength="128" />
+          <Property Type="String" Name="PhoneNumber" Nullable="true" MaxLength="16" />
+          <Property Type="Boolean" Name="PhoneNumberConfirmed" Nullable="true" />
+          <Property Type="String" Name="ConcurrencyStamp" Nullable="false" MaxLength="1024" />
+          <Property Type="String" Name="PasswordHashPBKDF2" Nullable="true" MaxLength="2048" />
+          <Property Type="String" Name="PasswordHashSHA256" Nullable="true" MaxLength="2048" />
+          <Property Type="Boolean" Name="PasswordConfirmed" Nullable="false" />
+          <Property Type="String" Name="SecurityStamp" Nullable="false" MaxLength="1024" />
+          <Property Type="Boolean" Name="IsHumanBeing" Nullable="false" />
+          <Property Type="Boolean" Name="IsLockedOut" Nullable="false" />
+          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
+          <Property Type="Int32" Name="AccessFailedCount" Nullable="false" />
+          <Property Type="Int32" Name="AccessSuccessCount" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="LockoutEndUtc" Nullable="true" />
+          <Property Type="DateTimeOffset" Name="LastLoginSuccessUtc" Nullable="true" />
+          <Property Type="DateTimeOffset" Name="LastLoginFailureUtc" Nullable="true" />
+          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="LastUpdatedUtc" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="usp_User_Update_Result">
+          <Property Type="Guid" Name="Id" Nullable="false" />
+          <Property Type="String" Name="UserName" Nullable="false" MaxLength="128" />
+          <Property Type="String" Name="EmailAddress" Nullable="true" MaxLength="128" />
+          <Property Type="Boolean" Name="EmailConfirmed" Nullable="false" />
+          <Property Type="String" Name="FirstName" Nullable="false" MaxLength="128" />
+          <Property Type="String" Name="LastName" Nullable="false" MaxLength="128" />
+          <Property Type="String" Name="PhoneNumber" Nullable="true" MaxLength="16" />
+          <Property Type="Boolean" Name="PhoneNumberConfirmed" Nullable="true" />
+          <Property Type="String" Name="ConcurrencyStamp" Nullable="false" MaxLength="1024" />
+          <Property Type="String" Name="PasswordHashPBKDF2" Nullable="true" MaxLength="2048" />
+          <Property Type="String" Name="PasswordHashSHA256" Nullable="true" MaxLength="2048" />
+          <Property Type="Boolean" Name="PasswordConfirmed" Nullable="false" />
+          <Property Type="String" Name="SecurityStamp" Nullable="false" MaxLength="1024" />
+          <Property Type="Boolean" Name="IsHumanBeing" Nullable="false" />
+          <Property Type="Boolean" Name="IsLockedOut" Nullable="false" />
+          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
+          <Property Type="Int32" Name="AccessFailedCount" Nullable="false" />
+          <Property Type="Int32" Name="AccessSuccessCount" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="LockoutEndUtc" Nullable="true" />
+          <Property Type="DateTimeOffset" Name="LastLoginSuccessUtc" Nullable="true" />
+          <Property Type="DateTimeOffset" Name="LastLoginFailureUtc" Nullable="true" />
+          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="LastUpdatedUtc" Nullable="true" />
+        </ComplexType>
+        <Association Name="User_Refreshes">
+          <End Type="IdentityModels.E_User" Role="E_User" Multiplicity="0..1" />
+          <End Type="IdentityModels.E_Refresh" Role="E_Refresh" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Refresh">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="User_States">
+          <End Type="IdentityModels.E_User" Role="E_User" Multiplicity="0..1" />
+          <End Type="IdentityModels.E_State" Role="E_State" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_State">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="User_Settings">
+          <End Type="IdentityModels.E_User" Role="E_User" Multiplicity="0..1" />
+          <End Type="IdentityModels.E_Setting" Role="E_Setting" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_Setting">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="User_UserClaims">
+          <End Type="IdentityModels.E_User" Role="E_User" Multiplicity="1" />
+          <End Type="IdentityModels.E_UserClaim" Role="E_UserClaim" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_UserClaim">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="User_UserLogins">
+          <End Type="IdentityModels.E_User" Role="E_User" Multiplicity="1" />
+          <End Type="IdentityModels.E_UserLogin" Role="E_UserLogin" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_UserLogin">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="E_AuthActivity">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="AudienceId" Type="Guid" />
           <Property Name="UserId" Type="Guid" />
-          <Property Name="ActivityType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
-          <Property Name="TableName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="KeyValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="OriginalValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="CurrentValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Audience" Relationship="IdentityModels.Audience_AuthActivity" FromRole="E_AuthActivity" ToRole="E_Audience" />
+          <NavigationProperty Name="User" Relationship="IdentityModels.User_AuthActivity" FromRole="E_AuthActivity" ToRole="E_User" />
+          <Property Name="LoginType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="LoginOutcome" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="LocalEndpoint" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="RemoteEndpoint" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
         </EntityType>
+        <Association Name="Audience_AuthActivity">
+          <End Type="IdentityModels.E_Audience" Role="E_Audience" Multiplicity="0..1" />
+          <End Type="IdentityModels.E_AuthActivity" Role="E_AuthActivity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_AuthActivity">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="User_AuthActivity">
+          <End Type="IdentityModels.E_User" Role="E_User" Multiplicity="0..1" />
+          <End Type="IdentityModels.E_AuthActivity" Role="E_AuthActivity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_AuthActivity">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <ComplexType Name="usp_AuthActivity_Delete_Result">
+          <Property Type="Guid" Name="Id" Nullable="false" />
+          <Property Type="Guid" Name="AudienceId" Nullable="true" />
+          <Property Type="Guid" Name="UserId" Nullable="true" />
+          <Property Type="String" Name="ActivityType" Nullable="false" MaxLength="64" />
+          <Property Type="String" Name="TableName" Nullable="true" MaxLength="256" />
+          <Property Type="String" Name="KeyValues" Nullable="true" />
+          <Property Type="String" Name="OriginalValues" Nullable="true" />
+          <Property Type="String" Name="CurrentValues" Nullable="true" />
+          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="usp_AuthActivity_Insert_Result">
+          <Property Type="Guid" Name="Id" Nullable="false" />
+          <Property Type="Guid" Name="AudienceId" Nullable="true" />
+          <Property Type="Guid" Name="UserId" Nullable="true" />
+          <Property Type="String" Name="ActivityType" Nullable="false" MaxLength="64" />
+          <Property Type="String" Name="TableName" Nullable="true" MaxLength="256" />
+          <Property Type="String" Name="KeyValues" Nullable="true" />
+          <Property Type="String" Name="OriginalValues" Nullable="true" />
+          <Property Type="String" Name="CurrentValues" Nullable="true" />
+          <Property Type="Boolean" Name="IsDeletable" Nullable="false" />
+          <Property Type="DateTimeOffset" Name="CreatedUtc" Nullable="false" />
+        </ComplexType>
+        <EntityType Name="E_RoleClaim">
+          <Key>
+            <PropertyRef Name="RoleId" />
+            <PropertyRef Name="ClaimId" />
+          </Key>
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="ClaimId" Type="Guid" Nullable="false" />
+          <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Claim" Relationship="IdentityModels.Claim_RoleClaim" FromRole="E_RoleClaim" ToRole="E_Claim" />
+          <NavigationProperty Name="Role" Relationship="IdentityModels.Role_RoleClaim" FromRole="E_RoleClaim" ToRole="E_Role" />
+        </EntityType>
+        <Association Name="Role_RoleClaim">
+          <End Type="IdentityModels.E_Role" Role="E_Role" Multiplicity="1" />
+          <End Type="IdentityModels.E_RoleClaim" Role="E_RoleClaim" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Role">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_RoleClaim">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Claim_RoleClaim">
+          <End Type="IdentityModels.E_Claim" Role="E_Claim" Multiplicity="1" />
+          <End Type="IdentityModels.E_RoleClaim" Role="E_RoleClaim" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Claim">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_RoleClaim">
+              <PropertyRef Name="ClaimId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="E_AudienceRole">
+          <Key>
+            <PropertyRef Name="AudienceId" />
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Audience" Relationship="IdentityModels.Audience_AudienceRoles" FromRole="E_AudienceRole" ToRole="E_Audience" />
+          <NavigationProperty Name="Role" Relationship="IdentityModels.Role_AudienceRoles" FromRole="E_AudienceRole" ToRole="E_Role" />
+        </EntityType>
+        <Association Name="Role_AudienceRoles">
+          <End Type="IdentityModels.E_Role" Role="E_Role" Multiplicity="1" />
+          <End Type="IdentityModels.E_AudienceRole" Role="E_AudienceRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Role">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_AudienceRole">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Audience_AudienceRoles">
+          <End Type="IdentityModels.E_Audience" Role="E_Audience" Multiplicity="1" />
+          <End Type="IdentityModels.E_AudienceRole" Role="E_AudienceRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_AudienceRole">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="E_UserRole">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="RoleId" Type="Guid" Nullable="false" />
+          <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Role" Relationship="IdentityModels.Role_UserRoles" FromRole="E_UserRole" ToRole="E_Role" />
+          <NavigationProperty Name="User" Relationship="IdentityModels.User_UserRoles" FromRole="E_UserRole" ToRole="E_User" />
+        </EntityType>
+        <Association Name="User_UserRoles">
+          <End Type="IdentityModels.E_User" Role="E_User" Multiplicity="1" />
+          <End Type="IdentityModels.E_UserRole" Role="E_UserRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_UserRole">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Role_UserRoles">
+          <End Type="IdentityModels.E_Role" Role="E_Role" Multiplicity="1" />
+          <End Type="IdentityModels.E_UserRole" Role="E_UserRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="E_Role">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="E_UserRole">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="IdentityModelsStoreContainer" CdmEntityContainer="IdentityEntities">
-          <EntitySetMapping Name="uvw_AudienceRole">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_AudienceRole">
-              <MappingFragment StoreEntitySet="uvw_AudienceRole">
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_AudienceRole">
-              <ModificationFunctionMapping>
-                <DeleteFunction FunctionName="IdentityModels.Store.usp_AudienceRole_Delete" >
-                  <ScalarProperty Name="RoleId" ParameterName="RoleID" />
-                  <ScalarProperty Name="AudienceId" ParameterName="AudienceID" />
-                </DeleteFunction>
-                <InsertFunction FunctionName="IdentityModels.Store.usp_AudienceRole_Insert">
-                  <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
-                  <ScalarProperty Name="RoleId" ParameterName="RoleId" />
-                  <ScalarProperty Name="AudienceId" ParameterName="AudienceId" />
-                  <ResultBinding Name="AudienceId" ColumnName="Id" />
-                  <ResultBinding Name="CreatedUtc" ColumnName="CreatedUtc" />
-                </InsertFunction>
-              </ModificationFunctionMapping>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Claim">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Claim">
+        <EntityContainerMapping StorageEntityContainer="IdentityModelsStoreContainer" CdmEntityContainer="IdentityEntities_EF6">
+          <EntitySetMapping Name="E_Claim">
+            <EntityTypeMapping TypeName="IdentityModels.E_Claim">
               <MappingFragment StoreEntitySet="uvw_Claim">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="ValueType" ColumnName="ValueType" />
@@ -2351,10 +2769,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Claim">
+            <EntityTypeMapping TypeName="IdentityModels.E_Claim">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_Claim_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_Claim_Update">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" Version="Current" />
@@ -2364,7 +2782,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ScalarProperty Name="Subject" ParameterName="Subject" Version="Current" />
                   <ScalarProperty Name="IssuerId" ParameterName="IssuerId" Version="Current" />
                   <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
-                  <ResultBinding Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 </UpdateFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_Claim_Insert">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
@@ -2379,10 +2796,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Issuer">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Issuer">
+          <EntitySetMapping Name="E_Issuer">
+            <EntityTypeMapping TypeName="IdentityModels.E_Issuer">
               <MappingFragment StoreEntitySet="uvw_Issuer">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
@@ -2392,10 +2808,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Issuer">
+            <EntityTypeMapping TypeName="IdentityModels.E_Issuer">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_Issuer_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_Issuer_Update">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" Version="Current" />
@@ -2404,7 +2820,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ScalarProperty Name="Description" ParameterName="Description" Version="Current" />
                   <ScalarProperty Name="Name" ParameterName="Name" Version="Current" />
                   <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
-                  <ResultBinding Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 </UpdateFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_Issuer_Insert">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
@@ -2418,10 +2833,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Login">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Login">
+          <EntitySetMapping Name="E_Login">
+            <EntityTypeMapping TypeName="IdentityModels.E_Login">
               <MappingFragment StoreEntitySet="uvw_Login">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
@@ -2431,10 +2845,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Login">
+            <EntityTypeMapping TypeName="IdentityModels.E_Login">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_Login_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_Login_Update">
                   <ScalarProperty Name="LoginKey" ParameterName="LoginKey" Version="Current" />
@@ -2443,7 +2857,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ScalarProperty Name="Description" ParameterName="Description" Version="Current" />
                   <ScalarProperty Name="Name" ParameterName="Name" Version="Current" />
                   <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
-                  <ResultBinding Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 </UpdateFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_Login_Insert">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
@@ -2457,8 +2870,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_MOTD">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_MOTD">
+          <EntitySetMapping Name="E_MOTD">
+            <EntityTypeMapping TypeName="IdentityModels.E_MOTD">
               <MappingFragment StoreEntitySet="uvw_MOTD">
                 <ScalarProperty Name="TssBackground" ColumnName="TssBackground" />
                 <ScalarProperty Name="TssTags" ColumnName="TssTags" />
@@ -2472,10 +2885,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_MOTD">
+            <EntityTypeMapping TypeName="IdentityModels.E_MOTD">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_MOTD_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_MOTD_Update">
                   <ScalarProperty Name="TssBackground" ParameterName="TssBackground" Version="Current" />
@@ -2504,8 +2917,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Refresh">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Refresh">
+          <EntitySetMapping Name="E_Refresh">
+            <EntityTypeMapping TypeName="IdentityModels.E_Refresh">
               <MappingFragment StoreEntitySet="uvw_Refresh">
                 <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
                 <ScalarProperty Name="ValidToUtc" ColumnName="ValidToUtc" />
@@ -2518,10 +2931,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Refresh">
+            <EntityTypeMapping TypeName="IdentityModels.E_Refresh">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_Refresh_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_Refresh_Insert">
                   <ScalarProperty Name="ValidToUtc" ParameterName="ValidToUtc" />
@@ -2537,10 +2950,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Role">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Role">
+          <EntitySetMapping Name="E_Role">
+            <EntityTypeMapping TypeName="IdentityModels.E_Role">
               <MappingFragment StoreEntitySet="uvw_Role">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
@@ -2550,10 +2962,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Role">
+            <EntityTypeMapping TypeName="IdentityModels.E_Role">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_Role_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_Role_Insert">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
@@ -2575,8 +2987,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Setting">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Setting">
+          <EntitySetMapping Name="E_Setting">
+            <EntityTypeMapping TypeName="IdentityModels.E_Setting">
               <MappingFragment StoreEntitySet="uvw_Setting">
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
@@ -2588,10 +3000,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Setting">
+            <EntityTypeMapping TypeName="IdentityModels.E_Setting">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_Setting_Delete" >
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_Setting_Update">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" Version="Current" />
@@ -2616,8 +3028,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_State">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_State">
+          <EntitySetMapping Name="E_State">
+            <EntityTypeMapping TypeName="IdentityModels.E_State">
               <MappingFragment StoreEntitySet="uvw_State">
                 <ScalarProperty Name="LastPollingUtc" ColumnName="LastPollingUtc" />
                 <ScalarProperty Name="IssuedUtc" ColumnName="IssuedUtc" />
@@ -2633,10 +3045,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_State">
+            <EntityTypeMapping TypeName="IdentityModels.E_State">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_State_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_State_Update">
                   <ScalarProperty Name="LastPollingUtc" ParameterName="LastPollingUtc" Version="Current" />
@@ -2669,8 +3081,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_TextQueue">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_TextQueue">
+          <EntitySetMapping Name="E_TextQueue">
+            <EntityTypeMapping TypeName="IdentityModels.E_TextQueue">
               <MappingFragment StoreEntitySet="uvw_TextQueue">
                 <ScalarProperty Name="IsCancelled" ColumnName="IsCancelled" />
                 <ScalarProperty Name="DeliveredUtc" ColumnName="DeliveredUtc" />
@@ -2682,10 +3094,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_TextQueue">
+            <EntityTypeMapping TypeName="IdentityModels.E_TextQueue">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_TextQueue_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_TextQueue_Update">
                   <ScalarProperty Name="DeliveredUtc" ParameterName="DeliveredUtc" Version="Current" />
@@ -2704,10 +3116,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Url">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Url">
+          <EntitySetMapping Name="E_Url">
+            <EntityTypeMapping TypeName="IdentityModels.E_Url">
               <MappingFragment StoreEntitySet="uvw_Url">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
@@ -2717,10 +3128,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Url">
+            <EntityTypeMapping TypeName="IdentityModels.E_Url">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_Url_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_Url_Update">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" Version="Current" />
@@ -2735,38 +3146,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="usp_Activity_Delete" FunctionName="IdentityModels.Store.usp_Activity_Delete">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_Activity_Delete_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
-                <ScalarProperty Name="TableName" ColumnName="TableName" />
-                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
-                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
-                <ScalarProperty Name="CurrentValues" ColumnName="CurrentValues" />
-                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="usp_Activity_Insert" FunctionName="IdentityModels.Store.usp_Activity_Insert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_Activity_Insert_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
-                <ScalarProperty Name="TableName" ColumnName="TableName" />
-                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
-                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
-                <ScalarProperty Name="CurrentValues" ColumnName="CurrentValues" />
-                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="usp_Audience_Delete" FunctionName="IdentityModels.Store.usp_Audience_Delete">
             <ResultMapping>
               <ComplexTypeMapping TypeName="IdentityModels.usp_Audience_Delete_Result">
@@ -3318,95 +3697,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="usp_User_Delete" FunctionName="IdentityModels.Store.usp_User_Delete">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_User_Delete_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UserName" ColumnName="UserName" />
-                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
-                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
-                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
-                <ScalarProperty Name="LastName" ColumnName="LastName" />
-                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
-                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
-                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
-                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
-                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
-                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
-                <ScalarProperty Name="IsHumanBeing" ColumnName="IsHumanBeing" />
-                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
-                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
-                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="usp_User_Insert" FunctionName="IdentityModels.Store.usp_User_Insert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_User_Insert_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UserName" ColumnName="UserName" />
-                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
-                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
-                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
-                <ScalarProperty Name="LastName" ColumnName="LastName" />
-                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
-                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
-                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
-                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
-                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
-                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
-                <ScalarProperty Name="IsHumanBeing" ColumnName="IsHumanBeing" />
-                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
-                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
-                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="usp_User_Update" FunctionName="IdentityModels.Store.usp_User_Update">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="IdentityModels.usp_User_Update_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UserName" ColumnName="UserName" />
-                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
-                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
-                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
-                <ScalarProperty Name="LastName" ColumnName="LastName" />
-                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
-                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
-                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
-                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
-                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
-                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
-                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
-                <ScalarProperty Name="IsHumanBeing" ColumnName="IsHumanBeing" />
-                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
-                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
-                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <EntitySetMapping Name="uvw_EmailQueue">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_EmailQueue">
+          <EntitySetMapping Name="E_EmailQueue">
+            <EntityTypeMapping TypeName="IdentityModels.E_EmailQueue">
               <MappingFragment StoreEntitySet="uvw_EmailQueue">
                 <ScalarProperty Name="IsCancelled" ColumnName="IsCancelled" />
                 <ScalarProperty Name="DeliveredUtc" ColumnName="DeliveredUtc" />
@@ -3421,10 +3713,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_EmailQueue">
+            <EntityTypeMapping TypeName="IdentityModels.E_EmailQueue">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_EmailQueue_Delete">
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_EmailQueue_Update">
                   <ScalarProperty Name="DeliveredUtc" ParameterName="DeliveredUtc" Version="Current" />
@@ -3441,31 +3733,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ScalarProperty Name="FromDisplay" ParameterName="FromDisplay" />
                   <ScalarProperty Name="FromEmail" ParameterName="FromEmail" />
                   <ResultBinding Name="Id" ColumnName="Id" />
-                  <ResultBinding Name="CreatedUtc" ColumnName="CreatedUtc" />
-                </InsertFunction>
-              </ModificationFunctionMapping>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="uvw_UserRole">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_UserRole">
-              <MappingFragment StoreEntitySet="uvw_UserRole">
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_UserRole">
-              <ModificationFunctionMapping>
-                <DeleteFunction FunctionName="IdentityModels.Store.usp_UserRole_Delete" >
-                  <ScalarProperty Name="RoleId" ParameterName="RoleID" />
-                  <ScalarProperty Name="UserId" ParameterName="UserID" />
-                </DeleteFunction>
-                <InsertFunction FunctionName="IdentityModels.Store.usp_UserRole_Insert">
-                  <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
-                  <ScalarProperty Name="RoleId" ParameterName="RoleId" />
-                  <ScalarProperty Name="UserId" ParameterName="UserId" />
-                  <ResultBinding Name="UserId" ColumnName="Id" />
                   <ResultBinding Name="CreatedUtc" ColumnName="CreatedUtc" />
                 </InsertFunction>
               </ModificationFunctionMapping>
@@ -3511,8 +3778,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
-          <EntitySetMapping Name="uvw_UserClaim">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_UserClaim">
+          <EntitySetMapping Name="E_UserClaim">
+            <EntityTypeMapping TypeName="IdentityModels.E_UserClaim">
               <MappingFragment StoreEntitySet="uvw_UserClaim">
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
@@ -3520,11 +3787,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_UserClaim">
+            <EntityTypeMapping TypeName="IdentityModels.E_UserClaim">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_UserClaim_Delete" >
-                  <ScalarProperty Name="ClaimId" ParameterName="ClaimID" />
-                  <ScalarProperty Name="UserId" ParameterName="UserID" />
+                  <ScalarProperty Name="ClaimId" ParameterName="ClaimId" />
+                  <ScalarProperty Name="UserId" ParameterName="UserId" />
                 </DeleteFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_UserClaim_Insert">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
@@ -3533,11 +3800,12 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ResultBinding Name="UserId" ColumnName="Id" />
                   <ResultBinding Name="CreatedUtc" ColumnName="CreatedUtc" />
                 </InsertFunction>
+                <UpdateFunction FunctionName="IdentityModels.Store.usp_DoNothing" />
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_UserLogin">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_UserLogin">
+          <EntitySetMapping Name="E_UserLogin">
+            <EntityTypeMapping TypeName="IdentityModels.E_UserLogin">
               <MappingFragment StoreEntitySet="uvw_UserLogin">
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
@@ -3545,11 +3813,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_UserLogin">
+            <EntityTypeMapping TypeName="IdentityModels.E_UserLogin">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_UserLogin_Delete" >
-                  <ScalarProperty Name="LoginId" ParameterName="LoginID" />
-                  <ScalarProperty Name="UserId" ParameterName="UserID" />
+                  <ScalarProperty Name="LoginId" ParameterName="LoginId" />
+                  <ScalarProperty Name="UserId" ParameterName="UserId" />
                 </DeleteFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_UserLogin_Insert">
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
@@ -3558,6 +3826,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ResultBinding Name="UserId" ColumnName="Id" />
                   <ResultBinding Name="CreatedUtc" ColumnName="CreatedUtc" />
                 </InsertFunction>
+                <UpdateFunction FunctionName="IdentityModels.Store.usp_DoNothing" />
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -3601,8 +3870,8 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
-          <EntitySetMapping Name="uvw_EmailActivity">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_EmailActivity">
+          <EntitySetMapping Name="E_EmailActivity">
+            <EntityTypeMapping TypeName="IdentityModels.E_EmailActivity">
               <MappingFragment StoreEntitySet="uvw_EmailActivity">
                 <ScalarProperty Name="StatusAtUtc" ColumnName="StatusAtUtc" />
                 <ScalarProperty Name="SendgridStatus" ColumnName="SendgridStatus" />
@@ -3611,10 +3880,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_EmailActivity">
+            <EntityTypeMapping TypeName="IdentityModels.E_EmailActivity">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_EmailActivity_Delete" >
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_EmailActivity_Insert">
                   <ScalarProperty Name="SendgridStatus" ParameterName="SendgridStatus" />
@@ -3623,11 +3892,12 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ResultBinding Name="Id" ColumnName="Id" />
                   <ResultBinding Name="StatusAtUtc" ColumnName="StatusAtUtc" />
                 </InsertFunction>
+                <UpdateFunction FunctionName="IdentityModels.Store.usp_DoNothing" />
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_TextActivity">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_TextActivity">
+          <EntitySetMapping Name="E_TextActivity">
+            <EntityTypeMapping TypeName="IdentityModels.E_TextActivity">
               <MappingFragment StoreEntitySet="uvw_TextActivity">
                 <ScalarProperty Name="StatusAtUtc" ColumnName="StatusAtUtc" />
                 <ScalarProperty Name="TwilioMessage" ColumnName="TwilioMessage" />
@@ -3637,10 +3907,10 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_TextActivity">
+            <EntityTypeMapping TypeName="IdentityModels.E_TextActivity">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_TextActivity_Delete" >
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_TextActivity_Insert">
                   <ScalarProperty Name="TwilioMessage" ParameterName="TwilioMessage" />
@@ -3650,6 +3920,7 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ResultBinding Name="Id" ColumnName="Id" />
                   <ResultBinding Name="StatusAtUtc" ColumnName="SttusAtUtc" />
                 </InsertFunction>
+                <UpdateFunction FunctionName="IdentityModels.Store.usp_DoNothing" />
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -3751,16 +4022,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
-          <EntitySetMapping Name="uvw_Audience">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Audience">
+          <EntitySetMapping Name="E_Audience">
+            <EntityTypeMapping TypeName="IdentityModels.E_Audience">
               <MappingFragment StoreEntitySet="uvw_Audience">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
-                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
                 <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
                 <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
@@ -3773,17 +4039,13 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Audience">
+            <EntityTypeMapping TypeName="IdentityModels.E_Audience">
               <ModificationFunctionMapping>
                 <DeleteFunction FunctionName="IdentityModels.Store.usp_Audience_Delete" >
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_Audience_Update">
-                  <ScalarProperty Name="LastLoginFailureUtc" ParameterName="LastLoginFailureUtc" Version="Current" />
-                  <ScalarProperty Name="LastLoginSuccessUtc" ParameterName="LastLoginSuccessUtc" Version="Current" />
                   <ScalarProperty Name="LockoutEndUtc" ParameterName="LockoutEndUtc" Version="Current" />
-                  <ScalarProperty Name="AccessSuccessCount" ParameterName="AccessSuccessCount" Version="Current" />
-                  <ScalarProperty Name="AccessFailedCount" ParameterName="AccessFailedCount" Version="Current" />
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" Version="Current" />
                   <ScalarProperty Name="IsLockedOut" ParameterName="IsLockedOut" Version="Current" />
                   <ScalarProperty Name="Description" ParameterName="Description" Version="Current" />
@@ -3792,14 +4054,9 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
                   <ResultBinding Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
                   <ResultBinding Name="SecurityStamp" ColumnName="SecurityStamp" />
-                  <ResultBinding Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 </UpdateFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_Audience_Insert">
-                  <ScalarProperty Name="LastLoginFailureUtc" ParameterName="LastLoginFailureUtc" />
-                  <ScalarProperty Name="LastLoginSuccessUtc" ParameterName="LastLoginSuccessUtc" />
                   <ScalarProperty Name="LockoutEndUtc" ParameterName="LockoutEndUtc" />
-                  <ScalarProperty Name="AccessSuccessCount" ParameterName="AccessSuccessCount" />
-                  <ScalarProperty Name="AccessFailedCount" ParameterName="AccessFailedCount" />
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
                   <ScalarProperty Name="IsLockedOut" ParameterName="IsLockedOut" />
                   <ScalarProperty Name="Description" ParameterName="Description" />
@@ -3813,16 +4070,11 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_User">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_User">
+          <EntitySetMapping Name="E_User">
+            <EntityTypeMapping TypeName="IdentityModels.E_User">
               <MappingFragment StoreEntitySet="uvw_User">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
-                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
                 <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
                 <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsHumanBeing" ColumnName="IsHumanBeing" />
@@ -3841,16 +4093,16 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_User">
+            <EntityTypeMapping TypeName="IdentityModels.E_User">
               <ModificationFunctionMapping>
-                <DeleteFunction FunctionName="IdentityModels.Store.usp_User_Delete" >
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                <DeleteFunction FunctionName="IdentityModels.Store.usp_User_Delete">
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
                 <UpdateFunction FunctionName="IdentityModels.Store.usp_User_Update">
                   <ScalarProperty Name="LockoutEndUtc" ParameterName="LockoutEndUtc" Version="Current" />
                   <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" Version="Current" />
-                  <ScalarProperty Name="IsHumanBeing" ParameterName="IsHumanBeing" Version="Current" />
                   <ScalarProperty Name="IsLockedOut" ParameterName="IsLockedOut" Version="Current" />
+                  <ScalarProperty Name="IsHumanBeing" ParameterName="IsHumanBeing" Version="Current" />
                   <ScalarProperty Name="PasswordConfirmed" ParameterName="PasswordConfirmed" Version="Current" />
                   <ScalarProperty Name="PhoneNumberConfirmed" ParameterName="PhoneNumberConfirmed" Version="Current" />
                   <ScalarProperty Name="PhoneNumber" ParameterName="PhoneNumber" Version="Current" />
@@ -3862,7 +4114,6 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
                   <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
                   <ResultBinding Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
                   <ResultBinding Name="SecurityStamp" ColumnName="SecurityStamp" />
-                  <ResultBinding Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
                 </UpdateFunction>
                 <InsertFunction FunctionName="IdentityModels.Store.usp_User_Insert">
                   <ScalarProperty Name="LockoutEndUtc" ParameterName="LockoutEndUtc" />
@@ -3882,42 +4133,189 @@ warning 6002: The table/view 'BhbkIdentity.svc.uvw_UserRole' does not have a pri
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="uvw_Activity">
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Activity">
-              <MappingFragment StoreEntitySet="uvw_Activity">
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+          <FunctionImportMapping FunctionImportName="usp_User_Delete" FunctionName="IdentityModels.Store.usp_User_Delete">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="IdentityModels.usp_User_Delete_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
+                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
+                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
+                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
+                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="IsHumanBeing" ColumnName="IsHumanBeing" />
+                <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="CurrentValues" ColumnName="CurrentValues" />
-                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
-                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
-                <ScalarProperty Name="TableName" ColumnName="TableName" />
-                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
+                <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
+                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
+                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="usp_User_Insert" FunctionName="IdentityModels.Store.usp_User_Insert">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="IdentityModels.usp_User_Insert_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
+                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
+                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
+                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
+                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="IsHumanBeing" ColumnName="IsHumanBeing" />
+                <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
+                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
+                <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
+                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
+                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="usp_User_Update" FunctionName="IdentityModels.Store.usp_User_Update">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="IdentityModels.usp_User_Update_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
+                <ScalarProperty Name="ConcurrencyStamp" ColumnName="ConcurrencyStamp" />
+                <ScalarProperty Name="PasswordHashPBKDF2" ColumnName="PasswordHashPBKDF2" />
+                <ScalarProperty Name="PasswordHashSHA256" ColumnName="PasswordHashSHA256" />
+                <ScalarProperty Name="PasswordConfirmed" ColumnName="PasswordConfirmed" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="IsHumanBeing" ColumnName="IsHumanBeing" />
+                <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
+                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
+                <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
+                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
+                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="E_AuthActivity">
+            <EntityTypeMapping TypeName="IdentityModels.E_AuthActivity">
+              <MappingFragment StoreEntitySet="uvw_AuthActivity">
+                <ScalarProperty Name="LoginOutcome" ColumnName="LoginOutcome" />
+                <ScalarProperty Name="RemoteEndpoint" ColumnName="RemoteEndpoint" />
+                <ScalarProperty Name="LocalEndpoint" ColumnName="LocalEndpoint" />
+                <ScalarProperty Name="LoginType" ColumnName="LoginType" />
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
-            <EntityTypeMapping TypeName="IdentityModels.uvw_Activity">
+            <EntityTypeMapping TypeName="IdentityModels.E_AuthActivity">
               <ModificationFunctionMapping>
-                <DeleteFunction FunctionName="IdentityModels.Store.usp_Activity_Delete" >
-                  <ScalarProperty Name="Id" ParameterName="ID" />
+                <DeleteFunction FunctionName="IdentityModels.Store.usp_AuthActivity_Delete">
+                  <ScalarProperty Name="Id" ParameterName="Id" />
                 </DeleteFunction>
-                <InsertFunction FunctionName="IdentityModels.Store.usp_Activity_Insert">
-                  <ScalarProperty Name="IsDeletable" ParameterName="IsDeletable" />
-                  <ScalarProperty Name="CurrentValues" ParameterName="CurrentValues" />
-                  <ScalarProperty Name="OriginalValues" ParameterName="OriginalValues" />
-                  <ScalarProperty Name="KeyValues" ParameterName="KeyValues" />
-                  <ScalarProperty Name="TableName" ParameterName="TableName" />
-                  <ScalarProperty Name="ActivityType" ParameterName="ActivityType" />
+                <InsertFunction FunctionName="IdentityModels.Store.usp_AuthActivity_Insert">
+                  <ScalarProperty Name="LoginOutcome" ParameterName="LoginOutcome" />
+                  <ScalarProperty Name="RemoteEndpoint" ParameterName="RemoteEndpoint" />
+                  <ScalarProperty Name="LocalEndpoint" ParameterName="LocalEndpoint" />
+                  <ScalarProperty Name="LoginType" ParameterName="LoginType" />
                   <ScalarProperty Name="UserId" ParameterName="UserId" />
                   <ScalarProperty Name="AudienceId" ParameterName="AudienceId" />
                   <ResultBinding Name="Id" ColumnName="Id" />
                   <ResultBinding Name="CreatedUtc" ColumnName="CreatedUtc" />
                 </InsertFunction>
+                <UpdateFunction FunctionName="IdentityModels.Store.usp_DoNothing" />
               </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
-        </EntityContainerMapping>
+          <FunctionImportMapping FunctionImportName="usp_AuthActivity_Delete" FunctionName="IdentityModels.Store.usp_AuthActivity_Delete">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="IdentityModels.usp_AuthActivity_Delete_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
+                <ScalarProperty Name="TableName" ColumnName="TableName" />
+                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
+                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
+                <ScalarProperty Name="CurrentValues" ColumnName="CurrentValues" />
+                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="usp_AuthActivity_Insert" FunctionName="IdentityModels.Store.usp_AuthActivity_Insert">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="IdentityModels.usp_AuthActivity_Insert_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
+                <ScalarProperty Name="TableName" ColumnName="TableName" />
+                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
+                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
+                <ScalarProperty Name="CurrentValues" ColumnName="CurrentValues" />
+                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="E_RoleClaim">
+            <EntityTypeMapping TypeName="IdentityModels.E_RoleClaim">
+              <MappingFragment StoreEntitySet="uvw_RoleClaim">
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
+                <ScalarProperty Name="ClaimId" ColumnName="ClaimId" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="usp_DoNothing" FunctionName="IdentityModels.Store.usp_DoNothing" />
+          <EntitySetMapping Name="E_AudienceRole">
+            <EntityTypeMapping TypeName="IdentityModels.E_AudienceRole">
+              <MappingFragment StoreEntitySet="uvw_AudienceRole">
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="E_UserRole">
+            <EntityTypeMapping TypeName="IdentityModels.E_UserRole">
+              <MappingFragment StoreEntitySet="uvw_UserRole">
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Models_Tbl
 {
     using System;
     using System.Collections.Generic;
@@ -18,6 +18,8 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
         public System.Guid RoleId { get; set; }
         public bool IsDeletable { get; set; }
         public System.DateTimeOffset CreatedUtc { get; set; }
+        public System.DateTime VersionStartUtc { get; set; }
+        public System.DateTime VersionEndUtc { get; set; }
     
         public virtual tbl_Role tbl_Role { get; set; }
         public virtual tbl_User tbl_User { get; set; }

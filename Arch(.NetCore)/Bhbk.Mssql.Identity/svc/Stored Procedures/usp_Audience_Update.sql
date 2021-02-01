@@ -6,11 +6,7 @@ CREATE PROCEDURE [svc].[usp_Audience_Update]
     ,@Description			NVARCHAR (256)
     ,@IsLockedOut		    BIT     
     ,@IsDeletable			BIT
-    ,@AccessFailedCount		INT  
-    ,@AccessSuccessCount	INT  
     ,@LockoutEndUtc			DATETIMEOFFSET (7)
-    ,@LastLoginSuccessUtc	DATETIMEOFFSET (7)
-    ,@LastLoginFailureUtc	DATETIMEOFFSET (7)
 
 AS
 BEGIN
@@ -18,7 +14,7 @@ BEGIN
 
 	BEGIN TRY
 
-        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
+    	BEGIN TRANSACTION;
 
         UPDATE [dbo].[tbl_Audience]
         SET
@@ -28,12 +24,7 @@ BEGIN
 	        ,Description			= @Description
             ,IsLockedOut			= @IsLockedOut
             ,IsDeletable			= @IsDeletable
-            ,AccessFailedCount		= @AccessFailedCount
-            ,AccessSuccessCount		= @AccessSuccessCount
             ,LockoutEndUtc			= @LockoutEndUtc
-            ,LastLoginSuccessUtc	= @LastLoginSuccessUtc
-            ,LastLoginFailureUtc	= @LastLoginFailureUtc
-            ,LastUpdatedUtc			= @LASTUPDATED
         WHERE Id = @Id
 
 		IF @@ROWCOUNT != 1
@@ -42,9 +33,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_Audience]
             WHERE Id = @Id
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

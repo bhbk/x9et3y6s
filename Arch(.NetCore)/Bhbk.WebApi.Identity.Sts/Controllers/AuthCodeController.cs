@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -147,7 +147,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     AudienceId = audience.Id,
                     UserId = user.Id,
                     StateValue = AlphaNumeric.CreateString(32),
-                    StateType = StateType.User.ToString(),
+                    StateType = ConsumerType.User.ToString(),
                     StateConsume = false,
                     ValidFromUtc = DateTime.UtcNow,
                     ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
@@ -284,7 +284,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var state = UoW.States.Get(x => x.StateValue == input.state
                 && x.ValidFromUtc < DateTime.UtcNow
                 && x.ValidToUtc > DateTime.UtcNow
-                && x.StateType == StateType.User.ToString()).SingleOrDefault();
+                && x.StateType == ConsumerType.User.ToString()).SingleOrDefault();
 
             if (state == null)
             {
@@ -295,22 +295,29 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check that payload can be decrypted and validated...
             if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(user.SecurityStamp, input.code, user.Id.ToString(), user.SecurityStamp))
             {
+                UoW.AuthActivity.Create(
+                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                    {
+                        UserId = user.Id,
+                        LoginType = GrantFlowType.AuthorizationCodeV2.ToString(),
+                        LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                    }));
+
+                UoW.Commit();
+
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.code}");
                 return BadRequest(ModelState);
             }
 
-            //adjust counter(s) for login success...
-            UoW.Users.AccessSuccess(user);
-
             var ac_claims = UoW.Users.GenerateAccessClaims(issuer, user);
             var ac = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audiences.Select(x => x.Name).ToList(), ac_claims);
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.CreateUserAccessTokenV2.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.AuthorizationCodeV2.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
@@ -321,18 +328,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
-                    RefreshType = RefreshType.User.ToString(),
+                    RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = rt.RawData,
                     ValidFromUtc = rt.ValidFrom,
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
-                    ActivityType = LoginType.CreateUserRefreshTokenV2.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.RefreshTokenV2.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             UoW.Commit();

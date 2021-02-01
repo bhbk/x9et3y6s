@@ -7,16 +7,16 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Models_Tbl
 {
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class IdentityEntities_TBL : DbContext
+    public partial class IdentityEntities_EF6_Tbl : DbContext
     {
-        public IdentityEntities_TBL()
-            : base("name=IdentityEntities_TBL")
+        public IdentityEntities_EF6_Tbl()
+            : base("name=IdentityEntities_EF6_Tbl")
         {
         }
     
@@ -25,7 +25,6 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<tbl_Activity> tbl_Activity { get; set; }
         public virtual DbSet<tbl_AudienceRole> tbl_AudienceRole { get; set; }
         public virtual DbSet<tbl_Issuer> tbl_Issuer { get; set; }
         public virtual DbSet<tbl_MOTD> tbl_MOTD { get; set; }
@@ -34,7 +33,6 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
         public virtual DbSet<tbl_RoleClaim> tbl_RoleClaim { get; set; }
         public virtual DbSet<tbl_Setting> tbl_Setting { get; set; }
         public virtual DbSet<tbl_State> tbl_State { get; set; }
-        public virtual DbSet<tbl_Url> tbl_Url { get; set; }
         public virtual DbSet<tbl_UserClaim> tbl_UserClaim { get; set; }
         public virtual DbSet<tbl_UserLogin> tbl_UserLogin { get; set; }
         public virtual DbSet<tbl_UserRole> tbl_UserRole { get; set; }
@@ -46,5 +44,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models_TBL
         public virtual DbSet<tbl_User> tbl_User { get; set; }
         public virtual DbSet<tbl_EmailQueue> tbl_EmailQueue { get; set; }
         public virtual DbSet<tbl_TextQueue> tbl_TextQueue { get; set; }
+        public virtual DbSet<tbl_AuthActivity> tbl_AuthActivity { get; set; }
+        public virtual DbSet<tbl_Url> tbl_Url { get; set; }
     }
 }

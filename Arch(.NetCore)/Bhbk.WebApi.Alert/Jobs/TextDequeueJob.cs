@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Alert.Jobs
             }
 #if !RELEASE
             Log.Information($"'{callPath}' completed");
-            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.Value.LocalDateTime}");
+            Log.Information($"'{callPath}' will run again at {context.NextFireTimeUtc.GetValueOrDefault().LocalDateTime}");
 #endif
             return Task.CompletedTask;
         }
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                             {
                                 var response = twilio.TryTextHandoff(twilioSid, twilioToken, msg).Result;
 
-                                uow.TextActivities.Create(
+                                uow.TextActivity.Create(
                                     new uvw_TextActivity()
                                     {
                                         TextId = msg.Id,
@@ -94,7 +94,7 @@ namespace Bhbk.WebApi.Alert.Jobs
                             }
                             catch (ApiException ex)
                             {
-                                uow.TextActivities.Create(
+                                uow.TextActivity.Create(
                                     new uvw_TextActivity()
                                     {
                                         TextId = msg.Id,

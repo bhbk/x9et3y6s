@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Models_TBL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_Tbl;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -291,7 +291,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
-                        RefreshType = RefreshType.Client.ToString(),
+                        RefreshType = ConsumerType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
@@ -342,7 +342,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
-                        RefreshType = RefreshType.Client.ToString(),
+                        RefreshType = ConsumerType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
@@ -392,7 +392,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
-                        RefreshType = RefreshType.Client.ToString(),
+                        RefreshType = ConsumerType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
@@ -443,7 +443,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
-                        RefreshType = RefreshType.Client.ToString(),
+                        RefreshType = ConsumerType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
@@ -495,7 +495,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
-                        RefreshType = RefreshType.Client.ToString(),
+                        RefreshType = ConsumerType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
@@ -545,7 +545,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
-                        RefreshType = RefreshType.Client.ToString(),
+                        RefreshType = ConsumerType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
@@ -597,7 +597,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
-                        RefreshType = RefreshType.Client.ToString(),
+                        RefreshType = ConsumerType.Client.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,

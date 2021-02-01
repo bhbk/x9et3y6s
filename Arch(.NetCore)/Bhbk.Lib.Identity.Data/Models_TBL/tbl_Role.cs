@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace Bhbk.Lib.Identity.Data.Models_TBL
+namespace Bhbk.Lib.Identity.Data.Models_Tbl
 {
     public partial class tbl_Role
     {
@@ -21,7 +21,6 @@ namespace Bhbk.Lib.Identity.Data.Models_TBL
         public bool IsEnabled { get; set; }
         public bool IsDeletable { get; set; }
         public DateTimeOffset CreatedUtc { get; set; }
-        public DateTimeOffset? LastUpdatedUtc { get; set; }
 
         public virtual tbl_Audience Audience { get; set; }
         public virtual ICollection<tbl_AudienceRole> tbl_AudienceRoles { get; set; }

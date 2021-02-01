@@ -1,6 +1,6 @@
 ﻿
 CREATE PROCEDURE [svc].[usp_EmailQueue_Delete]
-    @ID uniqueidentifier
+    @Id uniqueidentifier
 
 AS
 BEGIN
@@ -9,10 +9,10 @@ BEGIN
 	BEGIN TRY
 
         SELECT * FROM [dbo].[tbl_EmailQueue]
-            WHERE Id = @ID
+            WHERE Id = @Id
 
         DELETE [dbo].[tbl_EmailQueue]
-            WHERE Id = @ID
+            WHERE Id = @Id
 
     END TRY
 

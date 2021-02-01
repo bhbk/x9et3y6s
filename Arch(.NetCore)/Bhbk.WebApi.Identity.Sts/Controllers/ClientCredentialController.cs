@@ -1,5 +1,5 @@
 ﻿using Bhbk.Lib.Cryptography.Hashing;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -92,26 +92,28 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             else if (audience.IsLockedOut
                 || !PBKDF2.Validate(audience.PasswordHashPBKDF2, input.client_secret))
             {
-                //adjust counter(s) for login failure...
-                UoW.Audiences.AccessFailed(audience);
+                UoW.AuthActivity.Create(
+                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                    {
+                        AudienceId = audience.Id,
+                        LoginType = GrantFlowType.ClientCredentialV2.ToString(),
+                        LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                    }));
                 UoW.Commit();
 
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
-            //adjust counter(s) for login success...
-            UoW.Audiences.AccessSuccess(audience);
-
             var cc_claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
             var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audience.Name, cc_claims);
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     AudienceId = audience.Id,
-                    ActivityType = LoginType.CreateAudienceAccessTokenV2.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.ClientCredentialV2.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             var rt_claims = UoW.Audiences.GenerateRefreshClaims(issuer, audience);
@@ -122,18 +124,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
-                    RefreshType = RefreshType.Client.ToString(),
+                    RefreshType = ConsumerType.Client.ToString(),
                     RefreshValue = rt.RawData,
                     ValidFromUtc = rt.ValidFrom,
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     AudienceId = audience.Id,
-                    ActivityType = LoginType.CreateAudienceRefreshTokenV2.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.RefreshTokenV2.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             UoW.Commit();
@@ -166,7 +168,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
                 return NotFound(ModelState);
             }
-            else if (!string.Equals(refresh.RefreshType, RefreshType.Client.ToString(), StringComparison.OrdinalIgnoreCase)
+            else if (!string.Equals(refresh.RefreshType, ConsumerType.Client.ToString(), StringComparison.OrdinalIgnoreCase)
                 || (refresh.ValidFromUtc >= DateTime.UtcNow || refresh.ValidToUtc <= DateTime.UtcNow))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.refresh_token}");
@@ -224,18 +226,18 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
-                    RefreshType = RefreshType.Client.ToString(),
+                    RefreshType = ConsumerType.Client.ToString(),
                     RefreshValue = rt.RawData,
                     ValidFromUtc = rt.ValidFrom,
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.Activities.Create(
-                Mapper.Map<tbl_Activity>(new ActivityV1()
+            UoW.AuthActivity.Create(
+                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     AudienceId = audience.Id,
-                    ActivityType = LoginType.CreateAudienceRefreshTokenV2.ToString(),
-                    IsDeletable = false
+                    LoginType = GrantFlowType.RefreshTokenV2.ToString(),
+                    LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
             UoW.Commit();

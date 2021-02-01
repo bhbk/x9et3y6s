@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Domain.Profiles;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Constants;
@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Bhbk.Lib.Identity.Domain.Factories
 {
-    public class DefaultDataFactory_TBL : IDefaultDataFactory_TBL
+    public class DefaultDataFactory_Tbl : IDefaultDataFactory_Tbl
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
         private tbl_User foundAdmin, foundUser;
         private tbl_Setting foundGlobalLegacyClaims, foundGlobalLegacyIssuer, foundGlobalTotpExpire;
 
-        public DefaultDataFactory_TBL(IUnitOfWork uow)
+        public DefaultDataFactory_Tbl(IUnitOfWork uow)
         {
             _uow = uow ?? throw new ArgumentNullException();
             _mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>()).CreateMapper();
@@ -157,41 +157,75 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                     }));
 
                 _uow.Commit();
+            }
 
+            var foundAccessExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.AccessExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundAccessExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.AccessExpire,
                         ConfigValue = 600.ToString(),
-                        IsDeletable = true,
+                        IsDeletable = false,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundRefreshExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.RefreshExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundRefreshExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.RefreshExpire,
                         ConfigValue = 86400.ToString(),
-                        IsDeletable = true,
+                        IsDeletable = false,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundTotpExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.TotpExpire).ToLambda())
+                .SingleOrDefault();
+
+            if (foundTotpExpire == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.TotpExpire,
                         ConfigValue = 600.ToString(),
-                        IsDeletable = true,
+                        IsDeletable = false,
                     }));
 
+                _uow.Commit();
+            }
+
+            var foundPollingMax = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+                .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.PollingMax).ToLambda())
+                .SingleOrDefault();
+
+            if (foundPollingMax == null)
+            {
                 _uow.Settings.Create(
                     _mapper.Map<tbl_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.PollingMax,
                         ConfigValue = 10.ToString(),
-                        IsDeletable = true,
+                        IsDeletable = false,
                     }));
 
                 _uow.Commit();

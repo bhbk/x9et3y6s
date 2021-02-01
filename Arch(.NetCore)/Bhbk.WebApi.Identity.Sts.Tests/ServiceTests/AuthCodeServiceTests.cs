@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_Tbl;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Sts;
@@ -276,7 +276,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var url = new Uri(TestDefaultConstants.UriLink);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
-                    && x.StateType == StateType.User.ToString() && x.StateConsume == false
+                    && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
@@ -328,7 +328,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var url = new Uri(TestDefaultConstants.UriLink);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
-                    && x.StateType == StateType.User.ToString() && x.StateConsume == false
+                    && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
@@ -380,7 +380,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var url = new Uri(TestDefaultConstants.UriLink);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
-                    && x.StateType == StateType.User.ToString() && x.StateConsume == false
+                    && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
@@ -432,7 +432,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var url = new Uri(TestDefaultConstants.UriLink);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
-                    && x.StateType == StateType.User.ToString() && x.StateConsume == false
+                    && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
@@ -484,7 +484,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var url = new Uri(TestDefaultConstants.UriLink);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
-                    && x.StateType == StateType.User.ToString() && x.StateConsume == false
+                    && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
@@ -585,7 +585,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     .Generate(user.SecurityStamp, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user.Id.ToString(), user.SecurityStamp);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
-                    && x.StateType == StateType.User.ToString() && x.StateConsume == false
+                    && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
                 var result = await service.AuthCode_GrantV2(

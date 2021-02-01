@@ -3,9 +3,9 @@ using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Interfaces;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Models_TBL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_Tbl;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -462,7 +462,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
-                        RefreshType = RefreshType.User.ToString(),
+                        RefreshType = ConsumerType.User.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
@@ -503,7 +503,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     {
                         IssuerId = issuer.Id,
                         UserId = user.Id,
-                        RefreshType = RefreshType.User.ToString(),
+                        RefreshType = ConsumerType.User.ToString(),
                         RefreshValue = rt.RawData,
                         ValidFromUtc = rt.ValidFrom,
                         ValidToUtc = rt.ValidTo,
@@ -711,7 +711,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                         {
                             IssuerId = issuer.Id,
                             UserId = user.Id,
-                            RefreshType = RefreshType.User.ToString(),
+                            RefreshType = ConsumerType.User.ToString(),
                             RefreshValue = rt.RawData,
                             ValidFromUtc = rt.ValidFrom,
                             ValidToUtc = rt.ValidTo,

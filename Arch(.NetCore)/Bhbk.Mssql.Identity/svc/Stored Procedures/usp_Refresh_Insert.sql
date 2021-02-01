@@ -15,6 +15,8 @@ BEGIN
 
 	BEGIN TRY
 
+    	BEGIN TRANSACTION;
+
         DECLARE @REFRESHID UNIQUEIDENTIFIER = NEWID()
 
         INSERT INTO [dbo].[tbl_Refresh]
@@ -48,9 +50,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_Refresh]
             WHERE Id = @REFRESHID
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

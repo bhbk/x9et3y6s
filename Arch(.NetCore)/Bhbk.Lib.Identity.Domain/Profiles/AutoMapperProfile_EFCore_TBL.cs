@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Models.Alert;
 using Bhbk.Lib.Identity.Models.Me;
@@ -17,16 +17,13 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
              * activity models
              */
 
-            CreateMap<ActivityV1, tbl_Activity>()
+            CreateMap<AuthActivityV1, tbl_AuthActivity>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
                 .ForMember(dest => dest.Audience, src => src.Ignore())
-                .ForMember(dest => dest.User, src => src.Ignore())
-                .ForMember(dest => dest.KeyValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.KeyValues)))
-                .ForMember(dest => dest.OriginalValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.OriginalValues)))
-                .ForMember(dest => dest.CurrentValues, src => src.MapFrom(x => JsonConvert.SerializeObject(x.CurrentValues)));
+                .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<tbl_Activity, ActivityV1>();
+            CreateMap<tbl_AuthActivity, AuthActivityV1>();
 
             /*
              * audience models
@@ -38,15 +35,16 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AuthActivities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Roles, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
+                .ForMember(dest => dest.tbl_Roles, src => src.MapFrom(val => val.Roles))
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Urls, src => src.Ignore());
 
-            CreateMap<tbl_Audience, AudienceV1>();
+            CreateMap<tbl_Audience, AudienceV1>()
+                .ForMember(dest => dest.Roles, src => src.MapFrom(val => val.tbl_Roles));
 
             /*
              * claim models
@@ -80,13 +78,14 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
             CreateMap<IssuerV1, tbl_Issuer>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
+                .ForMember(dest => dest.tbl_Audiences, src => src.MapFrom(val => val.Audiences))
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Audiences, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore());
 
-            CreateMap<tbl_Issuer, IssuerV1>();
+            CreateMap<tbl_Issuer, IssuerV1>()
+                .ForMember(dest => dest.Audiences, src => src.MapFrom(val => val.tbl_Audiences));
 
             /*
              * login models
@@ -207,13 +206,11 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.EmailAddress, src => src.MapFrom(val => val.Email))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
-                .ForMember(dest => dest.AccessFailedCount, src => src.MapFrom(val => (val.AccessFailedCount == default) ? 0 : val.AccessFailedCount))
-                .ForMember(dest => dest.AccessSuccessCount, src => src.MapFrom(val => (val.AccessSuccessCount == default) ? 0 : val.AccessSuccessCount))
                 .ForMember(dest => dest.ConcurrencyStamp, src => src.MapFrom(val => val.ConcurrencyStamp == null ? Guid.NewGuid().ToString() : val.ConcurrencyStamp))
                 .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => val.SecurityStamp == null ? Guid.NewGuid().ToString() : val.SecurityStamp))
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
-                .ForMember(dest => dest.tbl_Activities, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AuthActivities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Settings, src => src.Ignore())
                 .ForMember(dest => dest.tbl_States, src => src.Ignore())

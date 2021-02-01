@@ -1,4 +1,5 @@
 ﻿
+
 CREATE VIEW [svc].[uvw_Audience]
 AS
 SELECT
@@ -12,13 +13,8 @@ SELECT
 	,SecurityStamp
 	,IsLockedOut
 	,IsDeletable
-	,AccessFailedCount
-	,AccessSuccessCount
 	,LockoutEndUtc
-	,LastLoginSuccessUtc
-	,LastLoginFailureUtc
 	,CreatedUtc
-	,LastUpdatedUtc
 
 FROM
 	[dbo].[tbl_Audience]

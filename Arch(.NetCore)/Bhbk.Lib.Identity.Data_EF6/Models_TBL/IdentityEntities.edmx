@@ -5,21 +5,6 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="IdentityEntities.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="tbl_Activity">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="AudienceId" Type="uniqueidentifier" />
-          <Property Name="UserId" Type="uniqueidentifier" />
-          <Property Name="ActivityType" Type="nvarchar" MaxLength="64" Nullable="false" />
-          <Property Name="TableName" Type="nvarchar" MaxLength="256" />
-          <Property Name="KeyValues" Type="nvarchar(max)" />
-          <Property Name="OriginalValues" Type="nvarchar(max)" />
-          <Property Name="CurrentValues" Type="nvarchar(max)" />
-          <Property Name="IsDeletable" Type="bit" Nullable="false" />
-          <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-        </EntityType>
         <EntityType Name="tbl_Audience">
           <Key>
             <PropertyRef Name="Id" />
@@ -34,13 +19,10 @@
           <Property Name="SecurityStamp" Type="nvarchar" MaxLength="256" />
           <Property Name="IsLockedOut" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
-          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="int" Nullable="false" />
           <Property Name="LockoutEndUtc" Type="datetimeoffset" Precision="7" />
-          <Property Name="LastLoginSuccessUtc" Type="datetimeoffset" Precision="7" />
-          <Property Name="LastLoginFailureUtc" Type="datetimeoffset" Precision="7" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_AudienceRole">
           <Key>
@@ -50,6 +32,21 @@
           <Property Name="AudienceId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
+          <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tbl_AuthActivity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AudienceId" Type="uniqueidentifier" />
+          <Property Name="UserId" Type="uniqueidentifier" />
+          <Property Name="LoginType" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="LoginOutcome" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="LocalEndpoint" Type="nvarchar" MaxLength="128" />
+          <Property Name="RemoteEndpoint" Type="nvarchar" MaxLength="128" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_Claim">
@@ -64,7 +61,8 @@
           <Property Name="ValueType" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_EmailActivity">
           <Key>
@@ -103,7 +101,8 @@
           <Property Name="IsEnabled" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_Login">
           <Key>
@@ -116,7 +115,8 @@
           <Property Name="IsEnabled" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_MOTD">
           <Key>
@@ -158,7 +158,8 @@
           <Property Name="IsEnabled" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_RoleClaim">
           <Key>
@@ -169,6 +170,8 @@
           <Property Name="ClaimId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_Setting">
           <Key>
@@ -182,6 +185,8 @@
           <Property Name="ConfigValue" Type="varchar" MaxLength="1024" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_State">
           <Key>
@@ -235,7 +240,8 @@
           <Property Name="IsEnabled" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_User">
           <Key>
@@ -257,13 +263,10 @@
           <Property Name="IsHumanBeing" Type="bit" Nullable="false" />
           <Property Name="IsLockedOut" Type="bit" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
-          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="int" Nullable="false" />
           <Property Name="LockoutEndUtc" Type="datetimeoffset" Precision="7" />
-          <Property Name="LastLoginSuccessUtc" Type="datetimeoffset" Precision="7" />
-          <Property Name="LastLoginFailureUtc" Type="datetimeoffset" Precision="7" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
-          <Property Name="LastUpdatedUtc" Type="datetimeoffset" Precision="7" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_UserClaim">
           <Key>
@@ -274,6 +277,8 @@
           <Property Name="ClaimId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_UserLogin">
           <Key>
@@ -284,6 +289,8 @@
           <Property Name="LoginId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tbl_UserRole">
           <Key>
@@ -294,31 +301,9 @@
           <Property Name="RoleId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IsDeletable" Type="bit" Nullable="false" />
           <Property Name="CreatedUtc" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="VersionStartUtc" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="VersionEndUtc" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
-        <Association Name="FK_tbl_Activity_AudienceID">
-          <End Role="tbl_Audience" Type="Self.tbl_Audience" Multiplicity="0..1" />
-          <End Role="tbl_Activity" Type="Self.tbl_Activity" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Audience">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_Activity">
-              <PropertyRef Name="AudienceId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_tbl_Activity_UserID">
-          <End Role="tbl_User" Type="Self.tbl_User" Multiplicity="0..1" />
-          <End Role="tbl_Activity" Type="Self.tbl_Activity" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_Activity">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_tbl_Audience_IssuerID">
           <End Role="tbl_Issuer" Type="Self.tbl_Issuer" Multiplicity="1" />
           <End Role="tbl_Audience" Type="Self.tbl_Audience" Multiplicity="*" />
@@ -356,6 +341,30 @@
             </Principal>
             <Dependent Role="tbl_AudienceRole">
               <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_AuthActivity_AudienceID">
+          <End Role="tbl_Audience" Type="Self.tbl_Audience" Multiplicity="0..1" />
+          <End Role="tbl_AuthActivity" Type="Self.tbl_AuthActivity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_AuthActivity">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_AuthActivity_UserID">
+          <End Role="tbl_User" Type="Self.tbl_User" Multiplicity="0..1" />
+          <End Role="tbl_AuthActivity" Type="Self.tbl_AuthActivity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_AuthActivity">
+              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -662,9 +671,9 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="IdentityEntitiesStoreContainer">
-          <EntitySet Name="tbl_Activity" EntityType="Self.tbl_Activity" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Audience" EntityType="Self.tbl_Audience" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_AudienceRole" EntityType="Self.tbl_AudienceRole" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_AuthActivity" EntityType="Self.tbl_AuthActivity" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_Claim" EntityType="Self.tbl_Claim" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_EmailActivity" EntityType="Self.tbl_EmailActivity" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_EmailQueue" EntityType="Self.tbl_EmailQueue" Schema="dbo" store:Type="Tables" />
@@ -683,14 +692,6 @@
           <EntitySet Name="tbl_UserClaim" EntityType="Self.tbl_UserClaim" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_UserLogin" EntityType="Self.tbl_UserLogin" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tbl_UserRole" EntityType="Self.tbl_UserRole" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_tbl_Activity_AudienceID" Association="Self.FK_tbl_Activity_AudienceID">
-            <End Role="tbl_Audience" EntitySet="tbl_Audience" />
-            <End Role="tbl_Activity" EntitySet="tbl_Activity" />
-          </AssociationSet>
-          <AssociationSet Name="FK_tbl_Activity_UserID" Association="Self.FK_tbl_Activity_UserID">
-            <End Role="tbl_User" EntitySet="tbl_User" />
-            <End Role="tbl_Activity" EntitySet="tbl_Activity" />
-          </AssociationSet>
           <AssociationSet Name="FK_tbl_Audience_IssuerID" Association="Self.FK_tbl_Audience_IssuerID">
             <End Role="tbl_Issuer" EntitySet="tbl_Issuer" />
             <End Role="tbl_Audience" EntitySet="tbl_Audience" />
@@ -702,6 +703,14 @@
           <AssociationSet Name="FK_tbl_AudienceRole_RoleID" Association="Self.FK_tbl_AudienceRole_RoleID">
             <End Role="tbl_Role" EntitySet="tbl_Role" />
             <End Role="tbl_AudienceRole" EntitySet="tbl_AudienceRole" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_AuthActivity_AudienceID" Association="Self.FK_tbl_AuthActivity_AudienceID">
+            <End Role="tbl_Audience" EntitySet="tbl_Audience" />
+            <End Role="tbl_AuthActivity" EntitySet="tbl_AuthActivity" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_AuthActivity_UserID" Association="Self.FK_tbl_AuthActivity_UserID">
+            <End Role="tbl_User" EntitySet="tbl_User" />
+            <End Role="tbl_AuthActivity" EntitySet="tbl_AuthActivity" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Claim_IssuerID" Association="Self.FK_tbl_Claim_IssuerID">
             <End Role="tbl_Issuer" EntitySet="tbl_Issuer" />
@@ -796,8 +805,7 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="IdentityEntities" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityContainer Name="IdentityEntities_TBL" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="tbl_Activity" EntityType="IdentityEntities.tbl_Activity" />
+        <EntityContainer Name="IdentityEntities_EF6_Tbl" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="tbl_AudienceRole" EntityType="IdentityEntities.tbl_AudienceRole" />
           <EntitySet Name="tbl_Issuer" EntityType="IdentityEntities.tbl_Issuer" />
           <EntitySet Name="tbl_MOTD" EntityType="IdentityEntities.tbl_MOTD" />
@@ -806,7 +814,6 @@
           <EntitySet Name="tbl_RoleClaim" EntityType="IdentityEntities.tbl_RoleClaim" />
           <EntitySet Name="tbl_Setting" EntityType="IdentityEntities.tbl_Setting" />
           <EntitySet Name="tbl_State" EntityType="IdentityEntities.tbl_State" />
-          <EntitySet Name="tbl_Url" EntityType="IdentityEntities.tbl_Url" />
           <EntitySet Name="tbl_UserClaim" EntityType="IdentityEntities.tbl_UserClaim" />
           <EntitySet Name="tbl_UserLogin" EntityType="IdentityEntities.tbl_UserLogin" />
           <EntitySet Name="tbl_UserRole" EntityType="IdentityEntities.tbl_UserRole" />
@@ -856,14 +863,6 @@
           </AssociationSet>
           <EntitySet Name="tbl_Audience" EntityType="IdentityEntities.tbl_Audience" />
           <EntitySet Name="tbl_User" EntityType="IdentityEntities.tbl_User" />
-          <AssociationSet Name="FK_tbl_Activity_AudienceID" Association="IdentityEntities.FK_tbl_Activity_AudienceID">
-            <End Role="tbl_Audience" EntitySet="tbl_Audience" />
-            <End Role="tbl_Activity" EntitySet="tbl_Activity" />
-          </AssociationSet>
-          <AssociationSet Name="FK_tbl_Activity_UserID" Association="IdentityEntities.FK_tbl_Activity_UserID">
-            <End Role="tbl_User" EntitySet="tbl_User" />
-            <End Role="tbl_Activity" EntitySet="tbl_Activity" />
-          </AssociationSet>
           <AssociationSet Name="FK_tbl_Audience_IssuerID" Association="IdentityEntities.FK_tbl_Audience_IssuerID">
             <End Role="tbl_Issuer" EntitySet="tbl_Issuer" />
             <End Role="tbl_Audience" EntitySet="tbl_Audience" />
@@ -887,10 +886,6 @@
           <AssociationSet Name="FK_tbl_State_AudienceID" Association="IdentityEntities.FK_tbl_State_AudienceID">
             <End Role="tbl_Audience" EntitySet="tbl_Audience" />
             <End Role="tbl_State" EntitySet="tbl_State" />
-          </AssociationSet>
-          <AssociationSet Name="FK_tbl_Url_AudienceID" Association="IdentityEntities.FK_tbl_Url_AudienceID">
-            <End Role="tbl_Audience" EntitySet="tbl_Audience" />
-            <End Role="tbl_Url" EntitySet="tbl_Url" />
           </AssociationSet>
           <AssociationSet Name="FK_tbl_Refresh_UserID" Association="IdentityEntities.FK_tbl_Refresh_UserID">
             <End Role="tbl_User" EntitySet="tbl_User" />
@@ -926,24 +921,21 @@
             <End Role="tbl_TextQueue" EntitySet="tbl_TextQueue" />
             <End Role="tbl_TextActivity" EntitySet="tbl_TextActivity" />
           </AssociationSet>
+          <EntitySet Name="tbl_AuthActivity" EntityType="IdentityEntities.tbl_AuthActivity" />
+          <AssociationSet Name="FK_tbl_AuthActivity_AudienceID" Association="IdentityEntities.FK_tbl_AuthActivity_AudienceID">
+            <End Role="tbl_Audience" EntitySet="tbl_Audience" />
+            <End Role="tbl_AuthActivity" EntitySet="tbl_AuthActivity" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tbl_AuthActivity_UserID" Association="IdentityEntities.FK_tbl_AuthActivity_UserID">
+            <End Role="tbl_User" EntitySet="tbl_User" />
+            <End Role="tbl_AuthActivity" EntitySet="tbl_AuthActivity" />
+          </AssociationSet>
+          <EntitySet Name="tbl_Url" EntityType="IdentityEntities.tbl_Url" />
+          <AssociationSet Name="FK_tbl_Url_AudienceID" Association="IdentityEntities.FK_tbl_Url_AudienceID">
+            <End Role="tbl_Audience" EntitySet="tbl_Audience" />
+            <End Role="tbl_Url" EntitySet="tbl_Url" />
+          </AssociationSet>
         </EntityContainer>
-        <EntityType Name="tbl_Activity">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="AudienceId" Type="Guid" />
-          <Property Name="UserId" Type="Guid" />
-          <Property Name="ActivityType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
-          <Property Name="TableName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="KeyValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="OriginalValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="CurrentValues" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
-          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_Activity_AudienceID" FromRole="tbl_Activity" ToRole="tbl_Audience" />
-          <NavigationProperty Name="tbl_User" Relationship="IdentityEntities.FK_tbl_Activity_UserID" FromRole="tbl_Activity" ToRole="tbl_User" />
-        </EntityType>
         <EntityType Name="tbl_AudienceRole">
           <Key>
             <PropertyRef Name="AudienceId" />
@@ -953,8 +945,10 @@
           <Property Name="RoleId" Type="Guid" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Role" Relationship="IdentityEntities.FK_tbl_AudienceRole_RoleID" FromRole="tbl_AudienceRole" ToRole="tbl_Role" />
           <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_AudienceRole_AudienceID" FromRole="tbl_AudienceRole" ToRole="tbl_Audience" />
+          <NavigationProperty Name="tbl_Role" Relationship="IdentityEntities.FK_tbl_AudienceRole_RoleID" FromRole="tbl_AudienceRole" ToRole="tbl_Role" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="tbl_Issuer">
           <Key>
@@ -967,12 +961,13 @@
           <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_Audience_IssuerID" FromRole="tbl_Issuer" ToRole="tbl_Audience" />
+          <NavigationProperty Name="tbl_Claim" Relationship="IdentityEntities.FK_tbl_Claim_IssuerID" FromRole="tbl_Issuer" ToRole="tbl_Claim" />
           <NavigationProperty Name="tbl_Refresh" Relationship="IdentityEntities.FK_tbl_Refresh_IssuerID" FromRole="tbl_Issuer" ToRole="tbl_Refresh" />
           <NavigationProperty Name="tbl_Setting" Relationship="IdentityEntities.FK_tbl_Setting_IssuerID" FromRole="tbl_Issuer" ToRole="tbl_Setting" />
           <NavigationProperty Name="tbl_State" Relationship="IdentityEntities.FK_tbl_State_IssuerID" FromRole="tbl_Issuer" ToRole="tbl_State" />
-          <NavigationProperty Name="tbl_Claim" Relationship="IdentityEntities.FK_tbl_Claim_IssuerID" FromRole="tbl_Issuer" ToRole="tbl_Claim" />
-          <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_Audience_IssuerID" FromRole="tbl_Issuer" ToRole="tbl_Audience" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="tbl_MOTD">
           <Key>
@@ -1002,8 +997,8 @@
           <Property Name="ValidFromUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="ValidToUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="IssuedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Issuer" Relationship="IdentityEntities.FK_tbl_Refresh_IssuerID" FromRole="tbl_Refresh" ToRole="tbl_Issuer" />
           <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_Refresh_AudienceID" FromRole="tbl_Refresh" ToRole="tbl_Audience" />
+          <NavigationProperty Name="tbl_Issuer" Relationship="IdentityEntities.FK_tbl_Refresh_IssuerID" FromRole="tbl_Refresh" ToRole="tbl_Issuer" />
           <NavigationProperty Name="tbl_User" Relationship="IdentityEntities.FK_tbl_Refresh_UserID" FromRole="tbl_Refresh" ToRole="tbl_User" />
         </EntityType>
         <EntityType Name="tbl_Role">
@@ -1017,11 +1012,12 @@
           <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_Role_AudienceID" FromRole="tbl_Role" ToRole="tbl_Audience" />
           <NavigationProperty Name="tbl_AudienceRole" Relationship="IdentityEntities.FK_tbl_AudienceRole_RoleID" FromRole="tbl_Role" ToRole="tbl_AudienceRole" />
           <NavigationProperty Name="tbl_RoleClaim" Relationship="IdentityEntities.FK_tbl_RoleClaim_RoleID" FromRole="tbl_Role" ToRole="tbl_RoleClaim" />
           <NavigationProperty Name="tbl_UserRole" Relationship="IdentityEntities.FK_tbl_UserRole_RoleID" FromRole="tbl_Role" ToRole="tbl_UserRole" />
-          <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_Role_AudienceID" FromRole="tbl_Role" ToRole="tbl_Audience" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="tbl_RoleClaim">
           <Key>
@@ -1032,8 +1028,10 @@
           <Property Name="ClaimId" Type="Guid" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Role" Relationship="IdentityEntities.FK_tbl_RoleClaim_RoleID" FromRole="tbl_RoleClaim" ToRole="tbl_Role" />
           <NavigationProperty Name="tbl_Claim" Relationship="IdentityEntities.FK_tbl_RoleClaim_ClaimID" FromRole="tbl_RoleClaim" ToRole="tbl_Claim" />
+          <NavigationProperty Name="tbl_Role" Relationship="IdentityEntities.FK_tbl_RoleClaim_RoleID" FromRole="tbl_RoleClaim" ToRole="tbl_Role" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="tbl_Setting">
           <Key>
@@ -1047,9 +1045,11 @@
           <Property Name="ConfigValue" Type="String" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Issuer" Relationship="IdentityEntities.FK_tbl_Setting_IssuerID" FromRole="tbl_Setting" ToRole="tbl_Issuer" />
           <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_Setting_AudienceID" FromRole="tbl_Setting" ToRole="tbl_Audience" />
+          <NavigationProperty Name="tbl_Issuer" Relationship="IdentityEntities.FK_tbl_Setting_IssuerID" FromRole="tbl_Setting" ToRole="tbl_Issuer" />
           <NavigationProperty Name="tbl_User" Relationship="IdentityEntities.FK_tbl_Setting_UserID" FromRole="tbl_Setting" ToRole="tbl_User" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="tbl_State">
           <Key>
@@ -1067,23 +1067,9 @@
           <Property Name="ValidToUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="IssuedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="LastPollingUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <NavigationProperty Name="tbl_Issuer" Relationship="IdentityEntities.FK_tbl_State_IssuerID" FromRole="tbl_State" ToRole="tbl_Issuer" />
           <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_State_AudienceID" FromRole="tbl_State" ToRole="tbl_Audience" />
+          <NavigationProperty Name="tbl_Issuer" Relationship="IdentityEntities.FK_tbl_State_IssuerID" FromRole="tbl_State" ToRole="tbl_Issuer" />
           <NavigationProperty Name="tbl_User" Relationship="IdentityEntities.FK_tbl_State_UserID" FromRole="tbl_State" ToRole="tbl_User" />
-        </EntityType>
-        <EntityType Name="tbl_Url">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="AudienceId" Type="Guid" Nullable="false" />
-          <Property Name="UrlHost" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
-          <Property Name="UrlPath" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
-          <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
-          <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
-          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
-          <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_Url_AudienceID" FromRole="tbl_Url" ToRole="tbl_Audience" />
         </EntityType>
         <EntityType Name="tbl_UserClaim">
           <Key>
@@ -1096,6 +1082,8 @@
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <NavigationProperty Name="tbl_Claim" Relationship="IdentityEntities.FK_tbl_UserClaim_ClaimID" FromRole="tbl_UserClaim" ToRole="tbl_Claim" />
           <NavigationProperty Name="tbl_User" Relationship="IdentityEntities.FK_tbl_UserClaim_UserID" FromRole="tbl_UserClaim" ToRole="tbl_User" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="tbl_UserLogin">
           <Key>
@@ -1108,6 +1096,8 @@
           <Property Name="CreatedUtc" Type="DateTimeOffset" Precision="7" />
           <NavigationProperty Name="tbl_Login" Relationship="IdentityEntities.FK_tbl_UserLogin_LoginID" FromRole="tbl_UserLogin" ToRole="tbl_Login" />
           <NavigationProperty Name="tbl_User" Relationship="IdentityEntities.FK_tbl_UserLogin_UserID" FromRole="tbl_UserLogin" ToRole="tbl_User" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="tbl_UserRole">
           <Key>
@@ -1120,6 +1110,8 @@
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <NavigationProperty Name="tbl_Role" Relationship="IdentityEntities.FK_tbl_UserRole_RoleID" FromRole="tbl_UserRole" ToRole="tbl_Role" />
           <NavigationProperty Name="tbl_User" Relationship="IdentityEntities.FK_tbl_UserRole_UserID" FromRole="tbl_UserRole" ToRole="tbl_User" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <Association Name="FK_tbl_AudienceRole_RoleID">
           <End Type="IdentityEntities.tbl_Role" Role="tbl_Role" Multiplicity="1">
@@ -1240,10 +1232,11 @@
           <Property Name="ValueType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
           <NavigationProperty Name="tbl_Issuer" Relationship="IdentityEntities.FK_tbl_Claim_IssuerID" FromRole="tbl_Claim" ToRole="tbl_Issuer" />
           <NavigationProperty Name="tbl_RoleClaim" Relationship="IdentityEntities.FK_tbl_RoleClaim_ClaimID" FromRole="tbl_Claim" ToRole="tbl_RoleClaim" />
           <NavigationProperty Name="tbl_UserClaim" Relationship="IdentityEntities.FK_tbl_UserClaim_ClaimID" FromRole="tbl_Claim" ToRole="tbl_UserClaim" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="tbl_Login">
           <Key>
@@ -1256,8 +1249,9 @@
           <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
           <NavigationProperty Name="tbl_UserLogin" Relationship="IdentityEntities.FK_tbl_UserLogin_LoginID" FromRole="tbl_Login" ToRole="tbl_UserLogin" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <Association Name="FK_tbl_Claim_IssuerID">
           <End Type="IdentityEntities.tbl_Issuer" Role="tbl_Issuer" Multiplicity="1">
@@ -1329,21 +1323,18 @@
           <Property Name="SecurityStamp" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="IsLockedOut" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
-          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
           <Property Name="LockoutEndUtc" Type="DateTimeOffset" Precision="7" />
-          <Property Name="LastLoginSuccessUtc" Type="DateTimeOffset" Precision="7" />
-          <Property Name="LastLoginFailureUtc" Type="DateTimeOffset" Precision="7" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
-          <NavigationProperty Name="tbl_Activity" Relationship="IdentityEntities.FK_tbl_Activity_AudienceID" FromRole="tbl_Audience" ToRole="tbl_Activity" />
-          <NavigationProperty Name="tbl_Issuer" Relationship="IdentityEntities.FK_tbl_Audience_IssuerID" FromRole="tbl_Audience" ToRole="tbl_Issuer" />
           <NavigationProperty Name="tbl_AudienceRole" Relationship="IdentityEntities.FK_tbl_AudienceRole_AudienceID" FromRole="tbl_Audience" ToRole="tbl_AudienceRole" />
+          <NavigationProperty Name="tbl_AuthActivity" Relationship="IdentityEntities.FK_tbl_AuthActivity_AudienceID" FromRole="tbl_Audience" ToRole="tbl_AuthActivity" />
+          <NavigationProperty Name="tbl_Issuer" Relationship="IdentityEntities.FK_tbl_Audience_IssuerID" FromRole="tbl_Audience" ToRole="tbl_Issuer" />
           <NavigationProperty Name="tbl_Refresh" Relationship="IdentityEntities.FK_tbl_Refresh_AudienceID" FromRole="tbl_Audience" ToRole="tbl_Refresh" />
           <NavigationProperty Name="tbl_Role" Relationship="IdentityEntities.FK_tbl_Role_AudienceID" FromRole="tbl_Audience" ToRole="tbl_Role" />
           <NavigationProperty Name="tbl_Setting" Relationship="IdentityEntities.FK_tbl_Setting_AudienceID" FromRole="tbl_Audience" ToRole="tbl_Setting" />
           <NavigationProperty Name="tbl_State" Relationship="IdentityEntities.FK_tbl_State_AudienceID" FromRole="tbl_Audience" ToRole="tbl_State" />
           <NavigationProperty Name="tbl_Url" Relationship="IdentityEntities.FK_tbl_Url_AudienceID" FromRole="tbl_Audience" ToRole="tbl_Url" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
         <EntityType Name="tbl_User">
           <Key>
@@ -1365,45 +1356,18 @@
           <Property Name="IsHumanBeing" Type="Boolean" Nullable="false" />
           <Property Name="IsLockedOut" Type="Boolean" Nullable="false" />
           <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
-          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
-          <Property Name="AccessSuccessCount" Type="Int32" Nullable="false" />
           <Property Name="LockoutEndUtc" Type="DateTimeOffset" Precision="7" />
-          <Property Name="LastLoginSuccessUtc" Type="DateTimeOffset" Precision="7" />
-          <Property Name="LastLoginFailureUtc" Type="DateTimeOffset" Precision="7" />
           <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
-          <Property Name="LastUpdatedUtc" Type="DateTimeOffset" Precision="7" />
-          <NavigationProperty Name="tbl_Activity" Relationship="IdentityEntities.FK_tbl_Activity_UserID" FromRole="tbl_User" ToRole="tbl_Activity" />
+          <NavigationProperty Name="tbl_AuthActivity" Relationship="IdentityEntities.FK_tbl_AuthActivity_UserID" FromRole="tbl_User" ToRole="tbl_AuthActivity" />
           <NavigationProperty Name="tbl_Refresh" Relationship="IdentityEntities.FK_tbl_Refresh_UserID" FromRole="tbl_User" ToRole="tbl_Refresh" />
           <NavigationProperty Name="tbl_Setting" Relationship="IdentityEntities.FK_tbl_Setting_UserID" FromRole="tbl_User" ToRole="tbl_Setting" />
           <NavigationProperty Name="tbl_State" Relationship="IdentityEntities.FK_tbl_State_UserID" FromRole="tbl_User" ToRole="tbl_State" />
           <NavigationProperty Name="tbl_UserClaim" Relationship="IdentityEntities.FK_tbl_UserClaim_UserID" FromRole="tbl_User" ToRole="tbl_UserClaim" />
           <NavigationProperty Name="tbl_UserLogin" Relationship="IdentityEntities.FK_tbl_UserLogin_UserID" FromRole="tbl_User" ToRole="tbl_UserLogin" />
           <NavigationProperty Name="tbl_UserRole" Relationship="IdentityEntities.FK_tbl_UserRole_UserID" FromRole="tbl_User" ToRole="tbl_UserRole" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
         </EntityType>
-        <Association Name="FK_tbl_Activity_AudienceID">
-          <End Type="IdentityEntities.tbl_Audience" Role="tbl_Audience" Multiplicity="0..1" />
-          <End Type="IdentityEntities.tbl_Activity" Role="tbl_Activity" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Audience">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_Activity">
-              <PropertyRef Name="AudienceId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_tbl_Activity_UserID">
-          <End Type="IdentityEntities.tbl_User" Role="tbl_User" Multiplicity="0..1" />
-          <End Type="IdentityEntities.tbl_Activity" Role="tbl_Activity" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_Activity">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_tbl_Audience_IssuerID">
           <End Type="IdentityEntities.tbl_Issuer" Role="tbl_Issuer" Multiplicity="1" />
           <End Type="IdentityEntities.tbl_Audience" Role="tbl_Audience" Multiplicity="*" />
@@ -1478,20 +1442,6 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="tbl_State">
-              <PropertyRef Name="AudienceId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_tbl_Url_AudienceID">
-          <End Type="IdentityEntities.tbl_Audience" Role="tbl_Audience" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="IdentityEntities.tbl_Url" Role="tbl_Url" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="tbl_Audience">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="tbl_Url">
               <PropertyRef Name="AudienceId" />
             </Dependent>
           </ReferentialConstraint>
@@ -1637,31 +1587,85 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="tbl_AuthActivity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" />
+          <Property Name="UserId" Type="Guid" />
+          <Property Name="LoginType" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="LoginOutcome" Type="String" MaxLength="16" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_AuthActivity_AudienceID" FromRole="tbl_AuthActivity" ToRole="tbl_Audience" />
+          <NavigationProperty Name="tbl_User" Relationship="IdentityEntities.FK_tbl_AuthActivity_UserID" FromRole="tbl_AuthActivity" ToRole="tbl_User" />
+          <Property Name="LocalEndpoint" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="RemoteEndpoint" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+        </EntityType>
+        <Association Name="FK_tbl_AuthActivity_AudienceID">
+          <End Type="IdentityEntities.tbl_Audience" Role="tbl_Audience" Multiplicity="0..1" />
+          <End Type="IdentityEntities.tbl_AuthActivity" Role="tbl_AuthActivity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_AuthActivity">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tbl_AuthActivity_UserID">
+          <End Type="IdentityEntities.tbl_User" Role="tbl_User" Multiplicity="0..1" />
+          <End Type="IdentityEntities.tbl_AuthActivity" Role="tbl_AuthActivity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_AuthActivity">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="tbl_Url">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="AudienceId" Type="Guid" Nullable="false" />
+          <Property Name="UrlHost" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="UrlPath" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeletable" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedUtc" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <NavigationProperty Name="tbl_Audience" Relationship="IdentityEntities.FK_tbl_Url_AudienceID" FromRole="tbl_Url" ToRole="tbl_Audience" />
+          <Property Name="VersionStartUtc" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="VersionEndUtc" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <Association Name="FK_tbl_Url_AudienceID">
+          <End Type="IdentityEntities.tbl_Audience" Role="tbl_Audience" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="IdentityEntities.tbl_Url" Role="tbl_Url" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_Audience">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="tbl_Url">
+              <PropertyRef Name="AudienceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="IdentityEntitiesStoreContainer" CdmEntityContainer="IdentityEntities_TBL">
-          <EntitySetMapping Name="tbl_Activity">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Activity">
-              <MappingFragment StoreEntitySet="tbl_Activity">
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="CurrentValues" ColumnName="CurrentValues" />
-                <ScalarProperty Name="OriginalValues" ColumnName="OriginalValues" />
-                <ScalarProperty Name="KeyValues" ColumnName="KeyValues" />
-                <ScalarProperty Name="TableName" ColumnName="TableName" />
-                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
+        <EntityContainerMapping StorageEntityContainer="IdentityEntitiesStoreContainer" CdmEntityContainer="IdentityEntities_EF6_Tbl">
           <EntitySetMapping Name="tbl_AudienceRole">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_AudienceRole">
               <MappingFragment StoreEntitySet="tbl_AudienceRole">
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="RoleId" ColumnName="RoleId" />
@@ -1672,7 +1676,8 @@
           <EntitySetMapping Name="tbl_Issuer">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_Issuer">
               <MappingFragment StoreEntitySet="tbl_Issuer">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
@@ -1717,7 +1722,8 @@
           <EntitySetMapping Name="tbl_Role">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_Role">
               <MappingFragment StoreEntitySet="tbl_Role">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
@@ -1731,6 +1737,8 @@
           <EntitySetMapping Name="tbl_RoleClaim">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_RoleClaim">
               <MappingFragment StoreEntitySet="tbl_RoleClaim">
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="ClaimId" ColumnName="ClaimId" />
@@ -1741,6 +1749,8 @@
           <EntitySetMapping Name="tbl_Setting">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_Setting">
               <MappingFragment StoreEntitySet="tbl_Setting">
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="ConfigValue" ColumnName="ConfigValue" />
@@ -1770,23 +1780,11 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="tbl_Url">
-            <EntityTypeMapping TypeName="IdentityEntities.tbl_Url">
-              <MappingFragment StoreEntitySet="tbl_Url">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
-                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
-                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
-                <ScalarProperty Name="UrlPath" ColumnName="UrlPath" />
-                <ScalarProperty Name="UrlHost" ColumnName="UrlHost" />
-                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="tbl_UserClaim">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_UserClaim">
               <MappingFragment StoreEntitySet="tbl_UserClaim">
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="ClaimId" ColumnName="ClaimId" />
@@ -1797,6 +1795,8 @@
           <EntitySetMapping Name="tbl_UserLogin">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_UserLogin">
               <MappingFragment StoreEntitySet="tbl_UserLogin">
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="LoginId" ColumnName="LoginId" />
@@ -1807,6 +1807,8 @@
           <EntitySetMapping Name="tbl_UserRole">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_UserRole">
               <MappingFragment StoreEntitySet="tbl_UserRole">
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="RoleId" ColumnName="RoleId" />
@@ -1840,7 +1842,8 @@
           <EntitySetMapping Name="tbl_Claim">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_Claim">
               <MappingFragment StoreEntitySet="tbl_Claim">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="ValueType" ColumnName="ValueType" />
@@ -1855,7 +1858,8 @@
           <EntitySetMapping Name="tbl_Login">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_Login">
               <MappingFragment StoreEntitySet="tbl_Login">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
@@ -1869,13 +1873,10 @@
           <EntitySetMapping Name="tbl_Audience">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_Audience">
               <MappingFragment StoreEntitySet="tbl_Audience">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
-                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
                 <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
                 <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
@@ -1892,13 +1893,10 @@
           <EntitySetMapping Name="tbl_User">
             <EntityTypeMapping TypeName="IdentityEntities.tbl_User">
               <MappingFragment StoreEntitySet="tbl_User">
-                <ScalarProperty Name="LastUpdatedUtc" ColumnName="LastUpdatedUtc" />
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
                 <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
-                <ScalarProperty Name="LastLoginFailureUtc" ColumnName="LastLoginFailureUtc" />
-                <ScalarProperty Name="LastLoginSuccessUtc" ColumnName="LastLoginSuccessUtc" />
                 <ScalarProperty Name="LockoutEndUtc" ColumnName="LockoutEndUtc" />
-                <ScalarProperty Name="AccessSuccessCount" ColumnName="AccessSuccessCount" />
-                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
                 <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
                 <ScalarProperty Name="IsLockedOut" ColumnName="IsLockedOut" />
                 <ScalarProperty Name="IsHumanBeing" ColumnName="IsHumanBeing" />
@@ -1945,6 +1943,35 @@
                 <ScalarProperty Name="Body" ColumnName="Body" />
                 <ScalarProperty Name="ToPhoneNumber" ColumnName="ToPhoneNumber" />
                 <ScalarProperty Name="FromPhoneNumber" ColumnName="FromPhoneNumber" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_AuthActivity">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_AuthActivity">
+              <MappingFragment StoreEntitySet="tbl_AuthActivity">
+                <ScalarProperty Name="LoginOutcome" ColumnName="LoginOutcome" />
+                <ScalarProperty Name="RemoteEndpoint" ColumnName="RemoteEndpoint" />
+                <ScalarProperty Name="LocalEndpoint" ColumnName="LocalEndpoint" />
+                <ScalarProperty Name="LoginType" ColumnName="LoginType" />
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_Url">
+            <EntityTypeMapping TypeName="IdentityEntities.tbl_Url">
+              <MappingFragment StoreEntitySet="tbl_Url">
+                <ScalarProperty Name="VersionEndUtc" ColumnName="VersionEndUtc" />
+                <ScalarProperty Name="VersionStartUtc" ColumnName="VersionStartUtc" />
+                <ScalarProperty Name="CreatedUtc" ColumnName="CreatedUtc" />
+                <ScalarProperty Name="IsDeletable" ColumnName="IsDeletable" />
+                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
+                <ScalarProperty Name="UrlPath" ColumnName="UrlPath" />
+                <ScalarProperty Name="UrlHost" ColumnName="UrlHost" />
+                <ScalarProperty Name="AudienceId" ColumnName="AudienceId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

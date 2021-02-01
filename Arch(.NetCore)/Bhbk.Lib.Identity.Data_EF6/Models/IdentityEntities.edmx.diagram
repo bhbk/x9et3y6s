@@ -5,27 +5,55 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="d0804a37b16b4b0daec76723ecf6b435" Name="Diagram1">
-        <EntityTypeShape EntityType="IdentityModels.uvw_AudienceRole" Width="1.5" PointX="4.75" PointY="0.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Claim" Width="1.5" PointX="4.75" PointY="3.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Issuer" Width="1.5" PointX="6.75" PointY="0.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Login" Width="1.5" PointX="0.75" PointY="6.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_MOTD" Width="1.5" PointX="6.75" PointY="4.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Refresh" Width="1.5" PointX="2.75" PointY="7.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Role" Width="1.5" PointX="8.75" PointY="0.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Setting" Width="1.5" PointX="8.75" PointY="4.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_State" Width="1.5" PointX="4.75" PointY="8.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_TextQueue" Width="1.5" PointX="6.75" PointY="8.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Url" Width="1.5" PointX="8.75" PointY="8.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_EmailQueue" Width="1.5" PointX="10.75" PointY="7.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_UserRole" Width="1.5" PointX="0.75" PointY="12.875" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_UserClaim" Width="1.5" PointX="2.75" PointY="12.875" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_UserLogin" Width="1.5" PointX="0.75" PointY="10" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_EmailActivity" Width="1.5" PointX="4.75" PointY="13" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_TextActivity" Width="1.5" PointX="6.75" PointY="12.625" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Audience" Width="1.5" PointX="2.75" PointY="0.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_User" Width="1.5" PointX="10.75" PointY="0.75" />
-        <EntityTypeShape EntityType="IdentityModels.uvw_Activity" Width="1.5" PointX="0.75" PointY="0.75" />
-      </Diagram>
+        <EntityTypeShape EntityType="IdentityModels.E_Claim" Width="1.5" PointX="3.875" PointY="11.625" />
+        <EntityTypeShape EntityType="IdentityModels.E_Issuer" Width="1.5" PointX="7.375" PointY="5.375" />
+        <EntityTypeShape EntityType="IdentityModels.E_Login" Width="1.5" PointX="7.375" PointY="9.625" />
+        <EntityTypeShape EntityType="IdentityModels.E_MOTD" Width="1.5" PointX="3.875" PointY="18.5" />
+        <EntityTypeShape EntityType="IdentityModels.E_Refresh" Width="1.5" PointX="7.375" PointY="0.5" />
+        <EntityTypeShape EntityType="IdentityModels.E_Role" Width="1.5" PointX="0.5" PointY="3.875" />
+        <EntityTypeShape EntityType="IdentityModels.E_Setting" Width="1.5" PointX="3.875" PointY="0.5" />
+        <EntityTypeShape EntityType="IdentityModels.E_State" Width="1.5" PointX="10.75" PointY="0.5" />
+        <EntityTypeShape EntityType="IdentityModels.E_TextQueue" Width="1.5" PointX="10.75" PointY="18" />
+        <EntityTypeShape EntityType="IdentityModels.E_Url" Width="1.5" PointX="0.5" PointY="0.5" />
+        <EntityTypeShape EntityType="IdentityModels.E_EmailQueue" Width="1.5" PointX="7.375" PointY="17.75" />
+        <EntityTypeShape EntityType="IdentityModels.E_UserClaim" Width="1.5" PointX="0.5" PointY="13.875" />
+        <EntityTypeShape EntityType="IdentityModels.E_UserLogin" Width="1.5" PointX="7.375" PointY="13" />
+        <EntityTypeShape EntityType="IdentityModels.E_EmailActivity" Width="1.5" PointX="7.375" PointY="21.875" />
+        <EntityTypeShape EntityType="IdentityModels.E_TextActivity" Width="1.5" PointX="10.75" PointY="21.25" />
+        <EntityTypeShape EntityType="IdentityModels.E_Audience" Width="1.5" PointX="3.875" PointY="5.125" />
+        <AssociationConnector Association="IdentityModels.Issuer_Audiences" />
+        <AssociationConnector Association="IdentityModels.Audience_Roles" />
+        <AssociationConnector Association="IdentityModels.Audience_Urls" />
+        <AssociationConnector Association="IdentityModels.Issuer_Refreshes" />
+        <AssociationConnector Association="IdentityModels.Audience_Refreshes" />
+        <AssociationConnector Association="IdentityModels.Issuer_Claims" />
+        <AssociationConnector Association="IdentityModels.Issuer_Settings" />
+        <AssociationConnector Association="IdentityModels.Audience_Settings" />
+        <AssociationConnector Association="IdentityModels.EmailQueue_EmailActivity" />
+        <AssociationConnector Association="IdentityModels.TextQueue_TextActivity" />
+        <AssociationConnector Association="IdentityModels.Audience_States" />
+        <AssociationConnector Association="IdentityModels.Issuer_States" />
+        <AssociationConnector Association="IdentityModels.Login_UserLogins" />
+        <AssociationConnector Association="IdentityModels.Claim_UserClaim" />
+        <EntityTypeShape EntityType="IdentityModels.E_User" Width="1.5" PointX="10.75" PointY="5.25" />
+        <AssociationConnector Association="IdentityModels.User_Refreshes" />
+        <AssociationConnector Association="IdentityModels.User_States" />
+        <AssociationConnector Association="IdentityModels.User_Settings" />
+        <AssociationConnector Association="IdentityModels.User_UserClaims" />
+        <AssociationConnector Association="IdentityModels.User_AuthActivity" />
+        <AssociationConnector Association="IdentityModels.User_UserLogins" />
+        <EntityTypeShape EntityType="IdentityModels.E_AuthActivity" Width="1.5" PointX="10.75" PointY="13" />
+        <AssociationConnector Association="IdentityModels.Audience_AuthActivity" />
+        <EntityTypeShape EntityType="IdentityModels.E_RoleClaim" Width="1.5" PointX="3.875" PointY="15.5" />
+        <AssociationConnector Association="IdentityModels.Role_RoleClaim" />
+        <AssociationConnector Association="IdentityModels.Claim_RoleClaim" />
+        <EntityTypeShape EntityType="IdentityModels.E_AudienceRole" Width="1.5" PointX="0.5" PointY="8" />
+        <AssociationConnector Association="IdentityModels.Role_AudienceRoles" />
+        <AssociationConnector Association="IdentityModels.Audience_AudienceRoles" />
+        <EntityTypeShape EntityType="IdentityModels.E_UserRole" Width="1.5" PointX="0.5" PointY="11.125" />
+        <AssociationConnector Association="IdentityModels.User_UserRoles" />
+        <AssociationConnector Association="IdentityModels.Role_UserRoles" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

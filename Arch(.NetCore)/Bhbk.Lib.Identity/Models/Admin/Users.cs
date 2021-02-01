@@ -45,20 +45,10 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public bool EmailConfirmed { get; set; }
 
-        public Nullable<bool> PhoneNumberConfirmed { get; set; }
-
-        public Nullable<DateTimeOffset> LastUpdatedUtc { get; set; }
-
         public Nullable<DateTimeOffset> LockoutEndUtc { get; set; }
 
-        public Nullable<DateTimeOffset> LastLoginFailureUtc { get; set; }
-
-        public Nullable<DateTimeOffset> LastLoginSuccessUtc { get; set; }
-
-        public int AccessFailedCount { get; set; }
-
-        public int AccessSuccessCount { get; set; }
-
         public bool PasswordConfirmed { get; set; }
+
+        public Nullable<bool> PhoneNumberConfirmed { get; set; }
     }
 }

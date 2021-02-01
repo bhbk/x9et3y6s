@@ -28,7 +28,5 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public Guid Id { get; set; }
 
         public DateTimeOffset CreatedUtc { get; set; }
-
-        public Nullable<DateTimeOffset> LastUpdatedUtc { get; set; }
     }
 }

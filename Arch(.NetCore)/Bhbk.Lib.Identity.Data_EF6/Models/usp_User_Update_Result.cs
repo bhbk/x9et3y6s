@@ -21,14 +21,14 @@ namespace Bhbk.Lib.Identity.Data_EF6.Models
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public Nullable<bool> PhoneNumberConfirmed { get; set; }
+        public string ConcurrencyStamp { get; set; }
         public string PasswordHashPBKDF2 { get; set; }
         public string PasswordHashSHA256 { get; set; }
         public bool PasswordConfirmed { get; set; }
-        public string ConcurrencyStamp { get; set; }
         public string SecurityStamp { get; set; }
         public bool IsHumanBeing { get; set; }
-        public bool IsDeletable { get; set; }
         public bool IsLockedOut { get; set; }
+        public bool IsDeletable { get; set; }
         public int AccessFailedCount { get; set; }
         public int AccessSuccessCount { get; set; }
         public Nullable<System.DateTimeOffset> LockoutEndUtc { get; set; }

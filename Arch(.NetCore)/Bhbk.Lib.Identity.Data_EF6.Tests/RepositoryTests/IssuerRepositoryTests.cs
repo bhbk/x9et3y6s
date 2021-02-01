@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Issuers.Create(new uvw_Issuer());
+                UoW.Issuers.Create(new E_Issuer());
                 UoW.Commit();
             });
         }
@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateIssuers();
 
             var result = UoW.Issuers.Create(
-                Mapper.Map<uvw_Issuer>(new IssuerV1()
+                Mapper.Map<E_Issuer>(new IssuerV1()
                 {
                     Name = TestDefaultConstants.IssuerName,
                     IssuerKey = TestDefaultConstants.IssuerKey,
@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
                 }));
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Issuer>();
+            result.Should().BeAssignableTo<E_Issuer>();
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Issuers.Delete(new uvw_Issuer());
+                UoW.Issuers.Delete(new E_Issuer());
                 UoW.Commit();
             });
         }
@@ -62,7 +62,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateIssuers();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<E_Issuer>()
                 .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
@@ -78,7 +78,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateIssuers();
 
             var results = UoW.Issuers.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Issuer>>();
+            results.Should().BeAssignableTo<IEnumerable<E_Issuer>>();
             results.Count().Should().Be(UoW.Issuers.Count());
         }
 
@@ -87,7 +87,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Issuers.Update(new uvw_Issuer());
+                UoW.Issuers.Update(new E_Issuer());
                 UoW.Commit();
             });
         }
@@ -99,7 +99,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateIssuers();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<E_Issuer>()
                 .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
             issuer.Name += "(Updated)";
@@ -107,7 +107,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             var result = UoW.Issuers.Update(issuer);
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Issuer>();
+            result.Should().BeAssignableTo<E_Issuer>();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Primitives.Enums;
@@ -105,7 +105,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     Data = Mapper.Map<IEnumerable<ClaimV1>>(
                         UoW.Claims.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claim>, IQueryable<tbl_Claim>>>>(
-                                QueryExpressionFactory.GetQueryExpression<tbl_Claim>().ApplyState(state)))),
+                                QueryExpressionFactory.GetQueryExpression<tbl_Claim>().ApplyState(state)),
+                                    new List<Expression<Func<tbl_Claim, object>>>()
+                                    {
+                                        x => x.Issuer,
+                                    })),
 
                     Total = UoW.Claims.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claim>, IQueryable<tbl_Claim>>>>(

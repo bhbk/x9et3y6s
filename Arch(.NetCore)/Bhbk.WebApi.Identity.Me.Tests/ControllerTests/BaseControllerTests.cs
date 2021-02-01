@@ -32,7 +32,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 sc.AddSingleton<IMapper>(mapper);
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    return new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                    return new UnitOfWork(conf["Databases:IdentityEntities_EFCore"], instance);
                 });
                 sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 

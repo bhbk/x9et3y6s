@@ -2,7 +2,7 @@
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Cryptography.Hashing;
 using Bhbk.Lib.DataAccess.EFCore.Repositories;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Primitives.Constants;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 
-namespace Bhbk.Lib.Identity.Data.Repositories_TBL
+namespace Bhbk.Lib.Identity.Data.Repositories_Tbl
 {
     public class AudienceRepository : GenericRepository<tbl_Audience>
     {
@@ -27,26 +27,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
         {
             get { return _clock.UtcNow; }
             set { _clock.UtcNow = value; }
-        }
-
-        public tbl_Audience AccessFailed(tbl_Audience audience)
-        {
-            audience.LastLoginFailureUtc = Clock.UtcDateTime;
-            audience.AccessFailedCount++;
-
-            _context.Entry(audience).State = EntityState.Modified;
-
-            return _context.Entry(audience).Entity;
-        }
-
-        public tbl_Audience AccessSuccess(tbl_Audience audience)
-        {
-            audience.LastLoginSuccessUtc = Clock.UtcDateTime;
-            audience.AccessSuccessCount++;
-
-            _context.Entry(audience).State = EntityState.Modified;
-
-            return _context.Entry(audience).Entity;
         }
 
         public tbl_AudienceRole AddRole(tbl_AudienceRole role)
@@ -79,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
 
         public override tbl_Audience Delete(tbl_Audience audience)
         {
-            var activity = _context.Set<tbl_Activity>()
+            var activity = _context.Set<tbl_AuthActivity>()
                 .Where(x => x.AudienceId == audience.Id);
 
             var refreshes = _context.Set<tbl_Refresh>()
@@ -202,7 +182,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
 
             audience.ConcurrencyStamp = Guid.NewGuid().ToString();
             audience.SecurityStamp = Guid.NewGuid().ToString();
-            audience.LastUpdatedUtc = Clock.UtcDateTime;
 
             if (string.IsNullOrEmpty(password))
             {
@@ -235,7 +214,6 @@ namespace Bhbk.Lib.Identity.Data.Repositories_TBL
             entity.IssuerId = audience.IssuerId;
             entity.Name = audience.Name;
             entity.Description = audience.Description;
-            entity.LastUpdatedUtc = Clock.UtcDateTime;
             entity.IsDeletable = audience.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;

@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.Identity.Data_EF6.Models_TBL;
+﻿using Bhbk.Lib.Identity.Data_EF6.Models_Tbl;
 using Bhbk.Lib.Identity.Models.Admin;
 using Bhbk.Lib.Identity.Primitives.Tests.Constants;
 using Bhbk.Lib.QueryExpression.Extensions;
@@ -10,9 +10,9 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using Xunit;
 
-namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
+namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_Tbl
 {
-    [Collection("RepositoryTests_TBL")]
+    [Collection("RepositoryTests_Tbl")]
     public class AudienceRepositoryTests : BaseRepositoryTests
     {
         [Fact]
@@ -70,7 +70,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests_TBL
                 .Where(x => x.Name == TestDefaultConstants.AudienceName).ToLambda())
                 .Single();
 
-            UoW.Activities.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Activity>()
+            UoW.AuthActivity.Delete(QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
             UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()

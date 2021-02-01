@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
 using Bhbk.Lib.Identity.Domain.Authorize;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Profiles;
@@ -39,7 +39,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 .Build();
 
             var instance = new ContextService(InstanceContext.SystemTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>()).CreateMapper();
+            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>())
+                .CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
@@ -50,9 +51,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    var uow = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                    var uow = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
 
-                    var data = new DefaultDataFactory_TBL(uow);
+                    var data = new DefaultDataFactory_Tbl(uow);
                     data.CreateSettings();
                     data.CreateAudienceRoles();
                     data.CreateUserLogins();
@@ -67,9 +68,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                  * only for owin authentication configuration.
                  */
 
-                var owin = new UnitOfWork(conf["Databases:IdentityEntities"], instance);
+                var owin = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
 
-                var data = new DefaultDataFactory_TBL(owin);
+                var data = new DefaultDataFactory_Tbl(owin);
                 data.CreateIssuers();
                 data.CreateAudiences();
 
@@ -103,8 +104,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     jwt.IncludeErrorDetails = true;
                     jwt.TokenValidationParameters = new TokenValidationParameters
                     {
-                        //AuthenticationType = "JWT:" + instance.InstanceType.ToString(),
-                        //ValidTypes = new List<string>() { "JWT:" + instance.InstanceType.ToString() },
                         ValidIssuers = issuers.ToArray(),
                         IssuerSigningKeys = issuerKeys.Select(x => new SymmetricSecurityKey(Encoding.Unicode.GetBytes(x))).ToArray(),
                         ValidAudiences = audiences.ToArray(),

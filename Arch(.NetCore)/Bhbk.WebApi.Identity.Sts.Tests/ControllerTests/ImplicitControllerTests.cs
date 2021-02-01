@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.Identity.Data.Infrastructure_TBL;
-using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_TBL;
+using Bhbk.Lib.Identity.Data.Infrastructure_Tbl;
+using Bhbk.Lib.Identity.Data.Tests.RepositoryTests_Tbl;
 using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Models.Sts;
 using Bhbk.Lib.Identity.Primitives.Constants;
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 var url = new Uri(TestDefaultConstants.UriLink);
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
-                    && x.StateType == StateType.User.ToString() && x.StateConsume == false
+                    && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
                     && x.ValidToUtc > DateTime.UtcNow).First();
 
                 var imp = controller.ImplicitV2_Grant(

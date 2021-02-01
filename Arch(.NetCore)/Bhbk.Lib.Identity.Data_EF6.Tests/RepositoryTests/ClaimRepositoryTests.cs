@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Claims.Create(new uvw_Claim());
+                UoW.Claims.Create(new E_Claim());
                 UoW.Commit();
             });
         }
@@ -33,12 +33,12 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateClaims();
 
-            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<uvw_Issuer>()
+            var issuer = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<E_Issuer>()
                 .Where(x => x.Name == TestDefaultConstants.IssuerName).ToLambda())
                 .Single();
 
             var result = UoW.Claims.Create(
-                Mapper.Map<uvw_Claim>(new ClaimV1()
+                Mapper.Map<E_Claim>(new ClaimV1()
                 {
                     IssuerId = issuer.Id,
                     Subject = TestDefaultConstants.ClaimSubject,
@@ -49,7 +49,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
                 }));
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Claim>();
+            result.Should().BeAssignableTo<E_Claim>();
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                UoW.Claims.Delete(new uvw_Claim());
+                UoW.Claims.Delete(new E_Claim());
                 UoW.Commit();
             });
         }
@@ -69,7 +69,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateClaims();
 
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claim>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<E_Claim>()
                 .Where(x => x.Type == TestDefaultConstants.ClaimName).ToLambda())
                 .Single();
 
@@ -85,7 +85,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.CreateClaims();
 
             var results = UoW.Claims.Get();
-            results.Should().BeAssignableTo<IEnumerable<uvw_Claim>>();
+            results.Should().BeAssignableTo<IEnumerable<E_Claim>>();
             results.Count().Should().Be(UoW.Claims.Count());
         }
 
@@ -94,7 +94,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
         {
             Assert.Throws<DbEntityValidationException>(() =>
             {
-                UoW.Claims.Update(new uvw_Claim());
+                UoW.Claims.Update(new E_Claim());
                 UoW.Commit();
             });
         }
@@ -106,7 +106,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             data.Destroy();
             data.CreateClaims();
 
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<uvw_Claim>()
+            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<E_Claim>()
                 .Where(x => x.Type == TestDefaultConstants.ClaimName).ToLambda())
                 .Single();
             claim.Value += "(Updated)";
@@ -114,7 +114,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             var result = UoW.Claims.Update(claim);
             UoW.Commit();
 
-            result.Should().BeAssignableTo<uvw_Claim>();
+            result.Should().BeAssignableTo<E_Claim>();
         }
     }
 }

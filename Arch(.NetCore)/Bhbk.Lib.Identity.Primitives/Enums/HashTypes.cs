@@ -5,5 +5,6 @@ namespace Bhbk.Lib.Identity.Primitives.Enums
     public enum HashTypes
     {
         PBKDF2,
+        SHA256,
     }
 }

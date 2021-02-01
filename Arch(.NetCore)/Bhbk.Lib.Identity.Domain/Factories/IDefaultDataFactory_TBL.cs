@@ -2,7 +2,7 @@
 
 namespace Bhbk.Lib.Identity.Domain.Factories
 {
-    public interface IDefaultDataFactory_TBL
+    public interface IDefaultDataFactory_Tbl
     {
         public void CreateAudiences();
         public void CreateAudienceRoles();

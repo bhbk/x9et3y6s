@@ -23,12 +23,7 @@ namespace Bhbk.Lib.Identity.Data.Models
         public bool IsHumanBeing { get; set; }
         public bool IsDeletable { get; set; }
         public bool IsLockedOut { get; set; }
-        public int AccessFailedCount { get; set; }
-        public int AccessSuccessCount { get; set; }
         public DateTimeOffset? LockoutEndUtc { get; set; }
-        public DateTimeOffset? LastLoginSuccessUtc { get; set; }
-        public DateTimeOffset? LastLoginFailureUtc { get; set; }
         public DateTimeOffset CreatedUtc { get; set; }
-        public DateTimeOffset? LastUpdatedUtc { get; set; }
     }
 }

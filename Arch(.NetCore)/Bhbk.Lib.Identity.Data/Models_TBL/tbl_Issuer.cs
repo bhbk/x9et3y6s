@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace Bhbk.Lib.Identity.Data.Models_TBL
+namespace Bhbk.Lib.Identity.Data.Models_Tbl
 {
     public partial class tbl_Issuer
     {
@@ -23,7 +23,6 @@ namespace Bhbk.Lib.Identity.Data.Models_TBL
         public bool IsEnabled { get; set; }
         public bool IsDeletable { get; set; }
         public DateTimeOffset CreatedUtc { get; set; }
-        public DateTimeOffset? LastUpdatedUtc { get; set; }
 
         public virtual ICollection<tbl_Audience> tbl_Audiences { get; set; }
         public virtual ICollection<tbl_Claim> tbl_Claims { get; set; }

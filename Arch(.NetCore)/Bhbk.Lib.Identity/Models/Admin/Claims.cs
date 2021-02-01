@@ -30,7 +30,5 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         [Required]
         public DateTimeOffset CreatedUtc { get; set; }
-
-        public DateTimeOffset? LastUpdatedUtc { get; set; }
     }
 }

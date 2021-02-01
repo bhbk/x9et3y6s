@@ -1,4 +1,5 @@
 ﻿
+
 CREATE PROCEDURE [svc].[usp_User_Update]
      @Id					UNIQUEIDENTIFIER 
     ,@UserName				NVARCHAR (256) 
@@ -20,7 +21,7 @@ BEGIN
 
 	BEGIN TRY
 
-        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
+    	BEGIN TRANSACTION;
 
         UPDATE [dbo].[tbl_User]
         SET
@@ -33,7 +34,6 @@ BEGIN
             ,PhoneNumber			= @PhoneNumber
 			,PhoneNumberConfirmed	= @PhoneNumberConfirmed
 			,PasswordConfirmed		= @PasswordConfirmed
-            ,LastUpdatedUtc			= @LASTUPDATED
             ,IsHumanBeing			= @IsHumanBeing
             ,IsLockedOut			= @IsLockedOut
             ,IsDeletable			= @IsDeletable
@@ -46,9 +46,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_User]
             WHERE Id = @Id
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

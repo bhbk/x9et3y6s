@@ -2,7 +2,7 @@
 using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
-using Bhbk.Lib.Identity.Data.Models_TBL;
+using Bhbk.Lib.Identity.Data.Models_Tbl;
 using Bhbk.Lib.Identity.Domain.Factories;
 using Bhbk.Lib.Identity.Domain.Templates;
 using Bhbk.Lib.Identity.Models.Admin;
@@ -350,7 +350,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         UoW.Users.Get(
                             Mapper.MapExpression<Expression<Func<IQueryable<tbl_User>, IQueryable<tbl_User>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_User>().ApplyState(state)),
-                            new List<Expression<Func<tbl_User, object>>>() { x => x.tbl_UserLogins, x => x.tbl_UserRoles })),
+                                    new List<Expression<Func<tbl_User, object>>>() 
+                                    { 
+                                        x => x.tbl_AuthActivities,
+                                        x => x.tbl_UserClaims,
+                                        x => x.tbl_UserLogins, 
+                                        x => x.tbl_UserRoles,
+                                    })),
 
                     Total = UoW.Users.Count(
                         Mapper.MapExpression<Expression<Func<IQueryable<tbl_User>, IQueryable<tbl_User>>>>(

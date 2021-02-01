@@ -19,6 +19,8 @@ BEGIN
 
 	BEGIN TRY
 
+    	BEGIN TRANSACTION;
+
         UPDATE [dbo].[tbl_State]
         SET
              IssuerId				= @IssuerId
@@ -40,9 +42,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_State] 
             WHERE Id = @Id
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

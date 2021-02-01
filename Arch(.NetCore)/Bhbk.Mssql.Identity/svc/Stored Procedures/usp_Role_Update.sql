@@ -13,7 +13,7 @@ BEGIN
 
 	BEGIN TRY
 
-        DECLARE @LASTUPDATED DATETIMEOFFSET (7) = GETUTCDATE()
+    	BEGIN TRANSACTION;
 
         UPDATE [dbo].[tbl_Role]
         SET
@@ -23,7 +23,6 @@ BEGIN
 	        ,Description			= @Description
 	        ,IsEnabled				= @IsEnabled
             ,IsDeletable			= @IsDeletable
-            ,LastUpdatedUtc			= @LASTUPDATED
         WHERE Id = @Id
 
 		IF @@ROWCOUNT != 1
@@ -32,9 +31,13 @@ BEGIN
         SELECT * FROM [dbo].[tbl_Role]
             WHERE Id = @Id
 
+    	COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+    	ROLLBACK TRANSACTION;
         THROW;
 
     END CATCH

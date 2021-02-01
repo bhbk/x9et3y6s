@@ -1,7 +1,7 @@
 ﻿
 CREATE   PROCEDURE [svc].[usp_UserLogin_Delete]
-    @UserID uniqueidentifier
-	,@LoginID uniqueidentifier
+    @UserId uniqueidentifier
+	,@LoginId uniqueidentifier
 
 AS
 BEGIN
@@ -10,10 +10,10 @@ BEGIN
 	BEGIN TRY
 
         SELECT * FROM [dbo].[tbl_UserLogin] 
-			WHERE UserId = @UserID AND LoginId = @LoginID 
+			WHERE UserId = @UserId AND LoginId = @LoginId 
 
         DELETE [dbo].[tbl_UserLogin]
-	        WHERE UserId = @UserID AND LoginId = @LoginID
+	        WHERE UserId = @UserId AND LoginId = @LoginId
 
     END TRY
 
