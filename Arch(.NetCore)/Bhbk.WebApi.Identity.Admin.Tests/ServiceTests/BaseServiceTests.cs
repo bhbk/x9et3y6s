@@ -38,20 +38,20 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var instance = new ContextService(InstanceContext.SystemTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>())
+            var env = new ContextService(InstanceContext.SystemTest);
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>())
                 .CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
                 sc.AddSingleton<IConfiguration>(conf);
-                sc.AddSingleton<IContextService>(instance);
-                sc.AddSingleton<IMapper>(mapper);
+                sc.AddSingleton<IContextService>(env);
+                sc.AddSingleton<IMapper>(map);
                 sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
                 sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    var uow = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
+                    var uow = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], env);
 
                     var data = new DefaultDataFactory_Tbl(uow);
                     data.CreateSettings();
@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                  * only for owin authentication configuration.
                  */
 
-                var owin = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
+                var owin = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], env);
 
                 var data = new DefaultDataFactory_Tbl(owin);
                 data.CreateIssuers();

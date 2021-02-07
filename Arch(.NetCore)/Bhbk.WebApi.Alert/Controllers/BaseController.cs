@@ -15,8 +15,8 @@ namespace Bhbk.WebApi.Alert.Controllers
         + DefaultConstants.RoleForAdmins_Alert)]
     public class BaseController : Controller
     {
-        protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
-        protected IUnitOfWork UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>(); }
+        protected IMapper map { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
+        protected IUnitOfWork uow { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>(); }
 
         [NonAction]
         protected Guid GetIdentityGUID()

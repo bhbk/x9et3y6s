@@ -20,21 +20,21 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(email, token, user.Id.ToString(), user.SecurityStamp))
+            else if (!new PasswordTokenFactory(uow.InstanceType.ToString()).Validate(email, token, user.Id.ToString(), user.SecurityStamp))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetConfirmedEmail(user, true);
-            UoW.Commit();
+            uow.Users.SetConfirmedEmail(user, true);
+            uow.Commit();
 
             return NoContent();
         }
@@ -45,21 +45,21 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
-            else if (!new PasswordTokenFactory(UoW.InstanceType.ToString()).Validate(password, token, user.Id.ToString(), user.SecurityStamp))
+            else if (!new PasswordTokenFactory(uow.InstanceType.ToString()).Validate(password, token, user.Id.ToString(), user.SecurityStamp))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{token}");
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetConfirmedPassword(user, true);
-            UoW.Commit();
+            uow.Users.SetConfirmedPassword(user, true);
+            uow.Commit();
 
             return NoContent();
         }
@@ -70,7 +70,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == userID).SingleOrDefault();
 
             if (user == null)
             {
@@ -83,8 +83,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetConfirmedPhoneNumber(user, true);
-            UoW.Commit();
+            uow.Users.SetConfirmedPhoneNumber(user, true);
+            uow.Commit();
 
             return NoContent();
         }

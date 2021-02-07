@@ -9,18 +9,18 @@ using System;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class DataDefaultCommand : ConsoleCommand
+    public class DataCommand : ConsoleCommand
     {
         private readonly IConfiguration _conf;
         private bool _create = false, _destroy = false, _destroyAll = false;
 
-        public DataDefaultCommand()
+        public DataCommand()
         {
             _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            IsCommand("data-default", "Data defaults");
+            IsCommand("data", "Data seeding");
 
             HasOption("c|create", "Create default data", arg => 
             { 
@@ -40,8 +40,8 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                var instance = new ContextService(InstanceContext.DeployedOrLocal);
-                var uow = new UnitOfWork(_conf["Databases:IdentityEntities_EFCore"], instance);
+                var env = new ContextService(InstanceContext.DeployedOrLocal);
+                var uow = new UnitOfWork(_conf["Databases:IdentityEntities_EFCore"], env);
                 var data = new DefaultDataFactory(uow);
 
                 if (_create)

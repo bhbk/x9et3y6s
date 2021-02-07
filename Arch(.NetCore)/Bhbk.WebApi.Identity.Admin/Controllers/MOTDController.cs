@@ -30,16 +30,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.MOTDs.Get(x => x.Quote == model.quote).Any())
+            if (uow.MOTDs.Get(x => x.Quote == model.quote).Any())
             {
                 ModelState.AddModelError(MessageType.MOTDAlreadyExists.ToString(), $"Author:\"{model.author}\" Quote:\"{model.quote}\"");
                 return BadRequest(ModelState);
             }
 
-            var motd = Mapper.Map<tbl_MOTD>(model);
-            var result = UoW.MOTDs.Create(motd);
+            var motd = map.Map<tbl_MOTD>(model);
+            var result = uow.MOTDs.Create(motd);
 
-            UoW.Commit();
+            uow.Commit();
 
             return Ok(model);
         }
@@ -49,7 +49,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid motdID)
         {
-            var motd = UoW.MOTDs.Get(x => x.Id == motdID)
+            var motd = uow.MOTDs.Get(x => x.Id == motdID)
                 .SingleOrDefault();
 
             if (motd == null)
@@ -58,8 +58,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.MOTDs.Delete(motd);
-            UoW.Commit();
+            uow.MOTDs.Delete(motd);
+            uow.Commit();
 
             return NoContent();
         }
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_MOTD motd = null;
 
             if (Guid.TryParse(motdValue, out motdID))
-                motd = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
+                motd = uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
                     .Where(x => x.Id == motdID).ToLambda())
                     .SingleOrDefault();
 
@@ -81,7 +81,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<MOTDTssV1>(motd));
+            return Ok(map.Map<MOTDTssV1>(motd));
         }
 
         [Route("v1/page"), HttpPost]
@@ -94,13 +94,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var result = new DataStateV1Result<MOTDTssV1>
                 {
-                    Data = Mapper.Map<IEnumerable<MOTDTssV1>>(
-                        UoW.MOTDs.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTD>, IQueryable<tbl_MOTD>>>>(
+                    Data = map.Map<IEnumerable<MOTDTssV1>>(
+                        uow.MOTDs.Get(
+                            map.MapExpression<Expression<Func<IQueryable<tbl_MOTD>, IQueryable<tbl_MOTD>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_MOTD>().ApplyState(state)))),
 
-                    Total = UoW.MOTDs.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_MOTD>, IQueryable<tbl_MOTD>>>>(
+                    Total = uow.MOTDs.Count(
+                        map.MapExpression<Expression<Func<IQueryable<tbl_MOTD>, IQueryable<tbl_MOTD>>>>(
                             QueryExpressionFactory.GetQueryExpression<tbl_MOTD>().ApplyPredicate(state)))
                 };
 
@@ -121,7 +121,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var motd = UoW.MOTDs.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
+            var motd = uow.MOTDs.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
                 .Where(x => x.Id == model.globalId).ToLambda()).SingleOrDefault();
 
             if (motd == null)
@@ -130,11 +130,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var result = UoW.MOTDs.Update(Mapper.Map<tbl_MOTD>(model));
+            var result = uow.MOTDs.Update(map.Map<tbl_MOTD>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<MOTDTssV1>(result));
+            return Ok(map.Map<MOTDTssV1>(result));
         }
     }
 }

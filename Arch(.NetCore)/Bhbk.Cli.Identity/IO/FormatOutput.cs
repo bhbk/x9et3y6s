@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Bhbk.Cli.Identity.Factories
 {
-    public class StandardOutputFactory
+    public class FormatOutput
     {
         public static void Audiences(IUnitOfWork uow, IEnumerable<E_Audience> audiences, bool? detail = null)
         {
@@ -23,7 +23,7 @@ namespace Bhbk.Cli.Identity.Factories
                     Console.ForegroundColor = ConsoleColor.White;
 
                 Console.Out.WriteLine($"  [audience GUID] {audience.Id} [name] {audience.Name}{(!audience.IsDeletable ? " is not deletable" : null)}" +
-                    $" [password] {(string.IsNullOrEmpty(audience.PasswordHashPBKDF2) ? "present" : "missing")}" +
+                    $" [password] {(string.IsNullOrEmpty(audience.PasswordHashPBKDF2) ? "missing" : "present")}" +
                     $" [created] {audience.CreatedUtc.LocalDateTime}");
 
                 if (detail.HasValue && detail.Value)
@@ -179,7 +179,7 @@ namespace Bhbk.Cli.Identity.Factories
                     Console.ForegroundColor = ConsoleColor.White;
 
                 Console.Out.WriteLine($"  [user GUID] {user.Id} [name] {user.UserName} {(!user.IsDeletable ? "is not deletable " : null)}" +
-                    $" [password] {(string.IsNullOrEmpty(user.PasswordHashPBKDF2) ? "present" : "missing")}" +
+                    $" [password] {(string.IsNullOrEmpty(user.PasswordHashPBKDF2) ? "missing" : "present")}" +
                     $" [created] {user.CreatedUtc.LocalDateTime}");
 
                 if (detail.HasValue && detail.Value)

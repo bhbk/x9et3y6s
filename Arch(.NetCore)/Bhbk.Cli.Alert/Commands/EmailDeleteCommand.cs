@@ -3,11 +3,11 @@ using System;
 
 namespace Bhbk.Cli.Alert.Commands
 {
-    public class TextCreateCommands : ConsoleCommand
+    public class EmailDeleteCommand : ConsoleCommand
     {
-        public TextCreateCommands() 
+        public EmailDeleteCommand()
         {
-            IsCommand("text-create", "Text create");
+            IsCommand("email-delete", "Delete email");
         }
 
         public override int Run(string[] remainingArguments)

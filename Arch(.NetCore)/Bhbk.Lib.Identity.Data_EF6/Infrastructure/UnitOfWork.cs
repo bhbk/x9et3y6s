@@ -30,9 +30,9 @@ namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure
         public UnitOfWork(string connection)
             : this(connection, new ContextService(InstanceContext.DeployedOrLocal)) { }
 
-        public UnitOfWork(string connection, IContextService instance)
+        public UnitOfWork(string connection, IContextService env)
         {
-            switch (instance.InstanceType)
+            switch (env.InstanceType)
             {
                 case InstanceContext.DeployedOrLocal:
                 case InstanceContext.End2EndTest:
@@ -59,9 +59,9 @@ namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure
             _context.Configuration.LazyLoadingEnabled = false;
             _context.Configuration.ProxyCreationEnabled = true;
 
-            InstanceType = instance.InstanceType;
+            InstanceType = env.InstanceType;
 
-            Audiences = new AudienceRepository(_context, instance);
+            Audiences = new AudienceRepository(_context, env);
             AuthActivity = new AuthActivityRepository(_context);
             Claims = new GenericRepository<E_Claim>(_context);
             EmailQueue = new GenericRepository<E_EmailQueue>(_context);
@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure
             States = new GenericRepository<E_State>(_context);
             TextQueue = new GenericRepository<E_TextQueue>(_context);
             Urls = new GenericRepository<E_Url>(_context);
-            Users = new UserRepository(_context, instance);
+            Users = new UserRepository(_context, env);
         }
 
         public void Commit()

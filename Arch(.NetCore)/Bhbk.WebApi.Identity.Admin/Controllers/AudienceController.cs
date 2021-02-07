@@ -29,7 +29,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult AddToRoleV1([FromRoute] Guid audienceID, [FromRoute] Guid roleID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+            var audience = uow.Audiences.Get(x => x.Id == audienceID)
                 .SingleOrDefault();
 
             if (audience == null)
@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var role = UoW.Roles.Get(x => x.Id == roleID)
+            var role = uow.Roles.Get(x => x.Id == roleID)
                 .SingleOrDefault();
 
             if (role == null)
@@ -47,16 +47,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Audiences.IsInRole(audience, role))
+            if (!uow.Audiences.IsInRole(audience, role))
             {
-                UoW.Audiences.AddRole(
+                uow.Audiences.AddRole(
                     new tbl_AudienceRole()
                     {
                         AudienceId = audience.Id,
                         RoleId = role.Id,
                         IsDeletable = true,
                     });
-                UoW.Commit();
+                uow.Commit();
             }
 
             return NoContent();
@@ -70,18 +70,18 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Audiences.Get(x => x.IssuerId == model.IssuerId
+            if (uow.Audiences.Get(x => x.IssuerId == model.IssuerId
                 && x.Name == model.Name).Any())
             {
                 ModelState.AddModelError(MessageType.AudienceAlreadyExists.ToString(), $"Issuer:{model.IssuerId} Audience:{model.Name}");
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Audiences.Create(Mapper.Map<tbl_Audience>(model));
+            var result = uow.Audiences.Create(map.Map<tbl_Audience>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<AudienceV1>(result));
+            return Ok(map.Map<AudienceV1>(result));
         }
 
         [Route("v1/{audienceID:guid}"), HttpDelete]
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+            var audience = uow.Audiences.Get(x => x.Id == audienceID)
                 .SingleOrDefault();
 
             if (audience == null)
@@ -104,8 +104,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Audiences.Delete(audience);
-            UoW.Commit();
+            uow.Audiences.Delete(audience);
+            uow.Commit();
 
             return NoContent();
         }
@@ -115,7 +115,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+            var audience = uow.Audiences.Get(x => x.Id == audienceID)
                 .SingleOrDefault();
 
             if (audience == null)
@@ -124,10 +124,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+            uow.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.AudienceId == audienceID).ToLambda());
 
-            UoW.Commit();
+            uow.Commit();
 
             return NoContent();
         }
@@ -140,14 +140,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.AudienceId == audienceID && x.Id == refreshID).ToLambda();
 
-            if (!UoW.Refreshes.Exists(expr))
+            if (!uow.Refreshes.Exists(expr))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{refreshID}");
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(expr);
-            UoW.Commit();
+            uow.Refreshes.Delete(expr);
+            uow.Commit();
 
             return NoContent();
         }
@@ -166,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 expr = QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                     .Where(x => x.Name == audienceValue).ToLambda();
 
-            audience = UoW.Audiences.Get(expr,
+            audience = uow.Audiences.Get(expr,
                 new List<Expression<Func<tbl_Audience, object>>>()
                 {
                     x => x.tbl_AudienceRoles,
@@ -181,7 +181,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<AudienceV1>(audience));
+            return Ok(map.Map<AudienceV1>(audience));
         }
 
         [Route("v1/page"), HttpPost]
@@ -194,9 +194,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var result = new DataStateV1Result<AudienceV1>
                 {
-                    Data = Mapper.Map<IEnumerable<AudienceV1>>(
-                        UoW.Audiences.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audience>, IQueryable<tbl_Audience>>>>(
+                    Data = map.Map<IEnumerable<AudienceV1>>(
+                        uow.Audiences.Get(
+                            map.MapExpression<Expression<Func<IQueryable<tbl_Audience>, IQueryable<tbl_Audience>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Audience>().ApplyState(state)),
                                     new List<Expression<Func<tbl_Audience, object>>>() 
                                     {
@@ -205,8 +205,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                                         x => x.tbl_Urls,
                                     })),
 
-                    Total = UoW.Audiences.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Audience>, IQueryable<tbl_Audience>>>>(
+                    Total = uow.Audiences.Count(
+                        map.MapExpression<Expression<Func<IQueryable<tbl_Audience>, IQueryable<tbl_Audience>>>>(
                             QueryExpressionFactory.GetQueryExpression<tbl_Audience>().ApplyPredicate(state)))
                 };
 
@@ -222,7 +222,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{audienceID:guid}/refreshes"), HttpGet]
         public IActionResult GetRefreshesV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+            var audience = uow.Audiences.Get(x => x.Id == audienceID)
                 .SingleOrDefault();
 
             if (audience == null)
@@ -231,16 +231,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var refreshes = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+            var refreshes = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<RefreshV1>>(refreshes));
+            return Ok(map.Map<IEnumerable<RefreshV1>>(refreshes));
         }
 
         [Route("v1/{audienceID:guid}/roles"), HttpGet]
         public IActionResult GetRolesV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+            var audience = uow.Audiences.Get(x => x.Id == audienceID)
                 .SingleOrDefault();
 
             if (audience == null)
@@ -249,16 +249,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var roles = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
+            var roles = uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<RoleV1>>(roles));
+            return Ok(map.Map<IEnumerable<RoleV1>>(roles));
         }
 
         [Route("v1/{audienceID:guid}/urls"), HttpGet]
         public IActionResult GetUrlsV1([FromRoute] Guid audienceID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+            var audience = uow.Audiences.Get(x => x.Id == audienceID)
                 .SingleOrDefault();
 
             if (audience == null)
@@ -267,10 +267,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var urls = UoW.Urls.Get(QueryExpressionFactory.GetQueryExpression<tbl_Url>()
+            var urls = uow.Urls.Get(QueryExpressionFactory.GetQueryExpression<tbl_Url>()
                 .Where(x => x.AudienceId == audience.Id).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<UrlV1>>(urls));
+            return Ok(map.Map<IEnumerable<UrlV1>>(urls));
         }
 
         [Route("v1/{audienceID:guid}/remove-from-role/{roleID:guid}"), HttpDelete]
@@ -278,7 +278,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult RemoveFromRoleV1([FromRoute] Guid audienceID, [FromRoute] Guid roleID)
         {
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+            var audience = uow.Audiences.Get(x => x.Id == audienceID)
                 .SingleOrDefault();
 
             if (audience == null)
@@ -287,7 +287,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var role = UoW.Roles.Get(x => x.Id == roleID)
+            var role = uow.Roles.Get(x => x.Id == roleID)
                 .SingleOrDefault();
 
             if (role == null)
@@ -296,15 +296,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
             
-            if(UoW.Audiences.IsInRole(audience, role))
+            if(uow.Audiences.IsInRole(audience, role))
             {
-                UoW.Audiences.RemoveRole(
+                uow.Audiences.RemoveRole(
                     new tbl_AudienceRole()
                     {
                         AudienceId = audience.Id,
                         RoleId = role.Id,
                     });
-                UoW.Commit();
+                uow.Commit();
             }
 
             return NoContent();
@@ -318,7 +318,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+            var audience = uow.Audiences.Get(x => x.Id == audienceID)
                 .SingleOrDefault();
 
             if (audience == null)
@@ -327,14 +327,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Audiences.IsPasswordSet(audience))
+            if (!uow.Audiences.IsPasswordSet(audience))
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"No password set for audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
-            UoW.Audiences.SetPassword(audience, null);
-            UoW.Commit();
+            uow.Audiences.SetPassword(audience, null);
+            uow.Commit();
 
             return NoContent();
         }
@@ -347,7 +347,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID)
+            var audience = uow.Audiences.Get(x => x.Id == audienceID)
                 .SingleOrDefault();
 
             if (audience == null)
@@ -363,8 +363,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Audiences.SetPassword(audience, model.NewPassword);
-            UoW.Commit();
+            uow.Audiences.SetPassword(audience, model.NewPassword);
+            uow.Commit();
 
             return NoContent();
         }
@@ -377,7 +377,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var audience = UoW.Audiences.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+            var audience = uow.Audiences.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
@@ -393,11 +393,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Audiences.Update(Mapper.Map<tbl_Audience>(model));
+            var result = uow.Audiences.Update(map.Map<tbl_Audience>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<AudienceV1>(result));
+            return Ok(map.Map<AudienceV1>(result));
         }
     }
 }

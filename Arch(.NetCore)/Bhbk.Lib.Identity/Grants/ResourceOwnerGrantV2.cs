@@ -26,10 +26,10 @@ namespace Bhbk.Lib.Identity.Grants
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
-        public ResourceOwnerGrantV2(IConfiguration conf, InstanceContext instance, HttpClient http)
+        public ResourceOwnerGrantV2(IConfiguration conf, InstanceContext env, HttpClient http)
         {
-            if (instance == InstanceContext.DeployedOrLocal
-                || instance == InstanceContext.End2EndTest)
+            if (env == InstanceContext.DeployedOrLocal
+                || env == InstanceContext.End2EndTest)
             {
                 var connect = new HttpClientHandler();
 

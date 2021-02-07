@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+            if (uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.IssuerId == model.IssuerId && x.Type == model.Type).ToLambda())
                 .Any())
             {
@@ -38,11 +38,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Claims.Create(Mapper.Map<tbl_Claim>(model));
+            var result = uow.Claims.Create(map.Map<tbl_Claim>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<ClaimV1>(result));
+            return Ok(map.Map<ClaimV1>(result));
         }
 
         [Route("v1/{claimID:guid}"), HttpDelete]
@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid claimID)
         {
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+            var claim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 
@@ -66,8 +66,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Claims.Delete(claim);
-            UoW.Commit();
+            uow.Claims.Delete(claim);
+            uow.Commit();
 
             return NoContent();
         }
@@ -79,7 +79,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_Claim claim = null;
 
             if (Guid.TryParse(claimValue, out claimID))
-                claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+                claim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                     .Where(x => x.Id == claimID).ToLambda())
                     .SingleOrDefault();
 
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<ClaimV1>(claim));
+            return Ok(map.Map<ClaimV1>(claim));
         }
 
         [Route("v1/page"), HttpPost]
@@ -102,17 +102,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var result = new DataStateV1Result<ClaimV1>
                 {
-                    Data = Mapper.Map<IEnumerable<ClaimV1>>(
-                        UoW.Claims.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claim>, IQueryable<tbl_Claim>>>>(
+                    Data = map.Map<IEnumerable<ClaimV1>>(
+                        uow.Claims.Get(
+                            map.MapExpression<Expression<Func<IQueryable<tbl_Claim>, IQueryable<tbl_Claim>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Claim>().ApplyState(state)),
                                     new List<Expression<Func<tbl_Claim, object>>>()
                                     {
                                         x => x.Issuer,
                                     })),
 
-                    Total = UoW.Claims.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Claim>, IQueryable<tbl_Claim>>>>(
+                    Total = uow.Claims.Count(
+                        map.MapExpression<Expression<Func<IQueryable<tbl_Claim>, IQueryable<tbl_Claim>>>>(
                             QueryExpressionFactory.GetQueryExpression<tbl_Claim>().ApplyPredicate(state)))
                 };
 
@@ -133,7 +133,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var claim = UoW.Claims.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+            var claim = uow.Claims.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
@@ -149,11 +149,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Claims.Update(Mapper.Map<tbl_Claim>(model));
+            var result = uow.Claims.Update(map.Map<tbl_Claim>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<ClaimV1>(result));
+            return Ok(map.Map<ClaimV1>(result));
         }
     }
 }

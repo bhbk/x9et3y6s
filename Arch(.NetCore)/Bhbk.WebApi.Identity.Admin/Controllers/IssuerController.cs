@@ -30,16 +30,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Issuers.Get(x => x.Name == model.Name).Any())
+            if (uow.Issuers.Get(x => x.Name == model.Name).Any())
             {
                 ModelState.AddModelError(MessageType.IssuerAlreadyExists.ToString(), $"Issuer:{model.Name}");
                 return BadRequest(ModelState);
             }
 
-            var issuer = UoW.Issuers.Create(Mapper.Map<tbl_Issuer>(model));
+            var issuer = uow.Issuers.Create(map.Map<tbl_Issuer>(model));
 
-            UoW.Settings.Create(
-                Mapper.Map<tbl_Setting>(new SettingV1()
+            uow.Settings.Create(
+                map.Map<tbl_Setting>(new SettingV1()
                 {
                     IssuerId = issuer.Id,
                     ConfigKey = SettingsConstants.AccessExpire,
@@ -47,8 +47,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     IsDeletable = true,
                 }));
 
-            UoW.Settings.Create(
-                Mapper.Map<tbl_Setting>(new SettingV1()
+            uow.Settings.Create(
+                map.Map<tbl_Setting>(new SettingV1()
                 {
                     IssuerId = issuer.Id,
                     ConfigKey = SettingsConstants.RefreshExpire,
@@ -56,8 +56,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     IsDeletable = true,
                 }));
 
-            UoW.Settings.Create(
-                Mapper.Map<tbl_Setting>(new SettingV1()
+            uow.Settings.Create(
+                map.Map<tbl_Setting>(new SettingV1()
                 {
                     IssuerId = issuer.Id,
                     ConfigKey = SettingsConstants.TotpExpire,
@@ -65,8 +65,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     IsDeletable = true,
                 }));
 
-            UoW.Settings.Create(
-                Mapper.Map<tbl_Setting>(new SettingV1()
+            uow.Settings.Create(
+                map.Map<tbl_Setting>(new SettingV1()
                 {
                     IssuerId = issuer.Id,
                     ConfigKey = SettingsConstants.PollingMax,
@@ -74,9 +74,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                     IsDeletable = true,
                 }));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<IssuerV1>(issuer));
+            return Ok(map.Map<IssuerV1>(issuer));
         }
 
         [Route("v1/{issuerID:guid}"), HttpDelete]
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid issuerID)
         {
-            var issuer = UoW.Issuers.Get(x => x.Id == issuerID)
+            var issuer = uow.Issuers.Get(x => x.Id == issuerID)
                 .SingleOrDefault();
 
             if (issuer == null)
@@ -99,26 +99,26 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var claims = UoW.Claims.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+            var claims = uow.Claims.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.IssuerId == issuer.Id).ToLambda());
 
-            var refreshes = UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+            var refreshes = uow.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.IssuerId == issuer.Id).ToLambda());
 
-            var settings = UoW.Settings.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
+            var settings = uow.Settings.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
                 .Where(x => x.IssuerId == issuer.Id).ToLambda());
 
-            var states = UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
+            var states = uow.States.Delete(QueryExpressionFactory.GetQueryExpression<tbl_State>()
                 .Where(x => x.IssuerId == issuer.Id).ToLambda());
 
-            var roles = UoW.Roles.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
+            var roles = uow.Roles.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
                 .Where(x => x.Audience.IssuerId == issuer.Id).ToLambda());
 
-            var audiences = UoW.Audiences.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+            var audiences = uow.Audiences.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.IssuerId == issuer.Id).ToLambda());
 
-            UoW.Issuers.Delete(issuer);
-            UoW.Commit();
+            uow.Issuers.Delete(issuer);
+            uow.Commit();
 
             return NoContent();
         }
@@ -128,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         public IActionResult GetKeysV1([FromBody] List<string> model)
         {
             var current = GetIdentityGUID();
-            var audience = UoW.Audiences.Get(x => x.Id == current).SingleOrDefault();
+            var audience = uow.Audiences.Get(x => x.Id == current).SingleOrDefault();
 
             if (audience == null)
             {
@@ -142,7 +142,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var issuers = UoW.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
+            var issuers = uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
                 .Where(x => x.IsEnabled == true && (model.Contains(x.Id.ToString()) || model.Contains(x.Name))).ToLambda());
 
             return Ok(issuers.ToDictionary(x => x.Id, x => x.IssuerKey));
@@ -162,7 +162,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 expr = QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
                     .Where(x => x.Name == issuerValue).ToLambda();
 
-            issuer = UoW.Issuers.Get(expr,
+            issuer = uow.Issuers.Get(expr,
                 new List<Expression<Func<tbl_Issuer, object>>>()
                 {
                     x => x.tbl_Audiences,
@@ -176,7 +176,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<IssuerV1>(issuer));
+            return Ok(map.Map<IssuerV1>(issuer));
         }
 
         [Route("v1/page"), HttpPost]
@@ -189,9 +189,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var result = new DataStateV1Result<IssuerV1>
                 {
-                    Data = Mapper.Map<IEnumerable<IssuerV1>>(
-                        UoW.Issuers.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(
+                    Data = map.Map<IEnumerable<IssuerV1>>(
+                        uow.Issuers.Get(
+                            map.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Issuer>().ApplyState(state)),
                                     new List<Expression<Func<tbl_Issuer, object>>>() 
                                     {
@@ -199,8 +199,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                                         x => x.tbl_Claims,
                                     })),
 
-                    Total = UoW.Issuers.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(
+                    Total = uow.Issuers.Count(
+                        map.MapExpression<Expression<Func<IQueryable<tbl_Issuer>, IQueryable<tbl_Issuer>>>>(
                             QueryExpressionFactory.GetQueryExpression<tbl_Issuer>().ApplyPredicate(state)))
                 };
 
@@ -216,7 +216,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{issuerID:guid}/audiences"), HttpGet]
         public IActionResult GetAudiencesV1([FromRoute] Guid issuerID)
         {
-            var issuer = UoW.Issuers.Get(x => x.Id == issuerID)
+            var issuer = uow.Issuers.Get(x => x.Id == issuerID)
                 .SingleOrDefault();
 
             if (issuer == null)
@@ -225,10 +225,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var audiences = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+            var audiences = uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.IssuerId == issuerID).ToLambda());
 
-            return Ok(Mapper.Map<AudienceV1>(audiences));
+            return Ok(map.Map<AudienceV1>(audiences));
         }
 
         [Route("v1"), HttpPut]
@@ -239,7 +239,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var issuer = UoW.Issuers.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
+            var issuer = uow.Issuers.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
                 .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
@@ -256,11 +256,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Issuers.Update(Mapper.Map<tbl_Issuer>(model));
+            var result = uow.Issuers.Update(map.Map<tbl_Issuer>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<IssuerV1>(result));
+            return Ok(map.Map<IssuerV1>(result));
         }
     }
 }

@@ -30,17 +30,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Logins.Get(x => x.Name == model.Name).Any())
+            if (uow.Logins.Get(x => x.Name == model.Name).Any())
             {
                 ModelState.AddModelError(MessageType.LoginAlreadyExists.ToString(), $"Login:{model.Name}");
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Logins.Create(Mapper.Map<tbl_Login>(model));
+            var result = uow.Logins.Create(map.Map<tbl_Login>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<LoginV1>(result));
+            return Ok(map.Map<LoginV1>(result));
         }
 
         [Route("v1/{loginID:guid}"), HttpDelete]
@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid loginID)
         {
-            var login = UoW.Logins.Get(x => x.Id == loginID)
+            var login = uow.Logins.Get(x => x.Id == loginID)
                 .SingleOrDefault();
 
             if (login == null)
@@ -63,8 +63,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Logins.Delete(login);
-            UoW.Commit();
+            uow.Logins.Delete(login);
+            uow.Commit();
 
             return NoContent();
         }
@@ -77,10 +77,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(loginValue, out loginID))
-                login = UoW.Logins.Get(x => x.Id == loginID)
+                login = uow.Logins.Get(x => x.Id == loginID)
                     .SingleOrDefault();
             else
-                login = UoW.Logins.Get(x => x.Name == loginValue)
+                login = uow.Logins.Get(x => x.Name == loginValue)
                     .SingleOrDefault();
 
             if (login == null)
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<LoginV1>(login));
+            return Ok(map.Map<LoginV1>(login));
         }
 
         [Route("v1/page"), HttpPost]
@@ -102,17 +102,17 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var result = new DataStateV1Result<LoginV1>
                 {
-                    Data = Mapper.Map<IEnumerable<LoginV1>>(
-                        UoW.Logins.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(
+                    Data = map.Map<IEnumerable<LoginV1>>(
+                        uow.Logins.Get(
+                            map.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_Login>().ApplyState(state)),
                                     new List<Expression<Func<tbl_Login, object>>>() 
                                     {
                                         x => x.tbl_UserLogins,
                                     })),
 
-                    Total = UoW.Logins.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(
+                    Total = uow.Logins.Count(
+                        map.MapExpression<Expression<Func<IQueryable<tbl_Login>, IQueryable<tbl_Login>>>>(
                             QueryExpressionFactory.GetQueryExpression<tbl_Login>().ApplyPredicate(state)))
                 };
 
@@ -128,7 +128,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{loginID:guid}/users"), HttpGet]
         public IActionResult GetUsersV1([FromRoute] Guid loginID)
         {
-            var login = UoW.Logins.Get(x => x.Id == loginID)
+            var login = uow.Logins.Get(x => x.Id == loginID)
                 .SingleOrDefault();
 
             if (login == null)
@@ -137,10 +137,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var users = UoW.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
+            var users = uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.LoginId == loginID)).ToLambda());
 
-            return Ok(Mapper.Map<UserV1>(users));
+            return Ok(map.Map<UserV1>(users));
         }
 
         [Route("v1"), HttpPut]
@@ -151,7 +151,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var login = UoW.Logins.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
+            var login = uow.Logins.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
                 .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
@@ -167,11 +167,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Logins.Update(Mapper.Map<tbl_Login>(model));
+            var result = uow.Logins.Update(map.Map<tbl_Login>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<LoginV1>(result));
+            return Ok(map.Map<LoginV1>(result));
         }
     }
 }

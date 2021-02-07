@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
     public class DefaultDataFactory : IDefaultDataFactory
     {
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
+        private readonly IMapper _map;
         private uvw_Issuer foundIssuer;
         private uvw_Audience foundAudience_Alert, foundAudience_Identity;
         private uvw_Login foundLogin;
@@ -25,7 +25,8 @@ namespace Bhbk.Lib.Identity.Domain.Factories
         public DefaultDataFactory(IUnitOfWork uow)
         {
             _uow = uow ?? throw new ArgumentNullException();
-            _mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>())
+                .CreateMapper();
         }
 
         public void CreateAudiences()
@@ -44,7 +45,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundAudience_Alert == null)
             {
                 foundAudience_Alert = _uow.Audiences.Create(
-                    _mapper.Map<uvw_Audience>(new AudienceV1()
+                    _map.Map<uvw_Audience>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = DefaultConstants.Audience_Alert,
@@ -62,7 +63,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundAudience_Identity == null)
             {
                 foundAudience_Identity = _uow.Audiences.Create(
-                    _mapper.Map<uvw_Audience>(new AudienceV1()
+                    _map.Map<uvw_Audience>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = DefaultConstants.Audience_Identity,
@@ -146,7 +147,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundIssuer == null)
             {
                 foundIssuer = _uow.Issuers.Create(
-                    _mapper.Map<uvw_Issuer>(new IssuerV1()
+                    _map.Map<uvw_Issuer>(new IssuerV1()
                     {
                         Name = DefaultConstants.IssuerName,
                         IssuerKey = DefaultConstants.IssuerKey,
@@ -164,7 +165,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundAccessExpire == null)
             {
                 _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.AccessExpire,
@@ -182,7 +183,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundRefreshExpire == null)
             {
                 _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.RefreshExpire,
@@ -200,7 +201,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundTotpExpire == null)
             {
                 _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.TotpExpire,
@@ -218,7 +219,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundPollingMax == null)
             {
                 _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.PollingMax,
@@ -243,7 +244,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundLogin == null)
             {
                 foundLogin = _uow.Logins.Create(
-                    _mapper.Map<uvw_Login>(new LoginV1()
+                    _map.Map<uvw_Login>(new LoginV1()
                     {
                         Name = DefaultConstants.LoginName,
                         LoginKey = DefaultConstants.LoginKey,
@@ -272,7 +273,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundRoleForAdmin_Alert == null)
             {
                 foundRoleForAdmin_Alert = _uow.Roles.Create(
-                    _mapper.Map<uvw_Role>(new RoleV1()
+                    _map.Map<uvw_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience_Alert.Id,
                         Name = DefaultConstants.RoleForAdmins_Alert,
@@ -290,7 +291,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundRoleForUser_Alert == null)
             {
                 foundRoleForUser_Alert = _uow.Roles.Create(
-                    _mapper.Map<uvw_Role>(new RoleV1()
+                    _map.Map<uvw_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience_Alert.Id,
                         Name = DefaultConstants.RoleForUsers_Alert,
@@ -308,7 +309,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundRoleForAdmin_Identity == null)
             {
                 foundRoleForAdmin_Identity = _uow.Roles.Create(
-                    _mapper.Map<uvw_Role>(new RoleV1()
+                    _map.Map<uvw_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience_Identity.Id,
                         Name = DefaultConstants.RoleForAdmins_Identity,
@@ -326,7 +327,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundRoleForUser_Identity == null)
             {
                 foundRoleForUser_Identity = _uow.Roles.Create(
-                    _mapper.Map<uvw_Role>(new RoleV1()
+                    _map.Map<uvw_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience_Identity.Id,
                         Name = DefaultConstants.RoleForUsers_Identity,
@@ -350,7 +351,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         ConfigKey = SettingsConstants.GlobalLegacyClaims,
                         ConfigValue = "true",
@@ -366,7 +367,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         ConfigKey = SettingsConstants.GlobalLegacyIssuer,
                         ConfigValue = "true",
@@ -382,7 +383,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         ConfigKey = SettingsConstants.GlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
@@ -406,7 +407,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundAdmin == null)
             {
                 foundAdmin = _uow.Users.Create(
-                    _mapper.Map<uvw_User>(new UserV1()
+                    _map.Map<uvw_User>(new UserV1()
                     {
                         UserName = DefaultConstants.UserName_Admin,
                         Email = DefaultConstants.UserName_Admin,
@@ -431,7 +432,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (foundUser == null)
             {
                 foundUser = _uow.Users.Create(
-                    _mapper.Map<uvw_User>(new UserV1()
+                    _map.Map<uvw_User>(new UserV1()
                     {
                         UserName = DefaultConstants.UserName_Normal,
                         Email = DefaultConstants.UserName_Normal,

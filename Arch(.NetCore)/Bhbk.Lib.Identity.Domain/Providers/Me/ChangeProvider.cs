@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Me
 {
     public class ChangeProvider : BaseProvider
     {
-        public ChangeProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public ChangeProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

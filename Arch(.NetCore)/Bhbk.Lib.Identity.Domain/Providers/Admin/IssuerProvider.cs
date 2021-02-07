@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Admin
 {
     public class IssuerProvider : BaseProvider
     {
-        public IssuerProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public IssuerProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

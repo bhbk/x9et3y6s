@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Admin
 {
     public class UserProvider : BaseProvider
     {
-        public UserProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public UserProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

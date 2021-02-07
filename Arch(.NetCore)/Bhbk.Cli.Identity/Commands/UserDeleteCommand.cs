@@ -35,8 +35,8 @@ namespace Bhbk.Cli.Identity.Commands
             _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>())
                 .CreateMapper();
 
-            var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], instance);
+            var env = new ContextService(InstanceContext.DeployedOrLocal);
+            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], env);
 
             _service = new AdminService(_conf)
             {
@@ -63,7 +63,7 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                StandardOutputFactory.Users(_uow, new List<E_User> { _user });
+                FormatOutput.Users(_uow, new List<E_User> { _user });
                 Console.Out.WriteLine();
 
                 Console.Out.Write("  *** Enter 'yes' to delete user *** : ");

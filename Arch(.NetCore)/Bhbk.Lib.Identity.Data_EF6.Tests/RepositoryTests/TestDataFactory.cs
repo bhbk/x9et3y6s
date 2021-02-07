@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
     public class TestDataFactory : IDisposable
     {
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
+        private readonly IMapper _map;
         private E_Issuer foundIssuer;
         private E_Audience foundAudience;
         private E_Login foundLogin;
@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
                 || _uow.InstanceType == InstanceContext.End2EndTest)
                 throw new InvalidOperationException();
 
-            _mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>()).CreateMapper();
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>()).CreateMapper();
         }
         
         public void CreateAudiences()
@@ -54,7 +54,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             if (foundAudience == null)
             {
                 foundAudience = _uow.Audiences.Create(
-                    _mapper.Map<E_Audience>(new AudienceV1()
+                    _map.Map<E_Audience>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = TestDefaultConstants.AudienceName,
@@ -65,7 +65,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
                 _uow.Commit();
 
                 _uow.AuthActivity.Create(
-                    _mapper.Map<E_AuthActivity>(new AuthActivityV1()
+                    _map.Map<E_AuthActivity>(new AuthActivityV1()
                     {
                         AudienceId = foundAudience.Id,
                         LoginType = GrantFlowType.ClientCredentialV2.ToString(),
@@ -89,7 +89,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
              */
 
             _uow.Refreshes.Create(
-                _mapper.Map<E_Refresh>(new RefreshV1()
+                _map.Map<E_Refresh>(new RefreshV1()
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
@@ -118,7 +118,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             if (foundClaim == null)
             {
                 foundClaim = _uow.Claims.Create(
-                    _mapper.Map<E_Claim>(new ClaimV1()
+                    _map.Map<E_Claim>(new ClaimV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Subject = TestDefaultConstants.ClaimSubject,
@@ -145,7 +145,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             if (foundIssuer == null)
             {
                 foundIssuer = _uow.Issuers.Create(
-                    _mapper.Map<E_Issuer>(new IssuerV1()
+                    _map.Map<E_Issuer>(new IssuerV1()
                     {
                         Name = TestDefaultConstants.IssuerName,
                         IssuerKey = TestDefaultConstants.IssuerKey,
@@ -170,7 +170,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             if (foundLogin == null)
             {
                 foundLogin = _uow.Logins.Create(
-                    _mapper.Map<E_Login>(new LoginV1()
+                    _map.Map<E_Login>(new LoginV1()
                     {
                         Name = TestDefaultConstants.LoginName,
                         LoginKey = AlphaNumeric.CreateString(16),
@@ -197,7 +197,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             if (foundRole == null)
             {
                 foundRole = _uow.Roles.Create(
-                    _mapper.Map<E_Role>(new RoleV1()
+                    _map.Map<E_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience.Id,
                         Name = TestDefaultConstants.RoleName,
@@ -222,7 +222,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
             if (foundUser == null)
             {
                 foundUser = _uow.Users.Create(
-                    _mapper.Map<E_User>(new UserV1()
+                    _map.Map<E_User>(new UserV1()
                     {
                         UserName = TestDefaultConstants.UserName,
                         Email = TestDefaultConstants.UserName,
@@ -237,7 +237,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
                 _uow.Commit();
 
                 _uow.AuthActivity.Create(
-                    _mapper.Map<E_AuthActivity>(new AuthActivityV1()
+                    _map.Map<E_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = foundUser.Id,
                         LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
@@ -264,7 +264,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
              */
 
             _uow.Refreshes.Create(
-                _mapper.Map<E_Refresh>(new RefreshV1()
+                _map.Map<E_Refresh>(new RefreshV1()
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
@@ -294,7 +294,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
              */
 
             _uow.States.Create(
-                _mapper.Map<E_State>(new StateV1()
+                _map.Map<E_State>(new StateV1()
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
@@ -307,7 +307,7 @@ namespace Bhbk.Lib.Identity.Data_EF6.Tests.RepositoryTests
                 }));
 
             _uow.States.Create(
-                _mapper.Map<E_State>(new StateV1()
+                _map.Map<E_State>(new StateV1()
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,

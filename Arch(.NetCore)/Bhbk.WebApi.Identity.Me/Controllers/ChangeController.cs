@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -45,17 +45,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
+            var expire = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == SettingsConstants.GlobalTotpExpire).Single();
 
-            string token = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
+            string token = HttpUtility.UrlEncode(new PasswordTokenFactory(uow.InstanceType.ToString())
                 .Generate(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user.Id.ToString(), user.SecurityStamp));
 
-            if (UoW.InstanceType != InstanceContext.DeployedOrLocal
-                && UoW.InstanceType != InstanceContext.End2EndTest)
+            if (uow.InstanceType != InstanceContext.DeployedOrLocal
+                && uow.InstanceType != InstanceContext.End2EndTest)
                 return Ok(token);
 
-            var url = UrlFactory.GenerateConfirmEmailV1(Conf, user.Id.ToString(), token);
+            var url = UrlFactory.GenerateConfirmEmailV1(conf, user.Id.ToString(), token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
             await alert.Enqueue_EmailV1(
@@ -66,7 +66,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     ToEmail = user.EmailAddress,
                     ToDisplay = $"{user.FirstName} {user.LastName}",
                     Subject = MessageConstants.ConfirmEmailSubject,
-                    Body = Email.ConfirmEmail(Mapper.Map<UserV1>(user), url)
+                    Body = Email.ConfirmEmail(map.Map<UserV1>(user), url)
                 });
 
             return NoContent();
@@ -78,7 +78,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -98,17 +98,17 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var expire = UoW.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
+            var expire = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == SettingsConstants.GlobalTotpExpire).Single();
 
-            string token = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
+            string token = HttpUtility.UrlEncode(new PasswordTokenFactory(uow.InstanceType.ToString())
                 .Generate(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user.Id.ToString(), user.SecurityStamp));
 
-            if (UoW.InstanceType != InstanceContext.DeployedOrLocal
-                && UoW.InstanceType != InstanceContext.End2EndTest)
+            if (uow.InstanceType != InstanceContext.DeployedOrLocal
+                && uow.InstanceType != InstanceContext.End2EndTest)
                 return Ok(token);
 
-            var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user.Id.ToString(), token);
+            var url = UrlFactory.GenerateConfirmPasswordV1(conf, user.Id.ToString(), token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
             await alert.Enqueue_EmailV1(
@@ -119,7 +119,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                     ToEmail = user.EmailAddress,
                     ToDisplay = $"{user.FirstName} {user.LastName}",
                     Subject = MessageConstants.ConfirmPasswordSubject,
-                    Body = Email.ConfirmPassword(Mapper.Map<UserV1>(user), url)
+                    Body = Email.ConfirmPassword(map.Map<UserV1>(user), url)
                 });
 
             return NoContent();
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -153,11 +153,11 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
 
             string token = HttpUtility.UrlEncode(new TimeBasedTokenFactory(8, 10).Generate(model.NewPhoneNumber, user.Id.ToString()));
 
-            if (UoW.InstanceType != InstanceContext.DeployedOrLocal
-                && UoW.InstanceType != InstanceContext.End2EndTest)
+            if (uow.InstanceType != InstanceContext.DeployedOrLocal
+                && uow.InstanceType != InstanceContext.End2EndTest)
                 return Ok(token);
 
-            var url = UrlFactory.GenerateConfirmPasswordV1(Conf, user.Id.ToString(), token);
+            var url = UrlFactory.GenerateConfirmPasswordV1(conf, user.Id.ToString(), token);
             var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
             await alert.Enqueue_TextV1(

@@ -38,8 +38,8 @@ namespace Bhbk.Cli.Identity.Commands
             _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>())
                 .CreateMapper();
 
-            var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], instance);
+            var env = new ContextService(InstanceContext.DeployedOrLocal);
+            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], env);
 
             _service = new AdminService(_conf)
             {
@@ -106,7 +106,7 @@ namespace Bhbk.Cli.Identity.Commands
                 var audience = _service.Audience_UpdateV1(_map.Map<AudienceV1>(_audience))
                     .Result;
 
-                StandardOutputFactory.Audiences(_uow, new List<E_Audience> { _map.Map<E_Audience>(audience) }, true);
+                FormatOutput.Audiences(_uow, new List<E_Audience> { _map.Map<E_Audience>(audience) }, true);
 
                 return StandardOutput.FondFarewell();
             }

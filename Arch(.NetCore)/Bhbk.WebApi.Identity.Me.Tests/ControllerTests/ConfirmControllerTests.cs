@@ -31,7 +31,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController();
@@ -72,7 +72,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController();
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController();
@@ -153,7 +153,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController();
@@ -193,7 +193,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController();
@@ -230,7 +230,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new ConfirmController();

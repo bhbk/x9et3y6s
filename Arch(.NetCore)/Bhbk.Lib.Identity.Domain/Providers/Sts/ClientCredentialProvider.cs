@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Sts
 {
     public class ClientCredentialProvider : BaseProvider
     {
-        public ClientCredentialProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public ClientCredentialProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

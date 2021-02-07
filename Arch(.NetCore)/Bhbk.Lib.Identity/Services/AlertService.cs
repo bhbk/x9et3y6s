@@ -22,9 +22,9 @@ namespace Bhbk.Lib.Identity.Services
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
-        public AlertService(IConfiguration conf, InstanceContext instance, HttpClient http)
+        public AlertService(IConfiguration conf, InstanceContext env, HttpClient http)
         {
-            Endpoints = new AlertServiceRepository(conf, instance, http);
+            Endpoints = new AlertServiceRepository(conf, env, http);
         }
 
         public async ValueTask<bool> Dequeue_EmailV1(Guid emailID)

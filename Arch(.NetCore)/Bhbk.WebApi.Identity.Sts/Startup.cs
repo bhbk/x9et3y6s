@@ -43,18 +43,18 @@ namespace Bhbk.WebApi.Identity.Sts
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>())
+            var env = new ContextService(InstanceContext.DeployedOrLocal);
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>())
                 .CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
-            sc.AddSingleton<IContextService>(instance);
-            sc.AddSingleton<IMapper>(mapper);
+            sc.AddSingleton<IContextService>(env);
+            sc.AddSingleton<IMapper>(map);
             sc.AddSingleton<IAuthorizationHandler, IdentityUsersAuthorize>();
             sc.AddSingleton<IAuthorizationHandler, IdentityServicesAuthorize>();
             sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
             {
-                return new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
+                return new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], env);
             });
             sc.AddSingleton<IAlertService, AlertService>(_ =>
             {
@@ -122,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 options.WaitForJobsToComplete = true;
             });
 
-            if (instance.InstanceType != InstanceContext.DeployedOrLocal)
+            if (env.InstanceType != InstanceContext.DeployedOrLocal)
                 throw new NotSupportedException();
 
             /*
@@ -130,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Sts
              * only for owin authentication configuration.
              */
 
-            var seeds = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
+            var seeds = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], env);
 
             var issuers = conf.GetSection("IdentityTenant:AllowedIssuers").GetChildren()
                 .Select(x => x.Value + ":" + conf["IdentityTenant:Salt"]);

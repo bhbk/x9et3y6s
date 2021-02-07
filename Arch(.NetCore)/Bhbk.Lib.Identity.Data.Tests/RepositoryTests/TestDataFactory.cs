@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
     public class TestDataFactory : IDisposable
     {
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
+        private readonly IMapper _map;
         private uvw_Setting foundGlobalLegacyClaims, foundGlobalLegacyIssuer, foundGlobalTotpExpire;
         private uvw_Issuer foundIssuer;
         private uvw_Audience foundAudience;
@@ -40,7 +40,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                 || _uow.InstanceType == InstanceContext.End2EndTest)
                 throw new InvalidOperationException();
 
-            _mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore>()).CreateMapper();
         }
 
         public void CreateAudiences()
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundAudience == null)
             {
                 foundAudience = _uow.Audiences.Create(
-                    _mapper.Map<uvw_Audience>(new AudienceV1()
+                    _map.Map<uvw_Audience>(new AudienceV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Name = TestDefaultConstants.AudienceName,
@@ -70,7 +70,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                 _uow.Commit();
 
                 _uow.AuthActivity.Create(
-                    _mapper.Map<uvw_AuthActivity>(new AuthActivityV1()
+                    _map.Map<uvw_AuthActivity>(new AuthActivityV1()
                     {
                         AudienceId = foundAudience.Id,
                         LoginType = GrantFlowType.ClientCredentialV2.ToString(),
@@ -104,7 +104,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
              */
 
             _uow.Refreshes.Create(
-                _mapper.Map<uvw_Refresh>(new RefreshV1()
+                _map.Map<uvw_Refresh>(new RefreshV1()
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
@@ -159,7 +159,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundClaim == null)
             {
                 foundClaim = _uow.Claims.Create(
-                    _mapper.Map<uvw_Claim>(new ClaimV1()
+                    _map.Map<uvw_Claim>(new ClaimV1()
                     {
                         IssuerId = foundIssuer.Id,
                         Subject = TestDefaultConstants.ClaimSubject,
@@ -185,7 +185,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                 var now = DateTime.UtcNow;
 
                 _uow.EmailQueue.Create(
-                    _mapper.Map<uvw_EmailQueue>(new EmailV1()
+                    _map.Map<uvw_EmailQueue>(new EmailV1()
                     {
                         FromEmail = foundUser.EmailAddress,
                         ToEmail = foundUser.EmailAddress,
@@ -212,7 +212,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundIssuer == null)
             {
                 foundIssuer = _uow.Issuers.Create(
-                    _mapper.Map<uvw_Issuer>(new IssuerV1()
+                    _map.Map<uvw_Issuer>(new IssuerV1()
                     {
                         Name = TestDefaultConstants.IssuerName,
                         IssuerKey = TestDefaultConstants.IssuerKey,
@@ -230,7 +230,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundAccessExpire == null)
             {
                 _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.AccessExpire,
@@ -248,7 +248,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundRefreshExpire == null)
             {
                 _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.RefreshExpire,
@@ -266,7 +266,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundTotpExpire == null)
             {
                 _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.TotpExpire,
@@ -284,7 +284,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundPollingMax == null)
             {
                 _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         IssuerId = foundIssuer.Id,
                         ConfigKey = SettingsConstants.PollingMax,
@@ -309,7 +309,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundLogin == null)
             {
                 foundLogin = _uow.Logins.Create(
-                    _mapper.Map<uvw_Login>(new LoginV1()
+                    _map.Map<uvw_Login>(new LoginV1()
                     {
                         Name = TestDefaultConstants.LoginName,
                         LoginKey = AlphaNumeric.CreateString(16),
@@ -327,7 +327,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             for (int i = 0; i < sets; i++)
             {
                 _uow.MOTDs.Create(
-                    _mapper.Map<uvw_MOTD>(new MOTDTssV1()
+                    _map.Map<uvw_MOTD>(new MOTDTssV1()
                     {
                         globalId = Guid.NewGuid(),
                         author = TestDefaultConstants.MOTDAuthor,
@@ -361,7 +361,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundRole == null)
             {
                 foundRole = _uow.Roles.Create(
-                    _mapper.Map<uvw_Role>(new RoleV1()
+                    _map.Map<uvw_Role>(new RoleV1()
                     {
                         AudienceId = foundAudience.Id,
                         Name = TestDefaultConstants.RoleName,
@@ -385,7 +385,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundGlobalLegacyClaims == null)
             {
                 foundGlobalLegacyClaims = _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         ConfigKey = SettingsConstants.GlobalLegacyClaims,
                         ConfigValue = "true",
@@ -401,7 +401,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundGlobalLegacyIssuer == null)
             {
                 foundGlobalLegacyIssuer = _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         ConfigKey = SettingsConstants.GlobalLegacyIssuer,
                         ConfigValue = "true",
@@ -417,7 +417,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundGlobalTotpExpire == null)
             {
                 foundGlobalTotpExpire = _uow.Settings.Create(
-                    _mapper.Map<uvw_Setting>(new SettingV1()
+                    _map.Map<uvw_Setting>(new SettingV1()
                     {
                         ConfigKey = SettingsConstants.GlobalTotpExpire,
                         ConfigValue = 1200.ToString(),
@@ -440,7 +440,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                 var now = DateTime.UtcNow;
 
                 _uow.TextQueue.Create(
-                    _mapper.Map<uvw_TextQueue>(new TextV1()
+                    _map.Map<uvw_TextQueue>(new TextV1()
                     {
                         FromPhoneNumber = TestDefaultConstants.UserPhoneNumber,
                         ToPhoneNumber = TestDefaultConstants.UserPhoneNumber,
@@ -473,7 +473,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundAudienceUrl == null)
             {
                 foundAudienceUrl = _uow.Urls.Create(
-                    _mapper.Map<uvw_Url>(new UrlV1()
+                    _map.Map<uvw_Url>(new UrlV1()
                     {
                         AudienceId = foundAudience.Id,
                         UrlHost = url.Scheme + "://" + url.Host,
@@ -498,7 +498,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
             if (foundUser == null)
             {
                 foundUser = _uow.Users.Create(
-                    _mapper.Map<uvw_User>(new UserV1()
+                    _map.Map<uvw_User>(new UserV1()
                     {
                         UserName = TestDefaultConstants.UserName,
                         Email = TestDefaultConstants.UserName,
@@ -513,7 +513,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                 _uow.Commit();
 
                 _uow.AuthActivity.Create(
-                    _mapper.Map<uvw_AuthActivity>(new AuthActivityV1()
+                    _map.Map<uvw_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = foundUser.Id,
                         LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
@@ -596,7 +596,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
              */
 
             _uow.Refreshes.Create(
-                _mapper.Map<uvw_Refresh>(new RefreshV1()
+                _map.Map<uvw_Refresh>(new RefreshV1()
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
@@ -652,7 +652,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
              */
 
             _uow.States.Create(
-                _mapper.Map<uvw_State>(new StateV1()
+                _map.Map<uvw_State>(new StateV1()
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,
@@ -665,7 +665,7 @@ namespace Bhbk.Lib.Identity.Data.Tests.RepositoryTests
                 }));
 
             _uow.States.Create(
-                _mapper.Map<uvw_State>(new StateV1()
+                _map.Map<uvw_State>(new StateV1()
                 {
                     IssuerId = foundIssuer.Id,
                     AudienceId = foundAudience.Id,

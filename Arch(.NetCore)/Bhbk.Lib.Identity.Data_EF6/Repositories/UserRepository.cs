@@ -16,10 +16,10 @@ namespace Bhbk.Lib.Identity.Data_EF6.Repositories
     {
         private IClockService _clock;
 
-        public UserRepository(IdentityEntities context, IContextService instance)
+        public UserRepository(IdentityEntities context, IContextService env)
             : base(context)
         {
-            _clock = new ClockService(instance);
+            _clock = new ClockService(env);
         }
 
         public DateTimeOffset Clock

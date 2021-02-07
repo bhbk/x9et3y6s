@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Admin
 {
     public class RoleProvider : BaseProvider
     {
-        public RoleProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public RoleProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

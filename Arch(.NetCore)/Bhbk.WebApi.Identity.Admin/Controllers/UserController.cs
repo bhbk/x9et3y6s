@@ -36,7 +36,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult AddToClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+            var claim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 
@@ -55,16 +55,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Users.IsInClaim(user, claim))
+            if (!uow.Users.IsInClaim(user, claim))
             {
-                UoW.Users.AddClaim(
+                uow.Users.AddClaim(
                     new tbl_UserClaim()
                     {
                         UserId = user.Id,
                         ClaimId = claim.Id,
                         IsDeletable = true,
                     });
-                UoW.Commit();
+                uow.Commit();
             }
 
             return NoContent();
@@ -75,7 +75,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -84,7 +84,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var login = UoW.Logins.Get(x => x.Id == loginID)
+            var login = uow.Logins.Get(x => x.Id == loginID)
                 .SingleOrDefault();
 
             if (login == null)
@@ -93,16 +93,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Users.IsInLogin(user, login))
+            if (!uow.Users.IsInLogin(user, login))
             {
-                UoW.Users.AddLogin(
+                uow.Users.AddLogin(
                     new tbl_UserLogin()
                     {
                         UserId = user.Id,
                         LoginId = login.Id,
                         IsDeletable = true,
                     });
-                UoW.Commit();
+                uow.Commit();
             }
 
             return NoContent();
@@ -113,7 +113,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult AddToRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -122,7 +122,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var role = UoW.Roles.Get(x => x.Id == roleID)
+            var role = uow.Roles.Get(x => x.Id == roleID)
                 .SingleOrDefault();
 
             if (role == null)
@@ -131,16 +131,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Users.IsInRole(user, role))
+            if (!uow.Users.IsInRole(user, role))
             {
-                UoW.Users.AddRole(
+                uow.Users.AddRole(
                     new tbl_UserRole()
                     {
                         UserId = user.Id,
                         RoleId = role.Id,
                         IsDeletable = true,
                     });
-                UoW.Commit();
+                uow.Commit();
             }
 
             return NoContent();
@@ -154,13 +154,13 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Users.Get(x => x.UserName == model.UserName).Any())
+            if (uow.Users.Get(x => x.UserName == model.UserName).Any())
             {
                 ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.UserName}");
                 return BadRequest(ModelState);
             }
 
-            var issuer = UoW.Issuers.Get(x => x.Id == model.IssuerId)
+            var issuer = uow.Issuers.Get(x => x.Id == model.IssuerId)
                 .SingleOrDefault();
 
             if (issuer == null)
@@ -181,20 +181,20 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Users.Create(Mapper.Map<tbl_User>(model));
+            var result = uow.Users.Create(map.Map<tbl_User>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            if (UoW.InstanceType == InstanceContext.DeployedOrLocal
-                || UoW.InstanceType == InstanceContext.End2EndTest)
+            if (uow.InstanceType == InstanceContext.DeployedOrLocal
+                || uow.InstanceType == InstanceContext.End2EndTest)
             {
-                var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
+                var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == SettingsConstants.TotpExpire).Single();
 
-                var code = HttpUtility.UrlEncode(new PasswordTokenFactory(UoW.InstanceType.ToString())
+                var code = HttpUtility.UrlEncode(new PasswordTokenFactory(uow.InstanceType.ToString())
                     .Generate(result.UserName, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), result.Id.ToString(), result.SecurityStamp));
 
-                var url = UrlFactory.GenerateConfirmEmailV1(Conf, result.Id.ToString(), code);
+                var url = UrlFactory.GenerateConfirmEmailV1(conf, result.Id.ToString(), code);
                 var alert = ControllerContext.HttpContext.RequestServices.GetRequiredService<IAlertService>();
 
                 await alert.Enqueue_EmailV1(
@@ -205,11 +205,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                         ToEmail = result.EmailAddress,
                         ToDisplay = $"{result.FirstName} {result.LastName}",
                         Subject = $"{issuer.Name} {MessageConstants.ConfirmNewUserSubject}",
-                        Body = Email.ConfirmNewUser(Mapper.Map<IssuerV1>(issuer), Mapper.Map<UserV1>(result), url)
+                        Body = Email.ConfirmNewUser(map.Map<IssuerV1>(issuer), map.Map<UserV1>(result), url)
                     });
             }
 
-            return Ok(Mapper.Map<UserV1>(result));
+            return Ok(map.Map<UserV1>(result));
         }
 
         [Route("v1/no-confirm"), HttpPost]
@@ -220,7 +220,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (UoW.Users.Get(x => x.UserName == model.UserName).Any())
+            if (uow.Users.Get(x => x.UserName == model.UserName).Any())
             {
                 ModelState.AddModelError(MessageType.UserAlreadyExists.ToString(), $"User:{model.UserName}");
                 return BadRequest(ModelState);
@@ -238,11 +238,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Users.Create(Mapper.Map<tbl_User>(model));
+            var result = uow.Users.Create(map.Map<tbl_User>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<UserV1>(result));
+            return Ok(map.Map<UserV1>(result));
         }
 
         [Route("v1/{userID:guid}"), HttpDelete]
@@ -250,7 +250,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -265,8 +265,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.Delete(user);
-            UoW.Commit();
+            uow.Users.Delete(user);
+            uow.Commit();
 
             return NoContent();
         }
@@ -276,7 +276,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -285,10 +285,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+            uow.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.UserId == userID).ToLambda());
 
-            UoW.Commit();
+            uow.Commit();
 
             return NoContent();
         }
@@ -301,14 +301,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.UserId == userID && x.Id == refreshID).ToLambda();
 
-            if (!UoW.Refreshes.Exists(expr))
+            if (!uow.Refreshes.Exists(expr))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{userID}");
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(expr);
-            UoW.Commit();
+            uow.Refreshes.Delete(expr);
+            uow.Commit();
 
             return NoContent();
         }
@@ -321,10 +321,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(userValue, out userID))
-                user = UoW.Users.Get(x => x.Id == userID)
+                user = uow.Users.Get(x => x.Id == userID)
                     .SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.UserName == userValue)
+                user = uow.Users.Get(x => x.UserName == userValue)
                     .SingleOrDefault();
 
             if (user == null)
@@ -333,7 +333,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<UserV1>(user));
+            return Ok(map.Map<UserV1>(user));
         }
 
         [Route("v1/page"), HttpPost]
@@ -346,9 +346,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var result = new DataStateV1Result<UserV1>
                 {
-                    Data = Mapper.Map<IEnumerable<UserV1>>(
-                        UoW.Users.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_User>, IQueryable<tbl_User>>>>(
+                    Data = map.Map<IEnumerable<UserV1>>(
+                        uow.Users.Get(
+                            map.MapExpression<Expression<Func<IQueryable<tbl_User>, IQueryable<tbl_User>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_User>().ApplyState(state)),
                                     new List<Expression<Func<tbl_User, object>>>() 
                                     { 
@@ -358,8 +358,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                                         x => x.tbl_UserRoles,
                                     })),
 
-                    Total = UoW.Users.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_User>, IQueryable<tbl_User>>>>(
+                    Total = uow.Users.Count(
+                        map.MapExpression<Expression<Func<IQueryable<tbl_User>, IQueryable<tbl_User>>>>(
                             QueryExpressionFactory.GetQueryExpression<tbl_User>().ApplyPredicate(state)))
                 };
 
@@ -375,7 +375,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Route("v1/{userID:guid}/claims"), HttpGet]
         public IActionResult GetClaimsV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -384,16 +384,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var claims = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+            var claims = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.tbl_UserClaims.Any(y => y.UserId == userID)).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<ClaimV1>>(claims));
+            return Ok(map.Map<IEnumerable<ClaimV1>>(claims));
         }
 
         [Route("v1/{userID:guid}/audiences"), HttpGet]
         public IActionResult GetAudiencesV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -402,16 +402,16 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var audiences = UoW.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
+            var audiences = uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                 .Where(x => x.tbl_Roles.Any(y => y.tbl_UserRoles.Any(z => z.UserId == userID))).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<AudienceV1>>(audiences));
+            return Ok(map.Map<IEnumerable<AudienceV1>>(audiences));
         }
 
         [Route("v1/{userID:guid}/logins"), HttpGet]
         public IActionResult GetLoginsV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -420,10 +420,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var logins = UoW.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
+            var logins = uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
                 .Where(x => x.tbl_UserLogins.Any(y => y.UserId == userID)).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<LoginV1>>(logins));
+            return Ok(map.Map<IEnumerable<LoginV1>>(logins));
         }
 
         [Route("v1/{userID:guid}/refreshes"), HttpGet]
@@ -432,21 +432,21 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.UserId == userID).ToLambda();
 
-            if (!UoW.Refreshes.Exists(expr))
+            if (!uow.Refreshes.Exists(expr))
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{userID}");
                 return NotFound(ModelState);
             }
 
-            var refreshes = UoW.Refreshes.Get(expr);
+            var refreshes = uow.Refreshes.Get(expr);
 
-            return Ok(Mapper.Map<IEnumerable<RefreshV1>>(refreshes));
+            return Ok(map.Map<IEnumerable<RefreshV1>>(refreshes));
         }
 
         [Route("v1/{userID:guid}/roles"), HttpGet]
         public IActionResult GetRolesV1([FromRoute] Guid userID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -455,10 +455,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var roles = UoW.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
+            var roles = uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
                 .Where(x => x.tbl_UserRoles.Any(y => y.UserId == userID)).ToLambda());
 
-            return Ok(Mapper.Map<IEnumerable<RoleV1>>(roles));
+            return Ok(map.Map<IEnumerable<RoleV1>>(roles));
         }
 
         [Route("v1/{userID:guid}/remove-from-claim/{claimID:guid}"), HttpDelete]
@@ -466,7 +466,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult RemoveFromClaimV1([FromRoute] Guid userID, [FromRoute] Guid claimID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -475,7 +475,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var claim = UoW.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
+            var claim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
                 .Where(x => x.Id == claimID).ToLambda())
                 .SingleOrDefault();
 
@@ -485,15 +485,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (UoW.Users.IsInClaim(user, claim))
+            if (uow.Users.IsInClaim(user, claim))
             {
-                UoW.Users.RemoveClaim(
+                uow.Users.RemoveClaim(
                     new tbl_UserClaim()
                     {
                         UserId = user.Id,
                         ClaimId = claim.Id,
                     });
-                UoW.Commit();
+                uow.Commit();
             }
 
             return NoContent();
@@ -504,7 +504,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -513,7 +513,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var login = UoW.Logins.Get(x => x.Id == loginID)
+            var login = uow.Logins.Get(x => x.Id == loginID)
                 .SingleOrDefault();
 
             if (login == null)
@@ -522,15 +522,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (UoW.Users.IsInLogin(user, login))
+            if (uow.Users.IsInLogin(user, login))
             {
-                UoW.Users.RemoveLogin(
+                uow.Users.RemoveLogin(
                     new tbl_UserLogin()
                     {
                         UserId = user.Id,
                         LoginId = login.Id,
                     });
-                UoW.Commit();
+                uow.Commit();
             }
 
             return NoContent();
@@ -541,7 +541,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         [Authorize(Roles = DefaultConstants.RoleForAdmins_Identity)]
         public IActionResult RemoveFromRoleV1([FromRoute] Guid userID, [FromRoute] Guid roleID)
         {
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -550,7 +550,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var role = UoW.Roles.Get(x => x.Id == roleID)
+            var role = uow.Roles.Get(x => x.Id == roleID)
                 .SingleOrDefault();
 
             if (role == null)
@@ -559,15 +559,15 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (UoW.Users.IsInRole(user, role))
+            if (uow.Users.IsInRole(user, role))
             {
-                UoW.Users.RemoveRole(
+                uow.Users.RemoveRole(
                     new tbl_UserRole()
                     {
                         UserId = user.Id,
                         RoleId = role.Id,
                     });
-                UoW.Commit();
+                uow.Commit();
             }
 
             return NoContent();
@@ -581,7 +581,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -590,14 +590,14 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            if (!UoW.Users.IsPasswordSet(user))
+            if (!uow.Users.IsPasswordSet(user))
             {
                 ModelState.AddModelError(MessageType.UserInvalid.ToString(), $"No password set for user:{user.Id}");
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetPassword(user, null);
-            UoW.Commit();
+            uow.Users.SetPassword(user, null);
+            uow.Commit();
 
             return NoContent();
         }
@@ -610,7 +610,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == userID)
+            var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
 
             if (user == null)
@@ -626,8 +626,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetPassword(user, model.NewPassword);
-            UoW.Commit();
+            uow.Users.SetPassword(user, model.NewPassword);
+            uow.Commit();
 
             return NoContent();
         }
@@ -640,7 +640,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_User>()
+            var user = uow.Users.GetAsNoTracking(QueryExpressionFactory.GetQueryExpression<tbl_User>()
                 .Where(x => x.Id == model.Id).ToLambda())
                 .SingleOrDefault();
 
@@ -656,11 +656,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Users.Update(Mapper.Map<tbl_User>(model));
+            var result = uow.Users.Update(map.Map<tbl_User>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<UserV1>(result));
+            return Ok(map.Map<UserV1>(result));
         }
     }
 }

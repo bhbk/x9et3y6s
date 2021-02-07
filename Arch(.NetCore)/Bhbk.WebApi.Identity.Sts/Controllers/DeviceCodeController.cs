@@ -59,9 +59,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -74,9 +74,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
-                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                audience = UoW.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
 
             if (audience == null)
             {
@@ -89,9 +89,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
-                user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+                user = uow.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.UserName == input.user).SingleOrDefault();
+                user = uow.Users.Get(x => x.UserName == input.user).SingleOrDefault();
 
             if (user == null)
             {
@@ -99,13 +99,13 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return NotFound(ModelState);
             }
 
-            var expire = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
+            var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == SettingsConstants.TotpExpire).Single();
 
-            var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
+            var polling = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == SettingsConstants.PollingMax).Single();
 
-            var authorize = new Uri(string.Format("{0}/{1}/{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "authorize"));
+            var authorize = new Uri(string.Format("{0}/{1}/{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "authorize"));
             var nonce = Base64.CreateString(32);
 
             //create domain model for this result type...
@@ -119,8 +119,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 interval = uint.Parse(polling.ConfigValue),
             };
 
-            var state = UoW.States.Create(
-                Mapper.Map<tbl_State>(new StateV1()
+            var state = uow.States.Create(
+                map.Map<tbl_State>(new StateV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -132,7 +132,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
-            UoW.Commit();
+            uow.Commit();
 
             return Ok(result);
         }
@@ -149,9 +149,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -169,9 +169,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
-                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                audience = UoW.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
 
             if (audience == null)
             {
@@ -184,11 +184,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var polling = UoW.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
+            var polling = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                 && x.ConfigKey == SettingsConstants.PollingMax).Single();
 
             //check if state is valid...
-            var state = UoW.States.Get(x => x.StateValue == input.device_code
+            var state = uow.States.Get(x => x.StateValue == input.device_code
                 && x.StateType == ConsumerType.Device.ToString()
                 && x.ValidFromUtc < DateTime.UtcNow
                 && x.ValidToUtc > DateTime.UtcNow).SingleOrDefault();
@@ -205,8 +205,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 state.LastPollingUtc = DateTime.UtcNow;
                 state.StateConsume = false;
 
-                UoW.States.Update(state);
-                UoW.Commit();
+                uow.States.Update(state);
+                uow.Commit();
 
                 ModelState.AddModelError(MessageType.StateSlowDown.ToString(), $"Device code:{input.device_code}");
                 return BadRequest(ModelState);
@@ -225,7 +225,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = UoW.Users.Get(x => x.Id == state.UserId).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == state.UserId).SingleOrDefault();
 
             if (user == null)
             {
@@ -234,7 +234,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             //check that user is confirmed...
             //check that user is not locked...
-            else if (UoW.Users.IsLockedOut(user)
+            else if (uow.Users.IsLockedOut(user)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
@@ -244,15 +244,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (!new TimeBasedTokenFactory(8, 10).Validate(user.SecurityStamp, input.user_code, user.Id.ToString()))
             {
-                UoW.AuthActivity.Create(
-                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                uow.AuthActivity.Create(
+                    map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = user.Id,
                         LoginType = GrantFlowType.DeviceCodeV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
                     }));
 
-                UoW.Commit();
+                uow.Commit();
 
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{input.user_code}");
                 return BadRequest(ModelState);
@@ -263,24 +263,24 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             state.StateConsume = true;
 
             //adjust state...
-            UoW.States.Update(state);
+            uow.States.Update(state);
 
-            var dc_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var dc = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, dc_claims);
+            var dc_claims = uow.Users.GenerateAccessClaims(issuer, user);
+            var dc = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, dc_claims);
 
-            UoW.AuthActivity.Create(
-                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+            uow.AuthActivity.Create(
+                map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
                     LoginType = GrantFlowType.DeviceCodeV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
-            var rt_claims = UoW.Users.GenerateRefreshClaims(issuer, user);
-            var rt = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rt_claims);
+            var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
+            var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rt_claims);
 
-            UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refresh>(new RefreshV1()
+            uow.Refreshes.Create(
+                map.Map<tbl_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     UserId = user.Id,
@@ -290,15 +290,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.AuthActivity.Create(
-                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+            uow.AuthActivity.Create(
+                map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
-            UoW.Commit();
+            uow.Commit();
 
             var result = new UserJwtV2()
             {
@@ -307,7 +307,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 refresh_token = rt.RawData,
                 user = user.UserName,
                 client = new List<string>() { audience.Name },
-                issuer = issuer.Name + ":" + Conf["IdentityTenant:Salt"],
+                issuer = issuer.Name + ":" + conf["IdentityTenant:Salt"],
                 expires_in = (int)(new DateTimeOffset(dc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 

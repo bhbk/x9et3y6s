@@ -56,9 +56,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -71,9 +71,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
-                audience = UoW.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Id == audienceID, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
             else
-                audience = UoW.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Name == input.client, x => x.Include(u => u.tbl_Urls)).SingleOrDefault();
 
             if (audience == null)
             {
@@ -86,9 +86,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.user, out userID))
-                user = UoW.Users.Get(x => x.Id == userID).SingleOrDefault();
+                user = uow.Users.Get(x => x.Id == userID).SingleOrDefault();
             else
-                user = UoW.Users.Get(x => x.UserName == input.user).SingleOrDefault();
+                user = uow.Users.Get(x => x.UserName == input.user).SingleOrDefault();
 
             if (user == null)
             {
@@ -97,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
             //check that user is confirmed...
             //check that user is not locked...
-            else if (UoW.Users.IsLockedOut(user)
+            else if (uow.Users.IsLockedOut(user)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
@@ -106,7 +106,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             //check if state is valid...
-            var state = UoW.States.Get(x => x.StateValue == input.state
+            var state = uow.States.Get(x => x.StateValue == input.state
                 && x.StateType == ConsumerType.User.ToString()
                 && x.ValidFromUtc < DateTime.UtcNow
                 && x.ValidToUtc > DateTime.UtcNow).SingleOrDefault();
@@ -115,15 +115,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || state.StateConsume == true
                 || state.UserId != user.Id)
             {
-                UoW.AuthActivity.Create(
-                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                uow.AuthActivity.Create(
+                    map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         UserId = user.Id,
                         LoginType = GrantFlowType.ImplicitV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
                     }));
 
-                UoW.Commit();
+                uow.Commit();
 
                 ModelState.AddModelError(MessageType.StateInvalid.ToString(), $"User state:{input.state}");
                 return BadRequest(ModelState);
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             //check if there is redirect url defined for client. if not then use base url for identity ui.
             if (audience.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
-                redirect = new Uri(string.Format("{0}{1}{2}", Conf["IdentityMeUrls:BaseUiUrl"], Conf["IdentityMeUrls:BaseUiPath"], "/implicit-callback"));
+                redirect = new Uri(string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/implicit-callback"));
             }
             else if (audience.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
@@ -148,21 +148,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //no reuse of state after this...
             state.StateConsume = true;
-            UoW.States.Update(state);
+            uow.States.Update(state);
 
             //no refresh token as part of this flow...
-            var imp_claims = UoW.Users.GenerateAccessClaims(issuer, user);
-            var imp = Auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, imp_claims);
+            var imp_claims = uow.Users.GenerateAccessClaims(issuer, user);
+            var imp = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, imp_claims);
 
-            UoW.AuthActivity.Create(
-                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+            uow.AuthActivity.Create(
+                map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     UserId = user.Id,
                     LoginType = GrantFlowType.ImplicitV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
-            UoW.Commit();
+            uow.Commit();
 
             var result = new Uri(redirect.AbsoluteUri + "#access_token=" + HttpUtility.UrlEncode(imp.RawData)
                 + "&expires_in=" + HttpUtility.UrlEncode(((int)(new DateTimeOffset(imp.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds).ToString())

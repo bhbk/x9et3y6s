@@ -39,9 +39,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var ask = await service.Endpoints.DeviceCode_AskV1(
                     new DeviceCodeAskV1()
@@ -63,9 +63,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var dc = await service.Endpoints.DeviceCode_AuthV1(
                     new DeviceCodeV1()
@@ -89,9 +89,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -122,9 +122,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -155,9 +155,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -187,9 +187,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -219,11 +219,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -240,7 +240,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_State>(new StateV1()
+                    map.Map<tbl_State>(new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -275,11 +275,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -296,7 +296,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_State>(new StateV1()
+                    map.Map<tbl_State>(new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -331,11 +331,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -352,7 +352,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_State>(new StateV1()
+                    map.Map<tbl_State>(new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -387,11 +387,11 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -408,7 +408,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_State>(new StateV1()
+                    map.Map<tbl_State>(new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -442,13 +442,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -465,7 +465,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var secret = new TimeBasedTokenFactory(8, 10).Generate(user.SecurityStamp, user.Id.ToString());
 
                 var state = uow.States.Create(
-                    mapper.Map<tbl_State>(new StateV1()
+                    map.Map<tbl_State>(new StateV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,

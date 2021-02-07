@@ -38,8 +38,8 @@ namespace Bhbk.Cli.Identity.Commands
             _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>())
                 .CreateMapper();
 
-            var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], instance);
+            var env = new ContextService(InstanceContext.DeployedOrLocal);
+            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], env);
 
             _service = new AdminService(_conf)
             {
@@ -74,18 +74,18 @@ namespace Bhbk.Cli.Identity.Commands
                 _human = bool.Parse(arg);
             });
 
-            HasRequiredOption("f|first=", "First name", arg =>
+            HasRequiredOption("g|given=", "Given (first) name", arg =>
             {
                 if (string.IsNullOrEmpty(arg))
-                    throw new ConsoleHelpAsException($"  *** No first name given ***");
+                    throw new ConsoleHelpAsException($"  *** No given (first) name given ***");
 
                 _firstName = arg;
             });
 
-            HasRequiredOption("l|last=", "Last name", arg =>
+            HasRequiredOption("s|surname=", "Surname (last) name", arg =>
             {
                 if (string.IsNullOrEmpty(arg))
-                    throw new ConsoleHelpAsException($"  *** No last name given ***");
+                    throw new ConsoleHelpAsException($"  *** No surname (last) name given ***");
 
                 _lastName = arg;
             });
@@ -129,7 +129,7 @@ namespace Bhbk.Cli.Identity.Commands
                 _ = _service.User_AddToLoginV1(user.Id, _login.Id)
                     .Result;
 
-                StandardOutputFactory.Users(_uow, new List<E_User> { _map.Map<E_User>(user) });
+                FormatOutput.Users(_uow, new List<E_User> { _map.Map<E_User>(user) });
 
                 return StandardOutput.FondFarewell();
             }

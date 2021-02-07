@@ -23,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1"), HttpGet]
         public IActionResult GetV1()
         {
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -31,29 +31,29 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<UserV1>(user));
+            return Ok(map.Map<UserV1>(user));
         }
 
         [Route("v1/msg-of-the-day"), HttpGet]
         public IActionResult GetMOTDV1()
         {
             var random = new Random();
-            var skip = random.Next(1, UoW.MOTDs.Count());
+            var skip = random.Next(1, uow.MOTDs.Count());
 
             if (skip == 1)
                 skip = 0;
 
-            var motd = UoW.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<uvw_MOTD>()
+            var motd = uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<uvw_MOTD>()
                 .OrderBy("id").Skip(skip).Take(1).ToLambda())
                 .SingleOrDefault();
 
-            return Ok(Mapper.Map<MOTDTssV1>(motd));
+            return Ok(map.Map<MOTDTssV1>(motd));
         }
 
         [Route("v1/code"), HttpGet]
         public IActionResult GetCodesV1()
         {
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -61,9 +61,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            var states = UoW.States.Get(x => x.UserId == user.Id);
+            var states = uow.States.Get(x => x.UserId == user.Id);
 
-            var result = states.Select(x => Mapper.Map<StateV1>(x));
+            var result = states.Select(x => map.Map<StateV1>(x));
 
             return Ok(result);
         }
@@ -71,7 +71,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/code/revoke"), HttpDelete]
         public IActionResult DeleteCodesV1()
         {
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -79,9 +79,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<uvw_State>()
+            uow.States.Delete(QueryExpressionFactory.GetQueryExpression<uvw_State>()
                 .Where(x => x.UserId == user.Id).ToLambda());
-            UoW.Commit();
+            uow.Commit();
 
             return NoContent();
         }
@@ -89,7 +89,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [Route("v1/code/{codeID}/revoke"), HttpDelete]
         public IActionResult DeleteCodeV1([FromRoute] Guid codeID)
         {
-            var code = UoW.States.Get(x => x.UserId == GetIdentityGUID()
+            var code = uow.States.Get(x => x.UserId == GetIdentityGUID()
                 && x.Id == codeID).SingleOrDefault();
 
             if (code == null)
@@ -98,9 +98,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.States.Delete(QueryExpressionFactory.GetQueryExpression<uvw_State>()
+            uow.States.Delete(QueryExpressionFactory.GetQueryExpression<uvw_State>()
                 .Where(x => x.Id == code.Id).ToLambda());
-            UoW.Commit();
+            uow.Commit();
 
             return NoContent();
         }
@@ -116,7 +116,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var state = UoW.States.Get(x => x.StateValue == codeValue).SingleOrDefault();
+            var state = uow.States.Get(x => x.StateValue == codeValue).SingleOrDefault();
 
             if (state == null)
             {
@@ -131,7 +131,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null
                 || user.Id != state.UserId)
@@ -141,7 +141,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             }
             //check that user is confirmed...
             //check that user is not locked...
-            else if (UoW.Users.IsLockedOut(user)
+            else if (uow.Users.IsLockedOut(user)
                 || !user.EmailConfirmed
                 || !user.PasswordConfirmed)
             {
@@ -164,8 +164,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             else
                 throw new NotImplementedException();
 
-            UoW.States.Update(state);
-            UoW.Commit();
+            uow.States.Update(state);
+            uow.Commit();
 
             return NoContent();
         }
@@ -176,21 +176,21 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var expr = QueryExpressionFactory.GetQueryExpression<uvw_Refresh>()
                 .Where(x => x.UserId == GetIdentityGUID()).ToLambda();
 
-            if (!UoW.Refreshes.Exists(expr))
+            if (!uow.Refreshes.Exists(expr))
             {
                 ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 
-            var refreshes = UoW.Refreshes.Get(expr);
+            var refreshes = uow.Refreshes.Get(expr);
 
-            return Ok(Mapper.Map<IEnumerable<RefreshV1>>(refreshes));
+            return Ok(map.Map<IEnumerable<RefreshV1>>(refreshes));
         }
 
         [Route("v1/refresh/revoke"), HttpDelete]
         public IActionResult DeleteRefreshesV1()
         {
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -198,9 +198,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<uvw_Refresh>()
+            uow.Refreshes.Delete(QueryExpressionFactory.GetQueryExpression<uvw_Refresh>()
                 .Where(x => x.UserId == user.Id).ToLambda());
-            UoW.Commit();
+            uow.Commit();
 
             return NoContent();
         }
@@ -211,14 +211,14 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             var expr = QueryExpressionFactory.GetQueryExpression<uvw_Refresh>()
                 .Where(x => x.UserId == GetIdentityGUID() && x.Id == refreshID).ToLambda();
 
-            if (!UoW.Refreshes.Exists(expr))
+            if (!uow.Refreshes.Exists(expr))
             {
                 ModelState.AddModelError(MessageType.TokenInvalid.ToString(), $"Token:{GetIdentityGUID()}");
                 return NotFound(ModelState);
             }
 
-            UoW.Refreshes.Delete(expr);
-            UoW.Commit();
+            uow.Refreshes.Delete(expr);
+            uow.Commit();
 
             return NoContent();
         }
@@ -229,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -249,8 +249,8 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            UoW.Users.SetPassword(user, model.NewPassword);
-            UoW.Commit();
+            uow.Users.SetPassword(user, model.NewPassword);
+            uow.Commit();
 
             return NoContent();
         }
@@ -261,7 +261,7 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = UoW.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
+            var user = uow.Users.Get(x => x.Id == GetIdentityGUID()).SingleOrDefault();
 
             if (user == null)
             {
@@ -276,11 +276,11 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = UoW.Users.Update(Mapper.Map<uvw_User>(model));
+            var result = uow.Users.Update(map.Map<uvw_User>(model));
 
-            UoW.Commit();
+            uow.Commit();
 
-            return Ok(Mapper.Map<UserV1>(result));
+            return Ok(map.Map<UserV1>(result));
         }
     }
 }

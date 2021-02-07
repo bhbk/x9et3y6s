@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Admin
 {
     public class AudienceProvider : BaseProvider
     {
-        public AudienceProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public AudienceProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

@@ -25,9 +25,9 @@ namespace Bhbk.Lib.Identity.Services
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
-        public AdminService(IConfiguration conf, InstanceContext instance, HttpClient http)
+        public AdminService(IConfiguration conf, InstanceContext env, HttpClient http)
         {
-            Endpoints = new AdminServiceRepository(conf, instance, http);
+            Endpoints = new AdminServiceRepository(conf, env, http);
         }
 
         public async ValueTask<AuthActivityV1> Activity_GetV1(string activityValue)

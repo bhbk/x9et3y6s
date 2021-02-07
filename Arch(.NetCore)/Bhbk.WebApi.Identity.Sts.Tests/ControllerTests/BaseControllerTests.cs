@@ -22,17 +22,17 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var instance = new ContextService(InstanceContext.IntegrationTest);
-            var mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>()).CreateMapper();
+            var env = new ContextService(InstanceContext.IntegrationTest);
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {
                 sc.AddSingleton<IConfiguration>(conf);
-                sc.AddSingleton<IContextService>(instance);
-                sc.AddSingleton<IMapper>(mapper);
+                sc.AddSingleton<IContextService>(env);
+                sc.AddSingleton<IMapper>(map);
                 sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
                 {
-                    var uow = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
+                    var uow = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], env);
 
                     var data = new DefaultDataFactory_Tbl(uow);
                     data.CreateSettings();

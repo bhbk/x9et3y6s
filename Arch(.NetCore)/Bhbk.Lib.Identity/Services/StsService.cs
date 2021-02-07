@@ -22,9 +22,9 @@ namespace Bhbk.Lib.Identity.Services
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
-        public StsService(IConfiguration conf, InstanceContext instance, HttpClient http)
+        public StsService(IConfiguration conf, InstanceContext env, HttpClient http)
         {
-            Endpoints = new StsServiceRepository(conf, instance, http);
+            Endpoints = new StsServiceRepository(conf, env, http);
         }
 
         public async ValueTask<AuthCodeV1> AuthCode_AskV1(AuthCodeAskV1 model)

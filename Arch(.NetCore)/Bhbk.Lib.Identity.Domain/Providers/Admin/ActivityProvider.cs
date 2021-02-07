@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Admin
 {
     public class ActivityProvider : BaseProvider
     {
-        public ActivityProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public ActivityProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

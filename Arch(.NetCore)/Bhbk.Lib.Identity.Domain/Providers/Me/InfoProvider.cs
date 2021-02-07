@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Me
 {
     public class InfoProvider : BaseProvider
     {
-        public InfoProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public InfoProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

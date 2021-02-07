@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Admin
 {
     public class MOTDProvider : BaseProvider
     {
-        public MOTDProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public MOTDProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

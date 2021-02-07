@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Me
 {
     public class InitProvider : BaseProvider
     {
-        public InitProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public InitProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

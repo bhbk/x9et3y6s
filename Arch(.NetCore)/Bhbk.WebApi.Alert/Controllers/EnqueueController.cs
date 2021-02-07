@@ -31,10 +31,10 @@ namespace Bhbk.WebApi.Alert.Controllers
                 return BadRequest(ModelState);
             }
 
-            var email = Mapper.Map<uvw_EmailQueue>(model);
+            var email = map.Map<uvw_EmailQueue>(model);
 
-            UoW.EmailQueue.Create(email);
-            UoW.Commit();
+            uow.EmailQueue.Create(email);
+            uow.Commit();
 
             return NoContent();
         }
@@ -49,13 +49,13 @@ namespace Bhbk.WebApi.Alert.Controllers
             {
                 var result = new DataStateV1Result<EmailV1>
                 {
-                    Data = Mapper.Map<IEnumerable<EmailV1>>(
-                        UoW.Audiences.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<uvw_EmailQueue>, IQueryable<uvw_EmailQueue>>>>(
+                    Data = map.Map<IEnumerable<EmailV1>>(
+                        uow.Audiences.Get(
+                            map.MapExpression<Expression<Func<IQueryable<uvw_EmailQueue>, IQueryable<uvw_EmailQueue>>>>(
                                 QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>().ApplyState(state)))),
 
-                    Total = UoW.Audiences.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<uvw_EmailQueue>, IQueryable<uvw_EmailQueue>>>>(
+                    Total = uow.Audiences.Count(
+                        map.MapExpression<Expression<Func<IQueryable<uvw_EmailQueue>, IQueryable<uvw_EmailQueue>>>>(
                             QueryExpressionFactory.GetQueryExpression<uvw_EmailQueue>().ApplyPredicate(state)))
                 };
 
@@ -80,10 +80,10 @@ namespace Bhbk.WebApi.Alert.Controllers
                 return BadRequest(ModelState);
             }
 
-            var text = Mapper.Map<uvw_TextQueue>(model);
+            var text = map.Map<uvw_TextQueue>(model);
 
-            UoW.TextQueue.Create(text);
-            UoW.Commit();
+            uow.TextQueue.Create(text);
+            uow.Commit();
 
             return NoContent();
         }
@@ -98,13 +98,13 @@ namespace Bhbk.WebApi.Alert.Controllers
             {
                 var result = new DataStateV1Result<EmailV1>
                 {
-                    Data = Mapper.Map<IEnumerable<EmailV1>>(
-                        UoW.Audiences.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<uvw_TextQueue>, IQueryable<uvw_TextQueue>>>>(
+                    Data = map.Map<IEnumerable<EmailV1>>(
+                        uow.Audiences.Get(
+                            map.MapExpression<Expression<Func<IQueryable<uvw_TextQueue>, IQueryable<uvw_TextQueue>>>>(
                                 QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>().ApplyState(state)))),
 
-                    Total = UoW.Audiences.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<uvw_TextQueue>, IQueryable<uvw_TextQueue>>>>(
+                    Total = uow.Audiences.Count(
+                        map.MapExpression<Expression<Func<IQueryable<uvw_TextQueue>, IQueryable<uvw_TextQueue>>>>(
                             QueryExpressionFactory.GetQueryExpression<uvw_TextQueue>().ApplyPredicate(state)))
                 };
 

@@ -24,9 +24,9 @@ namespace Bhbk.Lib.Identity.Services
             : this(conf, InstanceContext.DeployedOrLocal, new HttpClient())
         { }
 
-        public MeService(IConfiguration conf, InstanceContext instance, HttpClient http)
+        public MeService(IConfiguration conf, InstanceContext env, HttpClient http)
         {
-            Endpoints = new MeServiceRepository(conf, instance, http);
+            Endpoints = new MeServiceRepository(conf, env, http);
         }
 
         public async ValueTask<bool> Info_DeleteCodesV1()

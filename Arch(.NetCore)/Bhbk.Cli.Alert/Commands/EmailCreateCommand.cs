@@ -3,9 +3,9 @@ using System;
 
 namespace Bhbk.Cli.Alert.Commands
 {
-    public class EmailCreateCommands : ConsoleCommand
+    public class EmailCreateCommand : ConsoleCommand
     {
-        public EmailCreateCommands()
+        public EmailCreateCommand()
         {
             IsCommand("email-create", "Create email");
         }

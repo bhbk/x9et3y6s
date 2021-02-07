@@ -23,7 +23,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
                 var controller = new DiagnosticController();
                 controller.ControllerContext = new ControllerContext();

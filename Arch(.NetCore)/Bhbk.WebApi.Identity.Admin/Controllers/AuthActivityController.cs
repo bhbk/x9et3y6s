@@ -27,7 +27,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             tbl_AuthActivity activity = null;
 
             if (Guid.TryParse(activityValue, out activityID))
-                activity = UoW.AuthActivity.Get(QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>()
+                activity = uow.AuthActivity.Get(QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>()
                     .Where(x => x.Id == activityID).ToLambda())
                     .SingleOrDefault();
 
@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(Mapper.Map<AuthActivityV1>(activity));
+            return Ok(map.Map<AuthActivityV1>(activity));
         }
 
         [Route("v1/page"), HttpPost]
@@ -50,9 +50,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             {
                 var result = new DataStateV1Result<AuthActivityV1>
                 {
-                    Data = Mapper.Map<IEnumerable<AuthActivityV1>>(
-                        UoW.AuthActivity.Get(
-                            Mapper.MapExpression<Expression<Func<IQueryable<tbl_AuthActivity>, IQueryable<tbl_AuthActivity>>>>(
+                    Data = map.Map<IEnumerable<AuthActivityV1>>(
+                        uow.AuthActivity.Get(
+                            map.MapExpression<Expression<Func<IQueryable<tbl_AuthActivity>, IQueryable<tbl_AuthActivity>>>>(
                                 QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>().ApplyState(state)),
                                     new List<Expression<Func<tbl_AuthActivity, object>>>()
                                     {
@@ -60,8 +60,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                                         x => x.User,
                                     })),
 
-                    Total = UoW.AuthActivity.Count(
-                        Mapper.MapExpression<Expression<Func<IQueryable<tbl_AuthActivity>, IQueryable<tbl_AuthActivity>>>>(
+                    Total = uow.AuthActivity.Count(
+                        map.MapExpression<Expression<Func<IQueryable<tbl_AuthActivity>, IQueryable<tbl_AuthActivity>>>>(
                             QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>().ApplyPredicate(state)))
                 };
 

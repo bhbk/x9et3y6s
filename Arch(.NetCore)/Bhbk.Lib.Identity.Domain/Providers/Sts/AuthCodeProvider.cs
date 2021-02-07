@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Sts
 {
     public class AuthCodeProvider : BaseProvider
     {
-        public AuthCodeProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public AuthCodeProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

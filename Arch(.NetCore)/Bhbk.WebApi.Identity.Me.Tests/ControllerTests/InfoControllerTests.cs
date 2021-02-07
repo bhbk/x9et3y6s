@@ -37,7 +37,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new InfoController();
@@ -69,7 +69,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new InfoController();
@@ -135,7 +135,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new InfoController();
@@ -167,7 +167,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new InfoController();
@@ -206,7 +206,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new InfoController();
@@ -244,9 +244,9 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                 var controller = new InfoController();
@@ -269,7 +269,7 @@ namespace Bhbk.WebApi.Identity.Me.Tests.ControllerTests
                 user.FirstName += "(Updated)";
                 user.LastName += "(Updated)";
 
-                var result = controller.UpdateV1(mapper.Map<UserV1>(user)) as OkObjectResult;
+                var result = controller.UpdateV1(map.Map<UserV1>(user)) as OkObjectResult;
                 var ok = result.Should().BeAssignableTo<OkObjectResult>().Subject;
                 ok.Value.Should().BeAssignableTo<UserV1>();
             }

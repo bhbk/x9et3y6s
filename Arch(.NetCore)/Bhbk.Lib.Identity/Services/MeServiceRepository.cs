@@ -17,10 +17,10 @@ namespace Bhbk.Lib.Identity.Services
     {
         private readonly HttpClient _http;
 
-        public MeServiceRepository(IConfiguration conf, InstanceContext instance, HttpClient http)
+        public MeServiceRepository(IConfiguration conf, InstanceContext env, HttpClient http)
         {
-            if (instance == InstanceContext.DeployedOrLocal
-                || instance == InstanceContext.End2EndTest)
+            if (env == InstanceContext.DeployedOrLocal
+                || env == InstanceContext.End2EndTest)
             {
                 var connect = new HttpClientHandler();
 

@@ -38,7 +38,7 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
                 using (var scope = _factory.CreateScope())
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                    var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                    var map = scope.ServiceProvider.GetRequiredService<IMapper>();
 
                     if (uow.InstanceType == InstanceContext.DeployedOrLocal
                         || uow.InstanceType == InstanceContext.End2EndTest)
@@ -59,7 +59,7 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
 
                             if (response.IsSuccessStatusCode)
                                 foreach (var quote in result.contents.quotes)
-                                    ProcessMOTDSuccess(uow, mapper, quote);
+                                    ProcessMOTDSuccess(uow, map, quote);
                             else
                                 ProcessMOTDFail(response);
                         }
@@ -90,10 +90,10 @@ namespace Bhbk.WebApi.Identity.Me.Jobs
                 + Environment.NewLine + response.ToString());
         }
 
-        private static void ProcessMOTDSuccess(IUnitOfWork uow, IMapper mapper, MOTDTssV1 quote)
+        private static void ProcessMOTDSuccess(IUnitOfWork uow, IMapper map, MOTDTssV1 quote)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var model = mapper.Map<uvw_MOTD>(quote);
+            var model = map.Map<uvw_MOTD>(quote);
 
             var motds = uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<uvw_MOTD>()
                 .Where(x => x.Author == model.Author && x.Quote == model.Quote)

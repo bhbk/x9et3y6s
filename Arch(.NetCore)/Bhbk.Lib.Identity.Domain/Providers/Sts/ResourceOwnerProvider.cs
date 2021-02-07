@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Sts
 {
     public class ResourceOwnerProvider : BaseProvider
     {
-        public ResourceOwnerProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public ResourceOwnerProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

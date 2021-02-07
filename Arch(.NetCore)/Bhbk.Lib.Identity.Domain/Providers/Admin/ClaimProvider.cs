@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Admin
 {
     public class ClaimProvider : BaseProvider
     {
-        public ClaimProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public ClaimProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

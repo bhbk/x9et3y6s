@@ -38,8 +38,8 @@ namespace Bhbk.Cli.Identity.Commands
             _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>())
                 .CreateMapper();
 
-            var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], instance);
+            var env = new ContextService(InstanceContext.DeployedOrLocal);
+            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], env);
 
             _service = new AdminService(_conf)
             {
@@ -107,7 +107,7 @@ namespace Bhbk.Cli.Identity.Commands
                 var role = _service.Role_UpdateV1(_map.Map<RoleV1>(_role))
                     .Result;
 
-                StandardOutputFactory.Roles(_uow, new List<E_Role> { _map.Map<E_Role>(role) }, true);
+                FormatOutput.Roles(_uow, new List<E_Role> { _map.Map<E_Role>(role) }, true);
 
                 return StandardOutput.FondFarewell();
             }

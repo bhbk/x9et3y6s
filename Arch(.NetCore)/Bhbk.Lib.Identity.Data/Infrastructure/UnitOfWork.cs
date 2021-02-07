@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
         public UnitOfWork(string connection)
             : this(connection, new ContextService(InstanceContext.DeployedOrLocal)) { }
 
-        public UnitOfWork(string connection, IContextService instance)
+        public UnitOfWork(string connection, IContextService env)
         {
             _logger = LoggerFactory.Create(opt =>
             {
@@ -45,7 +45,7 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
                     .AddConsole();
             });
 
-            switch (instance.InstanceType)
+            switch (env.InstanceType)
             {
                 case InstanceContext.DeployedOrLocal:
                 case InstanceContext.End2EndTest:
@@ -78,9 +78,9 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
             _context.ChangeTracker.LazyLoadingEnabled = false;
             _context.ChangeTracker.CascadeDeleteTiming = CascadeTiming.Immediate;
 
-            InstanceType = instance.InstanceType;
+            InstanceType = env.InstanceType;
 
-            Audiences = new AudienceRepository(_context, instance);
+            Audiences = new AudienceRepository(_context, env);
             AuthActivity = new AuthActivityRepository(_context);
             Claims = new ClaimRepository(_context);
             EmailActivity = new EmailActivityRepository(_context);
@@ -95,7 +95,7 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure
             TextActivity = new TextActivityRepository(_context);
             TextQueue = new TextQueueRepository(_context);
             Urls = new UrlRepository(_context);
-            Users = new UserRepository(_context, instance);
+            Users = new UserRepository(_context, env);
         }
 
         public void Commit()

@@ -14,10 +14,10 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
     [Authorize]
     public class BaseController : Controller
     {
-        protected IOAuth2JwtFactory Auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IOAuth2JwtFactory>(); }
-        protected IMapper Mapper { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
-        protected IUnitOfWork UoW { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>(); }
-        protected IConfiguration Conf { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfiguration>(); }
+        protected IOAuth2JwtFactory auth { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IOAuth2JwtFactory>(); }
+        protected IMapper map { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }
+        protected IUnitOfWork uow { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IUnitOfWork>(); }
+        protected IConfiguration conf { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IConfiguration>(); }
 
         [NonAction]
         protected Guid GetIdentityGUID()
@@ -30,9 +30,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [NonAction]
         public void SetIdentity(Guid issuerID, Guid audienceID)
         {
-            var issuer = UoW.Issuers.Get(x => x.Id == issuerID).Single();
-            var audience = UoW.Audiences.Get(x => x.Id == audienceID).Single();
-            var claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
+            var issuer = uow.Issuers.Get(x => x.Id == issuerID).Single();
+            var audience = uow.Audiences.Get(x => x.Id == audienceID).Single();
+            var claims = uow.Audiences.GenerateAccessClaims(issuer, audience);
 
             ControllerContext.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims));
         }
@@ -40,9 +40,9 @@ namespace Bhbk.WebApi.Identity.Me.Controllers
         [NonAction]
         public void SetIdentity(Guid issuerID, Guid audienceID, Guid userID)
         {
-            var issuer = UoW.Issuers.Get(x => x.Id == issuerID).Single();
-            var user = UoW.Users.Get(x => x.Id == userID).Single();
-            var claims = UoW.Users.GenerateAccessClaims(issuer, user);
+            var issuer = uow.Issuers.Get(x => x.Id == issuerID).Single();
+            var user = uow.Users.Get(x => x.Id == userID).Single();
+            var claims = uow.Users.GenerateAccessClaims(issuer, user);
 
             ControllerContext.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims));
         }

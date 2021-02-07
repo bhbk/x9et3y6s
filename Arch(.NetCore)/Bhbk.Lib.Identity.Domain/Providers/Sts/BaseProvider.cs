@@ -13,9 +13,9 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Sts
         protected IMapper Mapper => new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EFCore_TBL>())
             .CreateMapper();
 
-        protected BaseProvider(IConfiguration conf, IContextService instance)
+        protected BaseProvider(IConfiguration conf, IContextService env)
         {
-            UoW = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], instance);
+            UoW = new UnitOfWork(conf["Databases:IdentityEntities_EFCore_Tbl"], env);
         }
 
         public void Dispose()

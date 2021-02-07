@@ -13,7 +13,7 @@ namespace Bhbk.WebApi.Alert.Controllers
         [Route("v1/email/{emailID:guid}"), HttpDelete]
         public IActionResult DequeueEmailV1([FromRoute] Guid emailID)
         {
-            var email = UoW.EmailQueue.Get(x => x.Id == emailID)
+            var email = uow.EmailQueue.Get(x => x.Id == emailID)
                 .SingleOrDefault();
 
             if (email == null)
@@ -22,7 +22,7 @@ namespace Bhbk.WebApi.Alert.Controllers
                 return NotFound(ModelState);
             }
             else
-                UoW.EmailQueue.Delete(email);
+                uow.EmailQueue.Delete(email);
 
             return NoContent();
         }
@@ -30,7 +30,7 @@ namespace Bhbk.WebApi.Alert.Controllers
         [Route("v1/text/{textID:guid}"), HttpDelete]
         public IActionResult DequeueTextV1([FromRoute] Guid textID)
         {
-            var text = UoW.TextQueue.Get(x => x.Id == textID)
+            var text = uow.TextQueue.Get(x => x.Id == textID)
                 .SingleOrDefault();
 
             if (text == null)
@@ -39,7 +39,7 @@ namespace Bhbk.WebApi.Alert.Controllers
                 return NotFound(ModelState);
             }
             else
-                UoW.TextQueue.Delete(text);
+                uow.TextQueue.Delete(text);
 
             return NoContent();
         }

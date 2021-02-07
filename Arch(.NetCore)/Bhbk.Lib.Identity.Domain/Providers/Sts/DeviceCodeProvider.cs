@@ -5,7 +5,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Sts
 {
     public class DeviceCodeProvider : BaseProvider
     {
-        public DeviceCodeProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public DeviceCodeProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
     }
 }

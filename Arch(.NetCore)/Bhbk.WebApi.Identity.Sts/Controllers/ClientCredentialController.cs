@@ -60,9 +60,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -80,9 +80,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
-                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                audience = UoW.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
 
             if (audience == null)
             {
@@ -92,35 +92,35 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             else if (audience.IsLockedOut
                 || !PBKDF2.Validate(audience.PasswordHashPBKDF2, input.client_secret))
             {
-                UoW.AuthActivity.Create(
-                    Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+                uow.AuthActivity.Create(
+                    map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
                         AudienceId = audience.Id,
                         LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
                     }));
-                UoW.Commit();
+                uow.Commit();
 
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
                 return BadRequest(ModelState);
             }
 
-            var cc_claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
-            var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audience.Name, cc_claims);
+            var cc_claims = uow.Audiences.GenerateAccessClaims(issuer, audience);
+            var cc = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, cc_claims);
 
-            UoW.AuthActivity.Create(
-                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+            uow.AuthActivity.Create(
+                map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     AudienceId = audience.Id,
                     LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
-            var rt_claims = UoW.Audiences.GenerateRefreshClaims(issuer, audience);
-            var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audience.Name, rt_claims);
+            var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
+            var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
-            UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refresh>(new RefreshV1()
+            uow.Refreshes.Create(
+                map.Map<tbl_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -130,15 +130,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.AuthActivity.Create(
-                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+            uow.AuthActivity.Create(
+                map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     AudienceId = audience.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
-            UoW.Commit();
+            uow.Commit();
 
             var result = new ClientJwtV2()
             {
@@ -146,7 +146,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
                 client = audience.Name,
-                issuer = issuer.Name + ":" + Conf["IdentityTenant:Salt"],
+                issuer = issuer.Name + ":" + conf["IdentityTenant:Salt"],
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 
@@ -160,7 +160,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refresh = UoW.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+            var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
                 .Where(x => x.RefreshValue == input.refresh_token).ToLambda()).SingleOrDefault();
 
             if (refresh == null)
@@ -180,9 +180,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.issuer, out issuerID))
-                issuer = UoW.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Id == issuerID).SingleOrDefault();
             else
-                issuer = UoW.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
+                issuer = uow.Issuers.Get(x => x.Name == input.issuer).SingleOrDefault();
 
             if (issuer == null)
             {
@@ -200,9 +200,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             //check if identifier is guid. resolve to guid if not.
             if (Guid.TryParse(input.client, out audienceID))
-                audience = UoW.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Id == audienceID).SingleOrDefault();
             else
-                audience = UoW.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
+                audience = uow.Audiences.Get(x => x.Name == input.client).SingleOrDefault();
 
             if (audience == null)
             {
@@ -215,14 +215,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var cc_claims = UoW.Audiences.GenerateAccessClaims(issuer, audience);
-            var cc = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audience.Name, cc_claims);
+            var cc_claims = uow.Audiences.GenerateAccessClaims(issuer, audience);
+            var cc = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, cc_claims);
 
-            var rt_claims = UoW.Audiences.GenerateRefreshClaims(issuer, audience);
-            var rt = Auth.ClientCredential(issuer.Name, issuer.IssuerKey, Conf["IdentityTenant:Salt"], audience.Name, rt_claims);
+            var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
+            var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
-            UoW.Refreshes.Create(
-                Mapper.Map<tbl_Refresh>(new RefreshV1()
+            uow.Refreshes.Create(
+                map.Map<tbl_Refresh>(new RefreshV1()
                 {
                     IssuerId = issuer.Id,
                     AudienceId = audience.Id,
@@ -232,15 +232,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     ValidToUtc = rt.ValidTo,
                 }));
 
-            UoW.AuthActivity.Create(
-                Mapper.Map<tbl_AuthActivity>(new AuthActivityV1()
+            uow.AuthActivity.Create(
+                map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
                     AudienceId = audience.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                 }));
 
-            UoW.Commit();
+            uow.Commit();
 
             var result = new ClientJwtV2()
             {
@@ -248,7 +248,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 access_token = cc.RawData,
                 refresh_token = rt.RawData,
                 client = audience.Name,
-                issuer = issuer.Name + ":" + Conf["IdentityTenant:Salt"],
+                issuer = issuer.Name + ":" + conf["IdentityTenant:Salt"],
                 expires_in = (int)(new DateTimeOffset(cc.ValidTo).Subtract(DateTime.UtcNow)).TotalSeconds,
             };
 

@@ -36,8 +36,8 @@ namespace Bhbk.Cli.Identity.Commands
             _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>())
                 .CreateMapper();
 
-            var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], instance);
+            var env = new ContextService(InstanceContext.DeployedOrLocal);
+            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], env);
 
             _service = new AdminService(_conf)
             {
@@ -69,7 +69,7 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                StandardOutputFactory.Issuers(_uow, new List<E_Issuer> { _issuer }, true);
+                FormatOutput.Issuers(_uow, new List<E_Issuer> { _issuer }, true);
 
                 return StandardOutput.FondFarewell();
             }

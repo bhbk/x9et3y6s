@@ -40,9 +40,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var cc = await service.Endpoints.ClientCredential_AuthV1(
                     new ClientCredentialV1()
@@ -64,9 +64,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var rt = await service.Endpoints.ClientCredential_RefreshV1(
                     new RefreshTokenV1()
@@ -89,9 +89,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -123,9 +123,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -155,9 +155,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -189,9 +189,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             {
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -222,9 +222,9 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -267,13 +267,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -287,7 +287,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refresh>(new RefreshV1()
+                    map.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -318,13 +318,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -338,7 +338,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refresh>(new RefreshV1()
+                    map.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -368,13 +368,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -388,7 +388,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refresh>(new RefreshV1()
+                    map.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -419,13 +419,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -439,7 +439,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refresh>(new RefreshV1()
+                    map.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -469,13 +469,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -491,7 +491,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refresh>(new RefreshV1()
+                    map.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -519,13 +519,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -541,7 +541,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refresh>(new RefreshV1()
+                    map.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,
@@ -573,13 +573,13 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                 var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
-                var instance = scope.ServiceProvider.GetRequiredService<IContextService>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
 
-                var service = new StsService(conf, instance.InstanceType, owin);
+                var service = new StsService(conf, env.InstanceType, owin);
 
                 var data = new TestDataFactory(uow);
                 data.Destroy();
@@ -593,7 +593,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
 
                 uow.Refreshes.Create(
-                    mapper.Map<tbl_Refresh>(new RefreshV1()
+                    map.Map<tbl_Refresh>(new RefreshV1()
                     {
                         IssuerId = issuer.Id,
                         AudienceId = audience.Id,

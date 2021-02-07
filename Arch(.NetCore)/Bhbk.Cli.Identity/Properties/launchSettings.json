@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Bhbk.Cli.Identity": {
-      "commandName": "Project",
-      "commandLineArgs": " admin --create audience"
+      "commandName": "Project"
     }
   }
 }

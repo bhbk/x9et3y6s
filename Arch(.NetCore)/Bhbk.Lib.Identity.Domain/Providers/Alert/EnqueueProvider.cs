@@ -5,8 +5,8 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Alert
 {
     public class EnqueueProvider : BaseProvider
     {
-        public EnqueueProvider(IConfiguration conf, IContextService instance)
-            : base(conf, instance) { }
+        public EnqueueProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
 
     }
 }

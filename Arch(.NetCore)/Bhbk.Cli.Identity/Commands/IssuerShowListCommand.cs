@@ -38,8 +38,8 @@ namespace Bhbk.Cli.Identity.Commands
             _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF6>())
                 .CreateMapper();
 
-            var instance = new ContextService(InstanceContext.DeployedOrLocal);
-            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], instance);
+            var env = new ContextService(InstanceContext.DeployedOrLocal);
+            _uow = new UnitOfWork(_conf["Databases:IdentityEntities_EF6"], env);
 
             _service = new AdminService(_conf)
             {
@@ -77,7 +77,7 @@ namespace Bhbk.Cli.Identity.Commands
                 if (_issuers == null)
                     throw new ConsoleHelpAsException($"  *** No issuer contains '{_search}' ***");
 
-                StandardOutputFactory.Issuers(_uow, _issuers.OrderBy(x => x.Name));
+                FormatOutput.Issuers(_uow, _issuers.OrderBy(x => x.Name));
 
                 return StandardOutput.FondFarewell();
             }
