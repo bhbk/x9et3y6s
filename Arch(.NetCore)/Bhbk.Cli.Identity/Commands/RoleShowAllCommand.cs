@@ -19,17 +19,17 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class RoleShowListCommand : ConsoleCommand
+    public class RoleShowAllCommand : ConsoleCommand
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _map;
         private readonly IUnitOfWork _uow;
         private readonly IAdminService _service;
         private IEnumerable<E_Role> _roles;
-        private LambdaExpression _expr;
-        private string _search;
+        private string _filter;
+        private int _count;
 
-        public RoleShowListCommand()
+        public RoleShowAllCommand()
         {
             _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
@@ -46,14 +46,20 @@ namespace Bhbk.Cli.Identity.Commands
                 Grant = new ResourceOwnerGrantV2(_conf)
             };
 
-            IsCommand("role-show-list", "Show role(s)");
+            IsCommand("role-show-all", "Show role(s)");
 
-            HasOption("s|search=", "Search existing role(s)", arg =>
+            HasRequiredOption("c|count=", "Enter how many results to display", arg =>
             {
-                if (string.IsNullOrEmpty(arg))
-                    throw new ConsoleHelpAsException($"  *** No search given ***");
+                if (!string.IsNullOrEmpty(arg))
+                    _count = int.Parse(arg);
+            });
 
-                _search = arg;
+            HasOption("f|filter=", "Enter file-sysm (full or partial) name to look for", arg =>
+            {
+                CheckRequiredArguments();
+
+                if (!string.IsNullOrEmpty(arg))
+                    _filter = arg;
             });
         }
 
@@ -61,22 +67,19 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                if(string.IsNullOrEmpty(_search))
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_Role>().ToLambda();
-                else
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_Role>()
-                        .Where(x => x.Name.Contains(_search)).ToLambda();
+                var expression = QueryExpressionFactory.GetQueryExpression<E_Role>();
 
-                _roles = _uow.Roles.Get(_expr,
+                if (!string.IsNullOrEmpty(_filter))
+                    expression = expression.Where(x => x.Name.Contains(_filter));
+
+                _roles = _uow.Roles.Get(expression.ToLambda(),
                     new List<Expression<Func<E_Role, object>>>()
                     {
                         x => x.AudienceRoles,
                         x => x.RoleClaims,
                         x => x.UserRoles,
-                    });
-
-                if (_roles == null)
-                    throw new ConsoleHelpAsException($"  *** No role contains '{_search}' ***");
+                    })
+                    .TakeLast(_count);
 
                 FormatOutput.Roles(_uow, _roles.OrderBy(x => x.Name));
 

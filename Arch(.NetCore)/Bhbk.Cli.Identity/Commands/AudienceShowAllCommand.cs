@@ -19,17 +19,17 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class IssuerShowListCommand : ConsoleCommand
+    public class AudienceShowAllCommand : ConsoleCommand
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _map;
         private readonly IUnitOfWork _uow;
         private readonly IAdminService _service;
-        private IEnumerable<E_Issuer> _issuers;
-        private LambdaExpression _expr;
-        private string _search;
+        private IEnumerable<E_Audience> _audiences;
+        private string _filter;
+        private int _count;
 
-        public IssuerShowListCommand()
+        public AudienceShowAllCommand()
         {
             _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
@@ -46,14 +46,20 @@ namespace Bhbk.Cli.Identity.Commands
                 Grant = new ResourceOwnerGrantV2(_conf)
             };
 
-            IsCommand("issuer-show-list", "Show issuer(s)");
+            IsCommand("audience-show-all", "Show audience(s)");
 
-            HasOption("s|search=", "Search existing issuer(s)", arg =>
+            HasRequiredOption("c|count=", "Enter how many results to display", arg =>
             {
-                if (string.IsNullOrEmpty(arg))
-                    throw new ConsoleHelpAsException($"  *** No search given ***");
+                if (!string.IsNullOrEmpty(arg))
+                    _count = int.Parse(arg);
+            });
 
-                _search = arg;
+            HasOption("f|filter=", "Enter audience (full or partial) name to look for", arg =>
+            {
+                CheckRequiredArguments();
+
+                if (!string.IsNullOrEmpty(arg))
+                    _filter = arg;
             });
         }
 
@@ -61,23 +67,21 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                if(string.IsNullOrEmpty(_search))
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_Issuer>().ToLambda();
-                else
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_Issuer>()
-                        .Where(x => x.Name.Contains(_search)).ToLambda();
+                var expression = QueryExpressionFactory.GetQueryExpression<E_Audience>();
 
-                _issuers = _uow.Issuers.Get(_expr,
-                    new List<Expression<Func<E_Issuer, object>>>()
+                if (!string.IsNullOrEmpty(_filter))
+                    expression = expression.Where(x => x.Name.Contains(_filter));
+
+                _audiences = _uow.Audiences.Get(expression.ToLambda(),
+                    new List<Expression<Func<E_Audience, object>>>()
                     {
-                        x => x.Audiences,
-                        x => x.Claims,
-                    });
+                        x => x.AudienceRoles,
+                        x => x.Roles,
+                    })
+                    .TakeLast(_count);
 
-                if (_issuers == null)
-                    throw new ConsoleHelpAsException($"  *** No issuer contains '{_search}' ***");
 
-                FormatOutput.Issuers(_uow, _issuers.OrderBy(x => x.Name));
+                FormatOutput.Audiences(_uow, _audiences.OrderBy(x => x.Name));
 
                 return StandardOutput.FondFarewell();
             }

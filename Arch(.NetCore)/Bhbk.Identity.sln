@@ -51,6 +51,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bhbk.WebApi.Identity.Sts", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bhbk.WebApi.Identity.Sts.Tests", "Bhbk.WebApi.Identity.Sts.Tests\Bhbk.WebApi.Identity.Sts.Tests.csproj", "{EDA28DD0-D73B-488F-B017-E03BDEA993EC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1D86CEBC-1563-4EC7-BC30-EA868F00F44E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -134,6 +136,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{77ADEBFE-21E5-4792-A0D3-F343C34971FB} = {1D86CEBC-1563-4EC7-BC30-EA868F00F44E}
+		{FA43A426-A4C2-44CE-BD1D-C155D71DAF7E} = {1D86CEBC-1563-4EC7-BC30-EA868F00F44E}
+		{32B5513E-7A30-4B92-B15F-751529195CE2} = {1D86CEBC-1563-4EC7-BC30-EA868F00F44E}
+		{16F3234E-CCCD-4AFD-9D34-A07613A3700A} = {1D86CEBC-1563-4EC7-BC30-EA868F00F44E}
+		{F33E52C0-8247-4FF0-9BFA-07165FB61538} = {1D86CEBC-1563-4EC7-BC30-EA868F00F44E}
+		{EDA28DD0-D73B-488F-B017-E03BDEA993EC} = {1D86CEBC-1563-4EC7-BC30-EA868F00F44E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {67136140-0514-4A62-BB43-BB66E0316424}

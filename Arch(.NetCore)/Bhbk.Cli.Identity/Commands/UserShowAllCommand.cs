@@ -19,17 +19,17 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class LoginShowListCommand : ConsoleCommand
+    public class UserShowAllCommand : ConsoleCommand
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _map;
         private readonly IUnitOfWork _uow;
         private readonly IAdminService _service;
-        private IEnumerable<E_Login> _logins;
-        private LambdaExpression _expr;
-        private string _search;
+        private IEnumerable<E_User> _users;
+        private string _filter;
+        private int _count;
 
-        public LoginShowListCommand()
+        public UserShowAllCommand()
         {
             _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
@@ -46,14 +46,20 @@ namespace Bhbk.Cli.Identity.Commands
                 Grant = new ResourceOwnerGrantV2(_conf)
             };
 
-            IsCommand("login-show-list", "Show login(s)");
+            IsCommand("user-show-all", "Show user(s)");
 
-            HasOption("s|search=", "Search existing login(s)", arg =>
+            HasRequiredOption("c|count=", "Enter how many results to display", arg =>
             {
-                if (string.IsNullOrEmpty(arg))
-                    throw new ConsoleHelpAsException($"  *** No search given ***");
+                if (!string.IsNullOrEmpty(arg))
+                    _count = int.Parse(arg);
+            });
 
-                _search = arg;
+            HasOption("f|filter=", "Enter user (full or partial) name to look for", arg =>
+            {
+                CheckRequiredArguments();
+
+                if (!string.IsNullOrEmpty(arg))
+                    _filter = arg;
             });
         }
 
@@ -61,22 +67,21 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                if (string.IsNullOrEmpty(_search))
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_Login>().ToLambda();
-                else
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_Login>()
-                        .Where(x => x.Name.Contains(_search)).ToLambda();
+                var expression = QueryExpressionFactory.GetQueryExpression<E_User>();
 
-                _logins = _uow.Logins.Get(_expr,
-                    new List<Expression<Func<E_Login, object>>>()
+                if (!string.IsNullOrEmpty(_filter))
+                    expression = expression.Where(x => x.UserName.Contains(_filter));
+
+                _users = _uow.Users.Get(expression.ToLambda(),
+                    new List<Expression<Func<E_User, object>>>()
                     {
+                        x => x.UserClaims,
                         x => x.UserLogins,
-                    });
+                        x => x.UserRoles,
+                    })
+                    .TakeLast(_count);
 
-                if (_logins == null)
-                    throw new ConsoleHelpAsException($"  *** No login contains '{_search}' ***");
-
-                FormatOutput.Logins(_uow, _logins.OrderBy(x => x.Name));
+                FormatOutput.Users(_uow, _users.OrderBy(x => x.UserName));
 
                 return StandardOutput.FondFarewell();
             }

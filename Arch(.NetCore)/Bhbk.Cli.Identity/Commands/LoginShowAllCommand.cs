@@ -19,17 +19,17 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class AudienceShowListCommand : ConsoleCommand
+    public class LoginShowAllCommand : ConsoleCommand
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _map;
         private readonly IUnitOfWork _uow;
         private readonly IAdminService _service;
-        private IEnumerable<E_Audience> _audiences;
-        private LambdaExpression _expr;
-        private string _search;
+        private IEnumerable<E_Login> _logins;
+        private string _filter;
+        private int _count;
 
-        public AudienceShowListCommand()
+        public LoginShowAllCommand()
         {
             _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
@@ -46,14 +46,20 @@ namespace Bhbk.Cli.Identity.Commands
                 Grant = new ResourceOwnerGrantV2(_conf)
             };
 
-            IsCommand("audience-show-list", "Show audience(s)");
+            IsCommand("login-show-all", "Show login(s)");
 
-            HasOption("s|search=", "Search existing audience(s)", arg =>
+            HasRequiredOption("c|count=", "Enter how many results to display", arg =>
             {
-                if (string.IsNullOrEmpty(arg))
-                    throw new ConsoleHelpAsException($"  *** No search given ***");
+                if (!string.IsNullOrEmpty(arg))
+                    _count = int.Parse(arg);
+            });
 
-                _search = arg;
+            HasOption("f|filter=", "Enter login (full or partial) name to look for", arg =>
+            {
+                CheckRequiredArguments();
+
+                if (!string.IsNullOrEmpty(arg))
+                    _filter = arg;
             });
         }
 
@@ -61,23 +67,20 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                if(string.IsNullOrEmpty(_search))
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_Audience>().ToLambda();
-                else
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_Audience>()
-                        .Where(x => x.Name.Contains(_search)).ToLambda();
+                var expression = QueryExpressionFactory.GetQueryExpression<E_Issuer>();
 
-                _audiences = _uow.Audiences.Get(_expr,
-                    new List<Expression<Func<E_Audience, object>>>()
+                if (!string.IsNullOrEmpty(_filter))
+                    expression = expression.Where(x => x.Name.Contains(_filter));
+
+                _logins = _uow.Logins.Get(expression.ToLambda(),
+                    new List<Expression<Func<E_Login, object>>>()
                     {
-                        x => x.AudienceRoles,
-                        x => x.Roles,
-                    });
+                        x => x.UserLogins,
+                    })
+                    .TakeLast(_count);
 
-                if (_audiences == null)
-                    throw new ConsoleHelpAsException($"  *** No audience contains '{_search}' ***");
 
-                FormatOutput.Audiences(_uow, _audiences.OrderBy(x => x.Name));
+                FormatOutput.Logins(_uow, _logins.OrderBy(x => x.Name));
 
                 return StandardOutput.FondFarewell();
             }

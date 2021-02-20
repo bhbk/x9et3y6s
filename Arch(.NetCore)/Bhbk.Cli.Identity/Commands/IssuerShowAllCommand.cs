@@ -19,17 +19,17 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class UserShowListCommand : ConsoleCommand
+    public class IssuerShowAllCommand : ConsoleCommand
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _map;
         private readonly IUnitOfWork _uow;
         private readonly IAdminService _service;
-        private IEnumerable<E_User> _users;
-        private LambdaExpression _expr;
-        private string _search;
+        private IEnumerable<E_Issuer> _issuers;
+        private string _filter;
+        private int _count;
 
-        public UserShowListCommand()
+        public IssuerShowAllCommand()
         {
             _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
@@ -46,14 +46,20 @@ namespace Bhbk.Cli.Identity.Commands
                 Grant = new ResourceOwnerGrantV2(_conf)
             };
 
-            IsCommand("user-show-list", "Show user(s)");
+            IsCommand("issuer-show-all", "Show issuer(s)");
 
-            HasOption("s|search=", "Search existing user(s)", arg =>
+            HasRequiredOption("c|count=", "Enter how many results to display", arg =>
             {
-                if (string.IsNullOrEmpty(arg))
-                    throw new ConsoleHelpAsException($"  *** No search given ***");
+                if (!string.IsNullOrEmpty(arg))
+                    _count = int.Parse(arg);
+            });
 
-                _search = arg;
+            HasOption("f|filter=", "Enter file-sysm (full or partial) name to look for", arg =>
+            {
+                CheckRequiredArguments();
+
+                if (!string.IsNullOrEmpty(arg))
+                    _filter = arg;
             });
         }
 
@@ -61,24 +67,20 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                if(string.IsNullOrEmpty(_search))
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_User>().ToLambda();
-                else
-                    _expr = QueryExpressionFactory.GetQueryExpression<E_User>()
-                        .Where(x => x.UserName.Contains(_search)).ToLambda();
+                var expression = QueryExpressionFactory.GetQueryExpression<E_Issuer>();
 
-                _users = _uow.Users.Get(_expr,
-                    new List<Expression<Func<E_User, object>>>()
+                if (!string.IsNullOrEmpty(_filter))
+                    expression = expression.Where(x => x.Name.Contains(_filter));
+
+                _issuers = _uow.Issuers.Get(expression.ToLambda(),
+                    new List<Expression<Func<E_Issuer, object>>>()
                     {
-                        x => x.UserClaims,
-                        x => x.UserLogins,
-                        x => x.UserRoles,
-                    });
+                        x => x.Audiences,
+                        x => x.Claims,
+                    })
+                    .TakeLast(_count);
 
-                if (_users == null)
-                    throw new ConsoleHelpAsException($"  *** No user contains '{_search}' ***");
-
-                FormatOutput.Users(_uow, _users.OrderBy(x => x.UserName));
+                FormatOutput.Issuers(_uow, _issuers.OrderBy(x => x.Name));
 
                 return StandardOutput.FondFarewell();
             }
