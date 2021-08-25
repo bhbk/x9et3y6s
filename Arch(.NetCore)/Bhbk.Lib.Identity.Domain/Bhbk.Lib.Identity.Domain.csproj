@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="Bhbk.Lib.Common" Version="2020.11.27.2100" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="5.0.5" />
