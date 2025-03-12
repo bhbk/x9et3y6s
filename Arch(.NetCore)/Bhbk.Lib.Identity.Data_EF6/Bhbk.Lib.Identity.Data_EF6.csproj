@@ -25,7 +25,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -35,13 +34,12 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bhbk.Lib.Common, Version=2020.11.27.2100, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Bhbk.Lib.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bhbk.Lib.Common.2020.11.27.2100\lib\netstandard2.0\Bhbk.Lib.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Bhbk.Lib.Cryptography, Version=2020.11.27.2100, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Bhbk.Lib.Cryptography, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bhbk.Lib.Cryptography.2020.11.27.2100\lib\netstandard2.0\Bhbk.Lib.Cryptography.dll</HintPath>
     </Reference>
     <Reference Include="Bhbk.Lib.DataAccess.EF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

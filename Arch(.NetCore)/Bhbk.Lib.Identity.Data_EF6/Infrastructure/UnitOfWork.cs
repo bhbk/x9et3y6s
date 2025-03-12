@@ -50,7 +50,6 @@ namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure
                     {
                         throw new NotImplementedException();
                     }
-                    break;
 
                 default:
                     throw new NotImplementedException();

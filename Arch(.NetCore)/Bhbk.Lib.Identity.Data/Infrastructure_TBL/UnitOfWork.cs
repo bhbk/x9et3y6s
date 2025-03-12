@@ -83,7 +83,6 @@ namespace Bhbk.Lib.Identity.Data.Infrastructure_Tbl
                     {
                         throw new NotImplementedException();
                     }
-                    break;
 
                 default:
                     throw new NotImplementedException();

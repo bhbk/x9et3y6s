@@ -60,7 +60,6 @@ namespace Bhbk.Lib.Identity.Data_EF6.Infrastructure_Tbl
                     {
                         throw new NotImplementedException();
                     }
-                    break;
 
                 default:
                     throw new NotImplementedException();
