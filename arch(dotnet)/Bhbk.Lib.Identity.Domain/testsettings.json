@@ -1,0 +1,60 @@
+{
+  "TestData": {
+    "Issuer": {
+      "Name": "IssuerTests",
+      "IssuerKey": "8%8?gh=-:P^&r([7+F(gQP_{g>z,RF2[C:-Dhdd6uMdW@^ocn7(w4_:*hHHWQU2rx-!PBG%;-5:>gw?P+Aq>9-M&adtEmovN4]4M:a5jgNR^Rv![28@aa;EfVU_D9NGPr@X[Y3uz:*5f64G+zA^NUo.efFy_r<hWPt?3%X>Z*Uk<KKNv9^a6W>BLTRH#vuxCe;x8JWY<d*Z6h!LvxEm[H-.zuMf#Z;}jPJ4L;PKewoc_#iGPtYd%W,]3Fo77KSXM"
+    },
+    "Login": {
+      "Name": "LoginTests",
+      "LoginKey": "LoginTestsKey"
+    },
+    "Audience": {
+      "Name": "AudienceTests",
+      "PasswordCurrent": "te$tAudiencePa$$word01!",
+      "PasswordNew": "te$tAudiencePa$$word01!new"
+    },
+    "Claim": {
+      "Name": "ClaimTests",
+      "Subject": "ClaimTestsSubject",
+      "ValueType": "ClaimTestsValueType"
+    },
+    "Email": {
+      "Content": "EmailTestsContent",
+      "Subject": "EmailTestsSubject"
+    },
+    "Text": {
+      "Content": "TextTestsContent"
+    },
+    "MOTD": {
+      "Author": "MOTDTestsAuthor"
+    },
+    "Role": {
+      "Name": "RoleTests"
+    },
+    "User": {
+      "UserName": "testuser1@localhost.localdomain",
+      "PhoneNumber": "+12223334444",
+      "PasswordCurrent": "te$tUserPa$$word01!",
+      "PasswordNew": "te$tUserPa$$word01!new"
+    },
+    "Url": {
+      "Name": "UrlTests",
+      "Link": "https://app.test.net/1/callback"
+    },
+    "Seed": {
+      "IssuerName": "Local",
+      "LoginName": "Local",
+      "AudienceNameAlert": "Alert",
+      "AudienceNameIdentity": "Identity",
+      "RoleForAdminsAlert": "Alert.Admins",
+      "RoleForUsersAlert": "Alert.Users",
+      "RoleForViewersAlert": "Alert.Viewers",
+      "RoleForAdminsIdentity": "Identity.Admins",
+      "RoleForUsersIdentity": "Identity.Users",
+      "RoleForViewersIdentity": "Identity.Viewers",
+      "UserNameAdmin": "admin@local",
+      "UserNameNormal": "user@local",
+      "UserNameViewer": "viewer@local"
+    }
+  }
+}
