@@ -1,0 +1,172 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm"
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "lib-identity": {
+      "projectType": "library",
+      "root": "projects/lib-identity",
+      "sourceRoot": "projects/lib-identity/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/lib-identity/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/lib-identity/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/lib-identity/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "app-identity-admin": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "projects/app-identity-admin",
+      "sourceRoot": "projects/app-identity-admin/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/app-identity-admin/src/main.ts",
+            "tsConfig": "projects/app-identity-admin/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/app-identity-admin/public"
+              }
+            ],
+            "styles": [
+              "projects/app-identity-admin/src/styles.css"
+            ],
+            "server": "projects/app-identity-admin/src/main.server.ts",
+            "outputMode": "server",
+            "ssr": {
+              "entry": "projects/app-identity-admin/src/server.ts"
+            }
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "app-identity-admin:build:production"
+            },
+            "development": {
+              "buildTarget": "app-identity-admin:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    },
+    "app-identity-user": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "projects/app-identity-user",
+      "sourceRoot": "projects/app-identity-user/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/app-identity-user/src/main.ts",
+            "tsConfig": "projects/app-identity-user/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/app-identity-user/public"
+              }
+            ],
+            "styles": [
+              "projects/app-identity-user/src/styles.css"
+            ],
+            "server": "projects/app-identity-user/src/main.server.ts",
+            "outputMode": "server",
+            "ssr": {
+              "entry": "projects/app-identity-user/src/server.ts"
+            }
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "app-identity-user:build:production"
+            },
+            "development": {
+              "buildTarget": "app-identity-user:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    }
+  }
+}
