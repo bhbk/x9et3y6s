@@ -117,14 +117,15 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
             if (foundIssuer == null)
             {
-                foundIssuer = _uow.Issuers.Create(
-                    _map.Map<tbl_Issuer>(new IssuerV1()
+                var issuerEntity = _map.Map<tbl_Issuer>(new IssuerV1()
                     {
                         Name = _seedData.Issuer.Name,
-                        IssuerKey = _seedData.Issuer.IssuerKey,
                         IsEnabled = true,
                         IsDeletable = false,
-                    }));
+                    });
+                issuerEntity.IssuerKey = _seedData.Issuer.IssuerKey;
+
+                foundIssuer = _uow.Issuers.Create(issuerEntity);
 
                 _uow.Commit();
             }

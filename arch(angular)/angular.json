@@ -52,25 +52,20 @@
             ],
             "styles": [
               "projects/app-identity-admin/src/styles.css"
-            ],
-            "server": "projects/app-identity-admin/src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "projects/app-identity-admin/src/server.ts"
-            }
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "8kB",
+                  "maximumError": "16kB"
                 }
               ],
               "outputHashing": "all"
@@ -85,6 +80,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 4302
+          },
           "configurations": {
             "production": {
               "buildTarget": "app-identity-admin:build:production"
@@ -120,25 +118,20 @@
             ],
             "styles": [
               "projects/app-identity-user/src/styles.css"
-            ],
-            "server": "projects/app-identity-user/src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "projects/app-identity-user/src/server.ts"
-            }
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "8kB",
+                  "maximumError": "16kB"
                 }
               ],
               "outputHashing": "all"
@@ -153,6 +146,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 4301
+          },
           "configurations": {
             "production": {
               "buildTarget": "app-identity-user:build:production"

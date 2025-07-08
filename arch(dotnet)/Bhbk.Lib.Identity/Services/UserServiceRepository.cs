@@ -28,7 +28,7 @@ namespace Bhbk.Lib.Identity.Services
                 connect.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
 
                 _http = new HttpClient(connect);
-                _http.BaseAddress = new Uri($"{conf["IdentityMeUrls:BaseApiUrl"]}/{conf["IdentityMeUrls:BaseApiPath"]}/");
+                _http.BaseAddress = new Uri($"{conf["IdentityUserUrls:BaseApiUrl"]}/{conf["IdentityUserUrls:BaseApiPath"]}/");
             }
             else
                 _http = http;

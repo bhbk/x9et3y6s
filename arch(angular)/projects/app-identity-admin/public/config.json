@@ -1,0 +1,10 @@
+{
+  "defaultIssuer": "Bhbk",
+  "defaultClient": "",
+  "pathBase": "/api",
+  "stsApiUrl": "http://localhost:55114",
+  "adminApiUrl": "http://localhost:55106",
+  "userApiUrl": "http://localhost:55109",
+  "alertApiUrl": "http://localhost:58485",
+  "userPortalUrl": "http://localhost:4301"
+}

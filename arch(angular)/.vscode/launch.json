@@ -3,11 +3,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "ng serve",
+      "name": "ng serve app-identity-user",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "npm: start",
-      "url": "http://localhost:4200/"
+      "url": "http://localhost:4301/"
+    },
+    {
+      "name": "ng serve app-identity-admin",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4302/"
     },
     {
       "name": "ng test",

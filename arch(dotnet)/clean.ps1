@@ -20,8 +20,8 @@ $AllProjects = @(
     "Bhbk.WebApi.Alert.Tests",
     "Bhbk.WebApi.Identity.Admin",
     "Bhbk.WebApi.Identity.Admin.Tests",
-    "Bhbk.WebApi.Identity.Me",
-    "Bhbk.WebApi.Identity.Me.Tests",
+    "Bhbk.WebApi.Identity.User",
+    "Bhbk.WebApi.Identity.User.Tests",
     "Bhbk.WebApi.Identity.Sts",
     "Bhbk.WebApi.Identity.Sts.Tests"
 )

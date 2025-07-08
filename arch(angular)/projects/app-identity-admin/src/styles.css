@@ -1,3 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+/* Kendo UI Material Theme */
+@import "@progress/kendo-theme-material/dist/all.css";
 
+/* Tailwind CSS */
 @import "tailwindcss";
+
+/* Custom global styles */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

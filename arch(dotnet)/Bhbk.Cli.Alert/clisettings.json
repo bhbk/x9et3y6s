@@ -21,19 +21,19 @@
     "AudienceSecret": "pa$$word01!"
   },
   "IdentityAlertUrls": {
-    "BaseApiUrl": "https://localhost:44374",
-    "BaseApiPath": "api/alert"
+    "BaseApiUrl": "http://localhost:58485",
+    "BaseApiPath": "api"
   },
   "IdentityAdminUrls": {
-    "BaseApiUrl": "https://localhost:44359",
-    "BaseApiPath": "api/identity/admin"
+    "BaseApiUrl": "http://localhost:55106",
+    "BaseApiPath": "api"
   },
-  "IdentityMeUrls": {
-    "BaseApiUrl": "https://localhost:44348",
-    "BaseApiPath": "api/identity/me"
+  "IdentityUserUrls": {
+    "BaseApiUrl": "http://localhost:55109",
+    "BaseApiPath": "api"
   },
   "IdentityStsUrls": {
-    "BaseApiUrl": "https://localhost:44375",
-    "BaseApiPath": "api/identity/sts"
+    "BaseApiUrl": "http://localhost:55114",
+    "BaseApiPath": "api"
   }
 }

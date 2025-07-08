@@ -42,8 +42,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public Guid Id { get; set; }
 
-        public Guid IssuerId { get; set; }
-
         public bool EmailConfirmed { get; set; }
 
         public Nullable<DateTimeOffset> LockoutEndUtc { get; set; }

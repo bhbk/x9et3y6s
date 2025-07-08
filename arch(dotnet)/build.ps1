@@ -21,7 +21,7 @@ $TestProjects = @(
     "Bhbk.Lib.Identity.Primitives.Tests",
     "Bhbk.WebApi.Alert.Tests",
     "Bhbk.WebApi.Identity.Admin.Tests",
-    "Bhbk.WebApi.Identity.Me.Tests",
+    "Bhbk.WebApi.Identity.User.Tests",
     "Bhbk.WebApi.Identity.Sts.Tests"
 )
 

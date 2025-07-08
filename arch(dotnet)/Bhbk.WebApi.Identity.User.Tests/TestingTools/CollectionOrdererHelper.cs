@@ -7,9 +7,9 @@ namespace Bhbk.WebApi.Identity.User.Tests.TestingTools
 {
     public class CollectionOrdererHelper : ITestCollectionOrderer
     {
-        public const string AssembyName = "Bhbk.WebApi.Identity.Me.Tests";
+        public const string AssembyName = "Bhbk.WebApi.Identity.User.Tests";
 
-        public const string TypeName = "Bhbk.WebApi.Identity.Me.Tests.TestingTools.CollectionOrdererHelper";
+        public const string TypeName = "Bhbk.WebApi.Identity.User.Tests.TestingTools.CollectionOrdererHelper";
 
         public IEnumerable<ITestCollection> OrderTestCollections(IEnumerable<ITestCollection> testCollections)
         {

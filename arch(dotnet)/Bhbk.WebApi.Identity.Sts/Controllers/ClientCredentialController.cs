@@ -99,6 +99,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         AudienceId = audience.Id,
                         LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                        LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                        RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
                 uow.Commit();
 
@@ -115,6 +117,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     AudienceId = audience.Id,
                     LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
+                    LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                    RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
             var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
@@ -139,6 +143,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     AudienceId = audience.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
+                    LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                    RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
             uow.Commit();
@@ -252,6 +258,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     AudienceId = audience.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
+                    LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                    RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
             uow.Commit();

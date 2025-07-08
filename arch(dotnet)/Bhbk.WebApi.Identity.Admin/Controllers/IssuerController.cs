@@ -1,4 +1,5 @@
 ﻿using AutoMapper.Extensions.ExpressionMapping;
+using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.DataState.Extensions;
 using Bhbk.Lib.DataState.Models;
 using Bhbk.Lib.Identity.Data.EF.Models;
@@ -36,7 +37,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var issuer = uow.Issuers.Create(map.Map<tbl_Issuer>(model));
+            var entity = map.Map<tbl_Issuer>(model);
+            entity.IssuerKey = Base64.CreateString(96);
+
+            var issuer = uow.Issuers.Create(entity);
 
             uow.Settings.Create(
                 map.Map<tbl_Setting>(new SettingV1()
@@ -258,7 +262,6 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             issuer.Name = model.Name;
             issuer.Description = model.Description;
-            issuer.IssuerKey = model.IssuerKey;
             issuer.IsEnabled = model.IsEnabled;
             issuer.IsDeletable = model.IsDeletable;
 

@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:55109/api/identity/me",
+      "applicationUrl": "http://localhost:55109/api",
       "sslPort": 44348
     }
   },
@@ -15,12 +15,12 @@
       },
       "ancmHostingModel": "OutOfProcess"
     },
-    "Bhbk.WebApi.Identity.Me": {
+    "Bhbk.WebApi.Identity.User": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:55109/api/identity/me"
+      "applicationUrl": "http://localhost:55109/api"
     }
   }
 }

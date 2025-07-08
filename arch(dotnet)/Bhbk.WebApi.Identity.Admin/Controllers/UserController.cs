@@ -160,14 +160,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return BadRequest(ModelState);
             }
 
-            var issuer = uow.Issuers.Get(x => x.Id == model.IssuerId)
-                .SingleOrDefault();
-
-            if (issuer == null)
-            {
-                ModelState.AddModelError(MessageType.IssuerNotFound.ToString(), $"Issuer:{model.IssuerId}");
-                return NotFound(ModelState);
-            }
+            var issuer = uow.Issuers.Get(x => x.IsEnabled)
+                .FirstOrDefault();
 
             /* ignore model values for these fields */
             model.IsHumanBeing = true;
@@ -185,8 +179,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             uow.Commit();
 
-            if (uow.InstanceType == InstanceContext.DeployedOrLocal
-                || uow.InstanceType == InstanceContext.End2EndTest)
+            if (issuer != null
+                && (uow.InstanceType == InstanceContext.DeployedOrLocal
+                    || uow.InstanceType == InstanceContext.End2EndTest))
             {
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == SettingsConstants.TotpExpire).Single();

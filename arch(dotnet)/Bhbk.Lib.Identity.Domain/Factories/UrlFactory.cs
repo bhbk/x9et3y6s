@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
         public static Uri GenerateConfirmEmailV1(IConfiguration conf, string user, string code)
         {
-            var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-email");
+            var path = string.Format("{0}{1}{2}", conf["IdentityUserUrls:BaseUiUrl"], conf["IdentityUserUrls:BaseUiPath"], "/confirm-email");
 
             return new Uri(path + "?user=" + user
                 + "&code=" + code);
@@ -26,7 +26,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
         public static Uri GenerateConfirmPasswordV1(IConfiguration conf, string user, string code)
         {
-            var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-password");
+            var path = string.Format("{0}{1}{2}", conf["IdentityUserUrls:BaseUiUrl"], conf["IdentityUserUrls:BaseUiPath"], "/confirm-password");
 
             return new Uri(path + "?user=" + user
                 + "&code=" + code);
@@ -34,7 +34,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
         public static Uri GenerateConfirmPhoneV1(IConfiguration conf, string user, string code)
         {
-            var path = string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/confirm-phone");
+            var path = string.Format("{0}{1}{2}", conf["IdentityUserUrls:BaseUiUrl"], conf["IdentityUserUrls:BaseUiPath"], "/confirm-phone");
 
             return new Uri(path + "?user=" + user
                 + "&code=" + code);

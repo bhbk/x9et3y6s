@@ -117,9 +117,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 uow.AuthActivity.Create(
                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         LoginType = GrantFlowType.ImplicitV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                        LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                        RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
 
                 uow.Commit();
@@ -133,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             /* check if redirect url is defined for client, otherwise use identity ui base url */
             if (audience.tbl_Urls.Any(x => x.UrlHost == null && x.UrlPath == redirect.AbsolutePath))
             {
-                redirect = new Uri(string.Format("{0}{1}{2}", conf["IdentityMeUrls:BaseUiUrl"], conf["IdentityMeUrls:BaseUiPath"], "/implicit-callback"));
+                redirect = new Uri(string.Format("{0}{1}{2}", conf["IdentityUserUrls:BaseUiUrl"], conf["IdentityUserUrls:BaseUiPath"], "/implicit-callback"));
             }
             else if (audience.tbl_Urls.Any(x => new Uri(x.UrlHost + x.UrlPath).AbsoluteUri == redirect.AbsoluteUri))
             {
@@ -156,9 +159,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
+                    AudienceId = audience.Id,
                     UserId = user.Id,
                     LoginType = GrantFlowType.ImplicitV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
+                    LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                    RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
             uow.Commit();

@@ -118,7 +118,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     new IssuerV1()
                     {
                         Name = Base64.CreateString(4) + "-" + _factory.TestData.Seed.IssuerName,
-                        IssuerKey = AlphaNumeric.CreateString(64),
                         IsEnabled = true,
                     });
                 result.Should().BeAssignableTo<IssuerV1>();

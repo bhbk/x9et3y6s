@@ -144,9 +144,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                                 uow.AuthActivity.Create(
                                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                                     {
+                                        AudienceId = audience.Id,
                                         UserId = user.Id,
                                         LoginType = GrantFlowType.ResourceOwnerPasswordV1.ToString(),
                                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                                        LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                                        RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                                     }));
 
                                 uow.Commit();
@@ -176,9 +179,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                                 uow.AuthActivity.Create(
                                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                                     {
+                                        AudienceId = audience.Id,
                                         UserId = user.Id,
                                         LoginType = GrantFlowType.ResourceOwnerPasswordV1.ToString(),
                                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                                        LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                                        RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                                     }));
 
                                 uow.Commit();
@@ -208,9 +214,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 uow.AuthActivity.Create(
                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         LoginType = GrantFlowType.ResourceOwnerPasswordV1_Legacy.ToString(),
                         LoginOutcome = GrantFlowResultType.Success.ToString(),
+                        LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                        RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
 
                 uow.Commit();
@@ -232,9 +241,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 uow.AuthActivity.Create(
                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         LoginType = GrantFlowType.ResourceOwnerPasswordV1.ToString(),
                         LoginOutcome = GrantFlowResultType.Success.ToString(),
+                        LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                        RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
 
                 var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -257,9 +269,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 uow.AuthActivity.Create(
                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
+                        AudienceId = audience.Id,
                         UserId = user.Id,
                         LoginType = GrantFlowType.RefreshTokenV1.ToString(),
                         LoginOutcome = GrantFlowResultType.Success.ToString(),
+                        LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                        RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
 
                 uow.Commit();
@@ -390,9 +405,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
+                    AudienceId = audience.Id,
                     UserId = user.Id,
                     LoginType = GrantFlowType.RefreshTokenV1.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
+                    LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                    RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
             uow.Commit();
@@ -523,9 +541,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                                 uow.AuthActivity.Create(
                                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                                     {
+                                        AudienceId = audiences.First().Id,
                                         UserId = user.Id,
                                         LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
                                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                                        LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                                        RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                                     }));
 
                                 uow.Commit();
@@ -555,9 +576,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                                 uow.AuthActivity.Create(
                                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                                     {
+                                        AudienceId = audiences.First().Id,
                                         UserId = user.Id,
                                         LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
                                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
+                                        LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                                        RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                                     }));
 
                                 uow.Commit();
@@ -585,9 +609,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
+                    AudienceId = audiences.First().Id,
                     UserId = user.Id,
                     LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
+                    LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                    RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
             var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -610,9 +637,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
+                    AudienceId = audiences.First().Id,
                     UserId = user.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
+                    LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                    RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
             uow.Commit();
@@ -766,9 +796,12 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
+                    AudienceId = audiences.First().Id,
                     UserId = user.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
+                    LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
+                    RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
             uow.Commit();

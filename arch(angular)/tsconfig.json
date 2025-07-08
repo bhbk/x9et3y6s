@@ -8,7 +8,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "paths": {
       "lib-identity": [
-        "./dist/lib-identity"
+        "./projects/lib-identity/src/public-api.ts"
       ]
     },
     "noImplicitReturns": true,
@@ -41,10 +41,10 @@
       "path": "./projects/app-identity-admin/tsconfig.spec.json"
     },
     {
-      "path": "./projects/app-identity-me/tsconfig.app.json"
+      "path": "./projects/app-identity-user/tsconfig.app.json"
     },
     {
-      "path": "./projects/app-identity-me/tsconfig.spec.json"
+      "path": "./projects/app-identity-user/tsconfig.spec.json"
     }
   ]
 }

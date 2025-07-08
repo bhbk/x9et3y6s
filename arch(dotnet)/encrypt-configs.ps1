@@ -14,7 +14,7 @@ if (-not (Test-Path $cliPath)) {
 $configFiles = @(
     "Bhbk.WebApi.Identity.Sts\appsettings.json",
     "Bhbk.WebApi.Identity.Admin\appsettings.json",
-    "Bhbk.WebApi.Identity.Me\appsettings.json",
+    "Bhbk.WebApi.Identity.User\appsettings.json",
     "Bhbk.WebApi.Alert\appsettings.json",
     "Bhbk.Cli.Identity\clisettings.json",
     "Bhbk.Cli.Alert\clisettings.json",

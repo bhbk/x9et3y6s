@@ -25,7 +25,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     .ReadFrom.Configuration(_conf)
                     .Enrich.FromLogContext()
                     .WriteTo.Console(theme: AnsiConsoleTheme.Code)
-                    .WriteTo.File($"{hostContext.HostingEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}appdebug-.log",
+                    .WriteTo.File($"{hostContext.HostingEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}logs{Path.DirectorySeparatorChar}appdebug-.log",
                         retainedFileCountLimit: int.Parse(_conf["Serilog:RollingFile:RetainedFileCountLimit"]),
                         fileSizeLimitBytes: int.Parse(_conf["Serilog:RollingFile:FileSizeLimitBytes"]),
                         rollingInterval: RollingInterval.Day)
@@ -44,7 +44,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     .ReadFrom.Configuration(_conf)
                     .Enrich.FromLogContext()
                     .WriteTo.Console()
-                    .WriteTo.File($"{hostContext.HostingEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}appdebug-.log",
+                    .WriteTo.File($"{hostContext.HostingEnvironment.ContentRootPath}{Path.DirectorySeparatorChar}logs{Path.DirectorySeparatorChar}appdebug-.log",
                         retainedFileCountLimit: int.Parse(_conf["Serilog:RollingFile:RetainedFileCountLimit"]),
                         fileSizeLimitBytes: int.Parse(_conf["Serilog:RollingFile:FileSizeLimitBytes"]),
                         rollingInterval: RollingInterval.Day)

@@ -30,14 +30,15 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
             data.Destroy();
             data.CreateIssuers();
 
-            var result = UoW.Issuers.Create(
-                Mapper.Map<tbl_Issuer>(new IssuerV1()
+            var issuerEntity = Mapper.Map<tbl_Issuer>(new IssuerV1()
                     {
                         Name = TestData.Issuer.Name,
-                        IssuerKey = TestData.Issuer.IssuerKey,
                         IsEnabled = true,
                         IsDeletable = false,
-                    }));
+                    });
+            issuerEntity.IssuerKey = TestData.Issuer.IssuerKey;
+
+            var result = UoW.Issuers.Create(issuerEntity);
             UoW.Commit();
 
             result.Should().BeAssignableTo<tbl_Issuer>();

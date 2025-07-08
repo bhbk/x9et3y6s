@@ -214,14 +214,15 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
 
             if (foundIssuer == null)
             {
-                foundIssuer = _uow.Issuers.Create(
-                    _map.Map<tbl_Issuer>(new IssuerV1()
+                var issuerEntity = _map.Map<tbl_Issuer>(new IssuerV1()
                     {
                         Name = _testData.Issuer.Name,
-                        IssuerKey = _testData.Issuer.IssuerKey,
                         IsEnabled = true,
                         IsDeletable = true,
-                    }));
+                    });
+                issuerEntity.IssuerKey = _testData.Issuer.IssuerKey;
+
+                foundIssuer = _uow.Issuers.Create(issuerEntity);
 
                 _uow.Commit();
             }

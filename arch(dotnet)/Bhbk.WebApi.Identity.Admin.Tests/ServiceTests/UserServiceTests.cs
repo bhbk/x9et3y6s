@@ -309,7 +309,6 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var result = await service.User_CreateV1(
                     new UserV1()
                     {
-                        IssuerId = issuer.Id,
                         UserName = address,
                         Email = address,
                         FirstName = "First-" + Base64.CreateString(4),

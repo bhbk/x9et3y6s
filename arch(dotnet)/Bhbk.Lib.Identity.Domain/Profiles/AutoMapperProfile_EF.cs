@@ -78,6 +78,7 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
             CreateMap<IssuerV1, tbl_Issuer>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
+                .ForMember(dest => dest.IssuerKey, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Audiences, src => src.MapFrom(val => val.Audiences))
                 .ForMember(dest => dest.tbl_Claims, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
@@ -222,7 +223,6 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.tbl_UserRoles, src => src.Ignore());
 
             CreateMap<tbl_User, UserV1>()
-                .ForMember(dest => dest.IssuerId, src => src.Ignore())
                 .ForMember(dest => dest.Email, src => src.MapFrom(val => val.EmailAddress))
                 .ForMember(dest => dest.Roles, src => src.Ignore())
                 .ForMember(dest => dest.Claims, src => src.Ignore())
