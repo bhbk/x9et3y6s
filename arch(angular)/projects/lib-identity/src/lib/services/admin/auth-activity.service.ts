@@ -30,17 +30,4 @@ export class AuthActivityService {
     return this.http.get<AuthActivityV1>(`${this.baseUrl}/v1/${id}`);
   }
 
-  /**
-   * Get auth activity by user ID
-   */
-  getByUserId(userId: string): Observable<AuthActivityV1[]> {
-    return this.http.get<AuthActivityV1[]>(`${this.baseUrl}/v1/user/${userId}`);
-  }
-
-  /**
-   * Get auth activity by audience ID
-   */
-  getByAudienceId(audienceId: string): Observable<AuthActivityV1[]> {
-    return this.http.get<AuthActivityV1[]>(`${this.baseUrl}/v1/audience/${audienceId}`);
-  }
 }

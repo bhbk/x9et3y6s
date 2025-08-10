@@ -24,16 +24,8 @@ namespace Bhbk.WebApi.Identity.User.Controllers
         [Route("v1/refreshes"), HttpGet]
         public IActionResult GetRefreshesV1()
         {
-            var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
-                .Where(x => x.UserId == GetIdentityGUID()).ToLambda();
-
-            if (!uow.Refreshes.Exists(expr))
-            {
-                ModelState.AddModelError(MessageType.UserNotFound.ToString(), $"User:{GetIdentityGUID()}");
-                return NotFound(ModelState);
-            }
-
-            var refreshes = uow.Refreshes.Get(expr);
+            var refreshes = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+                .Where(x => x.UserId == GetIdentityGUID()).ToLambda());
 
             return Ok(map.Map<IEnumerable<RefreshV1>>(refreshes));
         }

@@ -36,4 +36,24 @@ test.describe('Admin Auth Activity', () => {
     const pager = adminPage.locator('kendo-grid kendo-pager');
     await expect(pager).toBeVisible();
   });
+
+  test('audience column shows names for multi-audience entries', async ({ adminPage }) => {
+    const grid = new KendoGrid(adminPage);
+    await grid.waitForLoaded();
+
+    // Row 1 has two audiences (identity-admin, identity-user) — the multi-audience case
+    const audienceColumn = adminPage.locator('kendo-grid tbody tr[kendogridlogicalrow]').nth(1).locator('td').nth(4);
+    const audienceText = await audienceColumn.textContent();
+    expect(audienceText).toContain('identity-admin');
+    expect(audienceText).toContain('identity-user');
+  });
+
+  test('audience column shows dash for entries with no audiences', async ({ adminPage }) => {
+    const grid = new KendoGrid(adminPage);
+    await grid.waitForLoaded();
+
+    // Row 2 (Failure) has empty audienceIds — should show a dash
+    const audienceColumn = adminPage.locator('kendo-grid tbody tr[kendogridlogicalrow]').nth(2).locator('td').nth(4);
+    await expect(audienceColumn.locator('.text-gray-400')).toHaveText('-');
+  });
 });

@@ -202,7 +202,7 @@ export const LOGINS = [
 export const AUTH_ACTIVITIES = [
   {
     id: '77777777-7777-7777-7777-111111111111',
-    audienceId: AUDIENCES[0].id,
+    audienceIds: [AUDIENCES[0].id],
     userId: USERS[0].id,
     loginType: 'ResourceOwner',
     loginOutcome: 'Success',
@@ -212,7 +212,7 @@ export const AUTH_ACTIVITIES = [
   },
   {
     id: '77777777-7777-7777-7777-222222222222',
-    audienceId: AUDIENCES[1].id,
+    audienceIds: [AUDIENCES[0].id, AUDIENCES[1].id],
     userId: USERS[1].id,
     loginType: 'ResourceOwner',
     loginOutcome: 'Success',
@@ -222,6 +222,7 @@ export const AUTH_ACTIVITIES = [
   },
   {
     id: '77777777-7777-7777-7777-333333333333',
+    audienceIds: [],
     userId: USERS[1].id,
     loginType: 'ResourceOwner',
     loginOutcome: 'Failure',

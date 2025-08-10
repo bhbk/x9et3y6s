@@ -1,5 +1,5 @@
-/** sessionStorage key used by the Angular AuthStore */
-export const SESSION_STORAGE_KEY = 'identity_access_token';
+/** localStorage key used by the Angular AuthStore */
+export const STORAGE_KEY = 'identity_access_token';
 
 /** Test user identities (matched by mock JWT generator) */
 export const ADMIN_USER = { email: 'admin@local' };

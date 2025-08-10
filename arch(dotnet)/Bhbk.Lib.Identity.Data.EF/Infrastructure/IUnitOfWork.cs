@@ -9,6 +9,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
     {
         public AudienceRepository Audiences { get; }
         public AuthActivityRepository AuthActivity { get; }
+        public IGenericRepository<tbl_AuthActivityAudience> AuthActivityAudiences { get; }
         public IGenericRepository<tbl_Claim> Claims { get; }
         public IGenericRepository<tbl_EmailActivity> EmailActivity { get; }
         public IGenericRepository<tbl_EmailQueue> EmailQueue { get; }

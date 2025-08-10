@@ -28,7 +28,11 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (Guid.TryParse(activityValue, out activityID))
                 activity = uow.AuthActivity.Get(QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>()
-                    .Where(x => x.Id == activityID).ToLambda())
+                    .Where(x => x.Id == activityID).ToLambda(),
+                        new List<Expression<Func<tbl_AuthActivity, object>>>()
+                        {
+                            x => x.tbl_AuthActivityAudiences,
+                        })
                     .SingleOrDefault();
 
             if (activity == null)
@@ -56,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                                 QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>().ApplyState(state)),
                                     new List<Expression<Func<tbl_AuthActivity, object>>>()
                                     {
-                                        x => x.Audience,
+                                        x => x.tbl_AuthActivityAudiences,
                                         x => x.User,
                                     })),
 

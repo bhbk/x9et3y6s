@@ -71,13 +71,19 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
 
                 _uow.Commit();
 
-                _uow.AuthActivity.Create(
+                var activity = _uow.AuthActivity.Create(
                     _map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
-                        AudienceId = foundAudience.Id,
                         LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
+
+                _uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+                {
+                    AuthActivityId = activity.Id,
+                    AudienceId = foundAudience.Id,
+                    CreatedUtc = activity.CreatedUtc,
+                });
 
                 _uow.Commit();
             }

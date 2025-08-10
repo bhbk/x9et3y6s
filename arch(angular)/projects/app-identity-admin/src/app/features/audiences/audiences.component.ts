@@ -29,6 +29,11 @@ import { DateTime } from 'luxon';
   ],
   template: `
     <div class="p-6">
+      @if (isInitialLoad()) {
+        <div class="flex items-center justify-center p-12">
+          <kendo-loader size="large"></kendo-loader>
+        </div>
+      } @else {
       <div class="flex justify-between items-center mb-6">
         <div>
           <h1 class="text-2xl font-semibold text-gray-800">Audiences</h1>
@@ -130,6 +135,7 @@ import { DateTime } from 'luxon';
           </kendo-grid-column>
         </kendo-grid>
       </div>
+      }
 
       <!-- Create/Edit Dialog -->
       @if (showDialog()) {
@@ -299,6 +305,7 @@ export class AudiencesComponent implements OnInit {
   readonly skip = signal(0);
   readonly sort = signal<SortDescriptor[]>([{ field: 'name', dir: 'asc' }]);
   readonly isLoading = signal(false);
+  readonly isInitialLoad = signal(true);
   readonly error = signal<string | null>(null);
 
   // Dialog state
@@ -344,6 +351,7 @@ export class AudiencesComponent implements OnInit {
       },
       error: (err) => {
         this.error.set(err.message || 'Failed to load issuers');
+        this.isInitialLoad.set(false);
       }
     });
   }
@@ -370,10 +378,12 @@ export class AudiencesComponent implements OnInit {
             total: audiences.length
           });
           this.isLoading.set(false);
+          this.isInitialLoad.set(false);
         },
         error: (err) => {
           this.error.set(err.message || 'Failed to load audiences');
           this.isLoading.set(false);
+          this.isInitialLoad.set(false);
         }
       });
     } else {
@@ -384,10 +394,12 @@ export class AudiencesComponent implements OnInit {
             total: result.total
           });
           this.isLoading.set(false);
+          this.isInitialLoad.set(false);
         },
         error: (err) => {
           this.error.set(err.message || 'Failed to load audiences');
           this.isLoading.set(false);
+          this.isInitialLoad.set(false);
         }
       });
     }

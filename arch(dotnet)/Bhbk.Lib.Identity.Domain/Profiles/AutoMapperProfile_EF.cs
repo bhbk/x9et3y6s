@@ -20,10 +20,11 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
             CreateMap<AuthActivityV1, tbl_AuthActivity>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.CreatedUtc, src => src.MapFrom(val => val.CreatedUtc == default ? DateTime.UtcNow : val.CreatedUtc))
-                .ForMember(dest => dest.Audience, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AuthActivityAudiences, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<tbl_AuthActivity, AuthActivityV1>();
+            CreateMap<tbl_AuthActivity, AuthActivityV1>()
+                .ForMember(dest => dest.AudienceIds, src => src.MapFrom(val => val.tbl_AuthActivityAudiences.Select(x => x.AudienceId).ToList()));
 
             /*
              * audience models
@@ -35,7 +36,7 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
-                .ForMember(dest => dest.tbl_AuthActivities, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AuthActivityAudiences, src => src.Ignore())
                 .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Roles, src => src.MapFrom(val => val.Roles))

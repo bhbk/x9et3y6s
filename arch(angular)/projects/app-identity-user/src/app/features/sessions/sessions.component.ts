@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { SessionService, RefreshV1 } from 'lib-identity';
+import { Router } from '@angular/router';
+import { SessionService, RefreshV1, AuthStore } from 'lib-identity';
 import { KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { KENDO_INDICATORS } from '@progress/kendo-angular-indicators';
 import { KENDO_ICONS } from '@progress/kendo-angular-icons';
@@ -149,6 +150,8 @@ import { DateTime } from 'luxon';
 })
 export class SessionsComponent implements OnInit {
   private readonly sessionService = inject(SessionService);
+  private readonly authStore = inject(AuthStore);
+  private readonly router = inject(Router);
 
   readonly computerIcon = laptopOutlineIcon;
   readonly mobileIcon = mobileOutlineIcon;
@@ -268,8 +271,9 @@ export class SessionsComponent implements OnInit {
 
     this.sessionService.revokeAllSessions().subscribe({
       next: () => {
-        this.sessions.set([]);
-        this.isLoading.set(false);
+        // All refresh tokens are revoked server-side; clear local auth state and redirect to login
+        this.authStore.clearSession();
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         this.error.set(err.message || 'Failed to revoke sessions');

@@ -20,7 +20,7 @@ import { userIcon, checkIcon, xIcon } from '@progress/kendo-svg-icons';
     KENDO_ICONS
   ],
   template: `
-    <div class="p-6 max-w-4xl">
+    <div class="p-6">
       <h1 class="text-2xl font-semibold text-gray-800 mb-6">Profile</h1>
 
       @if (isLoading()) {

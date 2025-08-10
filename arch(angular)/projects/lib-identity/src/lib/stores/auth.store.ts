@@ -98,17 +98,10 @@ export const AuthStore = signalStore(
       return localStorage.getItem(REMEMBER_ME_KEY) === 'true';
     };
 
-    // Get the appropriate storage based on rememberMe
-    const getStorage = (): Storage | null => {
-      if (typeof window === 'undefined') return null;
-      return isRememberMe() ? localStorage : sessionStorage;
-    };
-
-    // Save token to storage (localStorage if rememberMe, sessionStorage otherwise)
+    // Save token and rememberMe preference to localStorage
     const saveToken = (jwt: UserJwtV2, rememberMe?: boolean) => {
       if (typeof window === 'undefined') return;
 
-      // If rememberMe is explicitly provided, persist the preference
       if (rememberMe !== undefined) {
         if (rememberMe) {
           localStorage.setItem(REMEMBER_ME_KEY, 'true');
@@ -117,21 +110,18 @@ export const AuthStore = signalStore(
         }
       }
 
-      const storage = rememberMe ?? isRememberMe() ? localStorage : sessionStorage;
-      storage.setItem(TOKEN_STORAGE_KEY, JSON.stringify({
+      localStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify({
         accessToken: jwt.access_token,
         expiresIn: jwt.expires_in,
         savedAt: new Date().toISOString()
       }));
     };
 
-    // Load token from storage (checks both localStorage and sessionStorage)
+    // Load token from localStorage
     const loadStoredToken = (): { accessToken: string; expiry: Date } | null => {
       if (typeof window === 'undefined') return null;
 
-      // Check localStorage first (rememberMe), then sessionStorage
-      const stored = localStorage.getItem(TOKEN_STORAGE_KEY)
-        ?? sessionStorage.getItem(TOKEN_STORAGE_KEY);
+      const stored = localStorage.getItem(TOKEN_STORAGE_KEY);
       if (!stored) return null;
 
       try {
@@ -139,27 +129,23 @@ export const AuthStore = signalStore(
         const savedAt = new Date(data.savedAt);
         const expiry = new Date(savedAt.getTime() + data.expiresIn * 1000);
 
-        // Check if still valid
         if (expiry <= new Date()) {
           localStorage.removeItem(TOKEN_STORAGE_KEY);
-          sessionStorage.removeItem(TOKEN_STORAGE_KEY);
           return null;
         }
 
         return { accessToken: data.accessToken, expiry };
       } catch {
         localStorage.removeItem(TOKEN_STORAGE_KEY);
-        sessionStorage.removeItem(TOKEN_STORAGE_KEY);
         return null;
       }
     };
 
-    // Clear stored token from both storages
+    // Clear stored token and rememberMe preference
     const clearToken = () => {
       if (typeof window !== 'undefined') {
         localStorage.removeItem(TOKEN_STORAGE_KEY);
         localStorage.removeItem(REMEMBER_ME_KEY);
-        sessionStorage.removeItem(TOKEN_STORAGE_KEY);
       }
     };
 
@@ -281,11 +267,11 @@ export const AuthStore = signalStore(
         }
       },
 
-      // Start auto-refresh timer
+      // Start auto-refresh timer (only refreshes when rememberMe is enabled)
       startAutoRefresh: (issuer: string, client?: string) => {
         return interval(30000).pipe(
           takeUntil(refreshSubject),
-          filter(() => store.shouldRefreshToken() && !store.isLoading())
+          filter(() => isRememberMe() && store.shouldRefreshToken() && !store.isLoading())
         ).subscribe(() => {
           authService.refreshToken(issuer, client).subscribe({
             next: jwt => handleAuthSuccess(jwt),

@@ -24,7 +24,7 @@ export const test = base.extend<AuthFixtures>({
     await mockAdminApi(page);
     await mockUserApi(page);
 
-    // Navigate to login page so sessionStorage is accessible
+    // Navigate to login page so localStorage is accessible
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
     // Inject mock JWT for admin user
     await injectMockAuth(page, ADMIN_USER.email);

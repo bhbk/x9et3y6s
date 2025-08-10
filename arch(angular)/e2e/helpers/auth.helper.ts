@@ -1,9 +1,9 @@
 import { Page } from '@playwright/test';
-import { SESSION_STORAGE_KEY } from './test-data';
+import { STORAGE_KEY } from './test-data';
 import { createMockJwt } from '../mocks/api-mocks';
 
 /**
- * Inject a mock auth token into the page's sessionStorage so the Angular
+ * Inject a mock auth token into the page's localStorage so the Angular
  * app recognizes the user as authenticated on next navigation.
  *
  * This generates a fake JWT locally — no real API call needed.
@@ -23,8 +23,8 @@ export async function injectMockAuth(
 
   await page.evaluate(
     ({ key, value }) => {
-      sessionStorage.setItem(key, value);
+      localStorage.setItem(key, value);
     },
-    { key: SESSION_STORAGE_KEY, value: storageData },
+    { key: STORAGE_KEY, value: storageData },
   );
 }

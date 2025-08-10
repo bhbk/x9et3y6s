@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public override tbl_Audience Delete(tbl_Audience audience)
         {
-            var activity = _context.Set<tbl_AuthActivity>()
+            var activityAudiences = _context.Set<tbl_AuthActivityAudience>()
                 .Where(x => x.AudienceId == audience.Id);
 
             var refreshes = _context.Set<tbl_Refresh>()
@@ -74,7 +74,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
             var roles = _context.Set<tbl_Role>()
                 .Where(x => x.AudienceId == audience.Id);
 
-            _context.RemoveRange(activity);
+            _context.RemoveRange(activityAudiences);
             _context.RemoveRange(refreshes);
             _context.RemoveRange(settings);
             _context.RemoveRange(states);

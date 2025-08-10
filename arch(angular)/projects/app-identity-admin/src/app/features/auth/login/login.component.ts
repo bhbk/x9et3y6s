@@ -199,7 +199,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       ));
       const expiresIn = payload.exp - Math.floor(Date.now() / 1000);
       if (expiresIn > 0) {
-        sessionStorage.setItem('identity_access_token', JSON.stringify({
+        localStorage.setItem('identity_access_token', JSON.stringify({
           accessToken: token,
           expiresIn,
           savedAt: new Date().toISOString()

@@ -20,6 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public virtual DbSet<tbl_Audience> tbl_Audiences { get; set; }
         public virtual DbSet<tbl_AudienceRole> tbl_AudienceRoles { get; set; }
         public virtual DbSet<tbl_AuthActivity> tbl_AuthActivities { get; set; }
+        public virtual DbSet<tbl_AuthActivityAudience> tbl_AuthActivityAudiences { get; set; }
         public virtual DbSet<tbl_Claim> tbl_Claims { get; set; }
         public virtual DbSet<tbl_EmailActivity> tbl_EmailActivities { get; set; }
         public virtual DbSet<tbl_EmailQueue> tbl_EmailQueues { get; set; }
@@ -114,15 +115,30 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
 
                 entity.Property(e => e.RemoteEndpoint).HasMaxLength(128);
 
-                entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_AuthActivities)
-                    .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_tbl_AuthActivity_AudienceID");
-
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.tbl_AuthActivities)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK_tbl_AuthActivity_UserID");
+            });
+
+            modelBuilder.Entity<tbl_AuthActivityAudience>(entity =>
+            {
+                entity.HasKey(e => new { e.AuthActivityId, e.AudienceId });
+
+                entity.ToTable("tbl_AuthActivityAudience");
+
+                entity.HasIndex(e => new { e.AuthActivityId, e.AudienceId }, "IX_tbl_AuthActivityAudience")
+                    .IsUnique();
+
+                entity.HasOne(d => d.AuthActivity)
+                    .WithMany(p => p.tbl_AuthActivityAudiences)
+                    .HasForeignKey(d => d.AuthActivityId)
+                    .HasConstraintName("FK_tbl_AuthActivityAudience_AuthActivityID");
+
+                entity.HasOne(d => d.Audience)
+                    .WithMany(p => p.tbl_AuthActivityAudiences)
+                    .HasForeignKey(d => d.AudienceId)
+                    .HasConstraintName("FK_tbl_AuthActivityAudience_AudienceID");
             });
 
             modelBuilder.Entity<tbl_Claim>(entity =>

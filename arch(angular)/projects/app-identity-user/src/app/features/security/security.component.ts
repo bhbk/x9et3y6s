@@ -20,12 +20,12 @@ import { lockIcon, warningTriangleIcon } from '@progress/kendo-svg-icons';
     KENDO_ICONS
   ],
   template: `
-    <div class="p-6 max-w-2xl">
+    <div class="p-6">
       <h1 class="text-2xl font-semibold text-gray-800 mb-6">Security</h1>
 
       <!-- Change Password Card -->
-      <div class="bg-white rounded-lg shadow mb-6">
-        <div class="p-6 border-b border-gray-200">
+      <div class="bg-blue-50 border border-blue-200 rounded-lg mb-6">
+        <div class="p-6 border-b border-blue-200">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
               <kendo-svg-icon [icon]="lockIcon" class="text-blue-600"></kendo-svg-icon>
@@ -76,7 +76,7 @@ import { lockIcon, warningTriangleIcon } from '@progress/kendo-svg-icons';
                 @if (passwordForm.get('newPassword')?.hasError('required') && passwordForm.get('newPassword')?.touched) {
                   <div class="text-red-500 text-sm mt-1">New password is required</div>
                 } @else if (passwordForm.get('newPassword')?.hasError('minlength') && passwordForm.get('newPassword')?.touched) {
-                  <div class="text-red-500 text-sm mt-1">Password must be at least 8 characters</div>
+                  <div class="text-red-500 text-sm mt-1">Password must be at least 10 characters</div>
                 }
               </div>
 
@@ -96,27 +96,50 @@ import { lockIcon, warningTriangleIcon } from '@progress/kendo-svg-icons';
               </div>
             </div>
 
-            <!-- Password Requirements -->
-            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
-              <p class="text-sm font-medium text-gray-700 mb-2">Password Requirements:</p>
-              <ul class="text-sm text-gray-600 space-y-1">
-                <li class="flex items-center gap-2">
-                  <span [class]="passwordLength ? 'text-green-500' : 'text-gray-400'">&#x2022;</span>
-                  At least 8 characters
-                </li>
-                <li class="flex items-center gap-2">
-                  <span [class]="passwordHasUpper ? 'text-green-500' : 'text-gray-400'">&#x2022;</span>
-                  One uppercase letter
-                </li>
-                <li class="flex items-center gap-2">
-                  <span [class]="passwordHasLower ? 'text-green-500' : 'text-gray-400'">&#x2022;</span>
-                  One lowercase letter
-                </li>
-                <li class="flex items-center gap-2">
-                  <span [class]="passwordHasNumber ? 'text-green-500' : 'text-gray-400'">&#x2022;</span>
-                  One number
-                </li>
-              </ul>
+            <!-- Password Requirements & Security Tips -->
+            <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex gap-3">
+                  <kendo-svg-icon [icon]="warningIcon" class="text-amber-500 flex-shrink-0 mt-0.5"></kendo-svg-icon>
+                  <div>
+                    <p class="text-sm font-medium text-amber-800 mb-2">Password Requirements</p>
+                    <ul class="text-sm text-amber-700 space-y-1">
+                      <li class="flex items-center gap-2">
+                        <span [class]="passwordLength ? 'text-green-500' : 'text-amber-400'">&#x2022;</span>
+                        At least 10 characters
+                      </li>
+                      <li class="flex items-center gap-2">
+                        <span [class]="passwordHasUpper ? 'text-green-500' : 'text-amber-400'">&#x2022;</span>
+                        One uppercase letter
+                      </li>
+                      <li class="flex items-center gap-2">
+                        <span [class]="passwordHasLower ? 'text-green-500' : 'text-amber-400'">&#x2022;</span>
+                        One lowercase letter
+                      </li>
+                      <li class="flex items-center gap-2">
+                        <span [class]="passwordHasNumber ? 'text-green-500' : 'text-amber-400'">&#x2022;</span>
+                        One number
+                      </li>
+                      <li class="flex items-center gap-2">
+                        <span [class]="passwordHasSymbol ? 'text-green-500' : 'text-amber-400'">&#x2022;</span>
+                        One special character
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="flex gap-3">
+                  <kendo-svg-icon [icon]="warningIcon" class="text-amber-500 flex-shrink-0 mt-0.5"></kendo-svg-icon>
+                  <div>
+                    <p class="text-sm font-medium text-amber-800 mb-2">Security Tips</p>
+                    <ul class="text-sm text-amber-700 space-y-1.5 list-disc list-inside">
+                      <li>Keep your password private and never share it</li>
+                      <li>Avoid reusing passwords across accounts</li>
+                      <li>Use a password manager for stronger credentials</li>
+                      <li>Enable two-factor authentication where possible</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
@@ -146,22 +169,6 @@ import { lockIcon, warningTriangleIcon } from '@progress/kendo-svg-icons';
           </form>
         </div>
       </div>
-
-      <!-- Security Tips -->
-      <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
-        <div class="flex gap-3">
-          <kendo-svg-icon [icon]="warningIcon" class="text-amber-500 flex-shrink-0"></kendo-svg-icon>
-          <div>
-            <h3 class="font-medium text-amber-800">Security Tips</h3>
-            <ul class="mt-2 text-sm text-amber-700 space-y-1">
-              <li>Never share your password with anyone</li>
-              <li>Use a unique password for each account</li>
-              <li>Consider using a password manager</li>
-              <li>Enable two-factor authentication when available</li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   `
 })
@@ -179,12 +186,12 @@ export class SecurityComponent {
 
   passwordForm: FormGroup = this.fb.group({
     currentPassword: ['', Validators.required],
-    newPassword: ['', [Validators.required, Validators.minLength(8)]],
+    newPassword: ['', [Validators.required, Validators.minLength(10)]],
     confirmPassword: ['', Validators.required]
   }, { validators: this.passwordMatchValidator });
 
   get passwordLength(): boolean {
-    return (this.passwordForm.get('newPassword')?.value?.length ?? 0) >= 8;
+    return (this.passwordForm.get('newPassword')?.value?.length ?? 0) >= 10;
   }
 
   get passwordHasUpper(): boolean {
@@ -197,6 +204,10 @@ export class SecurityComponent {
 
   get passwordHasNumber(): boolean {
     return /[0-9]/.test(this.passwordForm.get('newPassword')?.value ?? '');
+  }
+
+  get passwordHasSymbol(): boolean {
+    return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(this.passwordForm.get('newPassword')?.value ?? '');
   }
 
   private passwordMatchValidator(control: AbstractControl): ValidationErrors | null {

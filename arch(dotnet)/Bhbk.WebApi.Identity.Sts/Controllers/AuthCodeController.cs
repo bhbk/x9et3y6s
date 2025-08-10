@@ -294,16 +294,25 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             /* check that payload can be decrypted and validated */
             if (!new PasswordTokenFactory(uow.InstanceType.ToString()).Validate(user.SecurityStamp, input.code, user.Id.ToString(), user.SecurityStamp))
             {
-                uow.AuthActivity.Create(
+                var failActivity = uow.AuthActivity.Create(
                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
-                        AudienceId = audiences.First().Id,
                         UserId = user.Id,
                         LoginType = GrantFlowType.AuthorizationCodeV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
                         LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
                         RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
+
+                foreach (var aud in audiences)
+                {
+                    uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+                    {
+                        AuthActivityId = failActivity.Id,
+                        AudienceId = aud.Id,
+                        CreatedUtc = failActivity.CreatedUtc,
+                    });
+                }
 
                 uow.Commit();
 
@@ -314,16 +323,25 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var ac_claims = uow.Users.GenerateAccessClaims(issuer, user);
             var ac = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audiences.Select(x => x.Name).ToList(), ac_claims);
 
-            uow.AuthActivity.Create(
+            var acActivity = uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
-                    AudienceId = audiences.First().Id,
                     UserId = user.Id,
                     LoginType = GrantFlowType.AuthorizationCodeV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                     LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
+
+            foreach (var aud in audiences)
+            {
+                uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+                {
+                    AuthActivityId = acActivity.Id,
+                    AudienceId = aud.Id,
+                    CreatedUtc = acActivity.CreatedUtc,
+                });
+            }
 
             var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
             var rt = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audiences.Select(x => x.Name).ToList(), rt_claims);
@@ -341,16 +359,25 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserAgent = Request.Headers["User-Agent"].ToString(),
                 }));
 
-            uow.AuthActivity.Create(
+            var rtActivity = uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
-                    AudienceId = audiences.First().Id,
                     UserId = user.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                     LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
+
+            foreach (var aud in audiences)
+            {
+                uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+                {
+                    AuthActivityId = rtActivity.Id,
+                    AudienceId = aud.Id,
+                    CreatedUtc = rtActivity.CreatedUtc,
+                });
+            }
 
             uow.Commit();
 

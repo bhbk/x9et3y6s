@@ -114,16 +114,22 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || state.StateConsume == true
                 || state.UserId != user.Id)
             {
-                uow.AuthActivity.Create(
+                var failActivity = uow.AuthActivity.Create(
                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
-                        AudienceId = audience.Id,
                         UserId = user.Id,
                         LoginType = GrantFlowType.ImplicitV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
                         LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
                         RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
+
+                uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+                {
+                    AuthActivityId = failActivity.Id,
+                    AudienceId = audience.Id,
+                    CreatedUtc = failActivity.CreatedUtc,
+                });
 
                 uow.Commit();
 
@@ -156,16 +162,22 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var imp_claims = uow.Users.GenerateAccessClaims(issuer, user);
             var imp = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, imp_claims);
 
-            uow.AuthActivity.Create(
+            var impActivity = uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
-                    AudienceId = audience.Id,
                     UserId = user.Id,
                     LoginType = GrantFlowType.ImplicitV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                     LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
+
+            uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+            {
+                AuthActivityId = impActivity.Id,
+                AudienceId = audience.Id,
+                CreatedUtc = impActivity.CreatedUtc,
+            });
 
             uow.Commit();
 

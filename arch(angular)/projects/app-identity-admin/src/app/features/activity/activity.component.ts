@@ -23,6 +23,11 @@ import { DateTime } from 'luxon';
   ],
   template: `
     <div class="p-6">
+      @if (isInitialLoad()) {
+        <div class="flex items-center justify-center p-12">
+          <kendo-loader size="large"></kendo-loader>
+        </div>
+      } @else {
       <div class="flex justify-between items-center mb-6">
         <div>
           <h1 class="text-2xl font-semibold text-gray-800">Activity</h1>
@@ -128,10 +133,10 @@ import { DateTime } from 'luxon';
             </ng-template>
           </kendo-grid-column>
 
-          <kendo-grid-column field="audienceId" title="Audience" [width]="160">
+          <kendo-grid-column field="audienceIds" title="Audience" [width]="160">
             <ng-template kendoGridCellTemplate let-dataItem>
-              @if (dataItem.audienceId) {
-                <span class="text-sm">{{ getAudienceName(dataItem.audienceId) }}</span>
+              @if (dataItem.audienceIds?.length) {
+                <span class="text-sm">{{ getAudienceNames(dataItem.audienceIds) }}</span>
               } @else {
                 <span class="text-gray-400">-</span>
               }
@@ -159,6 +164,7 @@ import { DateTime } from 'luxon';
           </kendo-grid-column>
         </kendo-grid>
       </div>
+      }
     </div>
   `
 })
@@ -186,6 +192,7 @@ export class ActivityComponent implements OnInit {
   readonly skip = signal(0);
   readonly sort = signal<SortDescriptor[]>([{ field: 'createdUtc', dir: 'desc' }]);
   readonly isLoading = signal(false);
+  readonly isInitialLoad = signal(true);
   readonly error = signal<string | null>(null);
 
   // Statistics
@@ -250,10 +257,12 @@ export class ActivityComponent implements OnInit {
         this.lockedCount.set(locked);
 
         this.isLoading.set(false);
+        this.isInitialLoad.set(false);
       },
       error: (err) => {
         this.error.set(err.message || 'Failed to load activity');
         this.isLoading.set(false);
+        this.isInitialLoad.set(false);
       }
     });
   }
@@ -274,9 +283,11 @@ export class ActivityComponent implements OnInit {
     return user ? `${user.firstName} ${user.lastName}` : userId.substring(0, 8) + '...';
   }
 
-  getAudienceName(audienceId: string): string {
-    const audience = this.audiences().get(audienceId);
-    return audience ? audience.name : audienceId.substring(0, 8) + '...';
+  getAudienceNames(audienceIds: string[]): string {
+    return audienceIds.map(id => {
+      const audience = this.audiences().get(id);
+      return audience ? audience.name : id.substring(0, 8) + '...';
+    }).join(', ');
   }
 
   formatDate(dateStr: string): string {

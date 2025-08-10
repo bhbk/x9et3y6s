@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models.Admin
 {
     public abstract class AuthActivity
     {
-        public Guid? AudienceId { get; set; }
+        public List<Guid> AudienceIds { get; set; } = new List<Guid>();
 
         public Guid? UserId { get; set; }
 

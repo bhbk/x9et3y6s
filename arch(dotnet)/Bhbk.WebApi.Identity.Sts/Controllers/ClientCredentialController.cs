@@ -93,15 +93,22 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             else if (audience.IsLockedOut
                 || !PBKDF2.Validate(audience.PasswordHashPBKDF2, input.client_secret))
             {
-                uow.AuthActivity.Create(
+                var activity = uow.AuthActivity.Create(
                     map.Map<tbl_AuthActivity>(new AuthActivityV1()
                     {
-                        AudienceId = audience.Id,
                         LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
                         LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
                         RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
+
+                uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+                {
+                    AuthActivityId = activity.Id,
+                    AudienceId = audience.Id,
+                    CreatedUtc = activity.CreatedUtc,
+                });
+
                 uow.Commit();
 
                 ModelState.AddModelError(MessageType.AudienceInvalid.ToString(), $"Audience:{audience.Id}");
@@ -111,15 +118,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var cc_claims = uow.Audiences.GenerateAccessClaims(issuer, audience);
             var cc = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, cc_claims);
 
-            uow.AuthActivity.Create(
+            var ccActivity = uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
-                    AudienceId = audience.Id,
                     LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                     LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
+
+            uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+            {
+                AuthActivityId = ccActivity.Id,
+                AudienceId = audience.Id,
+                CreatedUtc = ccActivity.CreatedUtc,
+            });
 
             var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
             var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
@@ -137,15 +150,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserAgent = Request.Headers["User-Agent"].ToString(),
                 }));
 
-            uow.AuthActivity.Create(
+            var rtActivity = uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
-                    AudienceId = audience.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                     LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
+
+            uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+            {
+                AuthActivityId = rtActivity.Id,
+                AudienceId = audience.Id,
+                CreatedUtc = rtActivity.CreatedUtc,
+            });
 
             uow.Commit();
 
@@ -252,15 +271,21 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserAgent = Request.Headers["User-Agent"].ToString(),
                 }));
 
-            uow.AuthActivity.Create(
+            var activity = uow.AuthActivity.Create(
                 map.Map<tbl_AuthActivity>(new AuthActivityV1()
                 {
-                    AudienceId = audience.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
                     LocalEndpoint = Request.HttpContext.Connection.LocalIpAddress?.ToString() + ":" + Request.HttpContext.Connection.LocalPort,
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
+
+            uow.AuthActivityAudiences.Create(new tbl_AuthActivityAudience
+            {
+                AuthActivityId = activity.Id,
+                AudienceId = audience.Id,
+                CreatedUtc = activity.CreatedUtc,
+            });
 
             uow.Commit();
 

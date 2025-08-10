@@ -5,7 +5,7 @@
 
 export interface AuthActivityV1 {
   id: string;
-  audienceId?: string;
+  audienceIds: string[];
   userId?: string;
   loginType: string;
   loginOutcome: string;

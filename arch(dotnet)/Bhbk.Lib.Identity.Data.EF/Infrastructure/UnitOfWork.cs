@@ -17,6 +17,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
         public InstanceContext InstanceType { get; private set; }
         public AudienceRepository Audiences { get; private set; }
         public AuthActivityRepository AuthActivity { get; private set; }
+        public IGenericRepository<tbl_AuthActivityAudience> AuthActivityAudiences { get; private set; }
         public IGenericRepository<tbl_Claim> Claims { get; private set; }
         public IGenericRepository<tbl_EmailActivity> EmailActivity { get; private set; }
         public IGenericRepository<tbl_EmailQueue> EmailQueue { get; private set; }
@@ -95,6 +96,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
 
             Audiences = new AudienceRepository(_context, env);
             AuthActivity = new AuthActivityRepository(_context);
+            AuthActivityAudiences = new GenericRepository<tbl_AuthActivityAudience>(_context);
             Claims = new GenericRepository<tbl_Claim>(_context);
             EmailQueue = new GenericRepository<tbl_EmailQueue>(_context);
             EmailActivity = new GenericRepository<tbl_EmailActivity>(_context);

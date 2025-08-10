@@ -626,6 +626,7 @@
     <None Include="Maintenance\Test_PreRefresh.sql" />
     <None Include="Maintenance\Debug_PostRefresh.sql" />
     <None Include="Maintenance\Debug_PreRefresh.sql" />
+    <Build Include="dbo\Tables\tbl_AuthActivityAudience.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\130\SqlSchemas\master.dacpac">
