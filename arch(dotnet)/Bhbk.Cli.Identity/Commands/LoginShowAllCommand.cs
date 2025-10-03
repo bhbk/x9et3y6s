@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bhbk.Cli.Identity.Factories;
 using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.Primitives.Enums;
@@ -19,23 +19,23 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class LoginShowAllCommand : ConsoleCommand
+    public class LoginProviderShowAllCommand : ConsoleCommand
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _map;
         private readonly IUnitOfWork _uow;
         private readonly IAdminService _service;
-        private IEnumerable<tbl_Login> _logins;
+        private IEnumerable<tbl_LoginProvider> _loginProviders;
         private string _filter;
         private int _count;
 
-        public LoginShowAllCommand()
+        public LoginProviderShowAllCommand()
         {
             _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             var env = new ContextService(InstanceContext.DeployedOrLocal);
@@ -46,7 +46,7 @@ namespace Bhbk.Cli.Identity.Commands
                 Grant = new ResourceOwnerGrantV2(_conf)
             };
 
-            IsCommand("login-show-all", "Show login(s)");
+            IsCommand("login-provider-show-all", "Show login provider(s)");
 
             HasRequiredOption("c|count=", "Enter how many results to display", arg =>
             {
@@ -54,7 +54,7 @@ namespace Bhbk.Cli.Identity.Commands
                     _count = int.Parse(arg);
             });
 
-            HasOption("f|filter=", "Enter login (full or partial) name to look for", arg =>
+            HasOption("f|filter=", "Enter login provider (full or partial) name to look for", arg =>
             {
                 CheckRequiredArguments();
 
@@ -67,16 +67,16 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                var expression = QueryExpressionFactory.GetQueryExpression<tbl_Login>();
+                var expression = QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>();
 
                 if (!string.IsNullOrEmpty(_filter))
                     expression = expression.Where(x => x.Name.Contains(_filter));
 
-                _logins = _uow.Logins.Get(expression.ToLambda())
+                _loginProviders = _uow.LoginProviders.Get(expression.ToLambda())
                     .TakeLast(_count);
 
 
-                FormatOutput.Logins(_uow, _logins.OrderBy(x => x.Name));
+                FormatOutput.LoginProviders(_uow, _loginProviders.OrderBy(x => x.Name));
 
                 return StandardOutput.FondFarewell();
             }

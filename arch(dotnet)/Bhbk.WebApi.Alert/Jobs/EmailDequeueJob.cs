@@ -4,7 +4,6 @@ using Bhbk.Lib.Identity.Data.EF.Models;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Bhbk.WebApi.Alert.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Serilog;
@@ -34,11 +33,10 @@ namespace Bhbk.WebApi.Alert.Jobs
             {
                 using (var scope = _factory.CreateScope())
                 {
-                    var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var sendgrid = scope.ServiceProvider.GetRequiredService<ISendgridService>();
 
-                    DoDequeueWork(conf, uow, sendgrid);
+                    DoDequeueWork(uow, sendgrid);
                 }
             }
             catch (Exception ex)
@@ -56,10 +54,12 @@ namespace Bhbk.WebApi.Alert.Jobs
             return Task.CompletedTask;
         }
 
-        private void DoDequeueWork(IConfiguration conf, IUnitOfWork uow, ISendgridService sendgrid)
+        private void DoDequeueWork(IUnitOfWork uow, ISendgridService sendgrid)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var sendgridApiKey = conf["Jobs:EmailDequeue:SendgridApiKey"];
+
+            var job = uow.Jobs.Get(x => x.Name == "EmailDequeue").Single();
+            var sendgridApiKey = uow.JobSettings.Get(x => x.JobId == job.Id && x.ConfigKey == "SendgridApiKey").Single().ConfigValue;
 
             foreach (var msg in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>()
                 .Where(x => x.SendAtUtc < DateTime.UtcNow 

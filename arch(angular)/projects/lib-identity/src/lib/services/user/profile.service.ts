@@ -15,14 +15,14 @@ export class ProfileService {
    * Get current user's profile
    */
   getProfile(): Observable<UserV1> {
-    return this.http.get<UserV1>(`${this.config.userApiUrl}${this.config.pathBase}/profile/v1`);
+    return this.http.get<UserV1>(`${this.config.userApiUrl}${this.config.pathBase}/profiles/v1`);
   }
 
   /**
    * Update current user's profile (FirstName, LastName, PhoneNumber)
    */
-  updateProfile(profile: Partial<UserV1>): Observable<UserV1> {
-    return this.http.put<UserV1>(`${this.config.userApiUrl}${this.config.pathBase}/profile/v1`, profile);
+  updateProfile(profile: UserV1): Observable<UserV1> {
+    return this.http.put<UserV1>(`${this.config.userApiUrl}${this.config.pathBase}/profiles/v1`, profile);
   }
 
   /**

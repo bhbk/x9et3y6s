@@ -1,10 +1,11 @@
-import { Component, inject, signal, HostListener } from '@angular/core';
+import { Component, inject, signal, HostListener, OnInit } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthStore, ConfigService } from 'lib-identity';
+import { AuthStore, ChatStore, ConfigService } from 'lib-identity';
 import { KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { KENDO_ICONS } from '@progress/kendo-angular-icons';
 import {
   gridLayoutIcon,
+  gridIcon,
   userIcon,
   gearIcon,
   folderIcon,
@@ -13,8 +14,10 @@ import {
   clipboardIcon,
   chartLineMarkersIcon,
   commentIcon,
+  rightDoubleQuotesIcon,
   logoutIcon,
-  menuIcon
+  sparklesIcon,
+  clockIcon,
 } from '@progress/kendo-svg-icons';
 
 @Component({
@@ -22,47 +25,62 @@ import {
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, KENDO_BUTTONS, KENDO_ICONS],
   template: `
-    <div class="min-h-screen bg-gray-50 flex flex-col">
+    <div class="h-screen bg-gray-50 flex flex-col overflow-hidden">
       <!-- Top Bar -->
-      <header class="h-16 bg-white flex items-center px-4 shrink-0 relative z-50">
+      <header class="h-16 bg-white border-b border-gray-200 flex items-center px-4 shrink-0 relative z-50">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
             <kendo-svg-icon [icon]="lockIcon" size="medium" class="text-blue-600"></kendo-svg-icon>
           </div>
-          <span class="text-2xl font-semibold text-gray-800 whitespace-nowrap">Identity Administration</span>
+          <span class="text-base font-medium text-gray-700 whitespace-nowrap">Identity Admin Console</span>
         </div>
-        <div class="ml-auto relative" data-menu-container>
-          <button
-            kendoButton
-            fillMode="flat"
-            (click)="toggleMenu($event)"
-            class="!p-1"
-          >
-            <kendo-svg-icon [icon]="hamburgerIcon" size="medium"></kendo-svg-icon>
-          </button>
-          @if (menuOpen()) {
-            <div class="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
-              <div class="px-4 py-2 border-b border-gray-100">
-                <p class="text-sm font-medium text-gray-900 truncate">{{ authStore.userDisplayName() }}</p>
-              </div>
-              @if (userPortalUrl) {
-                <a
-                  [href]="getPortalUrl()"
-                  class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+        <div class="ml-auto flex items-center gap-2">
+          <a routerLink="/assistant" routerLinkActive="bg-blue-50 text-blue-600"
+             class="flex items-center gap-2 px-3 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors">
+            <kendo-svg-icon [icon]="commentIcon" size="small"></kendo-svg-icon>
+            <span class="text-base font-medium">AI Assistant</span>
+            <span
+              class="w-2 h-2 rounded-full inline-block"
+              [class.bg-gray-400]="!chatStore.isConnected()"
+              [class.bg-yellow-400]="chatStore.isConnected() && chatStore.llmAvailable() === null && !chatStore.llmError()"
+              [class.bg-red-400]="chatStore.isConnected() && chatStore.llmError()"
+              [class.bg-orange-400]="chatStore.isConnected() && chatStore.llmAvailable() === false && !chatStore.llmError()"
+              [class.bg-green-400]="chatStore.isConnected() && chatStore.llmAvailable() === true && !chatStore.llmError()"
+              [class.animate-pulse]="chatStore.isConnected() && chatStore.llmAvailable() === null && !chatStore.llmError()"
+              [title]="assistantStatusTitle()"
+            ></span>
+          </a>
+          <div class="relative mr-2" data-menu-container>
+            <button
+              (click)="toggleMenu($event)"
+              class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
+            >
+              <kendo-svg-icon [icon]="hamburgerIcon" size="medium" class="text-gray-600"></kendo-svg-icon>
+            </button>
+            @if (menuOpen()) {
+              <div class="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                <div class="px-4 py-2 border-b border-gray-100">
+                  <p class="text-sm font-medium text-gray-900 truncate">{{ authStore.userDisplayName() }}</p>
+                </div>
+                @if (userPortalUrl) {
+                  <a
+                    [href]="getPortalUrl()"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <kendo-svg-icon [icon]="userIcon" size="small"></kendo-svg-icon>
+                    Identity User Console
+                  </a>
+                }
+                <button
+                  (click)="logout()"
+                  class="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
                 >
-                  <kendo-svg-icon [icon]="userIcon" size="small"></kendo-svg-icon>
-                  User Portal
-                </a>
-              }
-              <button
-                (click)="logout()"
-                class="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
-              >
-                <kendo-svg-icon [icon]="logoutIcon" size="small"></kendo-svg-icon>
-                Sign Out
-              </button>
-            </div>
-          }
+                  <kendo-svg-icon [icon]="logoutIcon" size="small"></kendo-svg-icon>
+                  Sign Out
+                </button>
+              </div>
+            }
+          </div>
         </div>
       </header>
 
@@ -71,49 +89,59 @@ import {
         <aside class="w-64 bg-white shadow-sm flex flex-col overflow-y-auto shrink-0">
           <nav class="flex-1 p-4 space-y-1">
             <a routerLink="/dashboard" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="gridIcon" size="medium"></kendo-svg-icon>
               Dashboard
             </a>
             <a routerLink="/activity" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="chartIcon" size="medium"></kendo-svg-icon>
               Activity
             </a>
             <a routerLink="/issuers" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="folderIcon" size="medium"></kendo-svg-icon>
               Issuers
             </a>
             <a routerLink="/audiences" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="gearIcon" size="medium"></kendo-svg-icon>
               Audiences
             </a>
             <a routerLink="/users" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="userIcon" size="medium"></kendo-svg-icon>
               Users
             </a>
             <a routerLink="/roles" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="lockIcon" size="medium"></kendo-svg-icon>
               Roles
             </a>
             <a routerLink="/claims" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="clipboardIcon" size="medium"></kendo-svg-icon>
               Claims
             </a>
-            <a routerLink="/logins" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
+            <a routerLink="/login-providers" routerLinkActive="bg-blue-50 text-blue-600"
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="loginIcon" size="medium"></kendo-svg-icon>
-              Logins
+              Login Providers
             </a>
-            <a routerLink="/motds" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors">
-              <kendo-svg-icon [icon]="commentIcon" size="medium"></kendo-svg-icon>
-              MOTDs
+            <a routerLink="/llm-providers" routerLinkActive="bg-blue-50 text-blue-600"
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
+              <kendo-svg-icon [icon]="sparklesIcon" size="medium"></kendo-svg-icon>
+              LLM Providers
+            </a>
+            <a routerLink="/jobs" routerLinkActive="bg-blue-50 text-blue-600"
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
+              <kendo-svg-icon [icon]="jobsIcon" size="medium"></kendo-svg-icon>
+              Jobs
+            </a>
+            <a routerLink="/quotes" routerLinkActive="bg-blue-50 text-blue-600"
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
+              <kendo-svg-icon [icon]="quotesIcon" size="medium"></kendo-svg-icon>
+              Quotes
             </a>
           </nav>
         </aside>
@@ -126,10 +154,11 @@ import {
     </div>
   `
 })
-export class MainLayoutComponent {
+export class MainLayoutComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly config = inject(ConfigService);
   readonly authStore = inject(AuthStore);
+  readonly chatStore = inject(ChatStore);
 
   readonly gridIcon = gridLayoutIcon;
   readonly userIcon = userIcon;
@@ -140,10 +169,18 @@ export class MainLayoutComponent {
   readonly clipboardIcon = clipboardIcon;
   readonly chartIcon = chartLineMarkersIcon;
   readonly commentIcon = commentIcon;
+  readonly quotesIcon = rightDoubleQuotesIcon;
   readonly logoutIcon = logoutIcon;
-  readonly hamburgerIcon = menuIcon;
+  readonly sparklesIcon = sparklesIcon;
+  readonly jobsIcon = clockIcon;
+  readonly hamburgerIcon = gridIcon;
 
   readonly menuOpen = signal(false);
+
+  ngOnInit(): void {
+    this.chatStore.init();
+    this.chatStore.connect(true);
+  }
 
   get userPortalUrl(): string | undefined {
     return this.config.userPortalUrl;
@@ -165,9 +202,19 @@ export class MainLayoutComponent {
     this.menuOpen.set(false);
   }
 
-  logout(): void {
+  assistantStatusTitle(): string {
+    if (!this.chatStore.isConnected()) return 'Assistant: Disconnected';
+    if (this.chatStore.llmError()) return 'Assistant: Service error';
+    if (this.chatStore.llmAvailable() === null) return 'Assistant: Checking...';
+    if (this.chatStore.llmAvailable() === false) return 'Assistant: No LLM configured';
+    return 'Assistant: Ready';
+  }
+
+  async logout(): Promise<void> {
     this.menuOpen.set(false);
-    this.authStore.clearSession();
+    this.chatStore.disconnect();
+    this.chatStore.destroy();
+    await this.authStore.logout();
     this.router.navigate(['/login']);
   }
 }

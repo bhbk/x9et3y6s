@@ -9,7 +9,7 @@ import { ClaimV1, ClaimCreate, ClaimUpdate } from '../../models';
   providedIn: 'root'
 })
 export class ClaimService extends BaseAdminService<ClaimV1, ClaimCreate, ClaimUpdate> {
-  protected readonly endpoint = 'claim';
+  protected readonly endpoint = 'claims';
 
   constructor() {
     super(inject(HttpClient), inject(ConfigService));

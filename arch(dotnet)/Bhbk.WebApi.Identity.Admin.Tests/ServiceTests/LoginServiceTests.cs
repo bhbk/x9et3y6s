@@ -45,7 +45,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
                 };
 
-                var result = await service.Endpoints.Login_CreateV1(Base64.CreateString(8), new LoginV1());
+                var result = await service.Endpoints.LoginProvider_CreateV1(Base64.CreateString(8), new LoginProviderV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -60,7 +60,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Endpoints.Login_CreateV1(rop.RawData, new LoginV1());
+                result = await service.Endpoints.LoginProvider_CreateV1(rop.RawData, new LoginProviderV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -85,7 +85,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Endpoints.Login_CreateV1(rop.RawData, new LoginV1());
+                var result = await service.Endpoints.LoginProvider_CreateV1(rop.RawData, new LoginProviderV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -114,17 +114,17 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Login_CreateV1(
-                    new LoginV1()
+                var result = await service.LoginProvider_CreateV1(
+                    new LoginProviderV1()
                     {
-                        Name = Base64.CreateString(4) + "-" + _factory.TestData.Login.Name,
-                        LoginKey = _factory.TestData.Login.LoginKey,
+                        Name = Base64.CreateString(4) + "-" + _factory.TestData.LoginProvider.Name,
+                        ProviderKey = _factory.TestData.LoginProvider.ProviderKey,
                         IsEnabled = true,
                         IsDeletable = false
                     });
-                result.Should().BeAssignableTo<LoginV1>();
+                result.Should().BeAssignableTo<LoginProviderV1>();
 
-                var check = uow.Logins.Get(x => x.Id == result.Id).Any();
+                var check = uow.LoginProviders.Get(x => x.Id == result.Id).Any();
                 check.Should().BeTrue();
             }
         }
@@ -145,7 +145,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
                 };
 
-                var result = await service.Endpoints.Login_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
+                var result = await service.Endpoints.LoginProvider_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -160,7 +160,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Endpoints.Login_DeleteV1(rop.RawData, Guid.NewGuid());
+                result = await service.Endpoints.LoginProvider_DeleteV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -185,7 +185,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Endpoints.Login_DeleteV1(rop.RawData, Guid.NewGuid());
+                var result = await service.Endpoints.LoginProvider_DeleteV1(rop.RawData, Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
@@ -205,7 +205,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var data = new TestDataFactory(uow, _factory.TestData);
                 data.Destroy();
-                data.CreateLogins();
+                data.CreateLoginProviders();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
                 var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
@@ -214,13 +214,13 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testLogin = uow.Logins.Get(x => x.Name == _factory.TestData.Login.Name).Single();
+                var testLogin = uow.LoginProviders.Get(x => x.Name == _factory.TestData.LoginProvider.Name).Single();
                 testLogin.IsDeletable = false;
 
-                uow.Logins.Update(testLogin);
+                uow.LoginProviders.Update(testLogin);
                 uow.Commit();
 
-                var result = await service.Endpoints.Login_DeleteV1(rop.RawData, testLogin.Id);
+                var result = await service.Endpoints.LoginProvider_DeleteV1(rop.RawData, testLogin.Id);
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -244,7 +244,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var data = new TestDataFactory(uow, _factory.TestData);
                 data.Destroy();
-                data.CreateLogins();
+                data.CreateLoginProviders();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
                 var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
@@ -253,12 +253,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testLogin = uow.Logins.Get(x => x.Name == _factory.TestData.Login.Name).Single();
+                var testLogin = uow.LoginProviders.Get(x => x.Name == _factory.TestData.LoginProvider.Name).Single();
 
-                var result = await service.Login_DeleteV1(testLogin.Id);
+                var result = await service.LoginProvider_DeleteV1(testLogin.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Logins.Get(x => x.Id == testLogin.Id).Any();
+                var check = uow.LoginProviders.Get(x => x.Id == testLogin.Id).Any();
                 check.Should().BeFalse();
             }
         }
@@ -281,7 +281,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var data = new TestDataFactory(uow, _factory.TestData);
                 data.Destroy();
-                data.CreateLogins();
+                data.CreateLoginProviders();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
                 var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
@@ -290,10 +290,10 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testLogin = uow.Logins.Get(x => x.Name == _factory.TestData.Login.Name).Single();
+                var testLogin = uow.LoginProviders.Get(x => x.Name == _factory.TestData.LoginProvider.Name).Single();
 
-                var result = await service.Login_GetV1(testLogin.Id.ToString());
-                result.Should().BeAssignableTo<LoginV1>();
+                var result = await service.LoginProvider_GetV1(testLogin.Id.ToString());
+                result.Should().BeAssignableTo<LoginProviderV1>();
             }
 
             using (var owin = _factory.CreateClient())
@@ -311,7 +311,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var data = new TestDataFactory(uow, _factory.TestData);
                 data.Destroy();
-                data.CreateLogins();
+                data.CreateLoginProviders();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
                 var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
@@ -331,9 +331,9 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     Take = take
                 };
 
-                var result = await service.Login_GetV1(state);
+                var result = await service.LoginProvider_GetV1(state);
                 result.Data.Count().Should().Be(take);
-                result.Total.Should().Be(uow.Logins.Count());
+                result.Total.Should().Be(uow.LoginProviders.Count());
             }
         }
 
@@ -353,7 +353,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                     Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
                 };
 
-                var result = await service.Endpoints.Login_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
+                var result = await service.Endpoints.LoginProvider_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
@@ -368,7 +368,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                result = await service.Endpoints.Login_UpdateV1(rop.RawData, new LoginV1());
+                result = await service.Endpoints.LoginProvider_UpdateV1(rop.RawData, new LoginProviderV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             }
@@ -393,7 +393,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.Endpoints.Login_UpdateV1(rop.RawData, new LoginV1());
+                var result = await service.Endpoints.LoginProvider_UpdateV1(rop.RawData, new LoginProviderV1());
                 result.Should().BeAssignableTo(typeof(HttpResponseMessage));
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
@@ -418,7 +418,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var data = new TestDataFactory(uow, _factory.TestData);
                 data.Destroy();
-                data.CreateLogins();
+                data.CreateLoginProviders();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
                 var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
@@ -427,11 +427,11 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testLogin = uow.Logins.GetAsNoTracking(x => x.Name == _factory.TestData.Login.Name).Single();
+                var testLogin = uow.LoginProviders.GetAsNoTracking(x => x.Name == _factory.TestData.LoginProvider.Name).Single();
                 testLogin.Description += "(Updated)";
 
-                var result = await service.Login_UpdateV1(map.Map<LoginV1>(testLogin));
-                result.Should().BeAssignableTo<LoginV1>();
+                var result = await service.LoginProvider_UpdateV1(map.Map<LoginProviderV1>(testLogin));
+                result.Should().BeAssignableTo<LoginProviderV1>();
                 result.Description.Should().Be(testLogin.Description);
             }
         }

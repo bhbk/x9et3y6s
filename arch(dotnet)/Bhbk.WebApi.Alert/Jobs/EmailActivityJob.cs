@@ -2,7 +2,6 @@
 using Bhbk.Lib.Identity.Data.EF.Models;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Serilog;
@@ -31,10 +30,9 @@ namespace Bhbk.WebApi.Alert.Jobs
             {
                 using (var scope = _factory.CreateScope())
                 {
-                    var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    DoCleanupWork(conf, uow);
+                    DoCleanupWork(uow);
                 }
             }
             catch (Exception ex)
@@ -52,10 +50,12 @@ namespace Bhbk.WebApi.Alert.Jobs
             return Task.CompletedTask;
         }
 
-        private static void DoCleanupWork(IConfiguration conf, IUnitOfWork uow)
+        private static void DoCleanupWork(IUnitOfWork uow)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var expire = int.Parse(conf["Jobs:EmailActivity:ExpireDelay"]);
+
+            var job = uow.Jobs.Get(x => x.Name == "EmailActivity").Single();
+            var expire = int.Parse(uow.JobSettings.Get(x => x.JobId == job.Id && x.ConfigKey == "ExpireDelay").Single().ConfigValue);
 
             foreach (var entry in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>()
                 .Where(x => x.CreatedUtc < DateTime.UtcNow.AddSeconds(-(expire))).ToLambda()))

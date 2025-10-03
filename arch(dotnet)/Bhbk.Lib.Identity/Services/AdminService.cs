@@ -327,20 +327,20 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<LoginV1> Login_CreateV1(LoginV1 model)
+        public async ValueTask<LoginProviderV1> LoginProvider_CreateV1(LoginProviderV1 model)
         {
-            var response = await Endpoints.Login_CreateV1(Grant.AccessToken.RawData, model);
+            var response = await Endpoints.LoginProvider_CreateV1(Grant.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<LoginV1>().ConfigureAwait(false);
+                return await response.Content.ReadAsAsync<LoginProviderV1>().ConfigureAwait(false);
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<bool> Login_DeleteV1(Guid loginID)
+        public async ValueTask<bool> LoginProvider_DeleteV1(Guid loginProviderID)
         {
-            var response = await Endpoints.Login_DeleteV1(Grant.AccessToken.RawData, loginID);
+            var response = await Endpoints.LoginProvider_DeleteV1(Grant.AccessToken.RawData, loginProviderID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -349,56 +349,56 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<LoginV1> Login_GetV1(string loginValue)
+        public async ValueTask<LoginProviderV1> LoginProvider_GetV1(string loginProviderValue)
         {
-            var response = await Endpoints.Login_GetV1(Grant.AccessToken.RawData, loginValue);
+            var response = await Endpoints.LoginProvider_GetV1(Grant.AccessToken.RawData, loginProviderValue);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<LoginV1>().ConfigureAwait(false);
+                return await response.Content.ReadAsAsync<LoginProviderV1>().ConfigureAwait(false);
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<DataStateV1Result<LoginV1>> Login_GetV1(DataStateV1 model)
+        public async ValueTask<DataStateV1Result<LoginProviderV1>> LoginProvider_GetV1(DataStateV1 model)
         {
-            var response = await Endpoints.Login_GetV1(Grant.AccessToken.RawData, model);
+            var response = await Endpoints.LoginProvider_GetV1(Grant.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<DataStateV1Result<LoginV1>>();
+                return await response.Content.ReadAsAsync<DataStateV1Result<LoginProviderV1>>();
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<LoginV1> Login_UpdateV1(LoginV1 model)
+        public async ValueTask<LoginProviderV1> LoginProvider_UpdateV1(LoginProviderV1 model)
         {
-            var response = await Endpoints.Login_UpdateV1(Grant.AccessToken.RawData, model);
+            var response = await Endpoints.LoginProvider_UpdateV1(Grant.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<LoginV1>().ConfigureAwait(false);
+                return await response.Content.ReadAsAsync<LoginProviderV1>().ConfigureAwait(false);
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<MOTDTssV1> MOTD_GetV1(string motdValue)
+        public async ValueTask<QuoteV1> Quote_GetV1(string motdValue)
         {
-            var response = await Endpoints.MOTD_GetV1(Grant.AccessToken.RawData, motdValue);
+            var response = await Endpoints.Quote_GetV1(Grant.AccessToken.RawData, motdValue);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<MOTDTssV1>().ConfigureAwait(false);
+                return await response.Content.ReadAsAsync<QuoteV1>().ConfigureAwait(false);
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<DataStateV1Result<MOTDTssV1>> MOTD_GetV1(DataStateV1 model)
+        public async ValueTask<DataStateV1Result<QuoteV1>> Quote_GetV1(DataStateV1 model)
         {
-            var response = await Endpoints.MOTD_GetV1(Grant.AccessToken.RawData, model);
+            var response = await Endpoints.Quote_GetV1(Grant.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<DataStateV1Result<MOTDTssV1>>();
+                return await response.Content.ReadAsAsync<DataStateV1Result<QuoteV1>>();
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));
@@ -470,9 +470,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<bool> User_AddToLoginV1(Guid userID, Guid loginID)
+        public async ValueTask<bool> User_AddToLoginProviderV1(Guid userID, Guid loginProviderID)
         {
-            var response = await Endpoints.User_AddToLoginV1(Grant.AccessToken.RawData, userID, loginID);
+            var response = await Endpoints.User_AddToLoginProviderV1(Grant.AccessToken.RawData, userID, loginProviderID);
 
             if (response.IsSuccessStatusCode)
                 return true;
@@ -569,12 +569,12 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<IEnumerable<LoginV1>> User_GetLoginsV1(string userValue)
+        public async ValueTask<IEnumerable<LoginProviderV1>> User_GetLoginProvidersV1(string userValue)
         {
-            var response = await Endpoints.User_GetLoginsV1(Grant.AccessToken.RawData, userValue);
+            var response = await Endpoints.User_GetLoginProvidersV1(Grant.AccessToken.RawData, userValue);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<IEnumerable<LoginV1>>();
+                return await response.Content.ReadAsAsync<IEnumerable<LoginProviderV1>>();
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));
@@ -635,9 +635,9 @@ namespace Bhbk.Lib.Identity.Services
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<bool> User_RemoveFromLoginV1(Guid userID, Guid loginID)
+        public async ValueTask<bool> User_RemoveFromLoginProviderV1(Guid userID, Guid loginProviderID)
         {
-            var response = await Endpoints.User_RemoveFromLoginV1(Grant.AccessToken.RawData, userID, loginID);
+            var response = await Endpoints.User_RemoveFromLoginProviderV1(Grant.AccessToken.RawData, userID, loginProviderID);
 
             if (response.IsSuccessStatusCode)
                 return true;

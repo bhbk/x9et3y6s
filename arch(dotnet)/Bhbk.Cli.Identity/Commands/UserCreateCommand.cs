@@ -25,7 +25,7 @@ namespace Bhbk.Cli.Identity.Commands
         private readonly IMapper _map;
         private readonly IUnitOfWork _uow;
         private readonly IAdminService _service;
-        private tbl_Login _login;
+        private tbl_LoginProvider _login;
         private string _userName, _firstName, _lastName;
         private bool _human;
 
@@ -35,7 +35,7 @@ namespace Bhbk.Cli.Identity.Commands
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             var env = new ContextService(InstanceContext.DeployedOrLocal);
@@ -53,7 +53,7 @@ namespace Bhbk.Cli.Identity.Commands
                 if (string.IsNullOrEmpty(arg))
                     throw new ConsoleHelpAsException($"  *** No login given ***");
 
-                _login = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
+                _login = _uow.LoginProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
                     .Where(x => x.Name == arg).ToLambda())
                     .SingleOrDefault();
 
@@ -126,7 +126,7 @@ namespace Bhbk.Cli.Identity.Commands
                         }).Result;
                 }
 
-                _ = _service.User_AddToLoginV1(user.Id, _login.Id)
+                _ = _service.User_AddToLoginProviderV1(user.Id, _login.Id)
                     .Result;
 
                 FormatOutput.Users(_uow, new List<tbl_User> { _map.Map<tbl_User>(user) });

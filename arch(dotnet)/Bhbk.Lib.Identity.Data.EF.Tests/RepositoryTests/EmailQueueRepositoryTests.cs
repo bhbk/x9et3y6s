@@ -19,7 +19,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
         {
             Assert.Throws<DbUpdateException>(() =>
             {
-                UoW.MOTDs.Create(new tbl_MOTD());
+                UoW.Quotes.Create(new tbl_Quote());
                 UoW.Commit();
             });
         }

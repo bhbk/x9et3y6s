@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Domain.Providers.Admin
     public class BaseProvider : IDisposable
     {
         protected IUnitOfWork UoW;
-        protected IMapper Mapper => new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+        protected IMapper Mapper => new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
             .CreateMapper();
 
         protected BaseProvider(IConfiguration conf, IContextService env)

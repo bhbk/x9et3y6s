@@ -17,6 +17,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -30,6 +31,8 @@
     <ProjectReference Include="..\Bhbk.Lib.Identity.Data.EF\Bhbk.Lib.Identity.Data.EF.csproj" />
     <ProjectReference Include="..\Bhbk.Lib.Identity.Domain\Bhbk.Lib.Identity.Domain.csproj" />
     <ProjectReference Include="..\Bhbk.Lib.Identity.Primitives\Bhbk.Lib.Identity.Primitives.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.MCP\Bhbk.Lib.Identity.MCP.csproj" />
+    <ProjectReference Include="..\Bhbk.Lib.Identity.LLM\Bhbk.Lib.Identity.LLM.csproj" />
   </ItemGroup>
 
   <ItemGroup>

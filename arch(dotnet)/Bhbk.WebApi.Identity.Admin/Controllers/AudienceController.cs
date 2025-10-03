@@ -21,7 +21,7 @@ using System.Linq.Expressions;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
-    [Route("audience")]
+    [Route("audiences")]
     public class AudienceController : BaseController
     {
         [Route("v1/{audienceID:guid}/add-to-role/{roleID:guid}"), HttpGet]

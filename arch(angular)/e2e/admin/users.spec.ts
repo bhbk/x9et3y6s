@@ -31,6 +31,14 @@ test.describe('Admin Users', () => {
     await dialog.clickAction('Create');
     const createReq = await createPromise;
     expect(createReq.method()).toBe('POST');
+
+    const body = createReq.postDataJSON();
+    expect(body).toHaveProperty('userName');
+    expect(body).toHaveProperty('email');
+    expect(body).toHaveProperty('firstName');
+    expect(body).toHaveProperty('lastName');
+    expect(body).toHaveProperty('isHumanBeing');
+    expect(body).toHaveProperty('isDeletable');
   });
 
   test('edit user via dialog', async ({ adminPage }) => {

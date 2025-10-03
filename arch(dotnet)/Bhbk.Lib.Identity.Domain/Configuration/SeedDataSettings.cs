@@ -19,19 +19,50 @@ namespace Bhbk.Lib.Identity.Domain.Configuration
 
     public class IdentityProviderSettings
     {
-        public string BuiltInLoginName { get; set; }
+        public string BuiltInLoginProviderName { get; set; }
         public string BuiltInIssuerName { get; set; }
-        public string TestLoginNamePrefix { get; set; }
+        public string TestLoginProviderNamePrefix { get; set; }
         public string TestIssuerName { get; set; }
     }
 
     public class SeedDataSettings
     {
         public SeedIssuerSettings Issuer { get; set; }
-        public SeedLoginSettings Login { get; set; }
+        public SeedLoginProviderSettings LoginProvider { get; set; }
+        public List<SeedLLMProviderSettings> LLMProviders { get; set; }
+        public List<SeedJobSettings> Jobs { get; set; }
         public List<SeedAudienceSettings> Audiences { get; set; }
         public List<SeedRoleSettings> Roles { get; set; }
         public List<SeedUserSettings> Users { get; set; }
+    }
+
+    public class SeedJobSettings
+    {
+        public string Name { get; set; }
+        public bool IsEnabled { get; set; }
+        public List<SeedJobSettingItem> Settings { get; set; }
+    }
+
+    public class SeedJobSettingItem
+    {
+        public string ConfigKey { get; set; }
+        public string ConfigValue { get; set; }
+        public bool IsSecret { get; set; }
+    }
+
+    public class SeedLLMProviderSettings
+    {
+        public string Name { get; set; }
+        public bool IsEnabled { get; set; }
+        public int FailoverOrder { get; set; }
+        public List<SeedLLMProviderSettingItem> Settings { get; set; }
+    }
+
+    public class SeedLLMProviderSettingItem
+    {
+        public string ConfigKey { get; set; }
+        public string ConfigValue { get; set; }
+        public bool IsSecret { get; set; }
     }
 
     public class SeedIssuerSettings
@@ -40,10 +71,10 @@ namespace Bhbk.Lib.Identity.Domain.Configuration
         public string IssuerKey { get; set; }
     }
 
-    public class SeedLoginSettings
+    public class SeedLoginProviderSettings
     {
         public string Name { get; set; }
-        public string LoginKey { get; set; }
+        public string ProviderKey { get; set; }
     }
 
     public class SeedAudienceSettings
@@ -70,12 +101,12 @@ namespace Bhbk.Lib.Identity.Domain.Configuration
     public class TestDataSettings
     {
         public TestIssuerSettings Issuer { get; set; }
-        public TestLoginSettings Login { get; set; }
+        public TestLoginProviderSettings LoginProvider { get; set; }
         public TestAudienceSettings Audience { get; set; }
         public TestClaimSettings Claim { get; set; }
         public TestEmailSettings Email { get; set; }
         public TestTextSettings Text { get; set; }
-        public TestMOTDSettings MOTD { get; set; }
+        public TestQuoteSettings Quote { get; set; }
         public TestRoleSettings Role { get; set; }
         public TestUserSettings User { get; set; }
         public TestUrlSettings Url { get; set; }
@@ -85,7 +116,7 @@ namespace Bhbk.Lib.Identity.Domain.Configuration
     public class SeedEntitySettings
     {
         public string IssuerName { get; set; }
-        public string LoginName { get; set; }
+        public string LoginProviderName { get; set; }
         public string AudienceNameAlert { get; set; }
         public string AudienceNameIdentity { get; set; }
         public string RoleForAdminsAlert { get; set; }
@@ -105,10 +136,10 @@ namespace Bhbk.Lib.Identity.Domain.Configuration
         public string IssuerKey { get; set; }
     }
 
-    public class TestLoginSettings
+    public class TestLoginProviderSettings
     {
         public string Name { get; set; }
-        public string LoginKey { get; set; }
+        public string ProviderKey { get; set; }
     }
 
     public class TestAudienceSettings
@@ -136,7 +167,7 @@ namespace Bhbk.Lib.Identity.Domain.Configuration
         public string Content { get; set; }
     }
 
-    public class TestMOTDSettings
+    public class TestQuoteSettings
     {
         public string Author { get; set; }
     }

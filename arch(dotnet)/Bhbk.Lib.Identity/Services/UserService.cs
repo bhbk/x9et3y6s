@@ -151,14 +151,14 @@ namespace Bhbk.Lib.Identity.Services
 
         #endregion
 
-        #region MOTD
+        #region Quote
 
-        public async ValueTask<MOTDTssV1> MOTD_GetV1()
+        public async ValueTask<QuoteV1> Quote_GetV1()
         {
-            var response = await Endpoints.MOTD_GetV1(Grant.AccessToken.RawData);
+            var response = await Endpoints.Quote_GetV1(Grant.AccessToken.RawData);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<MOTDTssV1>().ConfigureAwait(false);
+                return await response.Content.ReadAsAsync<QuoteV1>().ConfigureAwait(false);
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));

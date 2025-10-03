@@ -9,7 +9,11 @@ using Bhbk.Lib.Identity.Factories;
 using Bhbk.Lib.Identity.Grants;
 using Bhbk.Lib.Identity.Primitives.Constants;
 using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.Identity.LLM.Abstractions;
+using Bhbk.Lib.Identity.LLM.Configuration;
+using Bhbk.Lib.Identity.LLM.Providers;
 using Bhbk.Lib.Identity.Validators;
+using Bhbk.WebApi.Identity.Admin.Hubs;
 using Bhbk.WebApi.Identity.Admin.Jobs;
 using CronExpressionDescriptor;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,15 +25,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Quartz;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Bhbk.WebApi.Identity.Admin
 {
@@ -49,7 +56,7 @@ namespace Bhbk.WebApi.Identity.Admin
                 .Build();
 
             var env = new ContextService(InstanceContext.DeployedOrLocal);
-            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
@@ -69,6 +76,49 @@ namespace Bhbk.WebApi.Identity.Admin
                 };
             });
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
+
+            var llmSettings = LoadLLMProviderSettings(conf["Databases:IdentityEntities_EF"]);
+            sc.AddSingleton(Microsoft.Extensions.Options.Options.Create(llmSettings));
+
+            if (llmSettings.Failover.Count > 0)
+            {
+                sc.AddSingleton<ILLMProvider>(sp =>
+                {
+                    var options = sp.GetRequiredService<IOptions<LLMProviderSettings>>();
+                    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+                    var providers = new List<ILLMProvider>();
+
+                    foreach (var name in llmSettings.Failover)
+                    {
+                        ILLMProvider provider = name switch
+                        {
+                            "AWSBedrock" when options.Value.AWSBedrock.Enabled =>
+                                new AWSBedrockLLMProvider(options),
+                            "Ollama" when options.Value.Ollama.Enabled =>
+                                new OllamaLLMProvider(options, loggerFactory.CreateLogger<OllamaLLMProvider>()),
+                            "AzureOpenAI" when options.Value.AzureOpenAI.Enabled =>
+                                new AzureOpenAILLMProvider(options),
+                            "GoogleVertexAI" when options.Value.VertexAI.Enabled =>
+                                new GoogleVertexAILLMProvider(options),
+                            _ => null
+                        };
+                        if (provider != null) providers.Add(provider);
+                    }
+
+                    if (providers.Count == 0)
+                        throw new InvalidOperationException(
+                            "LLM providers are configured in the database but none are enabled");
+                    if (providers.Count == 1)
+                        return providers[0];
+
+                    return new FailoverLLMProvider(providers, loggerFactory.CreateLogger<FailoverLLMProvider>());
+                });
+            }
+
+            sc.AddSignalR();
+
+            var jobSettings = LoadJobSettings(conf["Databases:IdentityEntities_EF"]);
+
             sc.AddQuartz(jobs =>
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
@@ -80,7 +130,7 @@ namespace Bhbk.WebApi.Identity.Admin
 
                 /* https://www.freeformatter.com/cron-expression-generator-quartz.html */
 
-                if (bool.Parse(conf["Jobs:MaintainActivity:Enable"]))
+                if (jobSettings.TryGetValue("MaintainActivity", out var maintainActivity) && maintainActivity.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(MaintainActivityJob).Name, workerName);
                     jobs.AddJob<MaintainActivityJob>(opt => opt
@@ -88,8 +138,7 @@ namespace Bhbk.WebApi.Identity.Admin
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:MaintainActivity:Schedules").GetChildren()
-                        .Select(x => x.Value).ToList())
+                    foreach (var cron in maintainActivity.Schedules)
                     {
                         jobs.AddTrigger(opt => opt
                             .ForJob(jobKey)
@@ -101,7 +150,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:MaintainUsers:Enable"]))
+                if (jobSettings.TryGetValue("MaintainUsers", out var maintainUsers) && maintainUsers.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(MaintainUsersJob).Name, workerName);
                     jobs.AddJob<MaintainUsersJob>(opt => opt
@@ -109,8 +158,7 @@ namespace Bhbk.WebApi.Identity.Admin
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:MaintainUsers:Schedules").GetChildren()
-                        .Select(x => x.Value).ToList())
+                    foreach (var cron in maintainUsers.Schedules)
                     {
                         jobs.AddTrigger(opt => opt
                             .ForJob(jobKey)
@@ -196,6 +244,23 @@ namespace Bhbk.WebApi.Identity.Admin
                     RequireExpirationTime = true,
                     RequireSignedTokens = true,
                 };
+
+                /* SignalR sends token as query param during WebSocket handshake */
+                jwt.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
             var authSettings = new AuthorizationSettings();
             conf.GetSection("Authorization").Bind(authSettings);
@@ -264,7 +329,57 @@ namespace Bhbk.WebApi.Identity.Admin
             app.UseEndpoints(opt =>
             {
                 opt.MapControllers();
+                opt.MapHub<ChatHub>("/hubs/chat");
             });
         }
+
+        private static LLMProviderSettings LoadLLMProviderSettings(string connectionString)
+        {
+            using var uow = new UnitOfWork(connectionString);
+
+            var dbProviders = uow.LLMProviders.Get()
+                .OrderBy(p => p.FailoverOrder)
+                .ToList();
+
+            var configs = new List<(string Name, bool Enabled, int FailoverOrder, IDictionary<string, string> Settings)>();
+
+            foreach (var provider in dbProviders)
+            {
+                var settings = uow.LLMProviderSettings.Get(s => s.ProviderId == provider.Id)
+                    .ToDictionary(s => s.ConfigKey, s => s.ConfigValue);
+
+                configs.Add((provider.Name, provider.IsEnabled, provider.FailoverOrder, settings));
+            }
+
+            return LLMProviderSettings.FromProviderConfigs(configs);
+        }
+
+        private static Dictionary<string, JobSettingsEntry> LoadJobSettings(string connectionString)
+        {
+            using var uow = new UnitOfWork(connectionString);
+
+            var result = new Dictionary<string, JobSettingsEntry>();
+
+            foreach (var job in uow.Jobs.Get().ToList())
+            {
+                var settings = uow.JobSettings.Get(s => s.JobId == job.Id).ToList();
+
+                result[job.Name] = new JobSettingsEntry
+                {
+                    IsEnabled = job.IsEnabled,
+                    Schedules = settings.Where(s => s.ConfigKey == "Schedule").Select(s => s.ConfigValue).ToList(),
+                    Settings = settings.Where(s => s.ConfigKey != "Schedule").ToDictionary(s => s.ConfigKey, s => s.ConfigValue),
+                };
+            }
+
+            return result;
+        }
+    }
+
+    internal class JobSettingsEntry
+    {
+        public bool IsEnabled { get; set; }
+        public List<string> Schedules { get; set; } = new();
+        public Dictionary<string, string> Settings { get; set; } = new();
     }
 }

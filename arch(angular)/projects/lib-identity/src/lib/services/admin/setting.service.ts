@@ -8,7 +8,7 @@ import { SettingV1, SettingCreate, SettingUpdate } from '../../models';
   providedIn: 'root'
 })
 export class SettingService extends BaseAdminService<SettingV1, SettingCreate, SettingUpdate> {
-  protected readonly endpoint = 'setting';
+  protected readonly endpoint = 'settings';
 
   constructor() {
     super(inject(HttpClient), inject(ConfigService));

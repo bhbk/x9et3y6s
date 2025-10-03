@@ -57,20 +57,20 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<IssuerV1> Issuer_UpdateV1(IssuerV1 model);
 
         /*
-         * logins
+         * login providers
          */
-        ValueTask<LoginV1> Login_CreateV1(LoginV1 model);
-        ValueTask<bool> Login_DeleteV1(Guid loginID);
-        ValueTask<LoginV1> Login_GetV1(string loginValue);
-        ValueTask<DataStateV1Result<LoginV1>> Login_GetV1(DataStateV1 model);
-        ValueTask<LoginV1> Login_UpdateV1(LoginV1 model);
+        ValueTask<LoginProviderV1> LoginProvider_CreateV1(LoginProviderV1 model);
+        ValueTask<bool> LoginProvider_DeleteV1(Guid loginProviderID);
+        ValueTask<LoginProviderV1> LoginProvider_GetV1(string loginProviderValue);
+        ValueTask<DataStateV1Result<LoginProviderV1>> LoginProvider_GetV1(DataStateV1 model);
+        ValueTask<LoginProviderV1> LoginProvider_UpdateV1(LoginProviderV1 model);
 
         /*
-         * message of the days
+         * quotes
          */
 
-        ValueTask<MOTDTssV1> MOTD_GetV1(string motdValue);
-        ValueTask<DataStateV1Result<MOTDTssV1>> MOTD_GetV1(DataStateV1 model);
+        ValueTask<QuoteV1> Quote_GetV1(string motdValue);
+        ValueTask<DataStateV1Result<QuoteV1>> Quote_GetV1(DataStateV1 model);
 
         /*
          * roles
@@ -85,7 +85,7 @@ namespace Bhbk.Lib.Identity.Services
          * users
          */
         ValueTask<bool> User_AddToClaimV1(Guid userID, Guid claimID);
-        ValueTask<bool> User_AddToLoginV1(Guid userID, Guid loginID);
+        ValueTask<bool> User_AddToLoginProviderV1(Guid userID, Guid loginProviderID);
         ValueTask<bool> User_AddToRoleV1(Guid userID, Guid roleID);
         ValueTask<UserV1> User_CreateV1(UserV1 model);
         ValueTask<UserV1> User_CreateV1NoConfirm(UserV1 model);
@@ -95,11 +95,11 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<UserV1> User_GetV1(string userValue);
         ValueTask<DataStateV1Result<UserV1>> User_GetV1(DataStateV1 model);
         ValueTask<IEnumerable<AudienceV1>> User_GetAudiencesV1(string userValue);
-        ValueTask<IEnumerable<LoginV1>> User_GetLoginsV1(string userValue);
+        ValueTask<IEnumerable<LoginProviderV1>> User_GetLoginProvidersV1(string userValue);
         ValueTask<IEnumerable<RefreshV1>> User_GetRefreshesV1(string userValue);
         ValueTask<IEnumerable<RoleV1>> User_GetRolesV1(string userValue);
         ValueTask<bool> User_RemoveFromClaimV1(Guid userID, Guid claimID);
-        ValueTask<bool> User_RemoveFromLoginV1(Guid userID, Guid loginID);
+        ValueTask<bool> User_RemoveFromLoginProviderV1(Guid userID, Guid loginProviderID);
         ValueTask<bool> User_RemoveFromRoleV1(Guid userID, Guid roleID);
         ValueTask<bool> User_RemovePasswordV1(Guid userID);
         ValueTask<bool> User_SetPasswordV1(Guid userID, PasswordAddV1 model);

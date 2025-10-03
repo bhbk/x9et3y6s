@@ -113,21 +113,21 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.UserName == _factory.TestData.User.UserName).Single();
-                var testLogin = uow.Logins.Create(
-                    map.Map<tbl_Login>(new LoginV1()
+                var testLogin = uow.LoginProviders.Create(
+                    map.Map<tbl_LoginProvider>(new LoginProviderV1()
                     {
-                        Name = Base64.CreateString(4) + "-" + _factory.TestData.Login.Name,
-                        LoginKey = _factory.TestData.Login.LoginKey,
+                        Name = Base64.CreateString(4) + "-" + _factory.TestData.LoginProvider.Name,
+                        ProviderKey = _factory.TestData.LoginProvider.ProviderKey,
                         IsEnabled = true,
                         IsDeletable = false,
                     }));
 
                 uow.Commit();
 
-                var result = await service.User_AddToLoginV1(testUser.Id, testLogin.Id);
+                var result = await service.User_AddToLoginProviderV1(testUser.Id, testLogin.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Users.IsInLogin(testUser, testLogin);
+                var check = uow.Users.IsInLoginProvider(testUser, testLogin);
                 check.Should().BeTrue();
             }
         }
@@ -671,8 +671,8 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var result = await service.User_GetLoginsV1(user.Id.ToString());
-                result.Should().BeAssignableTo<IEnumerable<LoginV1>>();
+                var result = await service.User_GetLoginProvidersV1(user.Id.ToString());
+                result.Should().BeAssignableTo<IEnumerable<LoginProviderV1>>();
             }
         }
 
@@ -812,7 +812,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
 
                 var data = new TestDataFactory(uow, _factory.TestData);
                 data.Destroy();
-                data.CreateLogins();
+                data.CreateLoginProviders();
                 data.CreateUsers();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
@@ -823,12 +823,12 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ServiceTests
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
                 var testUser = uow.Users.Get(x => x.UserName == _factory.TestData.User.UserName).Single();
-                var testLogin = uow.Logins.Get(x => x.Name == _factory.TestData.Login.Name).Single();
+                var testLogin = uow.LoginProviders.Get(x => x.Name == _factory.TestData.LoginProvider.Name).Single();
 
-                var result = await service.User_RemoveFromLoginV1(testUser.Id, testLogin.Id);
+                var result = await service.User_RemoveFromLoginProviderV1(testUser.Id, testLogin.Id);
                 result.Should().BeTrue();
 
-                var check = uow.Users.IsInLogin(testUser, testLogin);
+                var check = uow.Users.IsInLoginProvider(testUser, testLogin);
                 check.Should().BeFalse();
             }
         }

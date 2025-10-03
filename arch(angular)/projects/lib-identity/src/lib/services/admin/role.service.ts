@@ -9,7 +9,7 @@ import { RoleV1, RoleCreate, RoleUpdate } from '../../models';
   providedIn: 'root'
 })
 export class RoleService extends BaseAdminService<RoleV1, RoleCreate, RoleUpdate> {
-  protected readonly endpoint = 'role';
+  protected readonly endpoint = 'roles';
 
   constructor() {
     super(inject(HttpClient), inject(ConfigService));

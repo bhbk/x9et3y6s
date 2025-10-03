@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
             TestData = new TestDataSettings();
             testConf.GetSection("TestData").Bind(TestData);
 
-            Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>()).CreateMapper();
+            Mapper = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
 
             UoW = new UnitOfWork(conf["Databases:IdentityEntities_EF"],
                 new ContextService(InstanceContext.IntegrationTest));

@@ -17,7 +17,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
         // Clear auth state and redirect to login
-        authStore.logout(undefined);
+        authStore.clearSession();
         router.navigate(['/login'], {
           queryParams: { returnUrl: router.url }
         });

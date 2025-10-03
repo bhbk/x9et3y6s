@@ -19,7 +19,7 @@ using System.Linq.Expressions;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
-    [Route("role")]
+    [Route("roles")]
     public class RoleController : BaseController
     {
         [Route("v1"), HttpPost]

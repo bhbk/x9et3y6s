@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AuthStore, MotdService, MOTDTssV1 } from 'lib-identity';
+import { AuthStore, QuoteService, QuoteV1 } from 'lib-identity';
 import { KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { KENDO_INDICATORS } from '@progress/kendo-angular-indicators';
 import { KENDO_ICONS } from '@progress/kendo-angular-icons';
@@ -13,36 +13,35 @@ import { arrowRotateCwIcon, commentIcon } from '@progress/kendo-svg-icons';
   template: `
     <div class="p-6">
       <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">Dashboard</h1>
         <p class="text-gray-500">Manage your account settings and security</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <a routerLink="/profile" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+        <a routerLink="/profile" class="bg-white rounded-lg border border-gray-200 p-6 hover:bg-gray-100 hover:shadow-md transition-all">
           <h3 class="text-lg font-medium text-gray-800 mb-2">Profile</h3>
           <p class="text-gray-600 text-sm">Update your personal information</p>
         </a>
-        <a routerLink="/security" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+        <a routerLink="/security" class="bg-white rounded-lg border border-gray-200 p-6 hover:bg-gray-100 hover:shadow-md transition-all">
           <h3 class="text-lg font-medium text-gray-800 mb-2">Security</h3>
           <p class="text-gray-600 text-sm">Manage your password and security settings</p>
         </a>
-        <a routerLink="/sessions" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+        <a routerLink="/sessions" class="bg-white rounded-lg border border-gray-200 p-6 hover:bg-gray-100 hover:shadow-md transition-all">
           <h3 class="text-lg font-medium text-gray-800 mb-2">Sessions</h3>
           <p class="text-gray-600 text-sm">View and manage your active sessions</p>
         </a>
       </div>
 
-      <!-- MOTD Card -->
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <!-- Quote Card -->
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div class="p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
           <div class="flex justify-between items-start mb-4">
-            <h2 class="text-lg font-semibold text-gray-800">Message of the Day</h2>
-            <button kendoButton themeColor="primary" (click)="fetchNewQuote()" [disabled]="isLoadingMotd()">
+            <h2 class="text-lg font-medium text-gray-800">Quote of the Day</h2>
+            <button kendoButton themeColor="primary" (click)="fetchNewQuote()" [disabled]="isLoadingQuote()">
               <kendo-svg-icon [icon]="refreshIcon" size="small"></kendo-svg-icon>
               Get New Quote
             </button>
           </div>
-          @if (isLoadingMotd()) {
+          @if (isLoadingQuote()) {
             <div class="flex items-center justify-center p-8">
               <kendo-loader size="large"></kendo-loader>
             </div>
@@ -91,28 +90,28 @@ import { arrowRotateCwIcon, commentIcon } from '@progress/kendo-svg-icons';
 })
 export class DashboardComponent implements OnInit {
   readonly authStore = inject(AuthStore);
-  private readonly motdService = inject(MotdService);
+  private readonly quoteService = inject(QuoteService);
 
   readonly refreshIcon = arrowRotateCwIcon;
   readonly quoteIcon = commentIcon;
 
-  readonly currentQuote = signal<MOTDTssV1 | null>(null);
-  readonly isLoadingMotd = signal(false);
+  readonly currentQuote = signal<QuoteV1 | null>(null);
+  readonly isLoadingQuote = signal(false);
 
   ngOnInit(): void {
     this.fetchNewQuote();
   }
 
   fetchNewQuote(): void {
-    this.isLoadingMotd.set(true);
+    this.isLoadingQuote.set(true);
 
-    this.motdService.getMOTD().subscribe({
+    this.quoteService.getQuote().subscribe({
       next: (quote) => {
         this.currentQuote.set(quote);
-        this.isLoadingMotd.set(false);
+        this.isLoadingQuote.set(false);
       },
       error: () => {
-        const fallbackQuote: MOTDTssV1 = {
+        const fallbackQuote: QuoteV1 = {
           globalId: crypto.randomUUID(),
           author: 'System',
           quote: 'Welcome to the Identity Portal. Have a productive day!',
@@ -120,7 +119,7 @@ export class DashboardComponent implements OnInit {
           tags: ['welcome']
         };
         this.currentQuote.set(fallbackQuote);
-        this.isLoadingMotd.set(false);
+        this.isLoadingQuote.set(false);
       }
     });
   }

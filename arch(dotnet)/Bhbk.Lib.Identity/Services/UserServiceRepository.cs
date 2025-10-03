@@ -43,14 +43,14 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("profile/v1");
+            return await _http.GetAsync("profiles/v1");
         }
 
         public async ValueTask<HttpResponseMessage> Profile_UpdateV1(string jwt, UserV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("profile/v1",
+            return await _http.PutAsync("profiles/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -62,56 +62,56 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("session/v1/codes");
+            return await _http.DeleteAsync("sessions/v1/codes");
         }
 
         public async ValueTask<HttpResponseMessage> Session_DeleteCodeV1(string jwt, Guid codeID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("session/v1/codes/" + codeID.ToString());
+            return await _http.DeleteAsync("sessions/v1/codes/" + codeID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> Session_DeleteRefreshesV1(string jwt)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("session/v1/refreshes");
+            return await _http.DeleteAsync("sessions/v1/refreshes");
         }
 
         public async ValueTask<HttpResponseMessage> Session_DeleteRefreshV1(string jwt, Guid refreshID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("session/v1/refreshes/" + refreshID.ToString());
+            return await _http.DeleteAsync("sessions/v1/refreshes/" + refreshID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> Session_GetCodesV1(string jwt)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("session/v1/codes");
+            return await _http.GetAsync("sessions/v1/codes");
         }
 
         public async ValueTask<HttpResponseMessage> Session_GetRefreshesV1(string jwt)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("session/v1/refreshes");
+            return await _http.GetAsync("sessions/v1/refreshes");
         }
 
         public async ValueTask<HttpResponseMessage> Session_UpdateCodeV1(string jwt, string codeValue, string actionValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("session/v1/codes/" + codeValue + "/" + actionValue);
+            return await _http.GetAsync("sessions/v1/codes/" + codeValue + "/" + actionValue);
         }
 
         public async ValueTask<HttpResponseMessage> Session_LogoutV1(string jwt)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("session/v1/logout", null);
+            return await _http.PostAsync("sessions/v1/logout", null);
         }
 
         #endregion
@@ -128,13 +128,13 @@ namespace Bhbk.Lib.Identity.Services
 
         #endregion
 
-        #region MOTD
+        #region Quote
 
-        public async ValueTask<HttpResponseMessage> MOTD_GetV1(string jwt)
+        public async ValueTask<HttpResponseMessage> Quote_GetV1(string jwt)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("motd/v1");
+            return await _http.GetAsync("quotes/v1");
         }
 
         #endregion

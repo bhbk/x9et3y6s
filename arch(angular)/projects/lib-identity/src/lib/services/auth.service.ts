@@ -71,7 +71,7 @@ export class AuthService {
    */
   logout(): Observable<void> {
     return this.http.post<void>(
-      `${this.config.userApiUrl}${this.config.pathBase}/session/v1/logout`,
+      `${this.config.userApiUrl}${this.config.pathBase}/sessions/v1/logout`,
       {},
       { withCredentials: true }
     );

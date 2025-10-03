@@ -2,7 +2,6 @@
 using Bhbk.Lib.Identity.Data.EF.Models;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Serilog;
@@ -31,11 +30,13 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
             {
                 using (var scope = _factory.CreateScope())
                 {
-                    var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    var auditable = int.Parse(conf["Jobs:MaintainActivity:HoldAuditable"]);
-                    var transient = int.Parse(conf["Jobs:MaintainActivity:HoldTransient"]);
+                    var job = uow.Jobs.Get(x => x.Name == "MaintainActivity").Single();
+                    var jobSettings = uow.JobSettings.Get(x => x.JobId == job.Id).ToList();
+
+                    var auditable = int.Parse(jobSettings.Single(x => x.ConfigKey == "HoldAuditable").ConfigValue);
+                    var transient = int.Parse(jobSettings.Single(x => x.ConfigKey == "HoldTransient").ConfigValue);
 
                     var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>()
                         .Where(x => (x.CreatedUtc.AddSeconds(transient) < DateTime.UtcNow)

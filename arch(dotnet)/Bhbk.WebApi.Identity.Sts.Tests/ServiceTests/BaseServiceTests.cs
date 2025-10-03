@@ -57,7 +57,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
             testConf.GetSection("TestData").Bind(TestData);
 
             var env = new ContextService(InstanceContext.SystemTest);
-            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             builder.ConfigureServices(sc =>
@@ -74,7 +74,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                     var data = new DefaultDataFactory(uow, seedData);
                     data.CreateSettings();
                     data.CreateAudienceRoles();
-                    data.CreateUserLogins();
+                    data.CreateUserLoginProviders();
                     data.CreateUserRoles();
 
                     return uow;

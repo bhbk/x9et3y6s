@@ -55,13 +55,13 @@ namespace Bhbk.WebApi.Identity.User.Jobs
                             http.DefaultRequestHeaders.Add("X-TheySaidSo-Api-Secret", key.ConfigValue);
 
                             var response = http.GetAsync(url.ConfigValue + "/quote/random.json?language=en").Result;
-                            var result = JsonConvert.DeserializeObject<MOTDTssV1Response>(response.Content.ReadAsStringAsync().Result);
+                            var result = JsonConvert.DeserializeObject<QuoteV1Response>(response.Content.ReadAsStringAsync().Result);
 
                             if (response.IsSuccessStatusCode)
                                 foreach (var quote in result.contents.quotes)
-                                    ProcessMOTDSuccess(uow, map, quote);
+                                    ProcessQuoteSuccess(uow, map, quote);
                             else
-                                ProcessMOTDFail(response);
+                                ProcessQuoteFail(response);
                         }
                     }
                 }
@@ -81,7 +81,7 @@ namespace Bhbk.WebApi.Identity.User.Jobs
             return Task.CompletedTask;
         }
 
-        private static void ProcessMOTDFail(HttpResponseMessage response)
+        private static void ProcessQuoteFail(HttpResponseMessage response)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
 
@@ -90,16 +90,16 @@ namespace Bhbk.WebApi.Identity.User.Jobs
                 + Environment.NewLine + response.ToString());
         }
 
-        private static void ProcessMOTDSuccess(IUnitOfWork uow, IMapper map, MOTDTssV1 quote)
+        private static void ProcessQuoteSuccess(IUnitOfWork uow, IMapper map, QuoteV1 quote)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var model = map.Map<tbl_MOTD>(quote);
+            var model = map.Map<tbl_Quote>(quote);
 
-            var motds = uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
+            var entries = uow.Quotes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Quote>()
                 .Where(x => x.Author == model.Author && x.Quote == model.Quote)
                 .ToLambda());
 
-            if (!motds.Any())
+            if (!entries.Any())
             {
                 /*
                  * parts of model are broken...
@@ -111,59 +111,59 @@ namespace Bhbk.WebApi.Identity.User.Jobs
                 }
                 else
                 {
-                    uow.MOTDs.Create(model);
+                    uow.Quotes.Create(model);
                     uow.Commit();
 
                     Log.Information($"'{callPath}' success adding. Author:\"{model.Author}\" Quote:\"{model.Quote}\"");
                 }
             }
-            else if (motds.Count() == 1)
+            else if (entries.Count() == 1)
             {
-                var motd = motds.Single();
+                var entry = entries.Single();
                 var dirty = false;
 
                 /*
                  * parts of model are broken and need be fixed...
                  */
-                if (motd.TssId != model.TssId)
+                if (entry.TssId != model.TssId)
                 {
-                    motd.TssId = model.TssId;
+                    entry.TssId = model.TssId;
                     dirty = true;
                 }
 
-                if (motd.TssTitle != model.TssTitle)
+                if (entry.TssTitle != model.TssTitle)
                 {
-                    motd.TssTitle = model.TssTitle;
+                    entry.TssTitle = model.TssTitle;
                     dirty = true;
                 }
 
-                if (motd.TssCategory != model.TssCategory)
+                if (entry.TssCategory != model.TssCategory)
                 {
-                    motd.TssCategory = model.TssCategory;
+                    entry.TssCategory = model.TssCategory;
                     dirty = true;
                 }
 
-                if (motd.TssDate != model.TssDate)
+                if (entry.TssDate != model.TssDate)
                 {
-                    motd.TssDate = model.TssDate;
+                    entry.TssDate = model.TssDate;
                     dirty = true;
                 }
 
-                if (motd.TssTags != model.TssTags)
+                if (entry.TssTags != model.TssTags)
                 {
-                    motd.TssTags = model.TssTags;
+                    entry.TssTags = model.TssTags;
                     dirty = true;
                 }
 
-                if (motd.TssBackground != model.TssBackground)
+                if (entry.TssBackground != model.TssBackground)
                 {
-                    motd.TssBackground = model.TssBackground;
+                    entry.TssBackground = model.TssBackground;
                     dirty = true;
                 }
 
                 if (dirty)
                 {
-                    uow.MOTDs.Update(motd);
+                    uow.Quotes.Update(entry);
                     uow.Commit();
 
                     Log.Warning($"'{callPath}' success updating non-key(s). Author:\"{model.Author}\" Quote:\"{model.Quote}\"");

@@ -7,10 +7,12 @@ namespace Bhbk.Lib.Identity.Domain.Factories
         public void CreateAudiences();
         public void CreateAudienceRoles();
         public void CreateIssuers();
-        public void CreateLogins();
+        public void CreateJobs();
+        public void CreateLLMProviders();
+        public void CreateLoginProviders();
         public void CreateRoles();
         public void CreateUsers();
-        public void CreateUserLogins();
+        public void CreateUserLoginProviders();
         public void CreateUserRoles();
         public void Destroy();
     }

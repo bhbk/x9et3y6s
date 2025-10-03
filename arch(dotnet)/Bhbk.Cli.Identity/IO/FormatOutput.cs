@@ -86,9 +86,9 @@ namespace Bhbk.Cli.Identity.Factories
             }
         }
 
-        public static void Logins(IUnitOfWork uow, IEnumerable<tbl_Login> logins, bool? detail = null)
+        public static void LoginProviders(IUnitOfWork uow, IEnumerable<tbl_LoginProvider> loginProviders, bool? detail = null)
         {
-            foreach (var login in logins)
+            foreach (var loginProvider in loginProviders)
             {
                 if (detail.HasValue && detail.Value)
                 {
@@ -98,14 +98,14 @@ namespace Bhbk.Cli.Identity.Factories
                 else
                     Console.ForegroundColor = ConsoleColor.White;
 
-                Console.Out.WriteLine($"  [login GUID] {login.Id} [name] {login.Name} {(!login.IsDeletable ? "is not deletable " : null)}" +
-                    $"[created] {login.CreatedUtc.LocalDateTime}");
+                Console.Out.WriteLine($"  [login provider GUID] {loginProvider.Id} [name] {loginProvider.Name} {(!loginProvider.IsDeletable ? "is not deletable " : null)}" +
+                    $"[created] {loginProvider.CreatedUtc.LocalDateTime}");
 
                 if (detail.HasValue && detail.Value)
                 {
                     Console.ForegroundColor = ConsoleColor.White;
 
-                    var users = uow.Logins.GetUsersWithLogin(login.Id).OrderBy(x => x.UserName);
+                    var users = uow.LoginProviders.GetUsersWithLoginProvider(loginProvider.Id).OrderBy(x => x.UserName);
                     if (users.Any())
                     {
                         Console.Out.WriteLine();

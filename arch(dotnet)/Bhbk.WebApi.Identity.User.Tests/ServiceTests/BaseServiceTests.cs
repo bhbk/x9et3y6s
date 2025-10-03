@@ -50,7 +50,7 @@ namespace Bhbk.WebApi.Identity.User.Tests.ServiceTests
             testConf.GetSection("TestData").Bind(TestData);
 
             var env = new ContextService(InstanceContext.SystemTest);
-            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             builder.ConfigureServices(sc =>

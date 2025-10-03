@@ -21,7 +21,7 @@ namespace Bhbk.WebApi.Identity.Admin.Tests.ControllerTests
                 .Build();
 
             var env = new ContextService(InstanceContext.IntegrationTest);
-            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>()).CreateMapper();
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
 
             builder.ConfigureServices(sc =>
             {

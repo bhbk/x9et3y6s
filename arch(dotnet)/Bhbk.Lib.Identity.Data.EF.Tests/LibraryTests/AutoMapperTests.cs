@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.LibraryTests
         public void Lib_AutoMapper_Profile_Success()
         {
             var Mapper = new MapperConfiguration(
-                    x => x.AddProfile<AutoMapperProfile_EF>()).CreateMapper();
+                    x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
 
             Mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }

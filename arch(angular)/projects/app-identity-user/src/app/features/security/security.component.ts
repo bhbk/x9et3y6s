@@ -21,8 +21,6 @@ import { lockIcon, warningTriangleIcon } from '@progress/kendo-svg-icons';
   ],
   template: `
     <div class="p-6">
-      <h1 class="text-2xl font-semibold text-gray-800 mb-6">Security</h1>
-
       <!-- Change Password Card -->
       <div class="bg-blue-50 border border-blue-200 rounded-lg mb-6">
         <div class="p-6 border-b border-blue-200">
@@ -31,7 +29,7 @@ import { lockIcon, warningTriangleIcon } from '@progress/kendo-svg-icons';
               <kendo-svg-icon [icon]="lockIcon" class="text-blue-600"></kendo-svg-icon>
             </div>
             <div>
-              <h2 class="text-lg font-semibold text-gray-900">Change Password</h2>
+              <h2 class="text-lg font-medium text-gray-900">Change Password</h2>
               <p class="text-sm text-gray-500">Update your password to keep your account secure</p>
             </div>
           </div>

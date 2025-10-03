@@ -36,8 +36,7 @@ import { DateTime } from 'luxon';
       } @else {
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-800">Claims</h1>
-          <p class="text-gray-500">Manage identity claims</p>
+          <p class="text-gray-500">Manage claims for users</p>
         </div>
         <button kendoButton themeColor="primary" (click)="openCreate()" [disabled]="issuers().length === 0">
           <kendo-svg-icon [icon]="plusIcon" size="small"></kendo-svg-icon>
@@ -66,7 +65,7 @@ import { DateTime } from 'luxon';
         </div>
       }
 
-      <div class="bg-white rounded-lg shadow">
+      <div class="bg-white rounded-lg border border-gray-200">
         <kendo-grid
           [data]="gridData()"
           [pageSize]="pageSize()"

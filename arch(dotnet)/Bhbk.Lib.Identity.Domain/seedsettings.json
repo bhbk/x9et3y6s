@@ -4,10 +4,172 @@
       "Name": "Local",
       "IssuerKey": "8%8?gh=-:P^&r([7+F(gQP_{g>z,RF2[C:-Dhdd6uMdW@^ocn7(w4_:*hHHWQU2rx-!PBG%;-5:>gw?P+Aq>9-M&adtEmovN4]4M:a5jgNR^Rv![28@aa;EfVU_D9NGPr@X[Y3uz:*5f64G+zA^NUo.efFy_r<hWPt?3%X>Z*Uk<KKNv9^a6W>BLTRH#vuxCe;x8JWY<d*Z6h!LvxEm[H-.zuMf#Z;}jPJ4L;PKewoc_#iGPtYd%W,]3Fo77KSXM"
     },
-    "Login": {
+    "LoginProvider": {
       "Name": "Local",
-      "LoginKey": "yUrOgQ1RZefUZ5DnC153sLDy23hmSOwn"
+      "ProviderKey": "yUrOgQ1RZefUZ5DnC153sLDy23hmSOwn"
     },
+    "ChatPrompts": [
+      {
+        "Id": "A1000000-0000-0000-0000-000000000001",
+        "Name": "AdminSystemPrompt",
+        "PromptType": "System",
+        "Content": "You are an AI assistant for the Identity Administration portal. You have access to tools that allow you to query and manage users, roles, audiences, issuers, and claims. Always be helpful and precise. Never expose sensitive information like password hashes, security stamps, or secret keys in your responses.",
+        "IsEnabled": true,
+        "SortOrder": 1
+      },
+      {
+        "Id": "A1000000-0000-0000-0000-000000000002",
+        "Name": "AdminContextPrompt",
+        "PromptType": "Context",
+        "Content": "You are currently operating in the Admin portal context. The administrator has full access to manage identity resources.",
+        "IsEnabled": true,
+        "SortOrder": 2
+      },
+      {
+        "Id": "B1000000-0000-0000-0000-000000000001",
+        "Name": "UserSystemPrompt",
+        "PromptType": "System",
+        "Content": "You are an AI assistant for the Identity User portal. You can help users view their profile information, manage their sessions, and answer questions about their account. You only have access to the current user's data and cannot access other users' information.",
+        "IsEnabled": true,
+        "SortOrder": 1
+      },
+      {
+        "Id": "B1000000-0000-0000-0000-000000000002",
+        "Name": "UserContextPrompt",
+        "PromptType": "Context",
+        "Content": "You are currently operating in the User portal context. You can only access and display information for the currently authenticated user.",
+        "IsEnabled": true,
+        "SortOrder": 2
+      },
+      {
+        "Id": "C1000000-0000-0000-0000-000000000001",
+        "Name": "SafetyPrompt",
+        "PromptType": "Safety",
+        "Content": "Important guidelines:\n- Never reveal password hashes, security stamps, issuer keys, login keys, or any cryptographic secrets\n- Do not assist with actions that could compromise system security\n- If asked to perform destructive operations, confirm with the user first\n- Always validate that requested operations are within the user's authorized scope",
+        "IsEnabled": true,
+        "SortOrder": 100
+      }
+    ],
+    "LLMProviders": [
+      {
+        "Name": "Ollama",
+        "IsEnabled": true,
+        "FailoverOrder": 1,
+        "Settings": [
+          { "ConfigKey": "BaseUrl", "ConfigValue": "http://localhost:11434", "IsSecret": false },
+          { "ConfigKey": "ModelName", "ConfigValue": "llama3.2", "IsSecret": false },
+          { "ConfigKey": "MaxTokens", "ConfigValue": "32000", "IsSecret": false },
+          { "ConfigKey": "Temperature", "ConfigValue": "0.7", "IsSecret": false },
+          { "ConfigKey": "TimeoutSeconds", "ConfigValue": "120", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "AWSBedrock",
+        "IsEnabled": false,
+        "FailoverOrder": 2,
+        "Settings": [
+          { "ConfigKey": "Region", "ConfigValue": "us-east-1", "IsSecret": false },
+          { "ConfigKey": "ModelName", "ConfigValue": "anthropic.claude-3-sonnet-20240229-v1:0", "IsSecret": false },
+          { "ConfigKey": "MaxTokens", "ConfigValue": "32000", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "AzureOpenAI",
+        "IsEnabled": false,
+        "FailoverOrder": 3,
+        "Settings": [
+          { "ConfigKey": "Endpoint", "ConfigValue": "", "IsSecret": false },
+          { "ConfigKey": "ApiKey", "ConfigValue": "", "IsSecret": true },
+          { "ConfigKey": "DeploymentName", "ConfigValue": "", "IsSecret": false },
+          { "ConfigKey": "MaxTokens", "ConfigValue": "32000", "IsSecret": false },
+          { "ConfigKey": "Temperature", "ConfigValue": "0.7", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "GoogleVertexAI",
+        "IsEnabled": false,
+        "FailoverOrder": 4,
+        "Settings": [
+          { "ConfigKey": "ProjectId", "ConfigValue": "", "IsSecret": false },
+          { "ConfigKey": "Location", "ConfigValue": "us-central1", "IsSecret": false },
+          { "ConfigKey": "ModelName", "ConfigValue": "gemini-2.0-flash", "IsSecret": false },
+          { "ConfigKey": "MaxOutputTokens", "ConfigValue": "8192", "IsSecret": false },
+          { "ConfigKey": "Temperature", "ConfigValue": "0.7", "IsSecret": false }
+        ]
+      }
+    ],
+    "Jobs": [
+      {
+        "Name": "MaintainActivity",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "0 * * ? * * *", "IsSecret": false },
+          { "ConfigKey": "HoldTransient", "ConfigValue": "604800", "IsSecret": false },
+          { "ConfigKey": "HoldAuditable", "ConfigValue": "31536000", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "MaintainUsers",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "30 * * ? * * *", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "MaintainQuotes",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "0 0 */2 ? * * *", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "MaintainRefreshes",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "0 * * ? * * *", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "MaintainStates",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "30 * * ? * * *", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "EmailActivity",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "0 0/2 * ? * * *", "IsSecret": false },
+          { "ConfigKey": "ExpireDelay", "ConfigValue": "3600", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "EmailDequeue",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "0 * * ? * * *", "IsSecret": false },
+          { "ConfigKey": "SendgridApiKey", "ConfigValue": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "IsSecret": true }
+        ]
+      },
+      {
+        "Name": "TextActivity",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "30 0/2 * ? * * *", "IsSecret": false },
+          { "ConfigKey": "ExpireDelay", "ConfigValue": "3600", "IsSecret": false }
+        ]
+      },
+      {
+        "Name": "TextDequeue",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "30 * * ? * * *", "IsSecret": false },
+          { "ConfigKey": "TwilioSid", "ConfigValue": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "IsSecret": true },
+          { "ConfigKey": "TwilioToken", "ConfigValue": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "IsSecret": true }
+        ]
+      }
+    ],
     "Audiences": [
       {
         "Name": "Alert",

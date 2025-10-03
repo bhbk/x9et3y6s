@@ -127,8 +127,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var logins = uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
+            var loginProviders = uow.LoginProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
+                .Where(x => x.tbl_UserLoginProviders.Any(y => y.UserId == user.Id)).ToLambda());
 
             switch (uow.InstanceType)
             {
@@ -136,7 +136,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.End2EndTest:
                     {
                         /* check if login provider is local */
-                        if (logins.Where(x => x.Name.Equals(conf["IdentityProvider:BuiltInLoginName"], StringComparison.OrdinalIgnoreCase)).Any())
+                        if (loginProviders.Where(x => x.Name.Equals(conf["IdentityProvider:BuiltInLoginProviderName"], StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             /* validate password */
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -166,7 +166,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         }
                         else
                         {
-                            ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                            ModelState.AddModelError(MessageType.LoginProviderNotFound.ToString(), $"No login provider for user:{user.Id}");
                             return NotFound(ModelState);
                         }
                     }
@@ -176,8 +176,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.IntegrationTest:
                     {
                         /* check if login provider is local or test */
-                        if (logins.Where(x => x.Name.Equals(conf["IdentityProvider:BuiltInLoginName"], StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(conf["IdentityProvider:TestLoginNamePrefix"], StringComparison.OrdinalIgnoreCase)).Any())
+                        if (loginProviders.Where(x => x.Name.Equals(conf["IdentityProvider:BuiltInLoginProviderName"], StringComparison.OrdinalIgnoreCase)).Any()
+                            || loginProviders.Where(x => x.Name.StartsWith(conf["IdentityProvider:TestLoginProviderNamePrefix"], StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             /* validate password */
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -207,7 +207,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         }
                         else
                         {
-                            ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                            ModelState.AddModelError(MessageType.LoginProviderNotFound.ToString(), $"No login provider for user:{user.Id}");
                             return NotFound(ModelState);
                         }
                     }
@@ -560,8 +560,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
 
-            var logins = uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == user.Id)).ToLambda());
+            var loginProviders = uow.LoginProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
+                .Where(x => x.tbl_UserLoginProviders.Any(y => y.UserId == user.Id)).ToLambda());
 
             switch (uow.InstanceType)
             {
@@ -569,7 +569,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.End2EndTest:
                     {
                         /* check if login provider is local */
-                        if (logins.Where(x => x.Name.Equals(conf["IdentityProvider:BuiltInLoginName"], StringComparison.OrdinalIgnoreCase)).Any())
+                        if (loginProviders.Where(x => x.Name.Equals(conf["IdentityProvider:BuiltInLoginProviderName"], StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             /* validate password */
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -602,7 +602,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         }
                         else
                         {
-                            ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                            ModelState.AddModelError(MessageType.LoginProviderNotFound.ToString(), $"No login provider for user:{user.Id}");
                             return NotFound(ModelState);
                         }
                     }
@@ -612,8 +612,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 case InstanceContext.IntegrationTest:
                     {
                         /* check if login provider is local or test */
-                        if (logins.Where(x => x.Name.Equals(conf["IdentityProvider:BuiltInLoginName"], StringComparison.OrdinalIgnoreCase)).Any()
-                            || logins.Where(x => x.Name.StartsWith(conf["IdentityProvider:TestLoginNamePrefix"], StringComparison.OrdinalIgnoreCase)).Any())
+                        if (loginProviders.Where(x => x.Name.Equals(conf["IdentityProvider:BuiltInLoginProviderName"], StringComparison.OrdinalIgnoreCase)).Any()
+                            || loginProviders.Where(x => x.Name.StartsWith(conf["IdentityProvider:TestLoginProviderNamePrefix"], StringComparison.OrdinalIgnoreCase)).Any())
                         {
                             /* validate password */
                             if (!PBKDF2.Validate(user.PasswordHashPBKDF2, input.password))
@@ -646,7 +646,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         }
                         else
                         {
-                            ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"No login for user:{user.Id}");
+                            ModelState.AddModelError(MessageType.LoginProviderNotFound.ToString(), $"No login provider for user:{user.Id}");
                             return NotFound(ModelState);
                         }
 
@@ -908,8 +908,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             {
                 HttpOnly = true,
                 Secure = Request.IsHttps,
-                SameSite = SameSiteMode.Strict,
-                Path = "/oauth2",
+                SameSite = SameSiteMode.Lax,
+                Path = $"{Request.PathBase}/oauth2",
                 Expires = validTo
             };
             Response.Cookies.Append("refresh_token", refreshToken, cookieOptions);

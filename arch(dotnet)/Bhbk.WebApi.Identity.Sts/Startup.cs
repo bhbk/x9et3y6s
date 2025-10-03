@@ -27,6 +27,7 @@ using Newtonsoft.Json.Serialization;
 using Quartz;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -47,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Sts
                 .Build();
 
             var env = new ContextService(InstanceContext.DeployedOrLocal);
-            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
@@ -67,6 +68,9 @@ namespace Bhbk.WebApi.Identity.Sts
                 };
             });
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
+
+            var jobSettings = LoadJobSettings(conf["Databases:IdentityEntities_EF"]);
+
             sc.AddQuartz(jobs =>
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
@@ -78,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Sts
 
                 /* https://www.freeformatter.com/cron-expression-generator-quartz.html */
 
-                if (bool.Parse(conf["Jobs:MaintainRefreshes:Enable"]))
+                if (jobSettings.TryGetValue("MaintainRefreshes", out var maintainRefreshes) && maintainRefreshes.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(MaintainRefreshesJob).Name, workerName);
                     jobs.AddJob<MaintainRefreshesJob>(opt => opt
@@ -86,8 +90,7 @@ namespace Bhbk.WebApi.Identity.Sts
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:MaintainRefreshes:Schedules").GetChildren()
-                        .Select(x => x.Value).ToList())
+                    foreach (var cron in maintainRefreshes.Schedules)
                     {
                         jobs.AddTrigger(opt => opt
                             .ForJob(jobKey)
@@ -99,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Sts
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:MaintainStates:Enable"]))
+                if (jobSettings.TryGetValue("MaintainStates", out var maintainStates) && maintainStates.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(MaintainStatesJob).Name, workerName);
                     jobs.AddJob<MaintainStatesJob>(opt => opt
@@ -107,8 +110,7 @@ namespace Bhbk.WebApi.Identity.Sts
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:MaintainStates:Schedules").GetChildren()
-                        .Select(x => x.Value).ToList())
+                    foreach (var cron in maintainStates.Schedules)
                     {
                         jobs.AddTrigger(opt => opt
                             .ForJob(jobKey)
@@ -265,5 +267,33 @@ namespace Bhbk.WebApi.Identity.Sts
                 opt.MapControllers();
             });
         }
+
+        private static Dictionary<string, JobSettingsEntry> LoadJobSettings(string connectionString)
+        {
+            using var uow = new UnitOfWork(connectionString);
+
+            var result = new Dictionary<string, JobSettingsEntry>();
+
+            foreach (var job in uow.Jobs.Get().ToList())
+            {
+                var settings = uow.JobSettings.Get(s => s.JobId == job.Id).ToList();
+
+                result[job.Name] = new JobSettingsEntry
+                {
+                    IsEnabled = job.IsEnabled,
+                    Schedules = settings.Where(s => s.ConfigKey == "Schedule").Select(s => s.ConfigValue).ToList(),
+                    Settings = settings.Where(s => s.ConfigKey != "Schedule").ToDictionary(s => s.ConfigKey, s => s.ConfigValue),
+                };
+            }
+
+            return result;
+        }
+    }
+
+    internal class JobSettingsEntry
+    {
+        public bool IsEnabled { get; set; }
+        public List<string> Schedules { get; set; } = new();
+        public Dictionary<string, string> Settings { get; set; } = new();
     }
 }

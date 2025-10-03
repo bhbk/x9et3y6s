@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
         private tbl_Issuer foundIssuer;
         private tbl_Audience foundAudience;
         private tbl_Url foundAudienceUrl;
-        private tbl_Login foundLogin;
+        private tbl_LoginProvider foundLoginProvider;
         private tbl_Claim foundClaim;
         private tbl_Role foundRole;
         private tbl_User foundUser;
@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
                 || _uow.InstanceType == InstanceContext.End2EndTest)
                 throw new InvalidOperationException();
 
-            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>()).CreateMapper();
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
         }
 
         public void CreateAudiences()
@@ -306,23 +306,23 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
             }
         }
 
-        public void CreateLogins()
+        public void CreateLoginProviders()
         {
             /*
-             * create test logins
+             * create test login providers
              */
 
-            foundLogin = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.Name == _testData.Login.Name).ToLambda())
+            foundLoginProvider = _uow.LoginProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
+                .Where(x => x.Name == _testData.LoginProvider.Name).ToLambda())
                 .SingleOrDefault();
 
-            if (foundLogin == null)
+            if (foundLoginProvider == null)
             {
-                foundLogin = _uow.Logins.Create(
-                    _map.Map<tbl_Login>(new LoginV1()
+                foundLoginProvider = _uow.LoginProviders.Create(
+                    _map.Map<tbl_LoginProvider>(new LoginProviderV1()
                     {
-                        Name = _testData.Login.Name,
-                        LoginKey = AlphaNumeric.CreateString(16),
+                        Name = _testData.LoginProvider.Name,
+                        ProviderKey = AlphaNumeric.CreateString(16),
                         IsDeletable = true,
                     }));
 
@@ -330,17 +330,17 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
             }
         }
 
-        public void CreateMOTDs()
+        public void CreateQuotes()
         {
             var sets = 2;
 
             for (int i = 0; i < sets; i++)
             {
-                _uow.MOTDs.Create(
-                    _map.Map<tbl_MOTD>(new MOTDTssV1()
+                _uow.Quotes.Create(
+                    _map.Map<tbl_Quote>(new QuoteV1()
                     {
                         globalId = Guid.NewGuid(),
-                        author = _testData.MOTD.Author,
+                        author = _testData.Quote.Author,
                         quote = "Quote-" + Base64.CreateString(4),
                         length = 666.ToString(),
                         id = AlphaNumeric.CreateString(8),
@@ -565,25 +565,25 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
             }
         }
 
-        public void CreateUserLogins()
+        public void CreateUserLoginProviders()
         {
             if (foundUser == null)
                 CreateUsers();
 
-            if (foundLogin == null)
-                CreateLogins();
+            if (foundLoginProvider == null)
+                CreateLoginProviders();
 
             /*
-             * assign login to users
+             * assign login provider to users
              */
 
-            if (!_uow.Users.IsInLogin(foundUser, foundLogin))
+            if (!_uow.Users.IsInLoginProvider(foundUser, foundLoginProvider))
             {
-                _uow.Users.AddLogin(
-                    new tbl_UserLogin()
+                _uow.Users.AddLoginProvider(
+                    new tbl_UserLoginProvider()
                     {
                         UserId = foundUser.Id,
-                        LoginId = foundLogin.Id,
+                        LoginProviderId = foundLoginProvider.Id,
                         IsDeletable = true,
                         CreatedUtc = DateTime.UtcNow,
                     });
@@ -696,15 +696,15 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
         public void Destroy()
         {
             /*
-             * delete test motds
+             * delete test quotes
              */
 
-            var motds = _uow.MOTDs.Get(QueryExpressionFactory.GetQueryExpression<tbl_MOTD>()
-                .Where(x => x.Author.Contains(_testData.MOTD.Author)).ToLambda());
+            var quotes = _uow.Quotes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Quote>()
+                .Where(x => x.Author.Contains(_testData.Quote.Author)).ToLambda());
 
-            if (motds.Count() > 0)
+            if (quotes.Count() > 0)
             {
-                _uow.MOTDs.Delete(motds);
+                _uow.Quotes.Delete(quotes);
                 _uow.Commit();
             }
 
@@ -759,15 +759,15 @@ namespace Bhbk.Lib.Identity.Data.EF.Tests.RepositoryTests
             }
 
             /*
-             * delete test logins
+             * delete test login providers
              */
 
-            var logins = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.Name.Contains(_testData.Login.Name)).ToLambda());
+            var loginProviders = _uow.LoginProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
+                .Where(x => x.Name.Contains(_testData.LoginProvider.Name)).ToLambda());
 
-            if (logins.Count() > 0)
+            if (loginProviders.Count() > 0)
             {
-                _uow.Logins.Delete(logins);
+                _uow.LoginProviders.Delete(loginProviders);
                 _uow.Commit();
             }
 

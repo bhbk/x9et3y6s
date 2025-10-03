@@ -309,8 +309,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             {
                 HttpOnly = true,
                 Secure = Request.IsHttps,
-                SameSite = SameSiteMode.Strict,
-                Path = "/oauth2",
+                SameSite = SameSiteMode.Lax,
+                Path = $"{Request.PathBase}/oauth2",
                 Expires = validTo
             };
             Response.Cookies.Append("refresh_token", refreshToken, cookieOptions);

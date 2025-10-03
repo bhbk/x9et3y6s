@@ -3,9 +3,8 @@ import { test, expect } from '../fixtures/authenticated.fixture';
 test.describe('Admin Dashboard', () => {
   test('dashboard loads with summary cards', async ({ adminPage }) => {
     await expect(adminPage).toHaveURL(/\/dashboard/);
-    // Wait for Angular to render the dashboard component
-    await expect(adminPage.getByRole('heading', { name: 'Dashboard' })).toBeVisible({ timeout: 10000 });
-    await expect(adminPage.getByText('Total Users')).toBeVisible();
+    // Wait for Angular to render — cards appear after forkJoin completes
+    await expect(adminPage.getByText('Total Users')).toBeVisible({ timeout: 10000 });
     await expect(adminPage.getByText('Active Sessions')).toBeVisible();
     await expect(adminPage.getByText('Failed Logins')).toBeVisible();
     await expect(adminPage.getByText('Locked Accounts')).toBeVisible();
@@ -28,12 +27,19 @@ test.describe('Admin Dashboard', () => {
     await expect(pendingCard.locator('p')).not.toHaveText('--', { timeout: 5000 });
   });
 
-  test('dashboard shows recent activity table', async ({ adminPage }) => {
-    await expect(adminPage.getByRole('heading', { name: 'Dashboard' })).toBeVisible({ timeout: 10000 });
-    await expect(adminPage.getByText('Recent Activity')).toBeVisible();
+  test('dashboard shows recent activity table with username column', async ({ adminPage }) => {
+    // Wait for the activity section to appear
+    await expect(adminPage.getByText('Recent Activity')).toBeVisible({ timeout: 10000 });
 
-    // Should show activity rows from mock data (not "coming soon")
+    // Column headers
+    await expect(adminPage.getByRole('columnheader', { name: 'User' })).toBeVisible({ timeout: 5000 });
+    await expect(adminPage.getByRole('columnheader', { name: 'Type' })).toBeVisible();
+    await expect(adminPage.getByRole('columnheader', { name: 'Outcome' })).toBeVisible();
+
+    // Should show activity rows from mock data with resolved usernames
     await expect(adminPage.getByText('ResourceOwner').first()).toBeVisible({ timeout: 5000 });
     await expect(adminPage.getByText('Success').first()).toBeVisible();
+    // Mock data has admin@local and user@local — at least one username should be visible
+    await expect(adminPage.getByText('admin@local').first()).toBeVisible({ timeout: 5000 });
   });
 });

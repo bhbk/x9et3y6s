@@ -3,13 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ConfigService } from '../config.service';
 import { BaseAdminService } from './base-admin.service';
-import { UserV1, UserCreate, UserUpdate, UserPassword, RoleV1, ClaimV1, LoginV1 } from '../../models';
+import { UserV1, UserCreate, UserUpdate, UserPassword, RoleV1, ClaimV1, LoginProviderV1 } from '../../models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService extends BaseAdminService<UserV1, UserCreate, UserUpdate> {
-  protected readonly endpoint = 'user';
+  protected readonly endpoint = 'users';
 
   constructor() {
     super(inject(HttpClient), inject(ConfigService));
@@ -72,23 +72,23 @@ export class UserService extends BaseAdminService<UserV1, UserCreate, UserUpdate
   }
 
   /**
-   * Get logins for user
+   * Get login providers for user
    */
-  getLogins(id: string): Observable<LoginV1[]> {
-    return this.http.get<LoginV1[]>(`${this.baseUrl}/${this.endpoint}/v1/${id}/logins`);
+  getLoginProviders(id: string): Observable<LoginProviderV1[]> {
+    return this.http.get<LoginProviderV1[]>(`${this.baseUrl}/${this.endpoint}/v1/${id}/login-providers`);
   }
 
   /**
-   * Add login to user
+   * Add login provider to user
    */
-  addLogin(userId: string, loginId: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${this.endpoint}/v1/${userId}/logins/${loginId}`, {});
+  addLoginProvider(userId: string, loginProviderId: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${this.endpoint}/v1/${userId}/add-to-login-provider/${loginProviderId}`, {});
   }
 
   /**
-   * Remove login from user
+   * Remove login provider from user
    */
-  removeLogin(userId: string, loginId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${this.endpoint}/v1/${userId}/logins/${loginId}`);
+  removeLoginProvider(userId: string, loginProviderId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${this.endpoint}/v1/${userId}/remove-from-login-provider/${loginProviderId}`);
   }
 }

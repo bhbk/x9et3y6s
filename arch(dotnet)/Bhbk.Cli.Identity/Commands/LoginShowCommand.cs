@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bhbk.Cli.Identity.Factories;
 using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.Primitives.Enums;
@@ -19,21 +19,21 @@ using System.Linq.Expressions;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class LoginShowCommand : ConsoleCommand
+    public class LoginProviderShowCommand : ConsoleCommand
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _map;
         private readonly IUnitOfWork _uow;
         private readonly IAdminService _service;
-        private tbl_Login _login;
+        private tbl_LoginProvider _loginProvider;
 
-        public LoginShowCommand()
+        public LoginProviderShowCommand()
         {
             _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             var env = new ContextService(InstanceContext.DeployedOrLocal);
@@ -44,19 +44,19 @@ namespace Bhbk.Cli.Identity.Commands
                 Grant = new ResourceOwnerGrantV2(_conf)
             };
 
-            IsCommand("login-show", "Show login");
+            IsCommand("login-provider-show", "Show login provider");
 
-            HasRequiredOption("l|login=", "Enter existing login", arg =>
+            HasRequiredOption("l|login-provider=", "Enter existing login provider", arg =>
             {
                 if (string.IsNullOrEmpty(arg))
-                    throw new ConsoleHelpAsException($"  *** No login given ***");
+                    throw new ConsoleHelpAsException($"  *** No login provider given ***");
 
-                _login = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
+                _loginProvider = _uow.LoginProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
                     .Where(x => x.Name == arg).ToLambda())
                     .SingleOrDefault();
 
-                if (_login == null)
-                    throw new ConsoleHelpAsException($"  *** No login '{arg}' ***");
+                if (_loginProvider == null)
+                    throw new ConsoleHelpAsException($"  *** No login provider '{arg}' ***");
             });
         }
 
@@ -64,7 +64,7 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                FormatOutput.Logins(_uow, new List<tbl_Login> { _login }, true);
+                FormatOutput.LoginProviders(_uow, new List<tbl_LoginProvider> { _loginProvider }, true);
 
                 return StandardOutput.FondFarewell();
             }

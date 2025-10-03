@@ -1,8 +1,9 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap, catchError, of, filter, interval, takeUntil, Subject } from 'rxjs';
+import { pipe, switchMap, tap, catchError, of, filter, interval, takeUntil, Subject, firstValueFrom } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { ConfigService } from '../services/config.service';
 import { AuthState, AuthUser, JwtPayload, UserJwtV2 } from '../models';
 
 const initialState: AuthState = {
@@ -38,7 +39,7 @@ export const AuthStore = signalStore(
       const user = store.user();
       if (!user) return null;
       if (user.name) return user.name;
-      if (user.firstName && user.lastName) return `${user.firstName} ${user.lastName}`;
+      if (user.firstName || user.lastName) return `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
       return user.email || user.id;
     }),
     hasRole: computed(() => (role: string) => {
@@ -46,7 +47,7 @@ export const AuthStore = signalStore(
       return user?.roles?.includes(role) ?? false;
     })
   })),
-  withMethods((store, authService = inject(AuthService)) => {
+  withMethods((store, authService = inject(AuthService), configService = inject(ConfigService)) => {
     const refreshSubject = new Subject<void>();
 
     // Parse JWT payload
@@ -75,6 +76,12 @@ export const AuthStore = signalStore(
       return Array.isArray(raw) ? raw as string[] : [raw as string];
     };
 
+    // Extract a claim value, checking both the standard JWT short name and the
+    // long .NET ClaimTypes URI that the backend may serialize into the token.
+    const claim = (payload: JwtPayload, short: string, dotnetUri: string): string | undefined => {
+      return (payload[short] ?? payload[dotnetUri]) as string | undefined;
+    };
+
     // Extract user info from JWT
     const extractUser = (jwt: UserJwtV2): AuthUser | null => {
       const payload = parseJwt(jwt.access_token);
@@ -84,10 +91,10 @@ export const AuthStore = signalStore(
         id: payload.sub,
         issuer: jwt.issuer,
         clients: jwt.client || [],
-        email: payload.email,
-        name: payload.name,
-        firstName: payload.given_name,
-        lastName: payload.family_name,
+        email: claim(payload, 'email', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'),
+        name: claim(payload, 'name', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'),
+        firstName: claim(payload, 'given_name', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'),
+        lastName: claim(payload, 'family_name', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'),
         roles: extractRoles(payload)
       };
     };
@@ -216,27 +223,15 @@ export const AuthStore = signalStore(
       ),
 
       // Logout
-      logout: rxMethod<void>(
-        pipe(
-          tap(() => patchState(store, { isLoading: true })),
-          switchMap(() =>
-            authService.logout().pipe(
-              tap(() => {
-                clearToken();
-                refreshSubject.next();
-                patchState(store, initialState);
-              }),
-              catchError(() => {
-                // Clear local state even if server logout fails
-                clearToken();
-                refreshSubject.next();
-                patchState(store, initialState);
-                return of(null);
-              })
-            )
-          )
-        )
-      ),
+      logout: async (): Promise<void> => {
+        try {
+          await firstValueFrom(authService.logout());
+        } finally {
+          clearToken();
+          refreshSubject.next();
+          patchState(store, initialState);
+        }
+      },
 
       // Initialize from stored token
       initFromStorage: () => {
@@ -248,10 +243,10 @@ export const AuthStore = signalStore(
               id: payload.sub,
               issuer: payload.iss,
               clients: Array.isArray(payload.aud) ? payload.aud : [payload.aud],
-              email: payload.email,
-              name: payload.name,
-              firstName: payload.given_name,
-              lastName: payload.family_name,
+              email: claim(payload, 'email', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'),
+              name: claim(payload, 'name', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'),
+              firstName: claim(payload, 'given_name', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'),
+              lastName: claim(payload, 'family_name', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'),
               roles: extractRoles(payload)
             };
 
@@ -264,6 +259,28 @@ export const AuthStore = signalStore(
               error: null
             });
           }
+        }
+      },
+
+      // Attempt to refresh token using httpOnly cookie
+      // Always tries the refresh — the httpOnly cookie is the source of truth
+      // for whether a valid refresh token exists (shared across SPA origins).
+      tryRefreshToken: async (): Promise<boolean> => {
+        const issuer = configService.defaultIssuer;
+        if (!issuer) return false;
+
+        const client = configService.defaultClient;
+
+        try {
+          const jwt = await firstValueFrom(authService.refreshToken(issuer, client));
+          // Refresh succeeded — persist rememberMe on this origin so
+          // auto-refresh and future guard checks work correctly.
+          handleAuthSuccess(jwt, true);
+          return true;
+        } catch {
+          clearToken();
+          patchState(store, initialState);
+          return false;
         }
       },
 

@@ -48,7 +48,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -94,7 +94,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -138,7 +138,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -184,7 +184,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -229,7 +229,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -270,7 +270,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -317,7 +317,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -363,7 +363,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -419,7 +419,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -472,7 +472,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -521,7 +521,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -569,7 +569,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -618,7 +618,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -666,7 +666,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -716,7 +716,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -769,7 +769,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -834,7 +834,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -903,7 +903,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -965,7 +965,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1003,7 +1003,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1039,7 +1039,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1077,7 +1077,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1113,7 +1113,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1146,7 +1146,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1185,7 +1185,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1222,7 +1222,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -1277,7 +1277,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -1348,7 +1348,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -1407,7 +1407,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1456,7 +1456,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1504,7 +1504,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1553,7 +1553,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1602,7 +1602,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1667,7 +1667,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Issuer.Name).Single();
@@ -1735,7 +1735,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -1794,7 +1794,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -1851,7 +1851,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -1918,7 +1918,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
@@ -2000,7 +2000,7 @@ namespace Bhbk.WebApi.Identity.Sts.Tests.ServiceTests
                 data.Destroy();
                 data.CreateAudiences();
                 data.CreateUsers();
-                data.CreateUserLogins();
+                data.CreateUserLoginProviders();
                 data.CreateUserRoles();
 
                 var legacyIssuer = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null

@@ -174,14 +174,14 @@ export const CLAIMS = [
   },
 ];
 
-// ── Logins ───────────────────────────────────────────────────────────
+// ── Login Providers ──────────────────────────────────────────────────
 
-export const LOGINS = [
+export const LOGIN_PROVIDERS = [
   {
     id: '66666666-6666-6666-6666-111111111111',
     name: 'Local',
     description: 'Local password provider',
-    loginKey: 'local-provider',
+    providerKey: 'local-provider',
     isEnabled: true,
     isDeletable: false,
     createdUtc: '2024-01-01T00:00:00Z',
@@ -190,7 +190,7 @@ export const LOGINS = [
     id: '66666666-6666-6666-6666-222222222222',
     name: 'Google',
     description: 'Google OAuth provider',
-    loginKey: 'google-oauth',
+    providerKey: 'google-oauth',
     isEnabled: true,
     isDeletable: true,
     createdUtc: '2024-02-01T00:00:00Z',
@@ -263,9 +263,9 @@ export const REFRESHES = [
   },
 ];
 
-// ── MOTDs ────────────────────────────────────────────────────────────
+// ── Quotes ──────────────────────────────────────────────────────────
 
-export const MOTD = {
+export const QUOTE = {
   globalId: '99999999-9999-9999-9999-111111111111',
   author: 'System',
   quote: 'Welcome to the Identity Portal. Have a productive day!',
@@ -273,8 +273,8 @@ export const MOTD = {
   category: 'general',
 };
 
-export const MOTDS = [
-  MOTD,
+export const QUOTES = [
+  QUOTE,
   {
     globalId: '99999999-9999-9999-9999-222222222222',
     author: 'Albert Einstein',

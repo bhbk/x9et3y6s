@@ -30,7 +30,6 @@ import { DateTime } from 'luxon';
       } @else {
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-800">Activity</h1>
           <p class="text-gray-500">Monitor authentication activity and login attempts</p>
         </div>
         <button kendoButton fillMode="outline" (click)="loadData()">
@@ -48,25 +47,25 @@ import { DateTime } from 'luxon';
 
       <!-- Summary Statistics -->
       <div class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
           <div class="text-sm text-gray-500">Total Activities</div>
-          <div class="text-2xl font-semibold text-gray-900">{{ gridData().total }}</div>
+          <div class="text-2xl font-medium text-gray-900">{{ gridData().total }}</div>
         </div>
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
           <div class="text-sm text-gray-500">Successful Logins</div>
-          <div class="text-2xl font-semibold text-green-600">{{ successCount() }}</div>
+          <div class="text-2xl font-medium text-green-600">{{ successCount() }}</div>
         </div>
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
           <div class="text-sm text-gray-500">Failed Attempts</div>
-          <div class="text-2xl font-semibold text-red-600">{{ failureCount() }}</div>
+          <div class="text-2xl font-medium text-red-600">{{ failureCount() }}</div>
         </div>
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
           <div class="text-sm text-gray-500">Locked Out</div>
-          <div class="text-2xl font-semibold text-amber-600">{{ lockedCount() }}</div>
+          <div class="text-2xl font-medium text-amber-600">{{ lockedCount() }}</div>
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow">
+      <div class="bg-white rounded-lg border border-gray-200">
         <kendo-grid
           [data]="gridData()"
           [pageSize]="pageSize()"
@@ -87,7 +86,7 @@ import { DateTime } from 'luxon';
 
           <kendo-grid-column field="loginType" title="Type" [width]="160">
             <ng-template kendoGridCellTemplate let-dataItem>
-              <span class="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded">
+              <span class="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded border border-blue-200">
                 {{ formatLoginType(dataItem.loginType) }}
               </span>
             </ng-template>
@@ -97,25 +96,25 @@ import { DateTime } from 'luxon';
             <ng-template kendoGridCellTemplate let-dataItem>
               @switch (dataItem.loginOutcome) {
                 @case ('Success') {
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full border border-green-200">
                     <kendo-svg-icon [icon]="checkIcon" size="small"></kendo-svg-icon>
                     Success
                   </span>
                 }
                 @case ('Failure') {
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full border border-red-200">
                     <kendo-svg-icon [icon]="xIcon" size="small"></kendo-svg-icon>
                     Failed
                   </span>
                 }
                 @case ('LockedOut') {
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full border border-amber-200">
                     <kendo-svg-icon [icon]="warningIcon" size="small"></kendo-svg-icon>
                     Locked
                   </span>
                 }
                 @default {
-                  <span class="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+                  <span class="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full border border-gray-200">
                     {{ dataItem.loginOutcome }}
                   </span>
                 }
@@ -143,7 +142,7 @@ import { DateTime } from 'luxon';
             </ng-template>
           </kendo-grid-column>
 
-          <kendo-grid-column field="localEndpoint" title="Local Endpoint" [width]="160">
+          <kendo-grid-column field="localEndpoint" title="Local Address" [width]="160">
             <ng-template kendoGridCellTemplate let-dataItem>
               @if (dataItem.localEndpoint) {
                 <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{{ dataItem.localEndpoint }}</code>
@@ -153,7 +152,7 @@ import { DateTime } from 'luxon';
             </ng-template>
           </kendo-grid-column>
 
-          <kendo-grid-column field="remoteEndpoint" title="Remote IP" [width]="140">
+          <kendo-grid-column field="remoteEndpoint" title="Remote Address" [width]="140">
             <ng-template kendoGridCellTemplate let-dataItem>
               @if (dataItem.remoteEndpoint) {
                 <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{{ dataItem.remoteEndpoint }}</code>

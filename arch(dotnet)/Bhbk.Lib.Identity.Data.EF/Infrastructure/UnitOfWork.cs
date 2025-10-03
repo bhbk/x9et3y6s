@@ -18,12 +18,19 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
         public AudienceRepository Audiences { get; private set; }
         public AuthActivityRepository AuthActivity { get; private set; }
         public IGenericRepository<tbl_AuthActivityAudience> AuthActivityAudiences { get; private set; }
+        public IGenericRepository<tbl_ChatConversation> ChatConversations { get; private set; }
+        public IGenericRepository<tbl_ChatMessage> ChatMessages { get; private set; }
+        public IGenericRepository<tbl_ChatPrompt> ChatPrompts { get; private set; }
         public IGenericRepository<tbl_Claim> Claims { get; private set; }
         public IGenericRepository<tbl_EmailActivity> EmailActivity { get; private set; }
         public IGenericRepository<tbl_EmailQueue> EmailQueue { get; private set; }
         public IssuerRepository Issuers { get; private set; }
-        public LoginRepository Logins { get; private set; }
-        public IGenericRepository<tbl_MOTD> MOTDs { get; private set; }
+        public IGenericRepository<tbl_Job> Jobs { get; private set; }
+        public IGenericRepository<tbl_JobSetting> JobSettings { get; private set; }
+        public IGenericRepository<tbl_LLMProvider> LLMProviders { get; private set; }
+        public IGenericRepository<tbl_LLMProviderSetting> LLMProviderSettings { get; private set; }
+        public LoginProviderRepository LoginProviders { get; private set; }
+        public IGenericRepository<tbl_Quote> Quotes { get; private set; }
         public RefreshRepository Refreshes { get; private set; }
         public RoleRepository Roles { get; private set; }
         public IGenericRepository<tbl_Setting> Settings { get; private set; }
@@ -97,12 +104,19 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
             Audiences = new AudienceRepository(_context, env);
             AuthActivity = new AuthActivityRepository(_context);
             AuthActivityAudiences = new GenericRepository<tbl_AuthActivityAudience>(_context);
+            ChatConversations = new GenericRepository<tbl_ChatConversation>(_context);
+            ChatMessages = new GenericRepository<tbl_ChatMessage>(_context);
+            ChatPrompts = new GenericRepository<tbl_ChatPrompt>(_context);
             Claims = new GenericRepository<tbl_Claim>(_context);
             EmailQueue = new GenericRepository<tbl_EmailQueue>(_context);
             EmailActivity = new GenericRepository<tbl_EmailActivity>(_context);
             Issuers = new IssuerRepository(_context);
-            Logins = new LoginRepository(_context);
-            MOTDs = new GenericRepository<tbl_MOTD>(_context);
+            Jobs = new GenericRepository<tbl_Job>(_context);
+            JobSettings = new GenericRepository<tbl_JobSetting>(_context);
+            LLMProviders = new GenericRepository<tbl_LLMProvider>(_context);
+            LLMProviderSettings = new GenericRepository<tbl_LLMProviderSetting>(_context);
+            LoginProviders = new LoginProviderRepository(_context);
+            Quotes = new GenericRepository<tbl_Quote>(_context);
             Refreshes = new RefreshRepository(_context);
             Roles = new RoleRepository(_context);
             Settings = new GenericRepository<tbl_Setting>(_context);

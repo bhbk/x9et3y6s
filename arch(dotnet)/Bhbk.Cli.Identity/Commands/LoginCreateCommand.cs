@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bhbk.Cli.Identity.Factories;
 using Bhbk.Lib.CommandLine.IO;
 using Bhbk.Lib.Common.Primitives.Enums;
@@ -16,21 +16,21 @@ using System.Collections.Generic;
 
 namespace Bhbk.Cli.Identity.Commands
 {
-    public class LoginCreateCommand : ConsoleCommand
+    public class LoginProviderCreateCommand : ConsoleCommand
     {
         private readonly IConfiguration _conf;
         private readonly IMapper _map;
         private readonly IUnitOfWork _uow;
         private readonly IAdminService _service;
-        private string _loginName;
+        private string _loginProviderName;
 
-        public LoginCreateCommand()
+        public LoginProviderCreateCommand()
         {
             _conf = (IConfiguration)new ConfigurationBuilder()
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             var env = new ContextService(InstanceContext.DeployedOrLocal);
@@ -41,14 +41,14 @@ namespace Bhbk.Cli.Identity.Commands
                 Grant = new ResourceOwnerGrantV2(_conf)
             };
 
-            IsCommand("login-create", "Create login");
+            IsCommand("login-provider-create", "Create login provider");
 
-            HasRequiredOption("l|login=", "Enter new login", arg =>
+            HasRequiredOption("l|login-provider=", "Enter new login provider", arg =>
             {
                 if (string.IsNullOrEmpty(arg))
-                    throw new ConsoleHelpAsException($"  *** No login given ***");
+                    throw new ConsoleHelpAsException($"  *** No login provider given ***");
 
-                _loginName = arg;
+                _loginProviderName = arg;
             });
         }
 
@@ -56,15 +56,15 @@ namespace Bhbk.Cli.Identity.Commands
         {
             try
             {
-                var login = _service.Login_CreateV1(
-                    new LoginV1()
+                var loginProvider = _service.LoginProvider_CreateV1(
+                    new LoginProviderV1()
                     {
-                        Name = _loginName,
+                        Name = _loginProviderName,
                         IsEnabled = true,
                         IsDeletable = true,
                     }).Result;
 
-                FormatOutput.Logins(_uow, new List<tbl_Login> { _map.Map<tbl_Login>(login) });
+                FormatOutput.LoginProviders(_uow, new List<tbl_LoginProvider> { _map.Map<tbl_LoginProvider>(loginProvider) });
 
                 return StandardOutput.FondFarewell();
             }

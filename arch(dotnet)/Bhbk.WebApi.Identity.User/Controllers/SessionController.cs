@@ -15,7 +15,7 @@ using System.Linq.Dynamic.Core;
 
 namespace Bhbk.WebApi.Identity.User.Controllers
 {
-    [Route("session")]
+    [Route("sessions")]
     [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
     public class SessionController : BaseController
     {
@@ -217,7 +217,7 @@ namespace Bhbk.WebApi.Identity.User.Controllers
 
         private void ClearRefreshTokenCookie()
         {
-            Response.Cookies.Delete("refresh_token", new CookieOptions { Path = "/oauth2" });
+            Response.Cookies.Delete("refresh_token", new CookieOptions { Path = $"{Request.PathBase}/oauth2" });
         }
 
         #endregion

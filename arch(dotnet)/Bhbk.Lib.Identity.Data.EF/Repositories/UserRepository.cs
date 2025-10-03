@@ -45,11 +45,11 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
             return claim;
         }
 
-        public tbl_UserLogin AddLogin(tbl_UserLogin claim)
+        public tbl_UserLoginProvider AddLoginProvider(tbl_UserLoginProvider claim)
         {
             claim.CreatedUtc = Clock.UtcDateTime;
 
-            _context.Set<tbl_UserLogin>().Add(claim);
+            _context.Set<tbl_UserLoginProvider>().Add(claim);
 
             return claim;
         }
@@ -237,10 +237,10 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
             return false;
         }
 
-        public bool IsInLogin(tbl_User user, tbl_Login login)
+        public bool IsInLoginProvider(tbl_User user, tbl_LoginProvider loginProvider)
         {
-            if (_context.Set<tbl_UserLogin>()
-                .Any(x => x.UserId == user.Id && x.LoginId == login.Id))
+            if (_context.Set<tbl_UserLoginProvider>()
+                .Any(x => x.UserId == user.Id && x.LoginProviderId == loginProvider.Id))
                 return true;
 
             return false;
@@ -298,9 +298,9 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
             return claim;
         }
 
-        public tbl_UserLogin RemoveLogin(tbl_UserLogin login)
+        public tbl_UserLoginProvider RemoveLoginProvider(tbl_UserLoginProvider login)
         {
-            _context.Set<tbl_UserLogin>().Remove(login);
+            _context.Set<tbl_UserLoginProvider>().Remove(login);
 
             return login;
         }

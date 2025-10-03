@@ -46,16 +46,28 @@ export const routes: Routes = [
         loadComponent: () => import('./features/claims/claims.component').then(m => m.ClaimsComponent)
       },
       {
-        path: 'logins',
-        loadComponent: () => import('./features/logins/logins.component').then(m => m.LoginsComponent)
+        path: 'login-providers',
+        loadComponent: () => import('./features/login-providers/login-providers.component').then(m => m.LoginProvidersComponent)
       },
       {
         path: 'activity',
         loadComponent: () => import('./features/activity/activity.component').then(m => m.ActivityComponent)
       },
       {
-        path: 'motds',
-        loadComponent: () => import('./features/motds/motds.component').then(m => m.MotdsComponent)
+        path: 'quotes',
+        loadComponent: () => import('./features/quotes/quotes.component').then(m => m.QuotesComponent)
+      },
+      {
+        path: 'llm-providers',
+        loadComponent: () => import('./features/llm-providers/llm-providers.component').then(m => m.LlmProvidersComponent)
+      },
+      {
+        path: 'jobs',
+        loadComponent: () => import('./features/jobs/jobs.component').then(m => m.JobsComponent)
+      },
+      {
+        path: 'assistant',
+        loadComponent: () => import('./features/assistant/assistant.component').then(m => m.AssistantComponent)
       },
       {
         path: '',

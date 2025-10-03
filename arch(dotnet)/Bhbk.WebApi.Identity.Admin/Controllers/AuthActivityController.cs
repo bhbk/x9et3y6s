@@ -17,7 +17,7 @@ using System.Linq.Expressions;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
-    [Route("activity")]
+    [Route("activities")]
     public class AuthActivityController : BaseController
     {
         [Route("v1/{activityValue}"), HttpGet]

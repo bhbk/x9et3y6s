@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("activity/v1/page",
+            return await _http.PostAsync("activities/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -50,21 +50,21 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("activity/v1/" + activityValue);
+            return await _http.GetAsync("activities/v1/" + activityValue);
         }
 
         public async ValueTask<HttpResponseMessage> Audience_AddToRoleV1(string jwt, Guid audienceID, Guid roleID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("audience/v1/" + audienceID.ToString() + "/add-to-role/" + roleID.ToString());
+            return await _http.GetAsync("audiences/v1/" + audienceID.ToString() + "/add-to-role/" + roleID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> Audience_CreateV1(string jwt, AudienceV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("audience/v1",
+            return await _http.PostAsync("audiences/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -72,35 +72,35 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("audience/v1/" + audienceID.ToString());
+            return await _http.DeleteAsync("audiences/v1/" + audienceID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> Audience_DeleteRefreshesV1(string jwt, Guid audienceID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("audience/v1/" + audienceID.ToString() + "/refresh");
+            return await _http.DeleteAsync("audiences/v1/" + audienceID.ToString() + "/refresh");
         }
 
         public async ValueTask<HttpResponseMessage> Audience_DeleteRefreshV1(string jwt, Guid audienceID, Guid refreshID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("audience/v1/" + audienceID.ToString() + "/refresh/" + refreshID.ToString());
+            return await _http.DeleteAsync("audiences/v1/" + audienceID.ToString() + "/refresh/" + refreshID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> Audience_GetV1(string jwt, string audienceValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("audience/v1/" + audienceValue);
+            return await _http.GetAsync("audiences/v1/" + audienceValue);
         }
 
         public async ValueTask<HttpResponseMessage> Audience_GetV1(string jwt, DataStateV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("audience/v1/page",
+            return await _http.PostAsync("audiences/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -108,35 +108,35 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("audience/v1/" + audienceValue + "/refreshes");
+            return await _http.GetAsync("audiences/v1/" + audienceValue + "/refreshes");
         }
 
         public async ValueTask<HttpResponseMessage> Audience_GetRolesV1(string jwt, string audienceValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("audience/v1/" + audienceValue + "/roles");
+            return await _http.GetAsync("audiences/v1/" + audienceValue + "/roles");
         }
 
         public async ValueTask<HttpResponseMessage> Audience_RemoveFromRoleV1(string jwt, Guid audienceID, Guid roleID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("audience/v1/" + audienceID.ToString() + "/remove-from-role/" + roleID.ToString());
+            return await _http.DeleteAsync("audiences/v1/" + audienceID.ToString() + "/remove-from-role/" + roleID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> Audience_RemovePasswordV1(string jwt, Guid audienceID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("audience/v1/" + audienceID.ToString() + "/remove-password");
+            return await _http.GetAsync("audiences/v1/" + audienceID.ToString() + "/remove-password");
         }
 
         public async ValueTask<HttpResponseMessage> Audience_SetPasswordV1(string jwt, Guid audienceID, PasswordAddV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("audience/v1/" + audienceID.ToString() + "/set-password",
+            return await _http.PutAsync("audiences/v1/" + audienceID.ToString() + "/set-password",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -144,7 +144,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("audience/v1",
+            return await _http.PutAsync("audiences/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -152,7 +152,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("claim/v1",
+            return await _http.PostAsync("claims/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -160,21 +160,21 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("claim/v1/" + claimID.ToString());
+            return await _http.DeleteAsync("claims/v1/" + claimID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> Claim_GetV1(string jwt, string claimValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("claim/v1/" + claimValue);
+            return await _http.GetAsync("claims/v1/" + claimValue);
         }
 
         public async ValueTask<HttpResponseMessage> Claim_GetV1(string jwt, DataStateV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("claim/v1/page",
+            return await _http.PostAsync("claims/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -182,7 +182,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("claim/v1",
+            return await _http.PutAsync("claims/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -190,7 +190,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("issuer/v1",
+            return await _http.PostAsync("issuers/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -198,28 +198,28 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("issuer/v1/" + issuerID.ToString());
+            return await _http.DeleteAsync("issuers/v1/" + issuerID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> Issuer_GetAudiencesV1(string jwt, string issuerValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("issuer/v1/" + issuerValue + "/audiences");
+            return await _http.GetAsync("issuers/v1/" + issuerValue + "/audiences");
         }
 
         public async ValueTask<HttpResponseMessage> Issuer_GetV1(string jwt, string issuerValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("issuer/v1/" + issuerValue);
+            return await _http.GetAsync("issuers/v1/" + issuerValue);
         }
 
         public async ValueTask<HttpResponseMessage> Issuer_GetV1(string jwt, DataStateV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("issuer/v1/page",
+            return await _http.PostAsync("issuers/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -227,7 +227,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("issuer/v1/keys",
+            return await _http.PostAsync("issuers/v1/keys",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -235,59 +235,59 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("issuer/v1",
+            return await _http.PutAsync("issuers/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
-        public async ValueTask<HttpResponseMessage> Login_CreateV1(string jwt, LoginV1 model)
+        public async ValueTask<HttpResponseMessage> LoginProvider_CreateV1(string jwt, LoginProviderV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("login/v1", new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
+            return await _http.PostAsync("login-providers/v1", new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
-        public async ValueTask<HttpResponseMessage> Login_DeleteV1(string jwt, Guid loginID)
+        public async ValueTask<HttpResponseMessage> LoginProvider_DeleteV1(string jwt, Guid loginProviderID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("login/v1/" + loginID.ToString());
+            return await _http.DeleteAsync("login-providers/v1/" + loginProviderID.ToString());
         }
 
-        public async ValueTask<HttpResponseMessage> Login_GetV1(string jwt, string loginValue)
+        public async ValueTask<HttpResponseMessage> LoginProvider_GetV1(string jwt, string loginProviderValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("login/v1/" + loginValue);
+            return await _http.GetAsync("login-providers/v1/" + loginProviderValue);
         }
 
-        public async ValueTask<HttpResponseMessage> Login_GetV1(string jwt, DataStateV1 model)
+        public async ValueTask<HttpResponseMessage> LoginProvider_GetV1(string jwt, DataStateV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("login/v1/page",
+            return await _http.PostAsync("login-providers/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
-        public async ValueTask<HttpResponseMessage> Login_UpdateV1(string jwt, LoginV1 model)
+        public async ValueTask<HttpResponseMessage> LoginProvider_UpdateV1(string jwt, LoginProviderV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("login/v1",
+            return await _http.PutAsync("login-providers/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
-        public async ValueTask<HttpResponseMessage> MOTD_GetV1(string jwt, string motdValue)
+        public async ValueTask<HttpResponseMessage> Quote_GetV1(string jwt, string motdValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("motd/v1/" + motdValue);
+            return await _http.GetAsync("quotes/v1/" + motdValue);
         }
 
-        public async ValueTask<HttpResponseMessage> MOTD_GetV1(string jwt, DataStateV1 model)
+        public async ValueTask<HttpResponseMessage> Quote_GetV1(string jwt, DataStateV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("motd/v1/page",
+            return await _http.PostAsync("quotes/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -295,7 +295,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("role/v1",
+            return await _http.PostAsync("roles/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -303,21 +303,21 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("role/v1/" + roleID.ToString());
+            return await _http.DeleteAsync("roles/v1/" + roleID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> Role_GetV1(string jwt, string roleValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("role/v1/" + roleValue);
+            return await _http.GetAsync("roles/v1/" + roleValue);
         }
 
         public async ValueTask<HttpResponseMessage> Role_GetV1(string jwt, DataStateV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("role/v1/page",
+            return await _http.PostAsync("roles/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -325,7 +325,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("role/v1",
+            return await _http.PutAsync("roles/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -333,28 +333,28 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userID.ToString() + "/add-to-claim/" + claimID.ToString());
+            return await _http.GetAsync("users/v1/" + userID.ToString() + "/add-to-claim/" + claimID.ToString());
         }
 
-        public async ValueTask<HttpResponseMessage> User_AddToLoginV1(string jwt, Guid userID, Guid loginID)
+        public async ValueTask<HttpResponseMessage> User_AddToLoginProviderV1(string jwt, Guid userID, Guid loginProviderID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userID.ToString() + "/add-to-login/" + loginID.ToString());
+            return await _http.GetAsync("users/v1/" + userID.ToString() + "/add-to-login-provider/" + loginProviderID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> User_AddToRoleV1(string jwt, Guid userID, Guid roleID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userID.ToString() + "/add-to-role/" + roleID.ToString());
+            return await _http.GetAsync("users/v1/" + userID.ToString() + "/add-to-role/" + roleID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> User_CreateV1(string jwt, UserV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("user/v1",
+            return await _http.PostAsync("users/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -362,7 +362,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("user/v1/no-confirm",
+            return await _http.PostAsync("users/v1/no-confirm",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -370,70 +370,70 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("user/v1/" + userID.ToString());
+            return await _http.DeleteAsync("users/v1/" + userID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> User_DeleteRefreshesV1(string jwt, Guid userID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("user/v1/" + userID.ToString() + "/refresh");
+            return await _http.DeleteAsync("users/v1/" + userID.ToString() + "/refresh");
         }
 
         public async ValueTask<HttpResponseMessage> User_DeleteRefreshV1(string jwt, Guid userID, Guid refreshID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("user/v1/" + userID.ToString() + "/refresh/" + refreshID.ToString());
+            return await _http.DeleteAsync("users/v1/" + userID.ToString() + "/refresh/" + refreshID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> User_GetAudiencesV1(string jwt, string userValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userValue + "/audiences");
+            return await _http.GetAsync("users/v1/" + userValue + "/audiences");
         }
 
         public async ValueTask<HttpResponseMessage> User_GetClaimsV1(string jwt, string userValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userValue + "/claims");
+            return await _http.GetAsync("users/v1/" + userValue + "/claims");
         }
 
-        public async ValueTask<HttpResponseMessage> User_GetLoginsV1(string jwt, string userValue)
+        public async ValueTask<HttpResponseMessage> User_GetLoginProvidersV1(string jwt, string userValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userValue + "/logins");
+            return await _http.GetAsync("users/v1/" + userValue + "/login-providers");
         }
 
         public async ValueTask<HttpResponseMessage> User_GetRefreshesV1(string jwt, string userValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userValue + "/refreshes");
+            return await _http.GetAsync("users/v1/" + userValue + "/refreshes");
         }
 
         public async ValueTask<HttpResponseMessage> User_GetRolesV1(string jwt, string userValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userValue + "/roles");
+            return await _http.GetAsync("users/v1/" + userValue + "/roles");
         }
 
         public async ValueTask<HttpResponseMessage> User_GetV1(string jwt, string userValue)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userValue);
+            return await _http.GetAsync("users/v1/" + userValue);
         }
 
         public async ValueTask<HttpResponseMessage> User_GetV1(string jwt, DataStateV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("user/v1/page",
+            return await _http.PostAsync("users/v1/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -441,35 +441,35 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("user/v1/" + userID.ToString() + "/remove-from-claim/" + claimID.ToString());
+            return await _http.DeleteAsync("users/v1/" + userID.ToString() + "/remove-from-claim/" + claimID.ToString());
         }
 
-        public async ValueTask<HttpResponseMessage> User_RemoveFromLoginV1(string jwt, Guid userID, Guid loginID)
+        public async ValueTask<HttpResponseMessage> User_RemoveFromLoginProviderV1(string jwt, Guid userID, Guid loginProviderID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("user/v1/" + userID.ToString() + "/remove-from-login/" + loginID.ToString());
+            return await _http.DeleteAsync("users/v1/" + userID.ToString() + "/remove-from-login-provider/" + loginProviderID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> User_RemoveFromRoleV1(string jwt, Guid userID, Guid roleID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.DeleteAsync("user/v1/" + userID.ToString() + "/remove-from-role/" + roleID.ToString());
+            return await _http.DeleteAsync("users/v1/" + userID.ToString() + "/remove-from-role/" + roleID.ToString());
         }
 
         public async ValueTask<HttpResponseMessage> User_RemovePasswordV1(string jwt, Guid userID)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("user/v1/" + userID.ToString() + "/remove-password");
+            return await _http.GetAsync("users/v1/" + userID.ToString() + "/remove-password");
         }
 
         public async ValueTask<HttpResponseMessage> User_SetPasswordV1(string jwt, Guid userID, PasswordAddV1 model)
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("user/v1/" + userID.ToString() + "/set-password",
+            return await _http.PutAsync("users/v1/" + userID.ToString() + "/set-password",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -477,7 +477,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PutAsync("user/v1",
+            return await _http.PutAsync("users/v1",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
     }

@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Bhbk.WebApi.Alert.Controllers
 {
-    [Route("diagnostic")]
+    [Route("diagnostics")]
     public class DiagnosticController : BaseController
     {
         [Route("v1/version"), HttpGet]

@@ -31,41 +31,41 @@ export class RefreshService {
    * Get refresh tokens for a specific user
    */
   getByUserId(userId: string): Observable<RefreshV1[]> {
-    return this.http.get<RefreshV1[]>(`${this.baseUrl}/user/v1/${userId}/refreshes`);
+    return this.http.get<RefreshV1[]>(`${this.baseUrl}/users/v1/${userId}/refreshes`);
   }
 
   /**
    * Get refresh tokens for a specific audience
    */
   getByAudienceId(audienceId: string): Observable<RefreshV1[]> {
-    return this.http.get<RefreshV1[]>(`${this.baseUrl}/audience/v1/${audienceId}/refreshes`);
+    return this.http.get<RefreshV1[]>(`${this.baseUrl}/audiences/v1/${audienceId}/refreshes`);
   }
 
   /**
    * Revoke a specific refresh token for a user
    */
   revokeForUser(userId: string, refreshId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/user/v1/${userId}/refresh/${refreshId}`);
+    return this.http.delete<void>(`${this.baseUrl}/users/v1/${userId}/refresh/${refreshId}`);
   }
 
   /**
    * Revoke all refresh tokens for a user
    */
   revokeAllForUser(userId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/user/v1/${userId}/refresh`);
+    return this.http.delete<void>(`${this.baseUrl}/users/v1/${userId}/refresh`);
   }
 
   /**
    * Revoke a specific refresh token for an audience
    */
   revokeForAudience(audienceId: string, refreshId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/audience/v1/${audienceId}/refresh/${refreshId}`);
+    return this.http.delete<void>(`${this.baseUrl}/audiences/v1/${audienceId}/refresh/${refreshId}`);
   }
 
   /**
    * Revoke all refresh tokens for an audience
    */
   revokeAllForAudience(audienceId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/audience/v1/${audienceId}/refresh`);
+    return this.http.delete<void>(`${this.baseUrl}/audiences/v1/${audienceId}/refresh`);
   }
 }

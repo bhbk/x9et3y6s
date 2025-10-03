@@ -33,7 +33,7 @@ namespace Bhbk.Cli.Identity.Commands
                 .AddJsonFile("clisettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             var env = new ContextService(InstanceContext.DeployedOrLocal);

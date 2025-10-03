@@ -28,7 +28,7 @@ using System.Web;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
-    [Route("user")]
+    [Route("users")]
     public class UserController : BaseController
     {
         [Route("v1/{userID:guid}/add-to-claim/{claimID:guid}"), HttpGet]
@@ -70,10 +70,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{userID:guid}/add-to-login/{loginID:guid}"), HttpGet]
+        [Route("v1/{userID:guid}/add-to-login-provider/{loginProviderID:guid}"), HttpGet]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
         [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
-        public IActionResult AddToLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
+        public IActionResult AddToLoginProviderV1([FromRoute] Guid userID, [FromRoute] Guid loginProviderID)
         {
             var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
@@ -84,22 +84,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var login = uow.Logins.Get(x => x.Id == loginID)
+            var loginProvider = uow.LoginProviders.Get(x => x.Id == loginProviderID)
                 .SingleOrDefault();
 
-            if (login == null)
+            if (loginProvider == null)
             {
-                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{loginID}");
+                ModelState.AddModelError(MessageType.LoginProviderNotFound.ToString(), $"LoginProvider:{loginProviderID}");
                 return NotFound(ModelState);
             }
 
-            if (!uow.Users.IsInLogin(user, login))
+            if (!uow.Users.IsInLoginProvider(user, loginProvider))
             {
-                uow.Users.AddLogin(
-                    new tbl_UserLogin()
+                uow.Users.AddLoginProvider(
+                    new tbl_UserLoginProvider()
                     {
                         UserId = user.Id,
-                        LoginId = login.Id,
+                        LoginProviderId = loginProvider.Id,
                         IsDeletable = true,
                     });
                 uow.Commit();
@@ -349,7 +349,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                                     { 
                                         x => x.tbl_AuthActivities,
                                         x => x.tbl_UserClaims,
-                                        x => x.tbl_UserLogins, 
+                                        x => x.tbl_UserLoginProviders,
                                         x => x.tbl_UserRoles,
                                     })),
 
@@ -403,8 +403,8 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return Ok(map.Map<IEnumerable<AudienceV1>>(audiences));
         }
 
-        [Route("v1/{userID:guid}/logins"), HttpGet]
-        public IActionResult GetLoginsV1([FromRoute] Guid userID)
+        [Route("v1/{userID:guid}/login-providers"), HttpGet]
+        public IActionResult GetLoginProvidersV1([FromRoute] Guid userID)
         {
             var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
@@ -415,10 +415,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var logins = uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.tbl_UserLogins.Any(y => y.UserId == userID)).ToLambda());
+            var loginProviders = uow.LoginProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
+                .Where(x => x.tbl_UserLoginProviders.Any(y => y.UserId == userID)).ToLambda());
 
-            return Ok(map.Map<IEnumerable<LoginV1>>(logins));
+            return Ok(map.Map<IEnumerable<LoginProviderV1>>(loginProviders));
         }
 
         [Route("v1/{userID:guid}/refreshes"), HttpGet]
@@ -494,10 +494,10 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
             return NoContent();
         }
 
-        [Route("v1/{userID:guid}/remove-from-login/{loginID:guid}"), HttpDelete]
+        [Route("v1/{userID:guid}/remove-from-login-provider/{loginProviderID:guid}"), HttpDelete]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
         [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
-        public IActionResult RemoveFromLoginV1([FromRoute] Guid userID, [FromRoute] Guid loginID)
+        public IActionResult RemoveFromLoginProviderV1([FromRoute] Guid userID, [FromRoute] Guid loginProviderID)
         {
             var user = uow.Users.Get(x => x.Id == userID)
                 .SingleOrDefault();
@@ -508,22 +508,22 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
-            var login = uow.Logins.Get(x => x.Id == loginID)
+            var loginProvider = uow.LoginProviders.Get(x => x.Id == loginProviderID)
                 .SingleOrDefault();
 
-            if (login == null)
+            if (loginProvider == null)
             {
-                ModelState.AddModelError(MessageType.LoginNotFound.ToString(), $"Login:{loginID}");
+                ModelState.AddModelError(MessageType.LoginProviderNotFound.ToString(), $"LoginProvider:{loginProviderID}");
                 return NotFound(ModelState);
             }
 
-            if (uow.Users.IsInLogin(user, login))
+            if (uow.Users.IsInLoginProvider(user, loginProvider))
             {
-                uow.Users.RemoveLogin(
-                    new tbl_UserLogin()
+                uow.Users.RemoveLoginProvider(
+                    new tbl_UserLoginProvider()
                     {
                         UserId = user.Id,
-                        LoginId = login.Id,
+                        LoginProviderId = loginProvider.Id,
                     });
                 uow.Commit();
             }

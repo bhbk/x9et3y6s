@@ -35,6 +35,12 @@ test.describe('Admin Claims', () => {
     await dialog.clickAction('Create');
     const createReq = await createPromise;
     expect(createReq.method()).toBe('POST');
+
+    const body = createReq.postDataJSON();
+    expect(body).toHaveProperty('issuerId');
+    expect(body).toHaveProperty('type');
+    expect(body).toHaveProperty('value');
+    expect(body).toHaveProperty('isDeletable');
   });
 
   test('edit claim via dialog', async ({ adminPage }) => {

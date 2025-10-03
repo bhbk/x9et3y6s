@@ -21,12 +21,19 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public virtual DbSet<tbl_AudienceRole> tbl_AudienceRoles { get; set; }
         public virtual DbSet<tbl_AuthActivity> tbl_AuthActivities { get; set; }
         public virtual DbSet<tbl_AuthActivityAudience> tbl_AuthActivityAudiences { get; set; }
+        public virtual DbSet<tbl_ChatConversation> tbl_ChatConversations { get; set; }
+        public virtual DbSet<tbl_ChatMessage> tbl_ChatMessages { get; set; }
+        public virtual DbSet<tbl_ChatPrompt> tbl_ChatPrompts { get; set; }
         public virtual DbSet<tbl_Claim> tbl_Claims { get; set; }
         public virtual DbSet<tbl_EmailActivity> tbl_EmailActivities { get; set; }
         public virtual DbSet<tbl_EmailQueue> tbl_EmailQueues { get; set; }
         public virtual DbSet<tbl_Issuer> tbl_Issuers { get; set; }
-        public virtual DbSet<tbl_Login> tbl_Logins { get; set; }
-        public virtual DbSet<tbl_MOTD> tbl_MOTDs { get; set; }
+        public virtual DbSet<tbl_Job> tbl_Jobs { get; set; }
+        public virtual DbSet<tbl_JobSetting> tbl_JobSettings { get; set; }
+        public virtual DbSet<tbl_LLMProvider> tbl_LLMProviders { get; set; }
+        public virtual DbSet<tbl_LLMProviderSetting> tbl_LLMProviderSettings { get; set; }
+        public virtual DbSet<tbl_LoginProvider> tbl_LoginProviders { get; set; }
+        public virtual DbSet<tbl_Quote> tbl_Quotes { get; set; }
         public virtual DbSet<tbl_Refresh> tbl_Refreshes { get; set; }
         public virtual DbSet<tbl_Role> tbl_Roles { get; set; }
         public virtual DbSet<tbl_RoleClaim> tbl_RoleClaims { get; set; }
@@ -37,7 +44,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public virtual DbSet<tbl_Url> tbl_Urls { get; set; }
         public virtual DbSet<tbl_User> tbl_Users { get; set; }
         public virtual DbSet<tbl_UserClaim> tbl_UserClaims { get; set; }
-        public virtual DbSet<tbl_UserLogin> tbl_UserLogins { get; set; }
+        public virtual DbSet<tbl_UserLoginProvider> tbl_UserLoginProviders { get; set; }
         public virtual DbSet<tbl_UserRole> tbl_UserRoles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -139,6 +146,65 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                     .WithMany(p => p.tbl_AuthActivityAudiences)
                     .HasForeignKey(d => d.AudienceId)
                     .HasConstraintName("FK_tbl_AuthActivityAudience_AudienceID");
+            });
+
+            modelBuilder.Entity<tbl_ChatConversation>(entity =>
+            {
+                entity.ToTable("tbl_ChatConversation");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_ChatConversation")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Title).HasMaxLength(256);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.tbl_ChatConversations)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_tbl_ChatConversation_UserID");
+            });
+
+            modelBuilder.Entity<tbl_ChatMessage>(entity =>
+            {
+                entity.ToTable("tbl_ChatMessage");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_ChatMessage")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Role)
+                    .IsRequired()
+                    .HasMaxLength(16);
+
+                entity.HasOne(d => d.Conversation)
+                    .WithMany(p => p.tbl_ChatMessages)
+                    .HasForeignKey(d => d.ConversationId)
+                    .HasConstraintName("FK_tbl_ChatMessage_ConversationID");
+            });
+
+            modelBuilder.Entity<tbl_ChatPrompt>(entity =>
+            {
+                entity.ToTable("tbl_ChatPrompt");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_ChatPrompt")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.Name, "IX_tbl_ChatPrompt_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.PromptType)
+                    .IsRequired()
+                    .HasMaxLength(32);
+
+                entity.Property(e => e.Content).IsRequired();
             });
 
             modelBuilder.Entity<tbl_Claim>(entity =>
@@ -250,29 +316,121 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                     .HasMaxLength(128);
             });
 
-            modelBuilder.Entity<tbl_Login>(entity =>
+            modelBuilder.Entity<tbl_Job>(entity =>
             {
-                entity.ToTable("tbl_Login");
+                entity.ToTable("tbl_Job");
 
-                entity.HasIndex(e => e.Id, "IX_tbl_Login")
+                entity.HasIndex(e => e.Id, "IX_tbl_Job")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.Name, "IX_tbl_Job_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<tbl_JobSetting>(entity =>
+            {
+                entity.ToTable("tbl_JobSetting");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_JobSetting")
+                    .IsUnique();
+
+                entity.HasIndex(e => new { e.JobId, e.ConfigKey }, "IX_tbl_JobSetting_JobKey")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.ConfigKey)
+                    .IsRequired()
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ConfigValue)
+                    .IsRequired()
+                    .HasMaxLength(1024);
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.tbl_JobSettings)
+                    .HasForeignKey(d => d.JobId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_tbl_JobSetting_JobID");
+            });
+
+            modelBuilder.Entity<tbl_LLMProvider>(entity =>
+            {
+                entity.ToTable("tbl_LLMProvider");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_LLMProvider")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.Name, "IX_tbl_LLMProvider_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(64)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<tbl_LLMProviderSetting>(entity =>
+            {
+                entity.ToTable("tbl_LLMProviderSetting");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_LLMProviderSetting")
+                    .IsUnique();
+
+                entity.HasIndex(e => new { e.ProviderId, e.ConfigKey }, "IX_tbl_LLMProviderSetting_ProviderKey")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.ConfigKey)
+                    .IsRequired()
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ConfigValue)
+                    .IsRequired()
+                    .HasMaxLength(1024);
+
+                entity.HasOne(d => d.Provider)
+                    .WithMany(p => p.tbl_LLMProviderSettings)
+                    .HasForeignKey(d => d.ProviderId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_tbl_LLMProviderSetting_ProviderID");
+            });
+
+            modelBuilder.Entity<tbl_LoginProvider>(entity =>
+            {
+                entity.ToTable("tbl_LoginProvider");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_LoginProvider")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Description).HasMaxLength(256);
 
-                entity.Property(e => e.LoginKey).HasMaxLength(256);
+                entity.Property(e => e.ProviderKey).HasMaxLength(256);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(128);
             });
 
-            modelBuilder.Entity<tbl_MOTD>(entity =>
+            modelBuilder.Entity<tbl_Quote>(entity =>
             {
-                entity.ToTable("tbl_MOTD");
+                entity.ToTable("tbl_Quote");
 
-                entity.HasIndex(e => e.Id, "IX_tbl_MOTD")
+                entity.HasIndex(e => e.Id, "IX_tbl_Quote")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -582,24 +740,24 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                     .HasConstraintName("FK_tbl_UserClaim_UserID");
             });
 
-            modelBuilder.Entity<tbl_UserLogin>(entity =>
+            modelBuilder.Entity<tbl_UserLoginProvider>(entity =>
             {
-                entity.HasKey(e => new { e.UserId, e.LoginId });
+                entity.HasKey(e => new { e.UserId, e.LoginProviderId });
 
-                entity.ToTable("tbl_UserLogin");
+                entity.ToTable("tbl_UserLoginProvider");
 
-                entity.HasIndex(e => new { e.UserId, e.LoginId }, "IX_tbl_UserLogin")
+                entity.HasIndex(e => new { e.UserId, e.LoginProviderId }, "IX_tbl_UserLoginProvider")
                     .IsUnique();
 
-                entity.HasOne(d => d.Login)
-                    .WithMany(p => p.tbl_UserLogins)
-                    .HasForeignKey(d => d.LoginId)
-                    .HasConstraintName("FK_tbl_UserLogin_LoginID");
+                entity.HasOne(d => d.LoginProvider)
+                    .WithMany(p => p.tbl_UserLoginProviders)
+                    .HasForeignKey(d => d.LoginProviderId)
+                    .HasConstraintName("FK_tbl_UserLoginProvider_LoginProviderID");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_UserLogins)
+                    .WithMany(p => p.tbl_UserLoginProviders)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_tbl_UserLogin_UserID");
+                    .HasConstraintName("FK_tbl_UserLoginProvider_UserID");
             });
 
             modelBuilder.Entity<tbl_UserRole>(entity =>

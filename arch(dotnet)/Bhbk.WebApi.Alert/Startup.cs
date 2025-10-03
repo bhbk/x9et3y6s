@@ -28,6 +28,7 @@ using Newtonsoft.Json.Serialization;
 using Quartz;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -50,7 +51,7 @@ namespace Bhbk.WebApi.Alert
                 .Build();
 
             var env = new ContextService(InstanceContext.DeployedOrLocal);
-            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
 
             sc.AddSingleton<IConfiguration>(conf);
@@ -72,6 +73,9 @@ namespace Bhbk.WebApi.Alert
             });
             sc.AddScoped<ITwilioService, TwilioService>();
             sc.AddScoped<ISendgridService, SendgridService>();
+
+            var jobSettings = LoadJobSettings(conf["Databases:IdentityEntities_EF"]);
+
             sc.AddQuartz(jobs =>
             {
                 jobs.SchedulerId = Guid.NewGuid().ToString();
@@ -83,7 +87,7 @@ namespace Bhbk.WebApi.Alert
 
                 /* https://www.freeformatter.com/cron-expression-generator-quartz.html */
 
-                if (bool.Parse(conf["Jobs:EmailActivity:Enable"]))
+                if (jobSettings.TryGetValue("EmailActivity", out var emailActivity) && emailActivity.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(EmailActivityJob).Name, workerName);
                     jobs.AddJob<EmailActivityJob>(opt => opt
@@ -91,8 +95,7 @@ namespace Bhbk.WebApi.Alert
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:EmailActivity:Schedules").GetChildren()
-                        .Select(x => x.Value).ToList())
+                    foreach (var cron in emailActivity.Schedules)
                     {
                         jobs.AddTrigger(opt => opt
                             .ForJob(jobKey)
@@ -104,7 +107,7 @@ namespace Bhbk.WebApi.Alert
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:EmailDequeue:Enable"]))
+                if (jobSettings.TryGetValue("EmailDequeue", out var emailDequeue) && emailDequeue.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(EmailDequeueJob).Name, workerName);
                     jobs.AddJob<EmailDequeueJob>(opt => opt
@@ -112,8 +115,7 @@ namespace Bhbk.WebApi.Alert
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:EmailDequeue:Schedules").GetChildren()
-                        .Select(x => x.Value).ToList())
+                    foreach (var cron in emailDequeue.Schedules)
                     {
                         jobs.AddTrigger(opt => opt
                             .ForJob(jobKey)
@@ -125,7 +127,7 @@ namespace Bhbk.WebApi.Alert
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:TextActivity:Enable"]))
+                if (jobSettings.TryGetValue("TextActivity", out var textActivity) && textActivity.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(TextActivityJob).Name, workerName);
                     jobs.AddJob<TextActivityJob>(opt => opt
@@ -133,8 +135,7 @@ namespace Bhbk.WebApi.Alert
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:TextActivity:Schedules").GetChildren()
-                        .Select(x => x.Value).ToList())
+                    foreach (var cron in textActivity.Schedules)
                     {
                         jobs.AddTrigger(opt => opt
                             .ForJob(jobKey)
@@ -146,7 +147,7 @@ namespace Bhbk.WebApi.Alert
                     }
                 }
 
-                if (bool.Parse(conf["Jobs:TextDequeue:Enable"]))
+                if (jobSettings.TryGetValue("TextDequeue", out var textDequeue) && textDequeue.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(TextDequeueJob).Name, workerName);
                     jobs.AddJob<TextDequeueJob>(opt => opt
@@ -154,8 +155,7 @@ namespace Bhbk.WebApi.Alert
                         .WithIdentity(jobKey)
                     );
 
-                    foreach (var cron in conf.GetSection("Jobs:TextDequeue:Schedules").GetChildren()
-                        .Select(x => x.Value).ToList())
+                    foreach (var cron in textDequeue.Schedules)
                     {
                         jobs.AddTrigger(opt => opt
                             .ForJob(jobKey)
@@ -311,5 +311,33 @@ namespace Bhbk.WebApi.Alert
                 opt.MapControllers();
             });
         }
+
+        private static Dictionary<string, JobSettingsEntry> LoadJobSettings(string connectionString)
+        {
+            using var uow = new UnitOfWork(connectionString);
+
+            var result = new Dictionary<string, JobSettingsEntry>();
+
+            foreach (var job in uow.Jobs.Get().ToList())
+            {
+                var settings = uow.JobSettings.Get(s => s.JobId == job.Id).ToList();
+
+                result[job.Name] = new JobSettingsEntry
+                {
+                    IsEnabled = job.IsEnabled,
+                    Schedules = settings.Where(s => s.ConfigKey == "Schedule").Select(s => s.ConfigValue).ToList(),
+                    Settings = settings.Where(s => s.ConfigKey != "Schedule").ToDictionary(s => s.ConfigKey, s => s.ConfigValue),
+                };
+            }
+
+            return result;
+        }
+    }
+
+    internal class JobSettingsEntry
+    {
+        public bool IsEnabled { get; set; }
+        public List<string> Schedules { get; set; } = new();
+        public Dictionary<string, string> Settings { get; set; } = new();
     }
 }

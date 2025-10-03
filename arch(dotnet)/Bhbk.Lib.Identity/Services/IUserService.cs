@@ -36,8 +36,8 @@ namespace Bhbk.Lib.Identity.Services
         ValueTask<bool> Credentials_SetPasswordV1(PasswordAddV1 model);
 
         /*
-         * motd
+         * quote
          */
-        ValueTask<MOTDTssV1> MOTD_GetV1();
+        ValueTask<QuoteV1> Quote_GetV1();
     }
 }

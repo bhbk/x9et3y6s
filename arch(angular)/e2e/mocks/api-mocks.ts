@@ -5,11 +5,11 @@ import {
   ROLES,
   USERS,
   CLAIMS,
-  LOGINS,
+  LOGIN_PROVIDERS,
   AUTH_ACTIVITIES,
   REFRESHES,
-  MOTD,
-  MOTDS,
+  QUOTE,
+  QUOTES,
   pagedResult,
 } from './mock-data';
 
@@ -90,15 +90,15 @@ export async function mockStsRefresh(page: Page) {
 /** Mock all admin API routes — call this once per test that needs admin API */
 export async function mockAdminApi(page: Page) {
   // Issuers
-  await page.route(`${ADMIN_API}/issuer/v1/page`, (route) =>
+  await page.route(`${ADMIN_API}/issuers/v1/page`, (route) =>
     json(route, pagedResult(ISSUERS)),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/issuer/v1/[0-9a-f-]+$`), (route) => {
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/issuers/v1/[0-9a-f-]+$`), (route) => {
     if (route.request().method() === 'GET') return json(route, ISSUERS[0]);
     if (route.request().method() === 'DELETE') return ok(route);
     return json(route, ISSUERS[0]); // PUT
   });
-  await page.route(`${ADMIN_API}/issuer/v1`, (route) => {
+  await page.route(`${ADMIN_API}/issuers/v1`, (route) => {
     const method = route.request().method();
     if (method === 'POST') {
       // Create — return the posted data merged with generated fields
@@ -117,19 +117,19 @@ export async function mockAdminApi(page: Page) {
   });
 
   // Audiences
-  await page.route(`${ADMIN_API}/audience/v1/page`, (route) =>
+  await page.route(`${ADMIN_API}/audiences/v1/page`, (route) =>
     json(route, pagedResult(AUDIENCES)),
   );
   await page.route(
-    new RegExp(`${escapeRegex(ADMIN_API)}/audience/v1/issuer/[0-9a-f-]+$`),
+    new RegExp(`${escapeRegex(ADMIN_API)}/audiences/v1/issuer/[0-9a-f-]+$`),
     (route) => json(route, AUDIENCES.filter((a) => a.issuerId === ISSUERS[0].id)),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/audience/v1/[0-9a-f-]+$`), (route) => {
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/audiences/v1/[0-9a-f-]+$`), (route) => {
     if (route.request().method() === 'GET') return json(route, AUDIENCES[0]);
     if (route.request().method() === 'DELETE') return ok(route);
     return json(route, AUDIENCES[0]);
   });
-  await page.route(`${ADMIN_API}/audience/v1`, (route) => {
+  await page.route(`${ADMIN_API}/audiences/v1`, (route) => {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
@@ -140,19 +140,19 @@ export async function mockAdminApi(page: Page) {
   });
 
   // Roles
-  await page.route(`${ADMIN_API}/role/v1/page`, (route) =>
+  await page.route(`${ADMIN_API}/roles/v1/page`, (route) =>
     json(route, pagedResult(ROLES)),
   );
   await page.route(
-    new RegExp(`${escapeRegex(ADMIN_API)}/role/v1/audience/[0-9a-f-]+$`),
+    new RegExp(`${escapeRegex(ADMIN_API)}/roles/v1/audience/[0-9a-f-]+$`),
     (route) => json(route, ROLES.filter((r) => r.audienceId === AUDIENCES[0].id)),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/role/v1/[0-9a-f-]+$`), (route) => {
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/roles/v1/[0-9a-f-]+$`), (route) => {
     if (route.request().method() === 'GET') return json(route, ROLES[0]);
     if (route.request().method() === 'DELETE') return ok(route);
     return json(route, ROLES[0]);
   });
-  await page.route(`${ADMIN_API}/role/v1`, (route) => {
+  await page.route(`${ADMIN_API}/roles/v1`, (route) => {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
@@ -163,25 +163,25 @@ export async function mockAdminApi(page: Page) {
   });
 
   // Users
-  await page.route(`${ADMIN_API}/user/v1/page`, (route) =>
+  await page.route(`${ADMIN_API}/users/v1/page`, (route) =>
     json(route, pagedResult(USERS)),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/user/v1/[0-9a-f-]+/roles$`), (route) =>
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/users/v1/[0-9a-f-]+/roles$`), (route) =>
     json(route, [ROLES[0]]),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/user/v1/[0-9a-f-]+/claims$`), (route) =>
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/users/v1/[0-9a-f-]+/claims$`), (route) =>
     json(route, [CLAIMS[0]]),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/user/v1/[0-9a-f-]+/logins$`), (route) =>
-    json(route, [LOGINS[0]]),
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/users/v1/[0-9a-f-]+/login-providers$`), (route) =>
+    json(route, [LOGIN_PROVIDERS[0]]),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/user/v1/[0-9a-f-]+$`), (route) => {
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/users/v1/[0-9a-f-]+$`), (route) => {
     if (route.request().method() === 'GET') return json(route, USERS[0]);
     if (route.request().method() === 'DELETE') return ok(route);
     return json(route, USERS[0]);
   });
-  await page.route(`${ADMIN_API}/user/v1/password`, (route) => ok(route));
-  await page.route(`${ADMIN_API}/user/v1`, (route) => {
+  await page.route(`${ADMIN_API}/users/v1/password`, (route) => ok(route));
+  await page.route(`${ADMIN_API}/users/v1`, (route) => {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
@@ -192,19 +192,19 @@ export async function mockAdminApi(page: Page) {
   });
 
   // Claims
-  await page.route(`${ADMIN_API}/claim/v1/page`, (route) =>
+  await page.route(`${ADMIN_API}/claims/v1/page`, (route) =>
     json(route, pagedResult(CLAIMS)),
   );
   await page.route(
-    new RegExp(`${escapeRegex(ADMIN_API)}/claim/v1/issuer/[0-9a-f-]+$`),
+    new RegExp(`${escapeRegex(ADMIN_API)}/claims/v1/issuer/[0-9a-f-]+$`),
     (route) => json(route, CLAIMS),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/claim/v1/[0-9a-f-]+$`), (route) => {
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/claims/v1/[0-9a-f-]+$`), (route) => {
     if (route.request().method() === 'GET') return json(route, CLAIMS[0]);
     if (route.request().method() === 'DELETE') return ok(route);
     return json(route, CLAIMS[0]);
   });
-  await page.route(`${ADMIN_API}/claim/v1`, (route) => {
+  await page.route(`${ADMIN_API}/claims/v1`, (route) => {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
@@ -214,16 +214,16 @@ export async function mockAdminApi(page: Page) {
     return route.fallback();
   });
 
-  // Logins
-  await page.route(`${ADMIN_API}/login/v1/page`, (route) =>
-    json(route, pagedResult(LOGINS)),
+  // Login Providers
+  await page.route(`${ADMIN_API}/login-providers/v1/page`, (route) =>
+    json(route, pagedResult(LOGIN_PROVIDERS)),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/login/v1/[0-9a-f-]+$`), (route) => {
-    if (route.request().method() === 'GET') return json(route, LOGINS[0]);
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/login-providers/v1/[0-9a-f-]+$`), (route) => {
+    if (route.request().method() === 'GET') return json(route, LOGIN_PROVIDERS[0]);
     if (route.request().method() === 'DELETE') return ok(route);
-    return json(route, LOGINS[0]);
+    return json(route, LOGIN_PROVIDERS[0]);
   });
-  await page.route(`${ADMIN_API}/login/v1`, (route) => {
+  await page.route(`${ADMIN_API}/login-providers/v1`, (route) => {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
@@ -234,23 +234,23 @@ export async function mockAdminApi(page: Page) {
   });
 
   // Auth Activity
-  await page.route(`${ADMIN_API}/activity/v1/page`, (route) =>
+  await page.route(`${ADMIN_API}/activities/v1/page`, (route) =>
     json(route, pagedResult(AUTH_ACTIVITIES)),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/activity/v1/[0-9a-f-]+$`), (route) =>
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/activities/v1/[0-9a-f-]+$`), (route) =>
     json(route, AUTH_ACTIVITIES[0]),
   );
 
-  // MOTDs
-  await page.route(`${ADMIN_API}/motd/v1/page`, (route) =>
-    json(route, pagedResult(MOTDS)),
+  // Quotes
+  await page.route(`${ADMIN_API}/quotes/v1/page`, (route) =>
+    json(route, pagedResult(QUOTES)),
   );
-  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/motd/v1/[0-9a-f-]+$`), (route) => {
-    if (route.request().method() === 'GET') return json(route, MOTDS[0]);
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/quotes/v1/[0-9a-f-]+$`), (route) => {
+    if (route.request().method() === 'GET') return json(route, QUOTES[0]);
     if (route.request().method() === 'DELETE') return ok(route);
-    return json(route, MOTDS[0]);
+    return json(route, QUOTES[0]);
   });
-  await page.route(`${ADMIN_API}/motd/v1`, (route) => {
+  await page.route(`${ADMIN_API}/quotes/v1`, (route) => {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
@@ -259,6 +259,27 @@ export async function mockAdminApi(page: Page) {
     if (method === 'PUT') return json(route, route.request().postDataJSON());
     return route.fallback();
   });
+
+  // Chat API — conversations REST endpoint (used by ChatComponent.ngOnInit)
+  await page.route(`${ADMIN_API}/chat/**`, (route) => {
+    if (route.request().method() === 'GET') return json(route, []);
+    if (route.request().method() === 'POST') {
+      return json(route, {
+        id: crypto.randomUUID(),
+        title: 'New Chat',
+        createdUtc: new Date().toISOString(),
+        updatedUtc: new Date().toISOString(),
+      });
+    }
+    if (route.request().method() === 'DELETE') return ok(route);
+    return route.fallback();
+  });
+
+  // SignalR hub — fail negotiate fast so the connection settles into disconnected state
+  // Tests that need specific hub behavior (e.g. blocking negotiate) override this route
+  await page.route(`${ADMIN_API}/hubs/**`, (route) =>
+    route.fulfill({ status: 503, body: 'Service Unavailable' }),
+  );
 }
 
 // ── User API Mocks ───────────────────────────────────────────────────
@@ -266,35 +287,55 @@ export async function mockAdminApi(page: Page) {
 /** Mock all user-portal API routes */
 export async function mockUserApi(page: Page) {
   // Profile
-  await page.route(`${USER_API}/profile/v1`, (route) => {
+  await page.route(`${USER_API}/profiles/v1`, (route) => {
     if (route.request().method() === 'GET') return json(route, USERS[1]);
     if (route.request().method() === 'PUT') return json(route, route.request().postDataJSON());
     return route.fallback();
   });
 
   // Sessions
-  await page.route(`${USER_API}/session/v1/refreshes`, (route) => {
+  await page.route(`${USER_API}/sessions/v1/refreshes`, (route) => {
     if (route.request().method() === 'GET') return json(route, REFRESHES);
     if (route.request().method() === 'DELETE') return ok(route);
     return route.fallback();
   });
   await page.route(
-    new RegExp(`${escapeRegex(USER_API)}/session/v1/refreshes/[0-9a-f-]+$`),
+    new RegExp(`${escapeRegex(USER_API)}/sessions/v1/refreshes/[0-9a-f-]+$`),
     (route) => ok(route),
   );
 
   // Logout
-  await page.route(`${USER_API}/session/v1/logout`, (route) => ok(route));
+  await page.route(`${USER_API}/sessions/v1/logout`, (route) => ok(route));
 
-  // MOTD
-  await page.route(`${USER_API}/motd/v1/page`, (route) => json(route, pagedResult(MOTDS)));
-  await page.route(`${USER_API}/motd/v1`, (route) => json(route, MOTD));
+  // Quote
+  await page.route(`${USER_API}/quotes/v1/page`, (route) => json(route, pagedResult(QUOTES)));
+  await page.route(`${USER_API}/quotes/v1`, (route) => json(route, QUOTE));
 
   // Password / Credentials
   await page.route(`${USER_API}/credentials/v1/password`, (route) => ok(route));
   await page.route(`${USER_API}/credentials/v1/password/set`, (route) => ok(route));
   await page.route(`${USER_API}/credentials/v1/email/confirm`, (route) => ok(route));
   await page.route(`${USER_API}/credentials/v1/phone/confirm`, (route) => ok(route));
+
+  // Chat API — conversations REST endpoint
+  await page.route(`${USER_API}/chat/**`, (route) => {
+    if (route.request().method() === 'GET') return json(route, []);
+    if (route.request().method() === 'POST') {
+      return json(route, {
+        id: crypto.randomUUID(),
+        title: 'New Chat',
+        createdUtc: new Date().toISOString(),
+        updatedUtc: new Date().toISOString(),
+      });
+    }
+    if (route.request().method() === 'DELETE') return ok(route);
+    return route.fallback();
+  });
+
+  // SignalR hub — fail negotiate fast so the connection settles into disconnected state
+  await page.route(`${USER_API}/hubs/**`, (route) =>
+    route.fulfill({ status: 503, body: 'Service Unavailable' }),
+  );
 }
 
 // ── JWT Token Helper ─────────────────────────────────────────────────

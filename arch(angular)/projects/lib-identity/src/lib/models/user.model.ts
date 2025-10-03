@@ -5,7 +5,7 @@
 
 import { RoleV1 } from './role.model';
 import { ClaimV1 } from './claim.model';
-import { LoginV1 } from './login.model';
+import { LoginProviderV1 } from './login-provider.model';
 
 export interface UserV1 {
   id: string;
@@ -26,7 +26,7 @@ export interface UserV1 {
   createdUtc: string;
   roles?: RoleV1[];
   claims?: ClaimV1[];
-  logins?: LoginV1[];
+  loginProviders?: LoginProviderV1[];
 }
 
 export interface UserCreate {

@@ -27,7 +27,6 @@ import { DateTime } from 'luxon';
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-800">Sessions</h1>
           <p class="text-gray-500 mt-1">Manage your sessions and sign out from other devices</p>
         </div>
         @if (sessions().length > 1) {
@@ -56,14 +55,14 @@ import { DateTime } from 'luxon';
           </button>
         </div>
       } @else if (sessions().length === 0) {
-        <div class="bg-white rounded-lg shadow p-8 text-center">
+        <div class="bg-white rounded-lg border border-gray-200 p-8 text-center">
           <kendo-svg-icon [icon]="computerIcon" size="xlarge" class="text-gray-300 mb-4"></kendo-svg-icon>
           <p class="text-gray-500">No active sessions found</p>
         </div>
       } @else {
         <div class="space-y-4">
           @for (session of sessions(); track session.id) {
-            <div class="bg-white rounded-lg shadow p-4">
+            <div class="bg-white rounded-lg border border-gray-200 p-4">
               <div class="flex items-start justify-between">
                 <div class="flex items-start gap-4">
                   <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
@@ -73,7 +72,7 @@ import { DateTime } from 'luxon';
                     <div class="flex items-center gap-2">
                       <span class="font-medium text-gray-900">{{ getDeviceName(session) }}</span>
                       @if (isCurrentSession(session)) {
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full border border-green-200">
                           <kendo-svg-icon [icon]="checkIcon" size="small"></kendo-svg-icon>
                           Current
                         </span>

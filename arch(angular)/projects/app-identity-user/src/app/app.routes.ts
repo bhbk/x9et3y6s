@@ -48,6 +48,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/sessions/sessions.component').then(m => m.SessionsComponent)
       },
       {
+        path: 'assistant',
+        loadComponent: () => import('./features/assistant/assistant.component').then(m => m.AssistantComponent)
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'

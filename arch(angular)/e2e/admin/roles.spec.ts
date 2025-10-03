@@ -36,6 +36,12 @@ test.describe('Admin Roles', () => {
     await dialog.clickAction('Create');
     const createReq = await createPromise;
     expect(createReq.method()).toBe('POST');
+
+    const body = createReq.postDataJSON();
+    expect(body).toHaveProperty('audienceId');
+    expect(body).toHaveProperty('name');
+    expect(body).toHaveProperty('isEnabled');
+    expect(body).toHaveProperty('isDeletable');
   });
 
   test('edit role via dialog', async ({ adminPage }) => {

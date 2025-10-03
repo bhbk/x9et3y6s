@@ -34,6 +34,12 @@ test.describe('Admin Audiences', () => {
     await dialog.clickAction('Create');
     const createReq = await createPromise;
     expect(createReq.method()).toBe('POST');
+
+    const body = createReq.postDataJSON();
+    expect(body).toHaveProperty('issuerId');
+    expect(body).toHaveProperty('name');
+    expect(body).toHaveProperty('isLockedOut');
+    expect(body).toHaveProperty('isDeletable');
   });
 
   test('edit audience via dialog', async ({ adminPage }) => {

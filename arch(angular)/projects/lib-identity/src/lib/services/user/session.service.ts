@@ -15,21 +15,21 @@ export class SessionService {
    * Get all active sessions (refresh tokens) for current user
    */
   getSessions(): Observable<RefreshV1[]> {
-    return this.http.get<RefreshV1[]>(`${this.config.userApiUrl}${this.config.pathBase}/session/v1/refreshes`);
+    return this.http.get<RefreshV1[]>(`${this.config.userApiUrl}${this.config.pathBase}/sessions/v1/refreshes`);
   }
 
   /**
    * Revoke a specific session
    */
   revokeSession(refreshId: string): Observable<void> {
-    return this.http.delete<void>(`${this.config.userApiUrl}${this.config.pathBase}/session/v1/refreshes/${refreshId}`);
+    return this.http.delete<void>(`${this.config.userApiUrl}${this.config.pathBase}/sessions/v1/refreshes/${refreshId}`);
   }
 
   /**
    * Revoke all sessions for current user
    */
   revokeAllSessions(): Observable<void> {
-    return this.http.delete<void>(`${this.config.userApiUrl}${this.config.pathBase}/session/v1/refreshes`);
+    return this.http.delete<void>(`${this.config.userApiUrl}${this.config.pathBase}/sessions/v1/refreshes`);
   }
 
   /**
@@ -37,7 +37,7 @@ export class SessionService {
    */
   logout(): Observable<void> {
     return this.http.post<void>(
-      `${this.config.userApiUrl}${this.config.pathBase}/session/v1/logout`,
+      `${this.config.userApiUrl}${this.config.pathBase}/sessions/v1/logout`,
       {},
       { withCredentials: true }
     );

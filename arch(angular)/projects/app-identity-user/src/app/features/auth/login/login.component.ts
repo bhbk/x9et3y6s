@@ -30,7 +30,7 @@ import { lockIcon } from '@progress/kendo-svg-icons';
               <kendo-svg-icon [icon]="lockIcon" size="xlarge" class="text-blue-600"></kendo-svg-icon>
             </div>
           </div>
-          <h2 class="text-xl font-semibold text-gray-800 mb-2">Signing you in...</h2>
+          <h2 class="text-xl font-medium text-gray-800 mb-2">Signing you in...</h2>
           <p class="text-gray-500 mb-6">Transferring your session securely</p>
           <div class="w-48 mx-auto">
             <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden">
@@ -51,7 +51,7 @@ import { lockIcon } from '@progress/kendo-svg-icons';
             <p class="text-gray-600">Sign in to your account</p>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md p-8">
+          <div class="bg-white rounded-lg border border-gray-200 p-8">
             @if (authStore.error()) {
               <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
                 {{ authStore.error() }}
@@ -200,14 +200,15 @@ export class LoginComponent implements OnInit, OnDestroy {
           expiresIn,
           savedAt: new Date().toISOString()
         }));
+        localStorage.setItem('identity_remember_me', 'true');
         this.authStore.initFromStorage();
         if (this.authStore.isAuthenticated() && !this.authStore.isTokenExpired()) {
           setTimeout(() => this.router.navigateByUrl(this.returnUrl), 1000);
           return;
         }
       }
-    } catch {
-      // Invalid token, fall through to login form
+    } catch (e) {
+      console.error('Token hydration failed:', e);
     }
     this.isTransferring.set(false);
   }

@@ -12,7 +12,7 @@ export class AuthActivityService {
   private readonly config = inject(ConfigService);
 
   private get baseUrl(): string {
-    return `${this.config.adminApiUrl}${this.config.pathBase}/activity`;
+    return `${this.config.adminApiUrl}${this.config.pathBase}/activities`;
   }
 
   /**

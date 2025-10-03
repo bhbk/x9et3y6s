@@ -68,12 +68,14 @@ namespace Bhbk.Cli.Identity.Commands
 
                     data.CreateSettings();
                     data.CreateIssuers();
+                    data.CreateLLMProviders();
+                    data.CreateJobs();
                     data.CreateAudiences();
                     data.CreateAudienceRoles();
                     data.CreateRoles();
-                    data.CreateLogins();
+                    data.CreateLoginProviders();
                     data.CreateUsers();
-                    data.CreateUserLogins();
+                    data.CreateUserLoginProviders();
                     data.CreateUserRoles();
 
                     Console.WriteLine("\tCompleted create default data...");

@@ -54,6 +54,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public virtual ICollection<ClaimV1> Claims { get; set; }
 
-        public virtual ICollection<LoginV1> Logins { get; set; }
+        public virtual ICollection<LoginProviderV1> LoginProviders { get; set; }
     }
 }

@@ -11,7 +11,7 @@ test.describe('Admin Navigation', () => {
       { text: 'Roles', url: '/roles' },
       { text: 'Claims', url: '/claims' },
       { text: 'Logins', url: '/logins' },
-      { text: 'MOTDs', url: '/motds' },
+      { text: 'Quotes', url: '/quotes' },
     ];
 
     for (const link of links) {
@@ -31,13 +31,43 @@ test.describe('Admin Navigation', () => {
   });
 
   test('logout clears session and redirects to login', async ({ adminPage }) => {
-    // Open hamburger menu first
-    const hamburger = adminPage.locator('header button').first();
+    // Remove the old STS refresh handler and re-register to return 400.
+    // Without this, the guest guard on /login calls tryRefreshToken(),
+    // the mock succeeds, and the guard redirects back to /dashboard.
+    // Use 400 (not 401) because the error interceptor catches 401s and
+    // calls router.navigate(['/login']), which cancels the in-progress
+    // navigation and creates a conflict loop.
+    const STS_API = 'http://localhost:55114/api';
+    await adminPage.unroute(`${STS_API}/oauth2/v2/ropg-rt`);
+    await adminPage.route(`${STS_API}/oauth2/v2/ropg-rt`, (route) =>
+      route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'invalid_grant', error_description: 'Session expired' }),
+      }),
+    );
+
+    // Listen for the logout POST to verify the button click works
+    const logoutPromise = adminPage.waitForRequest((req) =>
+      req.url().includes('/session/v1/logout') && req.method() === 'POST',
+    );
+
+    // Open hamburger menu
+    const hamburger = adminPage.locator('[data-menu-container] button');
+    await expect(hamburger).toBeVisible({ timeout: 10000 });
     await hamburger.click();
 
-    // Click Sign Out in the dropdown
-    await adminPage.locator('button', { hasText: 'Sign Out' }).click();
-    await adminPage.waitForURL('**/login**', { timeout: 10000 });
+    // Wait for the Sign Out button to appear, then click it
+    const signOutBtn = adminPage.locator('[data-menu-container]').locator('button', { hasText: 'Sign Out' });
+    await expect(signOutBtn).toBeVisible({ timeout: 5000 });
+    await signOutBtn.click();
+
+    // Verify the logout POST was actually sent
+    const logoutReq = await logoutPromise;
+    expect(logoutReq.method()).toBe('POST');
+
+    // Should eventually reach /login
+    await adminPage.waitForURL('**/login**', { timeout: 15000 });
     await expect(adminPage).toHaveURL(/\/login/);
   });
 });

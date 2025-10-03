@@ -10,11 +10,12 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public tbl_User()
         {
             tbl_AuthActivities = new HashSet<tbl_AuthActivity>();
+            tbl_ChatConversations = new HashSet<tbl_ChatConversation>();
             tbl_Refreshes = new HashSet<tbl_Refresh>();
             tbl_Settings = new HashSet<tbl_Setting>();
             tbl_States = new HashSet<tbl_State>();
             tbl_UserClaims = new HashSet<tbl_UserClaim>();
-            tbl_UserLogins = new HashSet<tbl_UserLogin>();
+            tbl_UserLoginProviders = new HashSet<tbl_UserLoginProvider>();
             tbl_UserRoles = new HashSet<tbl_UserRole>();
         }
 
@@ -38,11 +39,12 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public DateTimeOffset CreatedUtc { get; set; }
 
         public virtual ICollection<tbl_AuthActivity> tbl_AuthActivities { get; set; }
+        public virtual ICollection<tbl_ChatConversation> tbl_ChatConversations { get; set; }
         public virtual ICollection<tbl_Refresh> tbl_Refreshes { get; set; }
         public virtual ICollection<tbl_Setting> tbl_Settings { get; set; }
         public virtual ICollection<tbl_State> tbl_States { get; set; }
         public virtual ICollection<tbl_UserClaim> tbl_UserClaims { get; set; }
-        public virtual ICollection<tbl_UserLogin> tbl_UserLogins { get; set; }
+        public virtual ICollection<tbl_UserLoginProvider> tbl_UserLoginProviders { get; set; }
         public virtual ICollection<tbl_UserRole> tbl_UserRoles { get; set; }
     }
 }

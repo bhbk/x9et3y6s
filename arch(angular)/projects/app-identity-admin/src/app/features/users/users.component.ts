@@ -34,7 +34,6 @@ import { DateTime } from 'luxon';
       } @else {
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-800">Users</h1>
           <p class="text-gray-500">Manage user accounts</p>
         </div>
         <button kendoButton themeColor="primary" (click)="openCreate()">
@@ -50,7 +49,7 @@ import { DateTime } from 'luxon';
         </div>
       }
 
-      <div class="bg-white rounded-lg shadow">
+      <div class="bg-white rounded-lg border border-gray-200">
         <kendo-grid
           [data]="gridData()"
           [pageSize]="pageSize()"
@@ -100,12 +99,12 @@ import { DateTime } from 'luxon';
           <kendo-grid-column field="isLockedOut" title="Status" [width]="100">
             <ng-template kendoGridCellTemplate let-dataItem>
               @if (dataItem.isLockedOut) {
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full border border-red-200">
                   <kendo-svg-icon [icon]="lockIcon" size="small"></kendo-svg-icon>
                   Locked
                 </span>
               } @else {
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full border border-green-200">
                   Active
                 </span>
               }

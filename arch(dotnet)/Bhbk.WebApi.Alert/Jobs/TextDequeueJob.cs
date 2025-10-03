@@ -4,7 +4,6 @@ using Bhbk.Lib.Identity.Data.EF.Models;
 using Bhbk.Lib.QueryExpression.Extensions;
 using Bhbk.Lib.QueryExpression.Factories;
 using Bhbk.WebApi.Alert.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Serilog;
@@ -37,11 +36,10 @@ namespace Bhbk.WebApi.Alert.Jobs
             {
                 using (var scope = _factory.CreateScope())
                 {
-                    var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var twilio = scope.ServiceProvider.GetRequiredService<ITwilioService>();
 
-                    DoDequeueWork(conf, uow, twilio);
+                    DoDequeueWork(uow, twilio);
                 }
             }
             catch (Exception ex)
@@ -59,11 +57,14 @@ namespace Bhbk.WebApi.Alert.Jobs
             return Task.CompletedTask;
         }
 
-        private void DoDequeueWork(IConfiguration conf, IUnitOfWork uow, ITwilioService twilio)
+        private void DoDequeueWork(IUnitOfWork uow, ITwilioService twilio)
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
-            var twilioSid = conf["Jobs:TextDequeue:TwilioSid"];
-            var twilioToken = conf["Jobs:TextDequeue:TwilioToken"];
+
+            var job = uow.Jobs.Get(x => x.Name == "TextDequeue").Single();
+            var jobSettings = uow.JobSettings.Get(x => x.JobId == job.Id).ToList();
+            var twilioSid = jobSettings.Single(x => x.ConfigKey == "TwilioSid").ConfigValue;
+            var twilioToken = jobSettings.Single(x => x.ConfigKey == "TwilioToken").ConfigValue;
 
             foreach (var msg in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>()
                 .Where(x => x.SendAtUtc < DateTime.UtcNow

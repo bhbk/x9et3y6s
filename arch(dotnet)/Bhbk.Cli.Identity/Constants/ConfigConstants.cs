@@ -20,7 +20,7 @@ namespace Bhbk.Cli.Identity.Constants
             "Jobs:TextDequeue:TwilioSid",
             "Jobs:TextDequeue:TwilioToken",
             "SeedData:Issuer:IssuerKey",
-            "SeedData:Login:LoginKey",
+            "SeedData:LoginProvider:ProviderKey",
         };
 
         /*

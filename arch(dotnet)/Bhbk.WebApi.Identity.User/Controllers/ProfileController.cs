@@ -10,7 +10,7 @@ using System.Linq.Dynamic.Core;
 
 namespace Bhbk.WebApi.Identity.User.Controllers
 {
-    [Route("profile")]
+    [Route("profiles")]
     [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
     public class ProfileController : BaseController
     {

@@ -21,8 +21,6 @@ import { userIcon, checkIcon, xIcon } from '@progress/kendo-svg-icons';
   ],
   template: `
     <div class="p-6">
-      <h1 class="text-2xl font-semibold text-gray-800 mb-6">Profile</h1>
-
       @if (isLoading()) {
         <div class="flex items-center justify-center p-12">
           <kendo-loader size="large"></kendo-loader>
@@ -32,7 +30,8 @@ import { userIcon, checkIcon, xIcon } from '@progress/kendo-svg-icons';
           {{ error() }}
         </div>
       } @else {
-        <div class="bg-white rounded-lg shadow">
+        <div>
+        <div class="bg-white rounded-lg border border-gray-200">
           <!-- Profile Header -->
           <div class="p-6 border-b border-gray-200">
             <div class="flex items-center gap-4">
@@ -40,7 +39,7 @@ import { userIcon, checkIcon, xIcon } from '@progress/kendo-svg-icons';
                 <kendo-svg-icon [icon]="userIcon" size="xlarge" class="text-blue-600"></kendo-svg-icon>
               </div>
               <div>
-                <h2 class="text-xl font-semibold text-gray-900">{{ profile()?.firstName }} {{ profile()?.lastName }}</h2>
+                <h2 class="text-xl font-medium text-gray-900">{{ profile()?.firstName }} {{ profile()?.lastName }}</h2>
                 <p class="text-gray-500">{{ profile()?.email }}</p>
                 <p class="text-sm text-gray-400">{{ '@' + profile()?.userName }}</p>
               </div>
@@ -155,6 +154,7 @@ import { userIcon, checkIcon, xIcon } from '@progress/kendo-svg-icons';
             </form>
           </div>
         </div>
+        </div>
       }
     </div>
   `
@@ -231,8 +231,8 @@ export class ProfileComponent implements OnInit {
 
     if (!currentProfile) return;
 
-    const update: Partial<UserV1> = {
-      id: currentProfile.id,
+    const update: UserV1 = {
+      ...currentProfile,
       firstName: firstName,
       lastName: lastName,
       phoneNumber: phoneNumber || undefined

@@ -1,0 +1,11 @@
+using Bhbk.Lib.Common.Services;
+using Microsoft.Extensions.Configuration;
+
+namespace Bhbk.Lib.Identity.Domain.Providers.Admin
+{
+    public class QuoteProvider : BaseProvider
+    {
+        public QuoteProvider(IConfiguration conf, IContextService env)
+            : base(conf, env) { }
+    }
+}

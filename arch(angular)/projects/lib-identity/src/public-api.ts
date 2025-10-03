@@ -11,6 +11,9 @@ export * from './lib/services';
 // Stores
 export * from './lib/stores';
 
+// Components
+export * from './lib/components';
+
 // Interceptors
 export * from './lib/interceptors';
 

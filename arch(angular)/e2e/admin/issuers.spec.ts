@@ -29,6 +29,11 @@ test.describe('Admin Issuers', () => {
     await dialog.clickAction('Create');
     const createReq = await createPromise;
     expect(createReq.method()).toBe('POST');
+
+    const body = createReq.postDataJSON();
+    expect(body).toHaveProperty('name');
+    expect(body).toHaveProperty('isEnabled');
+    expect(body).toHaveProperty('isDeletable');
   });
 
   test('edit issuer via dialog', async ({ adminPage }) => {

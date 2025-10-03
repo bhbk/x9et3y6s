@@ -8,7 +8,7 @@ import { IssuerV1, IssuerCreate, IssuerUpdate } from '../../models';
   providedIn: 'root'
 })
 export class IssuerService extends BaseAdminService<IssuerV1, IssuerCreate, IssuerUpdate> {
-  protected readonly endpoint = 'issuer';
+  protected readonly endpoint = 'issuers';
 
   constructor() {
     super(inject(HttpClient), inject(ConfigService));

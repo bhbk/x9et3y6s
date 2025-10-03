@@ -9,7 +9,7 @@ import { AudienceV1, AudienceCreate, AudienceUpdate, AudiencePassword, RoleV1 } 
   providedIn: 'root'
 })
 export class AudienceService extends BaseAdminService<AudienceV1, AudienceCreate, AudienceUpdate> {
-  protected readonly endpoint = 'audience';
+  protected readonly endpoint = 'audiences';
 
   constructor() {
     super(inject(HttpClient), inject(ConfigService));

@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
         private readonly SeedDataSettings _seedData;
 
         private tbl_Issuer foundIssuer;
-        private tbl_Login foundLogin;
+        private tbl_LoginProvider foundLoginProvider;
         private Dictionary<string, tbl_Audience> foundAudiences = new Dictionary<string, tbl_Audience>();
         private Dictionary<string, tbl_Role> foundRoles = new Dictionary<string, tbl_Role>();
         private Dictionary<string, tbl_User> foundUsers = new Dictionary<string, tbl_User>();
@@ -30,7 +30,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
         {
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
             _seedData = seedData ?? throw new ArgumentNullException(nameof(seedData));
-            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile_EF>())
+            _map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>())
                 .CreateMapper();
         }
 
@@ -203,19 +203,130 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
         }
 
-        public void CreateLogins()
+        public void CreateJobs()
         {
-            foundLogin = _uow.Logins.Get(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.Name == _seedData.Login.Name).ToLambda())
+            if (_seedData.Jobs == null)
+                return;
+
+            foreach (var jobSeed in _seedData.Jobs)
+            {
+                var foundJob = _uow.Jobs.Get(QueryExpressionFactory.GetQueryExpression<tbl_Job>()
+                    .Where(x => x.Name == jobSeed.Name).ToLambda())
+                    .SingleOrDefault();
+
+                if (foundJob == null)
+                {
+                    foundJob = _uow.Jobs.Create(
+                        new tbl_Job
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = jobSeed.Name,
+                            IsEnabled = jobSeed.IsEnabled,
+                            IsDeletable = false,
+                            CreatedUtc = DateTimeOffset.UtcNow,
+                        });
+
+                    _uow.Commit();
+                }
+
+                if (jobSeed.Settings == null)
+                    continue;
+
+                foreach (var settingSeed in jobSeed.Settings)
+                {
+                    var foundSetting = _uow.JobSettings.Get(
+                        x => x.JobId == foundJob.Id && x.ConfigKey == settingSeed.ConfigKey)
+                        .SingleOrDefault();
+
+                    if (foundSetting == null)
+                    {
+                        _uow.JobSettings.Create(
+                            new tbl_JobSetting
+                            {
+                                Id = Guid.NewGuid(),
+                                JobId = foundJob.Id,
+                                ConfigKey = settingSeed.ConfigKey,
+                                ConfigValue = settingSeed.ConfigValue,
+                                IsSecret = settingSeed.IsSecret,
+                                IsDeletable = false,
+                                CreatedUtc = DateTimeOffset.UtcNow,
+                            });
+
+                        _uow.Commit();
+                    }
+                }
+            }
+        }
+
+        public void CreateLLMProviders()
+        {
+            if (_seedData.LLMProviders == null)
+                return;
+
+            foreach (var providerSeed in _seedData.LLMProviders)
+            {
+                var foundProvider = _uow.LLMProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LLMProvider>()
+                    .Where(x => x.Name == providerSeed.Name).ToLambda())
+                    .SingleOrDefault();
+
+                if (foundProvider == null)
+                {
+                    foundProvider = _uow.LLMProviders.Create(
+                        new tbl_LLMProvider
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = providerSeed.Name,
+                            IsEnabled = providerSeed.IsEnabled,
+                            FailoverOrder = providerSeed.FailoverOrder,
+                            IsDeletable = false,
+                            CreatedUtc = DateTimeOffset.UtcNow,
+                        });
+
+                    _uow.Commit();
+                }
+
+                if (providerSeed.Settings == null)
+                    continue;
+
+                foreach (var settingSeed in providerSeed.Settings)
+                {
+                    var foundSetting = _uow.LLMProviderSettings.Get(
+                        x => x.ProviderId == foundProvider.Id && x.ConfigKey == settingSeed.ConfigKey)
+                        .SingleOrDefault();
+
+                    if (foundSetting == null)
+                    {
+                        _uow.LLMProviderSettings.Create(
+                            new tbl_LLMProviderSetting
+                            {
+                                Id = Guid.NewGuid(),
+                                ProviderId = foundProvider.Id,
+                                ConfigKey = settingSeed.ConfigKey,
+                                ConfigValue = settingSeed.ConfigValue,
+                                IsSecret = settingSeed.IsSecret,
+                                IsDeletable = false,
+                                CreatedUtc = DateTimeOffset.UtcNow,
+                            });
+
+                        _uow.Commit();
+                    }
+                }
+            }
+        }
+
+        public void CreateLoginProviders()
+        {
+            foundLoginProvider = _uow.LoginProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
+                .Where(x => x.Name == _seedData.LoginProvider.Name).ToLambda())
                 .SingleOrDefault();
 
-            if (foundLogin == null)
+            if (foundLoginProvider == null)
             {
-                foundLogin = _uow.Logins.Create(
-                    _map.Map<tbl_Login>(new LoginV1()
+                foundLoginProvider = _uow.LoginProviders.Create(
+                    _map.Map<tbl_LoginProvider>(new LoginProviderV1()
                     {
-                        Name = _seedData.Login.Name,
-                        LoginKey = _seedData.Login.LoginKey,
+                        Name = _seedData.LoginProvider.Name,
+                        ProviderKey = _seedData.LoginProvider.ProviderKey,
                         IsEnabled = true,
                         IsDeletable = false,
                     }));
@@ -340,26 +451,26 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
         }
 
-        public void CreateUserLogins()
+        public void CreateUserLoginProviders()
         {
             if (foundUsers.Count == 0)
                 CreateUsers();
 
-            if (foundLogin == null)
-                CreateLogins();
+            if (foundLoginProvider == null)
+                CreateLoginProviders();
 
             foreach (var userSeed in _seedData.Users)
             {
                 if (!foundUsers.TryGetValue(userSeed.UserName, out var user))
                     continue;
 
-                if (!_uow.Users.IsInLogin(user, foundLogin))
+                if (!_uow.Users.IsInLoginProvider(user, foundLoginProvider))
                 {
-                    _uow.Users.AddLogin(
-                        new tbl_UserLogin()
+                    _uow.Users.AddLoginProvider(
+                        new tbl_UserLoginProvider()
                         {
                             UserId = user.Id,
-                            LoginId = foundLogin.Id,
+                            LoginProviderId = foundLoginProvider.Id,
                             IsDeletable = true,
                             CreatedUtc = DateTime.UtcNow,
                         });
@@ -423,8 +534,8 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
             _uow.Commit();
 
-            _uow.Logins.Delete(QueryExpressionFactory.GetQueryExpression<tbl_Login>()
-                .Where(x => x.Name == _seedData.Login.Name).ToLambda());
+            _uow.LoginProviders.Delete(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
+                .Where(x => x.Name == _seedData.LoginProvider.Name).ToLambda());
             _uow.Commit();
 
             foreach (var audienceSeed in _seedData.Audiences)

@@ -17,7 +17,7 @@ test.describe('User Portal Sessions', () => {
     await userPage.goto('/sessions', { waitUntil: 'networkidle' });
 
     // Wait for sessions to load
-    const sessionCards = userPage.locator('.bg-white.rounded-lg.shadow.p-4');
+    const sessionCards = userPage.locator('.bg-white.rounded-lg.border.border-gray-200.p-4');
     await expect(sessionCards.first()).toBeVisible();
 
     // Revoke buttons should be present
@@ -33,7 +33,7 @@ test.describe('User Portal Sessions', () => {
     await expect(revokeButton).toBeVisible();
 
     // Count sessions before revoke
-    const sessionCards = userPage.locator('.bg-white.rounded-lg.shadow.p-4');
+    const sessionCards = userPage.locator('.bg-white.rounded-lg.border.border-gray-200.p-4');
     const countBefore = await sessionCards.count();
 
     // Click Revoke
@@ -46,7 +46,7 @@ test.describe('User Portal Sessions', () => {
 
     // Set up request listener before clicking confirm
     const revokePromise = userPage.waitForRequest((req) =>
-      req.url().includes('/session/v1/refreshes/') && req.method() === 'DELETE',
+      req.url().includes('/sessions/v1/refreshes/') && req.method() === 'DELETE',
     );
 
     // Click Revoke in the dialog
@@ -65,8 +65,24 @@ test.describe('User Portal Sessions', () => {
     await userPage.goto('/sessions', { waitUntil: 'networkidle' });
 
     // Wait for sessions to load — need at least 2 for the "Sign Out All" button
-    const sessionCards = userPage.locator('.bg-white.rounded-lg.shadow.p-4');
+    const sessionCards = userPage.locator('.bg-white.rounded-lg.border.border-gray-200.p-4');
     await expect(sessionCards.first()).toBeVisible();
+
+    // Remove old STS refresh handler and re-register to return 400,
+    // otherwise the guest guard on /login calls tryRefreshToken()
+    // which succeeds and redirects back to dashboard.
+    // Use 400 (not 401) because the error interceptor catches 401s and
+    // calls router.navigate(['/login']), which cancels the in-progress
+    // navigation and creates a conflict loop.
+    const STS_API = 'http://localhost:55114/api';
+    await userPage.unroute(`${STS_API}/oauth2/v2/ropg-rt`);
+    await userPage.route(`${STS_API}/oauth2/v2/ropg-rt`, (route) =>
+      route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'invalid_grant', error_description: 'Session expired' }),
+      }),
+    );
 
     // Click "Sign Out All"
     const signOutAllBtn = userPage.locator('button', { hasText: 'Sign Out All' });
@@ -80,7 +96,7 @@ test.describe('User Portal Sessions', () => {
 
     // Set up request listener for the bulk DELETE
     const deletePromise = userPage.waitForRequest((req) =>
-      req.url().includes('/session/v1/refreshes') && req.method() === 'DELETE',
+      req.url().includes('/sessions/v1/refreshes') && req.method() === 'DELETE',
     );
 
     // Confirm sign out all
@@ -108,24 +124,32 @@ test.describe('User Portal Sessions - Empty State', () => {
     await mockStsRefresh(page);
 
     const USER_API = 'http://localhost:55109/api';
-    await page.route(`${USER_API}/profile/v1`, (route) =>
+    await page.route(`${USER_API}/profiles/v1`, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(USERS[1]) }),
     );
-    await page.route(`${USER_API}/session/v1/refreshes`, (route) => {
+    await page.route(`${USER_API}/sessions/v1/refreshes`, (route) => {
       if (route.request().method() === 'GET') {
         // Return empty array — not 404
         return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
       }
       return route.fulfill({ status: 204 });
     });
-    await page.route(`${USER_API}/session/v1/logout`, (route) =>
+    await page.route(`${USER_API}/sessions/v1/logout`, (route) =>
       route.fulfill({ status: 200 }),
     );
-    await page.route(`${USER_API}/motd/v1/page`, (route) =>
+    await page.route(`${USER_API}/quotes/v1/page`, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [], total: 0 }) }),
     );
-    await page.route(`${USER_API}/motd/v1`, (route) =>
+    await page.route(`${USER_API}/quotes/v1`, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) }),
+    );
+    // Chat REST + SignalR hub mocks (MainLayout.ngOnInit calls chatStore.connect)
+    await page.route(`${USER_API}/chat/**`, (route) => {
+      if (route.request().method() === 'GET') return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+      return route.fulfill({ status: 200 });
+    });
+    await page.route(`${USER_API}/hubs/**`, (route) =>
+      route.fulfill({ status: 503, body: 'Service Unavailable' }),
     );
 
     // Authenticate and navigate
