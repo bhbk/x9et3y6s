@@ -14,6 +14,7 @@ export * from './user.model';
 export * from './refresh.model';
 export * from './auth-activity.model';
 export * from './setting.model';
+export * from './alert.model';
 
 // User entities
 export * from './quote.model';

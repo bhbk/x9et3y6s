@@ -57,16 +57,16 @@
         "FailoverOrder": 1,
         "Settings": [
           { "ConfigKey": "BaseUrl", "ConfigValue": "http://localhost:11434", "IsSecret": false },
-          { "ConfigKey": "ModelName", "ConfigValue": "llama3.2", "IsSecret": false },
+          { "ConfigKey": "ModelName", "ConfigValue": "qwen2.5:7b", "IsSecret": false },
           { "ConfigKey": "MaxTokens", "ConfigValue": "32000", "IsSecret": false },
-          { "ConfigKey": "Temperature", "ConfigValue": "0.7", "IsSecret": false },
+          { "ConfigKey": "Temperature", "ConfigValue": "0.3", "IsSecret": false },
           { "ConfigKey": "TimeoutSeconds", "ConfigValue": "120", "IsSecret": false }
         ]
       },
       {
         "Name": "AWSBedrock",
         "IsEnabled": false,
-        "FailoverOrder": 2,
+        "FailoverOrder": 3,
         "Settings": [
           { "ConfigKey": "Region", "ConfigValue": "us-east-1", "IsSecret": false },
           { "ConfigKey": "ModelName", "ConfigValue": "anthropic.claude-3-sonnet-20240229-v1:0", "IsSecret": false },
@@ -76,7 +76,7 @@
       {
         "Name": "AzureOpenAI",
         "IsEnabled": false,
-        "FailoverOrder": 3,
+        "FailoverOrder": 4,
         "Settings": [
           { "ConfigKey": "Endpoint", "ConfigValue": "", "IsSecret": false },
           { "ConfigKey": "ApiKey", "ConfigValue": "", "IsSecret": true },
@@ -88,7 +88,7 @@
       {
         "Name": "GoogleVertexAI",
         "IsEnabled": false,
-        "FailoverOrder": 4,
+        "FailoverOrder": 2,
         "Settings": [
           { "ConfigKey": "ProjectId", "ConfigValue": "", "IsSecret": false },
           { "ConfigKey": "Location", "ConfigValue": "us-central1", "IsSecret": false },
@@ -168,6 +168,13 @@
           { "ConfigKey": "TwilioSid", "ConfigValue": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "IsSecret": true },
           { "ConfigKey": "TwilioToken", "ConfigValue": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "IsSecret": true }
         ]
+      },
+      {
+        "Name": "MaintainChatFiles",
+        "IsEnabled": true,
+        "Settings": [
+          { "ConfigKey": "Schedule", "ConfigValue": "0 0 * ? * * *", "IsSecret": false }
+        ]
       }
     ],
     "Audiences": [
@@ -181,9 +188,9 @@
       }
     ],
     "Roles": [
-      { "Name": "Alert.Admins", "AudienceName": "Alert" },
-      { "Name": "Alert.Users", "AudienceName": "Alert" },
-      { "Name": "Alert.Viewers", "AudienceName": "Alert" },
+      { "Name": "Alert.Admins", "AudienceName": "Identity" },
+      { "Name": "Alert.Users", "AudienceName": "Identity" },
+      { "Name": "Alert.Viewers", "AudienceName": "Identity" },
       { "Name": "Identity.Admins", "AudienceName": "Identity" },
       { "Name": "Identity.Users", "AudienceName": "Identity" },
       { "Name": "Identity.Viewers", "AudienceName": "Identity" }

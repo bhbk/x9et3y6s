@@ -100,6 +100,49 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 m.CreatedUtc
             }));
         }
+
+        [Route("conversations/{conversationId}/files"), HttpGet]
+        public IActionResult GetConversationFiles(Guid conversationId)
+        {
+            var userId = GetIdentityGUID();
+            var conversation = uow.ChatConversations.Get(x => x.Id == conversationId && x.UserId == userId).FirstOrDefault();
+
+            if (conversation == null)
+                return NotFound();
+
+            var files = uow.ChatFiles.Get(x => x.ConversationId == conversationId);
+
+            return Ok(files.Select(f => new
+            {
+                f.Id,
+                f.FileName,
+                f.ContentType,
+                f.FileSize,
+                f.Summary,
+                f.ExpiresUtc,
+                f.CreatedUtc
+            }));
+        }
+
+        [Route("files/{id}"), HttpGet]
+        public IActionResult DownloadFile(Guid id)
+        {
+            var userId = GetIdentityGUID();
+            var file = uow.ChatFiles.Get(x => x.Id == id).FirstOrDefault();
+
+            if (file == null)
+                return NotFound();
+
+            /* Verify the file's conversation belongs to this user. */
+            var conversation = uow.ChatConversations.Get(x => x.Id == file.ConversationId && x.UserId == userId).FirstOrDefault();
+            if (conversation == null)
+                return NotFound();
+
+            if (file.ExpiresUtc < DateTimeOffset.UtcNow)
+                return NotFound();
+
+            return File(file.FileContent, file.ContentType, file.FileName);
+        }
     }
 
     public class CreateConversationRequest

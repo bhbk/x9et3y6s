@@ -16,20 +16,13 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "schema",
-            Description = "Get database schema information. Supports listing all entity schemas or getting a specific entity schema. Use this to understand the data model.",
+            Description = "Get database entity schema information.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['list', 'get'],
-                        'description': 'The action to perform'
-                    },
-                    'entity': {
-                        'type': 'string',
-                        'description': 'Entity name for get action (e.g., User, Audience, Issuer, Role, Claim)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['list', 'get'], 'description': 'The operation to perform. list returns all available entity names. get returns the schema (columns, types, relationships) for a specific entity.' },
+                    'entity': { 'type': 'string', 'description': 'Entity name required for the get action. Use the list action to see available entity names.' }
                 },
                 'required': ['action']
             }")

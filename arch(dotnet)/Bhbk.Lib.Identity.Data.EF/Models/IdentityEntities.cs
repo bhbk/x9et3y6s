@@ -22,6 +22,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public virtual DbSet<tbl_AuthActivity> tbl_AuthActivities { get; set; }
         public virtual DbSet<tbl_AuthActivityAudience> tbl_AuthActivityAudiences { get; set; }
         public virtual DbSet<tbl_ChatConversation> tbl_ChatConversations { get; set; }
+        public virtual DbSet<tbl_ChatFile> tbl_ChatFiles { get; set; }
         public virtual DbSet<tbl_ChatMessage> tbl_ChatMessages { get; set; }
         public virtual DbSet<tbl_ChatPrompt> tbl_ChatPrompts { get; set; }
         public virtual DbSet<tbl_Claim> tbl_Claims { get; set; }
@@ -163,6 +164,40 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                     .WithMany(p => p.tbl_ChatConversations)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK_tbl_ChatConversation_UserID");
+            });
+
+            modelBuilder.Entity<tbl_ChatFile>(entity =>
+            {
+                entity.ToTable("tbl_ChatFile");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_ChatFile")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.FileName)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.ContentType)
+                    .IsRequired()
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FileContent).IsRequired();
+
+                entity.Property(e => e.Summary).HasMaxLength(512);
+
+                entity.HasOne(d => d.Conversation)
+                    .WithMany(p => p.tbl_ChatFiles)
+                    .HasForeignKey(d => d.ConversationId)
+                    .HasConstraintName("FK_tbl_ChatFile_ConversationID");
+
+                entity.HasOne(d => d.Message)
+                    .WithMany()
+                    .HasForeignKey(d => d.MessageId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("FK_tbl_ChatFile_MessageID");
             });
 
             modelBuilder.Entity<tbl_ChatMessage>(entity =>

@@ -7,5 +7,8 @@ namespace Bhbk.Lib.Identity.LLM.Models
         public bool IsComplete { get; set; }
         public int? InputTokens { get; set; }
         public int? OutputTokens { get; set; }
+        public string FileId { get; set; }
+        public string FileName { get; set; }
+        public long? FileSize { get; set; }
     }
 }

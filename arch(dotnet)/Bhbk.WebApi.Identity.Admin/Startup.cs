@@ -14,6 +14,7 @@ using Bhbk.Lib.Identity.LLM.Configuration;
 using Bhbk.Lib.Identity.LLM.Providers;
 using Bhbk.Lib.Identity.Validators;
 using Bhbk.WebApi.Identity.Admin.Hubs;
+using Bhbk.WebApi.Identity.Admin.Services;
 using Bhbk.WebApi.Identity.Admin.Jobs;
 using CronExpressionDescriptor;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -76,6 +77,8 @@ namespace Bhbk.WebApi.Identity.Admin
                 };
             });
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
+            sc.AddScoped<ITwilioService, TwilioService>();
+            sc.AddScoped<ISendgridService, SendgridService>();
 
             var llmSettings = LoadLLMProviderSettings(conf["Databases:IdentityEntities_EF"]);
             sc.AddSingleton(Microsoft.Extensions.Options.Options.Create(llmSettings));
@@ -159,6 +162,106 @@ namespace Bhbk.WebApi.Identity.Admin
                     );
 
                     foreach (var cron in maintainUsers.Schedules)
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(jobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
+                    }
+                }
+
+                if (jobSettings.TryGetValue("EmailActivity", out var emailActivity) && emailActivity.IsEnabled)
+                {
+                    var jobKey = new JobKey(typeof(EmailActivityJob).Name, workerName);
+                    jobs.AddJob<EmailActivityJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(jobKey)
+                    );
+
+                    foreach (var cron in emailActivity.Schedules)
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(jobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
+                    }
+                }
+
+                if (jobSettings.TryGetValue("EmailDequeue", out var emailDequeue) && emailDequeue.IsEnabled)
+                {
+                    var jobKey = new JobKey(typeof(EmailDequeueJob).Name, workerName);
+                    jobs.AddJob<EmailDequeueJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(jobKey)
+                    );
+
+                    foreach (var cron in emailDequeue.Schedules)
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(jobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
+                    }
+                }
+
+                if (jobSettings.TryGetValue("TextActivity", out var textActivity) && textActivity.IsEnabled)
+                {
+                    var jobKey = new JobKey(typeof(TextActivityJob).Name, workerName);
+                    jobs.AddJob<TextActivityJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(jobKey)
+                    );
+
+                    foreach (var cron in textActivity.Schedules)
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(jobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
+                    }
+                }
+
+                if (jobSettings.TryGetValue("TextDequeue", out var textDequeue) && textDequeue.IsEnabled)
+                {
+                    var jobKey = new JobKey(typeof(TextDequeueJob).Name, workerName);
+                    jobs.AddJob<TextDequeueJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(jobKey)
+                    );
+
+                    foreach (var cron in textDequeue.Schedules)
+                    {
+                        jobs.AddTrigger(opt => opt
+                            .ForJob(jobKey)
+                            .StartNow()
+                            .WithCronSchedule(cron)
+                        );
+
+                        Log.Information($"'{callPath}' {jobKey.Name} job has schedule '{ExpressionDescriptor.GetDescription(cron)}'");
+                    }
+                }
+
+                if (jobSettings.TryGetValue("MaintainChatFiles", out var maintainChatFiles) && maintainChatFiles.IsEnabled)
+                {
+                    var jobKey = new JobKey(typeof(MaintainChatFilesJob).Name, workerName);
+                    jobs.AddJob<MaintainChatFilesJob>(opt => opt
+                        .StoreDurably()
+                        .WithIdentity(jobKey)
+                    );
+
+                    foreach (var cron in maintainChatFiles.Schedules)
                     {
                         jobs.AddTrigger(opt => opt
                             .ForJob(jobKey)
@@ -283,6 +386,14 @@ namespace Bhbk.WebApi.Identity.Admin
                     policy.RequireRole(authSettings.Roles.IdentityAdmins, authSettings.Roles.IdentityUsers));
                 opt.AddPolicy(PolicyConstants.IdentityViewerPolicy, policy =>
                     policy.RequireRole(authSettings.Roles.IdentityAdmins, authSettings.Roles.IdentityUsers, authSettings.Roles.IdentityViewers));
+
+                /* role-based policies for Alert service */
+                opt.AddPolicy(PolicyConstants.AlertAdminPolicy, policy =>
+                    policy.RequireRole(authSettings.Roles.AlertAdmins));
+                opt.AddPolicy(PolicyConstants.AlertUserPolicy, policy =>
+                    policy.RequireRole(authSettings.Roles.AlertAdmins, authSettings.Roles.AlertUsers));
+                opt.AddPolicy(PolicyConstants.AlertViewerPolicy, policy =>
+                    policy.RequireRole(authSettings.Roles.AlertAdmins, authSettings.Roles.AlertUsers, authSettings.Roles.AlertViewers));
             });
             sc.AddSwaggerGen(opt =>
             {

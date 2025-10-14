@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             {
                 var foundAudience = _uow.Audiences.Get(QueryExpressionFactory.GetQueryExpression<tbl_Audience>()
                     .Where(x => x.Name == audienceSeed.Name).ToLambda())
-                    .SingleOrDefault();
+                    .FirstOrDefault();
 
                 if (foundAudience == null)
                 {
@@ -113,7 +113,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
         {
             foundIssuer = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
                 .Where(x => x.Name == _seedData.Issuer.Name).ToLambda())
-                .SingleOrDefault();
+                .FirstOrDefault();
 
             if (foundIssuer == null)
             {
@@ -132,7 +132,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
             var foundAccessExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
                 .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.AccessExpire).ToLambda())
-                .SingleOrDefault();
+                .FirstOrDefault();
 
             if (foundAccessExpire == null)
             {
@@ -150,7 +150,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
             var foundRefreshExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
                 .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.RefreshExpire).ToLambda())
-                .SingleOrDefault();
+                .FirstOrDefault();
 
             if (foundRefreshExpire == null)
             {
@@ -168,7 +168,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
             var foundTotpExpire = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
                 .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.TotpExpire).ToLambda())
-                .SingleOrDefault();
+                .FirstOrDefault();
 
             if (foundTotpExpire == null)
             {
@@ -186,7 +186,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
             var foundPollingMax = _uow.Settings.Get(QueryExpressionFactory.GetQueryExpression<tbl_Setting>()
                 .Where(x => x.IssuerId == foundIssuer.Id && x.ConfigKey == SettingsConstants.PollingMax).ToLambda())
-                .SingleOrDefault();
+                .FirstOrDefault();
 
             if (foundPollingMax == null)
             {
@@ -212,7 +212,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             {
                 var foundJob = _uow.Jobs.Get(QueryExpressionFactory.GetQueryExpression<tbl_Job>()
                     .Where(x => x.Name == jobSeed.Name).ToLambda())
-                    .SingleOrDefault();
+                    .FirstOrDefault();
 
                 if (foundJob == null)
                 {
@@ -236,7 +236,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                 {
                     var foundSetting = _uow.JobSettings.Get(
                         x => x.JobId == foundJob.Id && x.ConfigKey == settingSeed.ConfigKey)
-                        .SingleOrDefault();
+                        .FirstOrDefault();
 
                     if (foundSetting == null)
                     {
@@ -267,7 +267,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             {
                 var foundProvider = _uow.LLMProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LLMProvider>()
                     .Where(x => x.Name == providerSeed.Name).ToLambda())
-                    .SingleOrDefault();
+                    .FirstOrDefault();
 
                 if (foundProvider == null)
                 {
@@ -292,7 +292,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                 {
                     var foundSetting = _uow.LLMProviderSettings.Get(
                         x => x.ProviderId == foundProvider.Id && x.ConfigKey == settingSeed.ConfigKey)
-                        .SingleOrDefault();
+                        .FirstOrDefault();
 
                     if (foundSetting == null)
                     {
@@ -318,7 +318,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
         {
             foundLoginProvider = _uow.LoginProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LoginProvider>()
                 .Where(x => x.Name == _seedData.LoginProvider.Name).ToLambda())
-                .SingleOrDefault();
+                .FirstOrDefault();
 
             if (foundLoginProvider == null)
             {
@@ -347,7 +347,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
 
                 var foundRole = _uow.Roles.Get(QueryExpressionFactory.GetQueryExpression<tbl_Role>()
                     .Where(x => x.Name == roleSeed.Name).ToLambda())
-                    .SingleOrDefault();
+                    .FirstOrDefault();
 
                 if (foundRole == null)
                 {
@@ -370,7 +370,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
         public void CreateSettings()
         {
             foundGlobalLegacyClaims = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == SettingsConstants.GlobalLegacyClaims).SingleOrDefault();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyClaims).FirstOrDefault();
 
             if (foundGlobalLegacyClaims == null)
             {
@@ -386,7 +386,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
 
             foundGlobalLegacyIssuer = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == SettingsConstants.GlobalLegacyIssuer).SingleOrDefault();
+                && x.ConfigKey == SettingsConstants.GlobalLegacyIssuer).FirstOrDefault();
 
             if (foundGlobalLegacyIssuer == null)
             {
@@ -402,7 +402,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             }
 
             foundGlobalTotpExpire = _uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
-                && x.ConfigKey == SettingsConstants.GlobalTotpExpire).SingleOrDefault();
+                && x.ConfigKey == SettingsConstants.GlobalTotpExpire).FirstOrDefault();
 
             if (foundGlobalTotpExpire == null)
             {
@@ -424,7 +424,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             {
                 var foundUser = _uow.Users.Get(QueryExpressionFactory.GetQueryExpression<tbl_User>()
                     .Where(x => x.UserName == userSeed.UserName).ToLambda())
-                    .SingleOrDefault();
+                    .FirstOrDefault();
 
                 if (foundUser == null)
                 {

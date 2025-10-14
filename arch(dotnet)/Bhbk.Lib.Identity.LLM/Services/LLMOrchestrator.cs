@@ -1,7 +1,9 @@
+using Bhbk.Lib.Identity.Data.EF.Models;
 using Bhbk.Lib.Identity.LLM.Abstractions;
 using Bhbk.Lib.Identity.LLM.Models;
 using Bhbk.Lib.Identity.MCP.Abstractions;
 using Bhbk.Lib.Identity.MCP.Models;
+using Bhbk.Lib.Identity.MCP.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -36,7 +38,6 @@ namespace Bhbk.Lib.Identity.LLM.Services
             string userMessage,
             CancellationToken cancellationToken = default)
         {
-            // Save user message
             _conversationService.AddMessage(conversationId, "user", userMessage);
 
             // Build message history
@@ -63,7 +64,7 @@ namespace Bhbk.Lib.Identity.LLM.Services
                     break;
 
                 // Execute tools
-                var toolResults = await ExecuteToolsAsync(response.ToolCalls, cancellationToken);
+                var (toolResults, _) = await ExecuteToolsAsync(response.ToolCalls, conversationId, cancellationToken);
 
                 // Save assistant message with tool calls
                 _conversationService.AddMessage(
@@ -105,7 +106,6 @@ namespace Bhbk.Lib.Identity.LLM.Services
             string userMessage,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            // Save user message
             _conversationService.AddMessage(conversationId, "user", userMessage);
 
             // Build message history
@@ -129,6 +129,9 @@ namespace Bhbk.Lib.Identity.LLM.Services
             // After the first tool call the LLM is producing its actual answer, so
             // content is streamed in real-time from that point on.
             bool firstToolCallComplete = false;
+
+            // Accumulate file references across all tool iterations
+            var pendingFiles = new List<JObject>();
 
             while (iterations < MaxToolIterations)
             {
@@ -168,7 +171,8 @@ namespace Bhbk.Lib.Identity.LLM.Services
                         contentBuilder.Clear();
 
                         var toolCalls = JArray.Parse(chunk.Content);
-                        var toolResults = await ExecuteToolsAsync(toolCalls, cancellationToken);
+                        var (toolResults, fileRefs) = await ExecuteToolsAsync(toolCalls, conversationId, cancellationToken);
+                        pendingFiles.AddRange(fileRefs);
 
                         _conversationService.AddMessage(
                             conversationId,
@@ -217,6 +221,21 @@ namespace Bhbk.Lib.Identity.LLM.Services
                                     yield return buffered;
                             }
 
+                            // Emit file chunks before the completion signal
+                            foreach (var fileRef in pendingFiles)
+                            {
+                                yield return new LLMStreamChunk
+                                {
+                                    Type = "file",
+                                    Content = fileRef["summary"]?.ToString(),
+                                    FileId = fileRef["fileId"]?.ToString(),
+                                    FileName = fileRef["fileName"]?.ToString(),
+                                    FileSize = fileRef["fileSize"]?.Value<long>(),
+                                    IsComplete = false
+                                };
+                            }
+                            pendingFiles.Clear();
+
                             yield return chunk;
                             yield break;
                         }
@@ -243,7 +262,8 @@ namespace Bhbk.Lib.Identity.LLM.Services
 
                         if (fallback.RequiresToolExecution)
                         {
-                            var toolResults = await ExecuteToolsAsync(fallback.ToolCalls, cancellationToken);
+                            var (toolResults, fileRefs) = await ExecuteToolsAsync(fallback.ToolCalls, conversationId, cancellationToken);
+                            pendingFiles.AddRange(fileRefs);
 
                             _conversationService.AddMessage(
                                 conversationId,
@@ -296,6 +316,20 @@ namespace Bhbk.Lib.Identity.LLM.Services
                 }
             }
 
+            // Emit any remaining file chunks before the final completion signal
+            foreach (var fileRef in pendingFiles)
+            {
+                yield return new LLMStreamChunk
+                {
+                    Type = "file",
+                    Content = fileRef["summary"]?.ToString(),
+                    FileId = fileRef["fileId"]?.ToString(),
+                    FileName = fileRef["fileName"]?.ToString(),
+                    FileSize = fileRef["fileSize"]?.Value<long>(),
+                    IsComplete = false
+                };
+            }
+
             yield return new LLMStreamChunk
             {
                 Type = "message_stop",
@@ -311,17 +345,101 @@ namespace Bhbk.Lib.Identity.LLM.Services
             var customPrompt = _conversationService.GetSystemPrompt(promptType);
 
             var basePrompt = _toolContext.Scope == MCPScope.Admin
-                ? "You are an AI assistant for the Identity management system. You have access to tools that allow you to query and analyze identity data including users, audiences, issuers, roles, claims, logins, and authentication activity. Use these tools to help administrators understand and manage the identity system.\n\nWhen you use a tool, always include the actual data from the tool results in your response. Present tables, lists, counts, and details directly — never say \"the output shows\" without including the data itself. Format data clearly using lists or tables when appropriate."
-                : $"You are an AI assistant for the Identity user portal. You can help the user view their profile, roles, settings, and session information. You only have access to data belonging to user ID: {_toolContext.UserId}. Never attempt to access data belonging to other users.\n\nWhen you use a tool, always include the actual data from the tool results in your response. Present your findings directly — never say \"the output shows\" without including the data itself.";
+                ? "You are an AI assistant for the Identity management system. You have access to tools that allow you to query and analyze identity data including users, audiences, issuers, roles, claims, logins, and authentication activity. Use these tools to help administrators understand and manage the identity system.\n\nWhen you use a tool, always include the actual data from the tool results in your response. Present tables, lists, counts, and details directly — never say \"the output shows\" without including the data itself. Format data clearly using lists or tables when appropriate.\n\nYou also have an 'export' tool that can generate downloadable CSV or JSON files. Use it when the user asks for a data export, download, or spreadsheet."
+                : BuildUserPromptWithContext();
 
             return !string.IsNullOrEmpty(customPrompt)
                 ? $"{basePrompt}\n\nAdditional instructions:\n{customPrompt}"
                 : basePrompt;
         }
 
-        private async Task<JArray> ExecuteToolsAsync(JArray toolCalls, CancellationToken cancellationToken)
+        private string BuildUserPromptWithContext()
+        {
+            var sb = new StringBuilder();
+
+            sb.Append($"You are an AI assistant for the Identity user portal. You can help the user view their profile, roles, settings, and session information. You only have access to data belonging to user ID: {_toolContext.UserId}. Never attempt to access data belonging to other users.");
+
+            var contextData = BuildUserContextData();
+            if (!string.IsNullOrEmpty(contextData))
+            {
+                sb.Append("\n\nThe user's current data is provided below. Answer questions from this data when possible. Only use tools when:");
+                sb.Append("\n- The user asks for data not shown below (e.g., refresh tokens, older activity beyond the last 10)");
+                sb.Append("\n- The user asks for a data export or download");
+                sb.Append("\n- The user asks for a quote or message of the day");
+                sb.Append("\n- The user explicitly asks to refresh the data");
+                sb.Append(contextData);
+            }
+
+            sb.Append("\n\nWhen you use a tool, always include the actual data from the tool results in your response. Present your findings directly — never say \"the output shows\" without including the data itself.");
+            sb.Append("\n\nYou also have an 'export' tool that can generate downloadable CSV or JSON files of your own data.");
+
+            return sb.ToString();
+        }
+
+        private string BuildUserContextData()
+        {
+            if (_toolContext.Scope != MCPScope.User || !_toolContext.UserId.HasValue)
+                return null;
+
+            var uow = _toolContext.UnitOfWork;
+            var userId = _toolContext.UserId.Value;
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+
+            try
+            {
+                var sb = new StringBuilder();
+
+                var user = uow.Users.Get(x => x.Id == userId).FirstOrDefault();
+                if (user == null)
+                    return null;
+
+                var userJson = JObject.FromObject(user, serializer);
+                sb.Append("\n\n--- YOUR PROFILE ---\n");
+                sb.Append(SensitiveFieldFilter.Filter(userJson).ToString(Formatting.Indented));
+
+                var roles = uow.Users.GetRolesForUser(userId);
+                var rolesJson = JArray.FromObject(roles, serializer);
+                sb.Append("\n\n--- YOUR ROLES ---\n");
+                sb.Append(SensitiveFieldFilter.Filter(rolesJson).ToString(Formatting.Indented));
+
+                var settings = uow.Settings.Get(x => x.UserId == userId)
+                    .OrderBy(x => x.ConfigKey)
+                    .ToList();
+                if (settings.Count > 0)
+                {
+                    var settingsJson = JArray.FromObject(settings, serializer);
+                    sb.Append("\n\n--- YOUR SETTINGS ---\n");
+                    sb.Append(SensitiveFieldFilter.Filter(settingsJson).ToString(Formatting.Indented));
+                }
+
+                var activityTotal = uow.AuthActivity.Get(x => x.UserId == userId).Count();
+                var activities = uow.AuthActivity.Get(x => x.UserId == userId)
+                    .OrderByDescending(x => x.CreatedUtc)
+                    .Take(10)
+                    .ToList();
+                if (activities.Count > 0)
+                {
+                    var activityJson = JArray.FromObject(activities, serializer);
+                    sb.Append($"\n\n--- YOUR RECENT ACTIVITY (last 10 of {activityTotal}) ---\n");
+                    sb.Append(SensitiveFieldFilter.Filter(activityJson).ToString(Formatting.Indented));
+                }
+
+                return sb.ToString();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private async Task<(JArray results, List<JObject> fileRefs)> ExecuteToolsAsync(
+            JArray toolCalls, Guid conversationId, CancellationToken cancellationToken)
         {
             var results = new JArray();
+            var fileRefs = new List<JObject>();
 
             foreach (var call in toolCalls)
             {
@@ -341,16 +459,66 @@ namespace Bhbk.Lib.Identity.LLM.Services
                     result = await tool.ExecuteAsync(toolInput);
                 }
 
-                results.Add(new JObject
+                // Intercept file_export results: save blob to DB, replace with reference
+                if (result.Success && result.Data?["type"]?.ToString() == "file_export")
                 {
-                    ["tool_use_id"] = toolId,
-                    ["content"] = result.Success
-                        ? result.Data?.ToString(Formatting.Indented)
-                        : $"Error: {result.Error}"
-                });
+                    var fileRef = SaveFileToDatabase(conversationId, result.Data);
+                    fileRefs.Add(fileRef);
+
+                    results.Add(new JObject
+                    {
+                        ["tool_use_id"] = toolId,
+                        ["content"] = fileRef.ToString(Formatting.Indented)
+                    });
+                }
+                else
+                {
+                    results.Add(new JObject
+                    {
+                        ["tool_use_id"] = toolId,
+                        ["content"] = result.Success
+                            ? result.Data?.ToString(Formatting.Indented)
+                            : $"Error: {result.Error}"
+                    });
+                }
             }
 
-            return results;
+            return (results, fileRefs);
+        }
+
+        private JObject SaveFileToDatabase(Guid conversationId, JToken fileData)
+        {
+            var uow = _toolContext.UnitOfWork;
+            var bytes = Convert.FromBase64String(fileData["contentBase64"].ToString());
+            var fileName = fileData["fileName"].ToString();
+            var contentType = fileData["contentType"].ToString();
+            var summary = fileData["summary"]?.ToString();
+
+            var file = new tbl_ChatFile
+            {
+                Id = Guid.NewGuid(),
+                ConversationId = conversationId,
+                FileName = fileName,
+                ContentType = contentType,
+                FileSize = bytes.Length,
+                FileContent = bytes,
+                Summary = summary,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(60),
+                CreatedUtc = DateTimeOffset.UtcNow
+            };
+
+            uow.ChatFiles.Create(file);
+            uow.Commit();
+
+            return new JObject
+            {
+                ["type"] = "file_reference",
+                ["fileId"] = file.Id.ToString(),
+                ["fileName"] = fileName,
+                ["contentType"] = contentType,
+                ["fileSize"] = bytes.Length,
+                ["summary"] = summary
+            };
         }
     }
 }

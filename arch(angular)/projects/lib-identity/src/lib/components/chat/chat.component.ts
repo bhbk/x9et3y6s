@@ -33,7 +33,8 @@ import {
   warningTriangleIcon,
   gearIcon,
   commentIcon,
-  starOutlineIcon
+  starOutlineIcon,
+  downloadIcon
 } from '@progress/kendo-svg-icons';
 
 @Component({
@@ -326,6 +327,20 @@ import {
                       } @else {
                         <div>
                           <p class="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{{ msg.content }}</p>
+                          @if (msg.files?.length) {
+                            <div class="mt-2 space-y-1.5">
+                              @for (file of msg.files; track file.fileId) {
+                                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                                  <kendo-svg-icon [icon]="downloadIcon" size="small" class="text-blue-500"></kendo-svg-icon>
+                                  <button class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                                          (click)="onDownloadFile(file.fileId, file.fileName)">
+                                    {{ file.fileName }}
+                                  </button>
+                                  <span class="text-xs text-gray-400">({{ formatFileSize(file.fileSize) }})</span>
+                                </div>
+                              }
+                            </div>
+                          }
                           @if (isAdmin && (msg.inputTokens !== null || msg.outputTokens !== null)) {
                             <p class="text-[11px] text-gray-400 mt-2">
                               {{ msg.inputTokens || 0 }} in / {{ msg.outputTokens || 0 }} out tokens
@@ -484,6 +499,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   readonly gearIcon = gearIcon;
   readonly commentIcon = commentIcon;
   readonly starOutlineIcon = starOutlineIcon;
+  readonly downloadIcon = downloadIcon;
 
   messageText = '';
   sidebarOpen = true;
@@ -941,5 +957,15 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       event.preventDefault();
       this.sendMessage();
     }
+  }
+
+  onDownloadFile(fileId: string, fileName: string): void {
+    this.chatStore.downloadFile(fileId, fileName);
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 }

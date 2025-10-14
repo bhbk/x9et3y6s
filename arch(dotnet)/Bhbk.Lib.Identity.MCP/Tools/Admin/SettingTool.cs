@@ -17,36 +17,17 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "settings",
-            Description = "Query user settings. Supports listing all settings, getting by ID, filtering by user, searching by key or value, and counting total records. Use 'count' to get the total number without fetching records.",
+            Description = "Query user settings.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['count', 'list', 'get', 'byuser', 'search'],
-                        'description': 'The action to perform. Use count to get total records without fetching data.'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'Setting ID (GUID) for get action'
-                    },
-                    'userId': {
-                        'type': 'string',
-                        'description': 'User ID (GUID) for byuser action'
-                    },
-                    'query': {
-                        'type': 'string',
-                        'description': 'Search query for key or value'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 50, max: 100)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['count', 'list', 'get', 'byuser', 'search'], 'description': 'The operation to perform. count returns total settings. list returns a paginated list. get returns a single setting by ID. byuser returns settings for a specific user. search finds settings by config key or value.' },
+                    'id': { 'type': 'string', 'description': 'Setting ID (GUID) required for the get action.' },
+                    'userId': { 'type': 'string', 'description': 'User ID (GUID) required for the byuser action.' },
+                    'query': { 'type': 'string', 'description': 'Search text for the search action. Matches against config key and value.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

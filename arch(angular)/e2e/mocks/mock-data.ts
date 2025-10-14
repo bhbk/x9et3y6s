@@ -305,6 +305,75 @@ export const QUOTES = [
   },
 ];
 
+// ── Email Queue ─────────────────────────────────────────────────────
+
+export const EMAIL_QUEUE = [
+  {
+    id: 'aaaa1111-1111-1111-1111-111111111111',
+    fromEmail: 'noreply@identity.local',
+    fromDisplay: 'Identity System',
+    toEmail: 'admin@local',
+    toDisplay: 'Admin User',
+    subject: 'Email Confirmation',
+    body: '<p>Please confirm your email address by clicking the link below.</p>',
+    isCancelled: false,
+    createdUtc: '2024-06-15T08:00:00Z',
+    sendAtUtc: '2024-06-15T08:05:00Z',
+    deliveredUtc: '2024-06-15T08:05:12Z',
+  },
+  {
+    id: 'aaaa1111-1111-1111-1111-222222222222',
+    fromEmail: 'noreply@identity.local',
+    fromDisplay: 'Identity System',
+    toEmail: 'user@local',
+    toDisplay: 'Regular User',
+    subject: 'Password Reset',
+    body: '<p>You requested a password reset. Use the code below.</p>',
+    isCancelled: false,
+    createdUtc: '2024-06-15T09:00:00Z',
+    sendAtUtc: '2024-06-15T09:05:00Z',
+    deliveredUtc: null,
+  },
+  {
+    id: 'aaaa1111-1111-1111-1111-333333333333',
+    fromEmail: 'noreply@identity.local',
+    fromDisplay: 'Identity System',
+    toEmail: 'locked@local',
+    toDisplay: 'Locked Account',
+    subject: 'Account Locked',
+    body: '<p>Your account has been locked due to too many failed attempts.</p>',
+    isCancelled: true,
+    createdUtc: '2024-06-15T10:00:00Z',
+    sendAtUtc: '2024-06-15T10:05:00Z',
+    deliveredUtc: null,
+  },
+];
+
+// ── Text Queue ──────────────────────────────────────────────────────
+
+export const TEXT_QUEUE = [
+  {
+    id: 'bbbb2222-2222-2222-2222-111111111111',
+    fromPhoneNumber: '+15551234567',
+    toPhoneNumber: '+15559876543',
+    body: 'Your verification code is 482910. It expires in 10 minutes.',
+    isCancelled: false,
+    createdUtc: '2024-06-15T08:30:00Z',
+    sendAtUtc: '2024-06-15T08:30:00Z',
+    deliveredUtc: '2024-06-15T08:30:05Z',
+  },
+  {
+    id: 'bbbb2222-2222-2222-2222-222222222222',
+    fromPhoneNumber: '+15551234567',
+    toPhoneNumber: '+15558765432',
+    body: 'Your verification code is 193847. It expires in 10 minutes.',
+    isCancelled: false,
+    createdUtc: '2024-06-15T09:15:00Z',
+    sendAtUtc: '2024-06-15T09:15:00Z',
+    deliveredUtc: null,
+  },
+];
+
 // ── Helpers ──────────────────────────────────────────────────────────
 
 /** Wrap an array in a PagedResult shape */

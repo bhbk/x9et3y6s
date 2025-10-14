@@ -67,7 +67,6 @@ namespace Bhbk.WebApi.Identity.Admin.Hubs
 
             try
             {
-                // Create admin-scoped MCP context (full access to all data)
                 var mcpContext = new AdminMCPContext(_uow);
                 var conversationService = new ConversationService(_uow);
                 var orchestrator = new LLMOrchestrator(_llmProvider, mcpContext, conversationService);
@@ -81,7 +80,10 @@ namespace Bhbk.WebApi.Identity.Admin.Hubs
                         content = chunk.Content,
                         isComplete = chunk.IsComplete,
                         inputTokens = chunk.InputTokens,
-                        outputTokens = chunk.OutputTokens
+                        outputTokens = chunk.OutputTokens,
+                        fileId = chunk.FileId,
+                        fileName = chunk.FileName,
+                        fileSize = chunk.FileSize
                     });
                 }
 
@@ -150,6 +152,7 @@ namespace Bhbk.WebApi.Identity.Admin.Hubs
                 "message_stop" => "complete",
                 "tool_use" => "tool_call",
                 "tool_execution" => "tool_result",
+                "file" => "file",
                 _ => providerType
             };
         }

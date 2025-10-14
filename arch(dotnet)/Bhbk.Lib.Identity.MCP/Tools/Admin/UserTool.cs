@@ -17,32 +17,16 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "users",
-            Description = "Query and manage users. Supports listing all users, getting user by ID, searching by username or email, viewing user roles and claims, and counting total records. Use 'count' to get the total number without fetching records.",
+            Description = "Query users, their roles, and claims.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['count', 'list', 'get', 'search', 'roles', 'claims'],
-                        'description': 'The action to perform. Use count to get total records without fetching data.'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'User ID (GUID) for get/roles/claims actions'
-                    },
-                    'query': {
-                        'type': 'string',
-                        'description': 'Search query for username or email'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 50, max: 100)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['count', 'list', 'get', 'search', 'roles', 'claims'], 'description': 'The operation to perform. count returns total users. list returns a paginated list. get returns a single user by ID. search finds users by username, email, or name. roles returns roles assigned to a user. claims returns claims for a user.' },
+                    'id': { 'type': 'string', 'description': 'User ID (GUID) required for get, roles, and claims actions.' },
+                    'query': { 'type': 'string', 'description': 'Search text for the search action. Matches against username, email, first name, and last name.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

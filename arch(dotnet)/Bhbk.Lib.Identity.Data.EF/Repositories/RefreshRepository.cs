@@ -1,4 +1,4 @@
-﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
+﻿using Bhbk.Lib.DataAccess.EF.Repositories;
 using Bhbk.Lib.Identity.Data.EF.Models;
 using System;
 

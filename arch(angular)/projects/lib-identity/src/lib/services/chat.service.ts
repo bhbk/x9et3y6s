@@ -249,6 +249,16 @@ export class ChatService {
   }
 
   /**
+   * Download a chat file by ID
+   */
+  downloadFile(fileId: string): Observable<Blob> {
+    return this.http.get(
+      `${this.getBaseUrl()}${this.config.pathBase}/chat/files/${fileId}`,
+      { responseType: 'blob' }
+    );
+  }
+
+  /**
    * Check if currently connected
    */
   get isConnected(): boolean {

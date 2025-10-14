@@ -17,32 +17,16 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "quotes",
-            Description = "Query quote entries. Supports listing all quotes, getting by ID, and searching by quote text or author.",
+            Description = "Query quote entries.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['list', 'get', 'search', 'current', 'count'],
-                        'description': 'The action to perform: list=all quotes with total count, get=specific quote by id, search=find by quote or author, current=most recent quote, count=total number of quotes'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'Quote ID (GUID) for get action'
-                    },
-                    'query': {
-                        'type': 'string',
-                        'description': 'Search query for quote or author'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 50, max: 100)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['list', 'get', 'search', 'current', 'count'], 'description': 'The operation to perform. count returns total quotes. list returns a paginated list. get returns a single quote by ID. search finds quotes by content or author. current returns the active quote of the day.' },
+                    'id': { 'type': 'string', 'description': 'Quote ID (GUID) required for the get action.' },
+                    'query': { 'type': 'string', 'description': 'Search text for the search action. Matches against quote content and author.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

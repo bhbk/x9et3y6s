@@ -10,6 +10,8 @@ import {
   REFRESHES,
   QUOTE,
   QUOTES,
+  EMAIL_QUEUE,
+  TEXT_QUEUE,
   pagedResult,
 } from './mock-data';
 
@@ -259,6 +261,22 @@ export async function mockAdminApi(page: Page) {
     if (method === 'PUT') return json(route, route.request().postDataJSON());
     return route.fallback();
   });
+
+  // Email Queue (Enqueue/Dequeue)
+  await page.route(`${ADMIN_API}/enqueue/v1/email/page`, (route) =>
+    json(route, pagedResult(EMAIL_QUEUE)),
+  );
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/dequeue/v1/email/[0-9a-f-]+$`), (route) =>
+    ok(route),
+  );
+
+  // Text Queue (Enqueue/Dequeue)
+  await page.route(`${ADMIN_API}/enqueue/v1/text/page`, (route) =>
+    json(route, pagedResult(TEXT_QUEUE)),
+  );
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/dequeue/v1/text/[0-9a-f-]+$`), (route) =>
+    ok(route),
+  );
 
   // Chat API — conversations REST endpoint (used by ChatComponent.ngOnInit)
   await page.route(`${ADMIN_API}/chat/**`, (route) => {

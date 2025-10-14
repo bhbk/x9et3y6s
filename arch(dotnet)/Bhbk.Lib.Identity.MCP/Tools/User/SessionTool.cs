@@ -18,24 +18,14 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "sessions",
-            Description = "View your active sessions, refresh tokens, and authentication activity. This tool only accesses your own data.",
+            Description = "View your sessions, refresh tokens, and activity.",
             Scope = MCPScope.User,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['refreshes', 'activity'],
-                        'description': 'The action to perform'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 20, max: 50)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['refreshes', 'activity'], 'description': 'The operation to perform. refreshes returns your active refresh tokens. activity returns your recent authentication activity.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

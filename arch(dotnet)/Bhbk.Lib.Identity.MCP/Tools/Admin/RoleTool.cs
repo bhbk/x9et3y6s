@@ -17,32 +17,16 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "roles",
-            Description = "Query and manage roles. Supports listing, getting by ID, searching, viewing users assigned to a role, and counting total records. Use 'count' to get the total number without fetching records.",
+            Description = "Query roles and their assigned users.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['count', 'list', 'get', 'search', 'users'],
-                        'description': 'The action to perform. Use count to get total records without fetching data.'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'Role ID (GUID) for get/users actions'
-                    },
-                    'query': {
-                        'type': 'string',
-                        'description': 'Search query for name'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 50, max: 100)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['count', 'list', 'get', 'search', 'users'], 'description': 'The operation to perform. count returns total roles. list returns a paginated list. get returns a single role by ID. search finds roles by name or description. users returns users assigned to a role.' },
+                    'id': { 'type': 'string', 'description': 'Role ID (GUID) required for get and users actions.' },
+                    'query': { 'type': 'string', 'description': 'Search text for the search action. Matches against role name and description.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

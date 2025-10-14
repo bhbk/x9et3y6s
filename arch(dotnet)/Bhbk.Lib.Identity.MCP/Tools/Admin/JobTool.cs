@@ -19,32 +19,16 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "jobs",
-            Description = "Query scheduled jobs and their settings. Supports listing all jobs, getting by ID, searching by name, viewing job settings (secret values are masked), and counting total records.",
+            Description = "Query scheduled jobs and their settings.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['count', 'list', 'get', 'search', 'settings'],
-                        'description': 'The action to perform. settings returns config key-value pairs for a job (secret values are masked).'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'Job ID (GUID) for get/settings actions'
-                    },
-                    'query': {
-                        'type': 'string',
-                        'description': 'Search query for job name'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 50, max: 100)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['count', 'list', 'get', 'search', 'settings'], 'description': 'The operation to perform. count returns total jobs. list returns a paginated list. get returns a single job by ID. search finds jobs by name or description. settings returns configuration details for a job.' },
+                    'id': { 'type': 'string', 'description': 'Job ID (GUID) required for get and settings actions.' },
+                    'query': { 'type': 'string', 'description': 'Search text for the search action. Matches against job name and description.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

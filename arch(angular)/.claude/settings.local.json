@@ -1,23 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find:*)",
-      "Bash(npx ng build)",
       "Bash(npx ng build:*)",
-      "Bash(npx ng build app-identity-admin)",
-      "Bash(cd:*)",
-      "Bash(dotnet build:*)",
-      "Bash(ls:*)",
-      "Bash(dotnet package search:*)",
-      "Bash(dotnet restore:*)",
-      "Bash(node -e:*)",
       "Bash(npx playwright test:*)",
-      "Bash(cat:*)",
-      "Bash(npx playwright:*)",
-      "WebFetch(domain:docs.cloud.google.com)",
+      "Bash(dotnet build:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
       "Bash(dotnet test:*)",
-      "Bash(npm install:*)",
-      "Bash(echo:*)"
+      "Bash(cat:*)",
+      "Bash(dotnet sln:*)"
     ]
   }
 }

@@ -88,6 +88,7 @@ import { DateTime } from 'luxon';
           [sortable]="sortSettings"
           [sort]="sort()"
           [filterable]="filterSettings"
+          [resizable]="true"
           [loading]="isLoading()"
           (pageChange)="onPageChange($event)"
           (sortChange)="onSortChange($event)"

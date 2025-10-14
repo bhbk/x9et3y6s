@@ -18,6 +18,7 @@ import {
   logoutIcon,
   sparklesIcon,
   clockIcon,
+  envelopeIcon,
 } from '@progress/kendo-svg-icons';
 
 @Component({
@@ -98,6 +99,11 @@ import {
               <kendo-svg-icon [icon]="chartIcon" size="medium"></kendo-svg-icon>
               Activity
             </a>
+            <a routerLink="/alerts" routerLinkActive="bg-blue-50 text-blue-600"
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
+              <kendo-svg-icon [icon]="envelopeIcon" size="medium"></kendo-svg-icon>
+              Alerts
+            </a>
             <a routerLink="/issuers" routerLinkActive="bg-blue-50 text-blue-600"
                class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="folderIcon" size="medium"></kendo-svg-icon>
@@ -173,6 +179,7 @@ export class MainLayoutComponent implements OnInit {
   readonly logoutIcon = logoutIcon;
   readonly sparklesIcon = sparklesIcon;
   readonly jobsIcon = clockIcon;
+  readonly envelopeIcon = envelopeIcon;
   readonly hamburgerIcon = gridIcon;
 
   readonly menuOpen = signal(false);

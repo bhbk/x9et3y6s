@@ -17,32 +17,16 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "claims",
-            Description = "Query claims (user attributes). Supports listing all claims, getting by ID, searching by type or value, and counting total records. Use 'count' to get the total number without fetching records.",
+            Description = "Query claims (user attributes).",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['count', 'list', 'get', 'search'],
-                        'description': 'The action to perform. Use count to get total records without fetching data.'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'Claim ID (GUID) for get action'
-                    },
-                    'query': {
-                        'type': 'string',
-                        'description': 'Search query for type or value'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 50, max: 100)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['count', 'list', 'get', 'search'], 'description': 'The operation to perform. count returns total claims. list returns a paginated list. get returns a single claim by ID. search finds claims by type or value.' },
+                    'id': { 'type': 'string', 'description': 'Claim ID (GUID) required for the get action.' },
+                    'query': { 'type': 'string', 'description': 'Search text for the search action. Matches against claim type and value.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

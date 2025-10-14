@@ -38,7 +38,8 @@ namespace Bhbk.Lib.Identity.MCP.Services
                 "User", "Audience", "Issuer", "Role", "Claim", "LoginProvider",
                 "AuthActivity", "Setting", "State", "Quote", "Url",
                 "ChatConversation", "ChatMessage", "ChatPrompt",
-                "LLMProvider", "LLMProviderSetting", "Job", "JobSetting"
+                "LLMProvider", "LLMProviderSetting", "Job", "JobSetting",
+                "EmailQueue", "TextQueue", "ChatFile"
             };
 
             foreach (var entityType in entityTypes)

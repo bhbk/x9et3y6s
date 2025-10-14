@@ -17,20 +17,13 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "quotes",
-            Description = "Get quote entries. Use 'current' for the most recent quote, or 'get' with an id to retrieve a specific quote by its GUID.",
+            Description = "Get quote entries.",
             Scope = MCPScope.User,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['current', 'get'],
-                        'description': 'The action to perform: current=most recent quote, get=specific quote by id'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'Quote ID (GUID) — required for the get action'
-                    }
+                    'action': { 'type': 'string', 'enum': ['current', 'get'], 'description': 'The operation to perform. current returns the active quote of the day. get returns a specific quote by ID.' },
+                    'id': { 'type': 'string', 'description': 'Quote ID (GUID) required for the get action.' }
                 },
                 'required': ['action']
             }")

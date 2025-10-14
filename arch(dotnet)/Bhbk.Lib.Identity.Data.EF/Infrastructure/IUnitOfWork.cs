@@ -1,5 +1,5 @@
-﻿using Bhbk.Lib.DataAccess.EFCore.Repositories;
-using Bhbk.Lib.DataAccess.EFCore.UnitOfWorks;
+﻿using Bhbk.Lib.DataAccess.EF.Repositories;
+using Bhbk.Lib.DataAccess.EF.UnitOfWorks;
 using Bhbk.Lib.Identity.Data.EF.Models;
 using Bhbk.Lib.Identity.Data.EF.Repositories;
 
@@ -11,6 +11,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
         public AuthActivityRepository AuthActivity { get; }
         public IGenericRepository<tbl_AuthActivityAudience> AuthActivityAudiences { get; }
         public IGenericRepository<tbl_ChatConversation> ChatConversations { get; }
+        public IGenericRepository<tbl_ChatFile> ChatFiles { get; }
         public IGenericRepository<tbl_ChatMessage> ChatMessages { get; }
         public IGenericRepository<tbl_ChatPrompt> ChatPrompts { get; }
         public IGenericRepository<tbl_Claim> Claims { get; }

@@ -18,16 +18,12 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "profile",
-            Description = "Get your profile information, roles, and claims. This tool only accesses your own data.",
+            Description = "Get your profile, roles, claims, and settings.",
             Scope = MCPScope.User,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['get', 'roles', 'claims', 'settings'],
-                        'description': 'The action to perform'
-                    }
+                    'action': { 'type': 'string', 'enum': ['get', 'roles', 'claims', 'settings'], 'description': 'The operation to perform. get returns your profile information. roles returns your assigned roles. claims returns your claims. settings returns your personal settings.' }
                 },
                 'required': ['action']
             }")

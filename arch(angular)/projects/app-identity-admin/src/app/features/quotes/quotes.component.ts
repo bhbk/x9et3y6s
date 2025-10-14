@@ -50,6 +50,7 @@ import { QuoteService, AdminQuoteService, QuoteV1 } from 'lib-identity';
             [pageable]="pageableSettings"
             [sortable]="sortSettings"
             [sort]="sort()"
+            [resizable]="true"
             [loading]="isGridLoading()"
             (pageChange)="onPageChange($event)"
             (sortChange)="onSortChange($event)"

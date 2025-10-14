@@ -31,6 +31,7 @@ namespace Bhbk.Lib.Identity.MCP.Context
             _registry.Register(new ProfileTool(UnitOfWork, UserId.Value));
             _registry.Register(new SessionTool(UnitOfWork, UserId.Value));
             _registry.Register(new UserQuoteTool(UnitOfWork));
+            _registry.Register(new UserExportTool(UnitOfWork, UserId.Value));
         }
 
         public IMCPTool GetTool(string name)

@@ -25,10 +25,10 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="8.0.0" />
-    <PackageReference Include="Bhbk.Lib.Common" Version="2020.11.27.2100" />
-    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2020.11.27.2100" />
-    <PackageReference Include="Bhbk.Lib.DataState" Version="2020.11.27.2100" />
-    <PackageReference Include="Bhbk.Lib.Hosting" Version="2020.11.27.2100" />
+    <PackageReference Include="Bhbk.Lib.Common" Version="2025.3.2.1800" />
+    <PackageReference Include="Bhbk.Lib.Cryptography" Version="2025.3.2.1800" />
+    <PackageReference Include="Bhbk.Lib.DataState" Version="2025.3.2.1800" />
+    <PackageReference Include="Bhbk.Lib.Hosting" Version="2025.3.2.1800" />
     <PackageReference Include="CronExpressionDescriptor" Version="2.16.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.0" />

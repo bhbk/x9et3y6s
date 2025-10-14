@@ -22,32 +22,16 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "llmproviders",
-            Description = "Query LLM providers and their settings. Supports listing all providers with failover order, getting by ID with settings, searching by name, and counting total records.",
+            Description = "Query LLM providers and their settings.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['count', 'list', 'get', 'search', 'settings'],
-                        'description': 'The action to perform. list returns providers ordered by failover priority. settings returns config key-value pairs for a provider (secret values are masked).'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'Provider ID (GUID) for get/settings actions'
-                    },
-                    'query': {
-                        'type': 'string',
-                        'description': 'Search query for provider name'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 50, max: 100)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['count', 'list', 'get', 'search', 'settings'], 'description': 'The operation to perform. count returns total LLM providers. list returns a paginated list. get returns a single provider by ID. search finds providers by name or type. settings returns configuration details for a provider.' },
+                    'id': { 'type': 'string', 'description': 'LLM provider ID (GUID) required for get and settings actions.' },
+                    'query': { 'type': 'string', 'description': 'Search text for the search action. Matches against provider name and type.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

@@ -1,6 +1,6 @@
 ﻿using Bhbk.Lib.Common.Primitives.Enums;
 using Bhbk.Lib.Common.Services;
-using Bhbk.Lib.DataAccess.EFCore.Repositories;
+using Bhbk.Lib.DataAccess.EF.Repositories;
 using Bhbk.Lib.Identity.Data.EF.Models;
 using Bhbk.Lib.Identity.Data.EF.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +19,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
         public AuthActivityRepository AuthActivity { get; private set; }
         public IGenericRepository<tbl_AuthActivityAudience> AuthActivityAudiences { get; private set; }
         public IGenericRepository<tbl_ChatConversation> ChatConversations { get; private set; }
+        public IGenericRepository<tbl_ChatFile> ChatFiles { get; private set; }
         public IGenericRepository<tbl_ChatMessage> ChatMessages { get; private set; }
         public IGenericRepository<tbl_ChatPrompt> ChatPrompts { get; private set; }
         public IGenericRepository<tbl_Claim> Claims { get; private set; }
@@ -105,6 +106,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
             AuthActivity = new AuthActivityRepository(_context);
             AuthActivityAudiences = new GenericRepository<tbl_AuthActivityAudience>(_context);
             ChatConversations = new GenericRepository<tbl_ChatConversation>(_context);
+            ChatFiles = new GenericRepository<tbl_ChatFile>(_context);
             ChatMessages = new GenericRepository<tbl_ChatMessage>(_context);
             ChatPrompts = new GenericRepository<tbl_ChatPrompt>(_context);
             Claims = new GenericRepository<tbl_Claim>(_context);

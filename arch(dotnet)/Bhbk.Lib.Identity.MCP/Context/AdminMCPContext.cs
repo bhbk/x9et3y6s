@@ -38,6 +38,9 @@ namespace Bhbk.Lib.Identity.MCP.Context
             _registry.Register(new QuoteTool(UnitOfWork));
             _registry.Register(new LLMProviderTool(UnitOfWork));
             _registry.Register(new JobTool(UnitOfWork));
+            _registry.Register(new EmailQueueTool(UnitOfWork));
+            _registry.Register(new TextQueueTool(UnitOfWork));
+            _registry.Register(new ExportTool(UnitOfWork));
             _registry.Register(new SchemaTool(UnitOfWork));
         }
 

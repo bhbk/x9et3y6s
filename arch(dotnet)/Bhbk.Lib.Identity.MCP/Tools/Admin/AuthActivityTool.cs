@@ -17,36 +17,17 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "authactivity",
-            Description = "Query authentication activity logs. Supports listing recent activity, getting by ID, filtering by user, searching by login type, and counting total records. Use 'count' to get the total number without fetching records.",
+            Description = "Query authentication activity logs.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['count', 'list', 'get', 'byuser', 'search'],
-                        'description': 'The action to perform. Use count to get total records without fetching data.'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'Activity ID (GUID) for get action'
-                    },
-                    'userId': {
-                        'type': 'string',
-                        'description': 'User ID (GUID) for byuser action'
-                    },
-                    'query': {
-                        'type': 'string',
-                        'description': 'Search query for login type'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 50, max: 100)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['count', 'list', 'get', 'byuser', 'search'], 'description': 'The operation to perform. count returns total activity records. list returns a paginated list sorted by most recent. get returns a single record by ID. byuser returns activity for a specific user. search finds records by login type or audience name.' },
+                    'id': { 'type': 'string', 'description': 'Activity record ID (GUID) required for the get action.' },
+                    'userId': { 'type': 'string', 'description': 'User ID (GUID) required for the byuser action.' },
+                    'query': { 'type': 'string', 'description': 'Search text for the search action. Matches against login type and audience name.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

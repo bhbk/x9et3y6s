@@ -1,7 +1,7 @@
 ﻿using Bhbk.Lib.Common.Services;
 using Bhbk.Lib.Cryptography.Entropy;
 using Bhbk.Lib.Cryptography.Hashing;
-using Bhbk.Lib.DataAccess.EFCore.Repositories;
+using Bhbk.Lib.DataAccess.EF.Repositories;
 using Bhbk.Lib.Identity.Data.EF.Models;
 using Bhbk.Lib.Identity.Primitives.Constants;
 using Microsoft.EntityFrameworkCore;

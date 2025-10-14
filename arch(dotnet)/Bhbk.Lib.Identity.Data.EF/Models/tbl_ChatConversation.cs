@@ -9,6 +9,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
     {
         public tbl_ChatConversation()
         {
+            tbl_ChatFiles = new HashSet<tbl_ChatFile>();
             tbl_ChatMessages = new HashSet<tbl_ChatMessage>();
         }
 
@@ -22,6 +23,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public DateTimeOffset? ModifiedUtc { get; set; }
 
         public virtual tbl_User User { get; set; }
+        public virtual ICollection<tbl_ChatFile> tbl_ChatFiles { get; set; }
         public virtual ICollection<tbl_ChatMessage> tbl_ChatMessages { get; set; }
     }
 }

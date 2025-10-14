@@ -17,32 +17,16 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
             Name = "audiences",
-            Description = "Query and manage audiences (OAuth2 clients). Supports listing, getting by ID, searching, viewing associated roles, and counting total records. Use 'count' to get the total number without fetching records.",
+            Description = "Query audiences (OAuth2 clients) and their roles.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': {
-                        'type': 'string',
-                        'enum': ['count', 'list', 'get', 'search', 'roles'],
-                        'description': 'The action to perform. Use count to get total records without fetching data.'
-                    },
-                    'id': {
-                        'type': 'string',
-                        'description': 'Audience ID (GUID) for get/roles actions'
-                    },
-                    'query': {
-                        'type': 'string',
-                        'description': 'Search query for name'
-                    },
-                    'skip': {
-                        'type': 'integer',
-                        'description': 'Number of records to skip (default: 0)'
-                    },
-                    'take': {
-                        'type': 'integer',
-                        'description': 'Number of records to take (default: 50, max: 100)'
-                    }
+                    'action': { 'type': 'string', 'enum': ['count', 'list', 'get', 'search', 'roles'], 'description': 'The operation to perform. count returns total audiences. list returns a paginated list. get returns a single audience by ID. search finds audiences by name or description. roles returns roles assigned to an audience.' },
+                    'id': { 'type': 'string', 'description': 'Audience ID (GUID) required for get and roles actions.' },
+                    'query': { 'type': 'string', 'description': 'Search text for the search action. Matches against audience name and description.' },
+                    'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
+                    'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
                 'required': ['action']
             }")

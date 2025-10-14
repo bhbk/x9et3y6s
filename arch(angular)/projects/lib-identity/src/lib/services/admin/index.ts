@@ -11,3 +11,4 @@ export * from './setting.service';
 export * from './quote.service';
 export * from './llm-provider.service';
 export * from './job.service';
+export * from './alert-queue.service';
