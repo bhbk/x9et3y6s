@@ -62,7 +62,7 @@ namespace Bhbk.Test.Identity.Integration.ControllerTests
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
-                    && x.ValidToUtc > DateTime.UtcNow).First();
+                    && x.ValidTo > DateTime.UtcNow).First();
 
                 var imp = controller.ImplicitV2_Grant(
                     new ImplicitV2()

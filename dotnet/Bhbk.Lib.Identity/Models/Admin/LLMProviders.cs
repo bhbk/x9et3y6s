@@ -25,9 +25,9 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public Guid Id { get; set; }
 
         [Required]
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
-        public DateTimeOffset? ModifiedUtc { get; set; }
+        public DateTimeOffset? Modified { get; set; }
 
         public List<LLMProviderSettingV1> Settings { get; set; }
     }
@@ -51,7 +51,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool IsDeletable { get; set; }
 
         [Required]
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
     }
 
     public class LLMProviderOrderV1

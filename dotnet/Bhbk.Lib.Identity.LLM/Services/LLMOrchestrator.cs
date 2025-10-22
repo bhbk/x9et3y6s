@@ -345,7 +345,7 @@ namespace Bhbk.Lib.Identity.LLM.Services
             var customPrompt = _conversationService.GetSystemPrompt(promptType);
 
             var basePrompt = _toolContext.Scope == MCPScope.Admin
-                ? "You are an AI assistant for the Identity management system. You have access to tools that allow you to query and analyze identity data including users, audiences, issuers, roles, claims, logins, and authentication activity. Use these tools to help administrators understand and manage the identity system.\n\nWhen you use a tool, always include the actual data from the tool results in your response. Present tables, lists, counts, and details directly — never say \"the output shows\" without including the data itself. Format data clearly using lists or tables when appropriate.\n\nYou also have an 'export' tool that can generate downloadable CSV or JSON files. Use it when the user asks for a data export, download, or spreadsheet."
+                ? "You are an AI assistant for the Identity management system. You have access to tools that allow you to query and analyze identity data including users, audiences, issuers, roles, claims, logins, and authentication activity. Use these tools to help administrators understand and manage the identity system.\n\nAlways respond in natural language. Never paste raw JSON, code blocks, or unformatted tool output in your response. When you use a tool, summarize the results conversationally — use markdown tables, bullet lists, or plain sentences to present the data clearly. Include the actual data from tool results directly in your response, but always in a human-readable format.\n\nYou also have an 'export' tool that can generate downloadable CSV or JSON files. Use it when the user asks for a data export, download, or spreadsheet."
                 : BuildUserPromptWithContext();
 
             return !string.IsNullOrEmpty(customPrompt)
@@ -370,7 +370,7 @@ namespace Bhbk.Lib.Identity.LLM.Services
                 sb.Append(contextData);
             }
 
-            sb.Append("\n\nWhen you use a tool, always include the actual data from the tool results in your response. Present your findings directly — never say \"the output shows\" without including the data itself.");
+            sb.Append("\n\nAlways respond in natural language. Never paste raw JSON, code blocks, or unformatted tool output in your response. When you use a tool, summarize the results conversationally — use markdown tables, bullet lists, or plain sentences. Include the actual data from tool results directly, but always in a human-readable format.");
             sb.Append("\n\nYou also have an 'export' tool that can generate downloadable CSV or JSON files of your own data.");
 
             return sb.ToString();
@@ -415,9 +415,9 @@ namespace Bhbk.Lib.Identity.LLM.Services
                     sb.Append(SensitiveFieldFilter.Filter(settingsJson).ToString(Formatting.Indented));
                 }
 
-                var activityTotal = uow.AuthActivity.Get(x => x.UserId == userId).Count();
-                var activities = uow.AuthActivity.Get(x => x.UserId == userId)
-                    .OrderByDescending(x => x.CreatedUtc)
+                var activityTotal = uow.UserAuthActivities.Get(x => x.UserId == userId).Count();
+                var activities = uow.UserAuthActivities.Get(x => x.UserId == userId)
+                    .OrderByDescending(x => x.Created)
                     .Take(10)
                     .ToList();
                 if (activities.Count > 0)
@@ -503,8 +503,8 @@ namespace Bhbk.Lib.Identity.LLM.Services
                 FileSize = bytes.Length,
                 FileContent = bytes,
                 Summary = summary,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(60),
-                CreatedUtc = DateTimeOffset.UtcNow
+                Expires = DateTimeOffset.UtcNow.AddMinutes(60),
+                Created = DateTimeOffset.UtcNow
             };
 
             uow.ChatFiles.Post(file);

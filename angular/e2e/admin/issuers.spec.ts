@@ -24,7 +24,7 @@ test.describe('Admin Issuers', () => {
 
     // Verify the create API call fires
     const createPromise = adminPage.waitForRequest((req) =>
-      req.url().includes('/issuer/v1') && req.method() === 'POST' && !req.url().includes('/page'),
+      req.url().includes('/issuers/v1') && req.method() === 'POST' && !req.url().includes('/page'),
     );
     await dialog.clickAction('Create');
     const createReq = await createPromise;

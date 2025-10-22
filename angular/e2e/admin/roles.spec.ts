@@ -31,7 +31,7 @@ test.describe('Admin Roles', () => {
     await dialog.fillField('Name', `E2E-Role-${Date.now()}`);
 
     const createPromise = adminPage.waitForRequest((req) =>
-      req.url().includes('/role/v1') && req.method() === 'POST' && !req.url().includes('/page'),
+      req.url().includes('/roles/v1') && req.method() === 'POST' && !req.url().includes('/page'),
     );
     await dialog.clickAction('Create');
     const createReq = await createPromise;

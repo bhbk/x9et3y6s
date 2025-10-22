@@ -276,7 +276,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
-                    && x.ValidToUtc > DateTime.UtcNow).First();
+                    && x.ValidTo > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
                     new AuthCodeV2()
@@ -328,7 +328,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
-                    && x.ValidToUtc > DateTime.UtcNow).First();
+                    && x.ValidTo > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
                     new AuthCodeV2()
@@ -380,7 +380,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
-                    && x.ValidToUtc > DateTime.UtcNow).First();
+                    && x.ValidTo > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
                     new AuthCodeV2()
@@ -432,7 +432,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
-                    && x.ValidToUtc > DateTime.UtcNow).First();
+                    && x.ValidTo > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
                     new AuthCodeV2()
@@ -484,7 +484,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
-                    && x.ValidToUtc > DateTime.UtcNow).First();
+                    && x.ValidTo > DateTime.UtcNow).First();
 
                 var ac = await service.Endpoints.AuthCode_AuthV2(
                     new AuthCodeV2()
@@ -585,7 +585,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
 
                 var state = uow.States.Get(x => x.IssuerId == issuer.Id && x.AudienceId == audience.Id && x.UserId == user.Id
                     && x.StateType == ConsumerType.User.ToString() && x.StateConsume == false
-                    && x.ValidToUtc > DateTime.UtcNow).First();
+                    && x.ValidTo > DateTime.UtcNow).First();
 
                 var result = await service.AuthCode_GrantV2(
                     new AuthCodeV2()

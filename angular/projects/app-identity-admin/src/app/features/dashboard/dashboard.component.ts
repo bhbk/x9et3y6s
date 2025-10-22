@@ -5,8 +5,8 @@ import { KENDO_INDICATORS } from '@progress/kendo-angular-indicators';
 import { forkJoin } from 'rxjs';
 import {
   UserService,
-  AuthActivityService,
-  AuthActivityV1,
+  UserAuthActivityService,
+  UserAuthActivityV1,
   UserV1
 } from 'lib-identity';
 
@@ -69,7 +69,7 @@ import {
                   <tbody>
                     @for (item of recentActivity(); track item.id) {
                       <tr class="border-b border-gray-100">
-                        <td class="py-2 pr-4 text-gray-700">{{ item.createdUtc | date:'short' }}</td>
+                        <td class="py-2 pr-4 text-gray-700">{{ item.created | date:'short' }}</td>
                         <td class="py-2 pr-4 text-gray-700">{{ getUserName(item.userId) }}</td>
                         <td class="py-2 pr-4 text-gray-700">{{ item.loginType }}</td>
                         <td class="py-2 pr-4">
@@ -94,7 +94,7 @@ import {
 })
 export class DashboardComponent implements OnInit {
   private readonly userService = inject(UserService);
-  private readonly activityService = inject(AuthActivityService);
+  private readonly activityService = inject(UserAuthActivityService);
 
   readonly isLoading = signal(true);
   readonly error = signal<string | null>(null);
@@ -103,7 +103,7 @@ export class DashboardComponent implements OnInit {
   readonly failedLoginCount = signal('0');
   readonly lockedAccountCount = signal('0');
   readonly pendingConfirmationCount = signal('0');
-  readonly recentActivity = signal<AuthActivityV1[]>([]);
+  readonly recentActivity = signal<UserAuthActivityV1[]>([]);
   private userMap = new Map<string, string>();
 
   getUserName(userId?: string): string {
@@ -120,7 +120,7 @@ export class DashboardComponent implements OnInit {
     this.error.set(null);
     forkJoin({
       users: this.userService.getAll({ skip: 0, take: 100, sort: [{ field: 'userName', dir: 'asc' }] }),
-      activity: this.activityService.getAll({ skip: 0, take: 100, sort: [{ field: 'createdUtc', dir: 'desc' }] })
+      activity: this.activityService.getAll({ skip: 0, take: 100, sort: [{ field: 'created', dir: 'desc' }] })
     }).subscribe({
       next: ({ users, activity }) => {
         this.userMap = new Map(users.data.map((u: UserV1) => [u.id, u.userName]));

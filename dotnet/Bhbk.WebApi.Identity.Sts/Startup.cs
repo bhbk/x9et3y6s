@@ -82,7 +82,7 @@ namespace Bhbk.WebApi.Identity.Sts
 
                 /* https://www.freeformatter.com/cron-expression-generator-quartz.html */
 
-                if (jobSettings.TryGetValue("MaintainRefreshes", out var maintainRefreshes) && maintainRefreshes.IsEnabled)
+                if (jobSettings.TryGetValue("Maintain Refreshes", out var maintainRefreshes) && maintainRefreshes.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(MaintainRefreshesJob).Name, workerName);
                     jobs.AddJob<MaintainRefreshesJob>(opt => opt
@@ -102,7 +102,7 @@ namespace Bhbk.WebApi.Identity.Sts
                     }
                 }
 
-                if (jobSettings.TryGetValue("MaintainStates", out var maintainStates) && maintainStates.IsEnabled)
+                if (jobSettings.TryGetValue("Maintain States", out var maintainStates) && maintainStates.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(MaintainStatesJob).Name, workerName);
                     jobs.AddJob<MaintainStatesJob>(opt => opt
@@ -197,9 +197,6 @@ namespace Bhbk.WebApi.Identity.Sts
                     RequireSignedTokens = true,
                 };
             });
-            var authSettings = new AuthorizationSettings();
-            conf.GetSection("Authorization").Bind(authSettings);
-
             sc.AddAuthorization(opt =>
             {
                 opt.AddPolicy(PolicyConstants.OAuth2ROPGrants, humans =>
@@ -211,14 +208,15 @@ namespace Bhbk.WebApi.Identity.Sts
                     servers.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                 });
 
-                /* role-based policies for Identity service */
-                opt.AddPolicy(PolicyConstants.IdentityAdminPolicy, policy =>
-                    policy.RequireRole(authSettings.Roles.IdentityAdmins));
-                opt.AddPolicy(PolicyConstants.IdentityUserPolicy, policy =>
-                    policy.RequireRole(authSettings.Roles.IdentityAdmins, authSettings.Roles.IdentityUsers));
-                opt.AddPolicy(PolicyConstants.IdentityViewerPolicy, policy =>
-                    policy.RequireRole(authSettings.Roles.IdentityAdmins, authSettings.Roles.IdentityUsers, authSettings.Roles.IdentityViewers));
+                /* entitlement-based policies (database-driven RBAC) */
+                opt.AddPolicy(PolicyConstants.EntitlementAdminPolicy, policy =>
+                    policy.Requirements.Add(new IdentityEntitlementRequirement("Admin")));
+                opt.AddPolicy(PolicyConstants.EntitlementUserPolicy, policy =>
+                    policy.Requirements.Add(new IdentityEntitlementRequirement("User")));
+                opt.AddPolicy(PolicyConstants.EntitlementViewerPolicy, policy =>
+                    policy.Requirements.Add(new IdentityEntitlementRequirement("Viewer")));
             });
+            sc.AddScoped<IAuthorizationHandler, IdentityEntitlementAuthorize>();
             sc.AddSwaggerGen(opt =>
             {
                 opt.SwaggerDoc("v1", new OpenApiInfo { Title = "Reference", Version = "v1" });

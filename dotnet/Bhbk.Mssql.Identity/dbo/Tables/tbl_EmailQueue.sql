@@ -7,9 +7,9 @@
     [Subject]      VARCHAR (1024)     NOT NULL,
     [Body]         VARCHAR (MAX)      NULL,
     [IsCancelled]  BIT                NOT NULL,
-    [CreatedUtc]   DATETIMEOFFSET (7) NOT NULL,
-    [SendAtUtc]    DATETIMEOFFSET (7) NOT NULL,
-    [DeliveredUtc] DATETIMEOFFSET (7) NULL,
+    [Created]   DATETIMEOFFSET (7) NOT NULL,
+    [SendAt]    DATETIMEOFFSET (7) NOT NULL,
+    [Delivered] DATETIMEOFFSET (7) NULL,
     CONSTRAINT [PK_tbl_EmailQueue] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

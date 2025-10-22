@@ -6,6 +6,10 @@ namespace Bhbk.Lib.Identity.Domain.Factories
     {
         public void CreateAudiences();
         public void CreateAudienceRoles();
+        public void CreateEntitlementTypes();
+        public void CreateEntitlementScopes();
+        public void CreateUserEntitlements();
+        public void CreateAudienceEntitlements();
         public void CreateIssuers();
         public void CreateJobs();
         public void CreateLLMProviders();

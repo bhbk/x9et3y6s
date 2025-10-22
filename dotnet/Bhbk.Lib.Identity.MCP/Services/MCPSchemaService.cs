@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.MCP.Services
             var entityTypes = new[]
             {
                 "User", "Audience", "Issuer", "Role", "Claim", "LoginProvider",
-                "AuthActivity", "Setting", "State", "Quote", "Url",
+                "UserAuthActivity", "Setting", "State", "Quote", "Url",
                 "ChatConversation", "ChatMessage", "ChatPrompt",
                 "LLMProvider", "LLMProviderSetting", "Job", "JobSetting",
                 "EmailQueue", "TextQueue", "ChatFile"

@@ -15,15 +15,21 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
     {
         private readonly ILoggerFactory _logger;
         public AudienceRepository Audiences { get; private set; }
-        public IGenericRepository<tbl_AuthActivity> AuthActivity { get; private set; }
-        public IGenericRepository<tbl_AuthActivityAudience> AuthActivityAudiences { get; private set; }
+        public IGenericRepository<tbl_UserAuthActivity> UserAuthActivities { get; private set; }
+        public IGenericRepository<tbl_AudienceAuthActivity> AudienceAuthActivities { get; private set; }
         public IGenericRepository<tbl_ChatConversation> ChatConversations { get; private set; }
+        public IGenericRepository<tbl_ChatFavorite> ChatFavorites { get; private set; }
         public IGenericRepository<tbl_ChatFile> ChatFiles { get; private set; }
         public IGenericRepository<tbl_ChatMessage> ChatMessages { get; private set; }
         public IGenericRepository<tbl_ChatPrompt> ChatPrompts { get; private set; }
+        public IGenericRepository<tbl_ChatPromptHistory> ChatPromptHistories { get; private set; }
         public IGenericRepository<tbl_Claim> Claims { get; private set; }
         public IGenericRepository<tbl_EmailActivity> EmailActivity { get; private set; }
         public IGenericRepository<tbl_EmailQueue> EmailQueue { get; private set; }
+        public IGenericRepository<tbl_UserEntitlement> UserEntitlements { get; private set; }
+        public IGenericRepository<tbl_AudienceEntitlement> AudienceEntitlements { get; private set; }
+        public IGenericRepository<tbl_EntitlementScope> EntitlementScopes { get; private set; }
+        public IGenericRepository<tbl_EntitlementType> EntitlementTypes { get; private set; }
         public IGenericRepository<tbl_Issuer> Issuers { get; private set; }
         public IGenericRepository<tbl_Job> Jobs { get; private set; }
         public IGenericRepository<tbl_JobSetting> JobSettings { get; private set; }
@@ -107,15 +113,21 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
             var context = (IdentityEntities)DbContext;
 
             Audiences = new AudienceRepository(context, env);
-            AuthActivity = new GenericRepository<tbl_AuthActivity>(context);
-            AuthActivityAudiences = new GenericRepository<tbl_AuthActivityAudience>(context);
+            UserAuthActivities = new GenericRepository<tbl_UserAuthActivity>(context);
+            AudienceAuthActivities = new GenericRepository<tbl_AudienceAuthActivity>(context);
             ChatConversations = new GenericRepository<tbl_ChatConversation>(context);
+            ChatFavorites = new GenericRepository<tbl_ChatFavorite>(context);
             ChatFiles = new GenericRepository<tbl_ChatFile>(context);
             ChatMessages = new GenericRepository<tbl_ChatMessage>(context);
             ChatPrompts = new GenericRepository<tbl_ChatPrompt>(context);
+            ChatPromptHistories = new GenericRepository<tbl_ChatPromptHistory>(context);
             Claims = new GenericRepository<tbl_Claim>(context);
             EmailQueue = new GenericRepository<tbl_EmailQueue>(context);
             EmailActivity = new GenericRepository<tbl_EmailActivity>(context);
+            UserEntitlements = new GenericRepository<tbl_UserEntitlement>(context);
+            AudienceEntitlements = new GenericRepository<tbl_AudienceEntitlement>(context);
+            EntitlementScopes = new GenericRepository<tbl_EntitlementScope>(context);
+            EntitlementTypes = new GenericRepository<tbl_EntitlementType>(context);
             Issuers = new GenericRepository<tbl_Issuer>(context);
             Jobs = new GenericRepository<tbl_Job>(context);
             JobSettings = new GenericRepository<tbl_JobSetting>(context);

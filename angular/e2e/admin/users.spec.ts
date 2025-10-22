@@ -26,7 +26,7 @@ test.describe('Admin Users', () => {
     await dialog.fillField('Email', `e2e-${Date.now()}@test.local`);
 
     const createPromise = adminPage.waitForRequest((req) =>
-      req.url().includes('/user/v1') && req.method() === 'POST' && !req.url().includes('/page'),
+      req.url().includes('/users/v1') && req.method() === 'POST' && !req.url().includes('/page'),
     );
     await dialog.clickAction('Create');
     const createReq = await createPromise;

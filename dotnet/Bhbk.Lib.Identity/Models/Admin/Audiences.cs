@@ -28,7 +28,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public string SecurityStamp { get; set; }
 
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
     }
 
     public class AudienceV1 : Audiences
@@ -36,7 +36,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public Guid Id { get; set; }
 
-        public Nullable<DateTimeOffset> LockoutEndUtc { get; set; }
+        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
 
         public virtual ICollection<RoleV1> Roles { get; set; }
     }

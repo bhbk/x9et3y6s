@@ -12,10 +12,11 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
 
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
         public bool IsEnabled { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
-        public DateTimeOffset? ModifiedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset? Modified { get; set; }
 
         public virtual ICollection<tbl_JobSetting> tbl_JobSettings { get; set; }
     }

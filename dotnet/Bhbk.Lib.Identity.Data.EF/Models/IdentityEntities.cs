@@ -19,15 +19,21 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
 
         public virtual DbSet<tbl_Audience> tbl_Audiences { get; set; }
         public virtual DbSet<tbl_AudienceRole> tbl_AudienceRoles { get; set; }
-        public virtual DbSet<tbl_AuthActivity> tbl_AuthActivities { get; set; }
-        public virtual DbSet<tbl_AuthActivityAudience> tbl_AuthActivityAudiences { get; set; }
+        public virtual DbSet<tbl_UserAuthActivity> tbl_UserAuthActivities { get; set; }
+        public virtual DbSet<tbl_AudienceAuthActivity> tbl_AudienceAuthActivities { get; set; }
         public virtual DbSet<tbl_ChatConversation> tbl_ChatConversations { get; set; }
+        public virtual DbSet<tbl_ChatFavorite> tbl_ChatFavorites { get; set; }
         public virtual DbSet<tbl_ChatFile> tbl_ChatFiles { get; set; }
         public virtual DbSet<tbl_ChatMessage> tbl_ChatMessages { get; set; }
         public virtual DbSet<tbl_ChatPrompt> tbl_ChatPrompts { get; set; }
+        public virtual DbSet<tbl_ChatPromptHistory> tbl_ChatPromptHistories { get; set; }
         public virtual DbSet<tbl_Claim> tbl_Claims { get; set; }
         public virtual DbSet<tbl_EmailActivity> tbl_EmailActivities { get; set; }
         public virtual DbSet<tbl_EmailQueue> tbl_EmailQueues { get; set; }
+        public virtual DbSet<tbl_UserEntitlement> tbl_UserEntitlements { get; set; }
+        public virtual DbSet<tbl_AudienceEntitlement> tbl_AudienceEntitlements { get; set; }
+        public virtual DbSet<tbl_EntitlementScope> tbl_EntitlementScopes { get; set; }
+        public virtual DbSet<tbl_EntitlementType> tbl_EntitlementTypes { get; set; }
         public virtual DbSet<tbl_Issuer> tbl_Issuers { get; set; }
         public virtual DbSet<tbl_Job> tbl_Jobs { get; set; }
         public virtual DbSet<tbl_JobSetting> tbl_JobSettings { get; set; }
@@ -102,11 +108,11 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                     .HasConstraintName("FK_tbl_AudienceRole_RoleID");
             });
 
-            modelBuilder.Entity<tbl_AuthActivity>(entity =>
+            modelBuilder.Entity<tbl_UserAuthActivity>(entity =>
             {
-                entity.ToTable("tbl_AuthActivity");
+                entity.ToTable("tbl_UserAuthActivity");
 
-                entity.HasIndex(e => e.Id, "IX_tbl_AuthActivity")
+                entity.HasIndex(e => e.Id, "IX_tbl_UserAuthActivity")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -124,29 +130,29 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                 entity.Property(e => e.RemoteEndpoint).HasMaxLength(128);
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_AuthActivities)
+                    .WithMany(p => p.tbl_UserAuthActivities)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_tbl_AuthActivity_UserID");
+                    .HasConstraintName("FK_tbl_UserAuthActivity_UserID");
             });
 
-            modelBuilder.Entity<tbl_AuthActivityAudience>(entity =>
+            modelBuilder.Entity<tbl_AudienceAuthActivity>(entity =>
             {
-                entity.HasKey(e => new { e.AuthActivityId, e.AudienceId });
+                entity.HasKey(e => new { e.UserAuthActivityId, e.AudienceId });
 
-                entity.ToTable("tbl_AuthActivityAudience");
+                entity.ToTable("tbl_AudienceAuthActivity");
 
-                entity.HasIndex(e => new { e.AuthActivityId, e.AudienceId }, "IX_tbl_AuthActivityAudience")
+                entity.HasIndex(e => new { e.UserAuthActivityId, e.AudienceId }, "IX_tbl_AudienceAuthActivity")
                     .IsUnique();
 
-                entity.HasOne(d => d.AuthActivity)
-                    .WithMany(p => p.tbl_AuthActivityAudiences)
-                    .HasForeignKey(d => d.AuthActivityId)
-                    .HasConstraintName("FK_tbl_AuthActivityAudience_AuthActivityID");
+                entity.HasOne(d => d.UserAuthActivity)
+                    .WithMany(p => p.tbl_AudienceAuthActivities)
+                    .HasForeignKey(d => d.UserAuthActivityId)
+                    .HasConstraintName("FK_tbl_AudienceAuthActivity_UserAuthActivityID");
 
                 entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_AuthActivityAudiences)
+                    .WithMany(p => p.tbl_AudienceAuthActivities)
                     .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_tbl_AuthActivityAudience_AudienceID");
+                    .HasConstraintName("FK_tbl_AudienceAuthActivity_AudienceID");
             });
 
             modelBuilder.Entity<tbl_ChatConversation>(entity =>
@@ -242,6 +248,48 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                 entity.Property(e => e.Content).IsRequired();
             });
 
+            modelBuilder.Entity<tbl_ChatFavorite>(entity =>
+            {
+                entity.ToTable("tbl_ChatFavorite");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_ChatFavorite")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.Prompt)
+                    .IsRequired()
+                    .HasMaxLength(2048);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.tbl_ChatFavorites)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_tbl_ChatFavorite_UserID");
+            });
+
+            modelBuilder.Entity<tbl_ChatPromptHistory>(entity =>
+            {
+                entity.ToTable("tbl_ChatPromptHistory");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_ChatPromptHistory")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.PromptText)
+                    .IsRequired()
+                    .HasMaxLength(2048);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.tbl_ChatPromptHistories)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_tbl_ChatPromptHistory_UserID");
+            });
+
             modelBuilder.Entity<tbl_Claim>(entity =>
             {
                 entity.ToTable("tbl_Claim");
@@ -331,6 +379,106 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<tbl_UserEntitlement>(entity =>
+            {
+                entity.ToTable("tbl_UserEntitlement");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_UserEntitlement")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.tbl_UserEntitlements)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_tbl_UserEntitlement_UserID");
+
+                entity.HasOne(d => d.EntitlementType)
+                    .WithMany(p => p.tbl_UserEntitlements)
+                    .HasForeignKey(d => d.EntitlementTypeId)
+                    .HasConstraintName("FK_tbl_UserEntitlement_EntitlementTypeID");
+
+                entity.HasOne(d => d.EntitlementScope)
+                    .WithMany(p => p.tbl_UserEntitlements)
+                    .HasForeignKey(d => d.EntitlementScopeId)
+                    .HasConstraintName("FK_tbl_UserEntitlement_EntitlementScopeID");
+
+                entity.HasOne(d => d.Issuer)
+                    .WithMany(p => p.tbl_UserEntitlements)
+                    .HasForeignKey(d => d.IssuerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tbl_UserEntitlement_IssuerID");
+
+                entity.HasOne(d => d.Audience)
+                    .WithMany(p => p.tbl_UserEntitlements)
+                    .HasForeignKey(d => d.AudienceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tbl_UserEntitlement_AudienceID");
+            });
+
+            modelBuilder.Entity<tbl_AudienceEntitlement>(entity =>
+            {
+                entity.ToTable("tbl_AudienceEntitlement");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_AudienceEntitlement")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.Audience)
+                    .WithMany(p => p.tbl_AudienceEntitlements)
+                    .HasForeignKey(d => d.AudienceId)
+                    .HasConstraintName("FK_tbl_AudienceEntitlement_AudienceID");
+
+                entity.HasOne(d => d.EntitlementType)
+                    .WithMany(p => p.tbl_AudienceEntitlements)
+                    .HasForeignKey(d => d.EntitlementTypeId)
+                    .HasConstraintName("FK_tbl_AudienceEntitlement_EntitlementTypeID");
+
+                entity.HasOne(d => d.EntitlementScope)
+                    .WithMany(p => p.tbl_AudienceEntitlements)
+                    .HasForeignKey(d => d.EntitlementScopeId)
+                    .HasConstraintName("FK_tbl_AudienceEntitlement_EntitlementScopeID");
+
+                entity.HasOne(d => d.Issuer)
+                    .WithMany(p => p.tbl_AudienceEntitlements)
+                    .HasForeignKey(d => d.IssuerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tbl_AudienceEntitlement_IssuerID");
+            });
+
+            modelBuilder.Entity<tbl_EntitlementScope>(entity =>
+            {
+                entity.ToTable("tbl_EntitlementScope");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_EntitlementScope")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(64);
+            });
+
+            modelBuilder.Entity<tbl_EntitlementType>(entity =>
+            {
+                entity.ToTable("tbl_EntitlementType");
+
+                entity.HasIndex(e => e.Id, "IX_tbl_EntitlementType")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(64);
+            });
+
             modelBuilder.Entity<tbl_Issuer>(entity =>
             {
                 entity.ToTable("tbl_Issuer");
@@ -367,6 +515,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                     .IsRequired()
                     .HasMaxLength(128)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Description).HasMaxLength(256);
             });
 
             modelBuilder.Entity<tbl_JobSetting>(entity =>

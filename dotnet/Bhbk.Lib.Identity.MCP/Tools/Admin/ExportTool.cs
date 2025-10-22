@@ -161,20 +161,20 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
 
                 case "activity":
                 {
-                    var q = _uow.AuthActivity.Get(x => true);
-                    return JArray.FromObject(q.OrderByDescending(x => x.CreatedUtc).Skip(skip).Take(take).ToList(), serializer);
+                    var q = _uow.UserAuthActivities.Get(x => true);
+                    return JArray.FromObject(q.OrderByDescending(x => x.Created).Skip(skip).Take(take).ToList(), serializer);
                 }
 
                 case "email_queue":
                 {
                     var q = _uow.EmailQueue.Get(x => true);
-                    return JArray.FromObject(q.OrderByDescending(x => x.CreatedUtc).Skip(skip).Take(take).ToList(), serializer);
+                    return JArray.FromObject(q.OrderByDescending(x => x.Created).Skip(skip).Take(take).ToList(), serializer);
                 }
 
                 case "text_queue":
                 {
                     var q = _uow.TextQueue.Get(x => true);
-                    return JArray.FromObject(q.OrderByDescending(x => x.CreatedUtc).Skip(skip).Take(take).ToList(), serializer);
+                    return JArray.FromObject(q.OrderByDescending(x => x.Created).Skip(skip).Take(take).ToList(), serializer);
                 }
 
                 default:

@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string Value { get; set; }
         public string ValueType { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual tbl_Issuer Issuer { get; set; }
         public virtual ICollection<tbl_RoleClaim> tbl_RoleClaims { get; set; }

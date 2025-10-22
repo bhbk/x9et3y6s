@@ -11,7 +11,7 @@ export interface SettingV1 {
   configKey: string;
   configValue: string;
   isDeletable: boolean;
-  createdUtc: string;
+  created: string;
 }
 
 export interface SettingCreate {

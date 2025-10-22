@@ -5,13 +5,13 @@ CREATE TABLE [dbo].[tbl_LLMProviderSetting] (
     [ConfigValue]     NVARCHAR (1024)    NOT NULL,
     [IsSecret]        BIT                NOT NULL,
     [IsDeletable]     BIT                NOT NULL,
-    [CreatedUtc]      DATETIMEOFFSET (7) NOT NULL,
-    [VersionStartUtc] DATETIME2 (7) GENERATED ALWAYS AS ROW START HIDDEN DEFAULT (GETUTCDATE()) NOT NULL,
-    [VersionEndUtc]   DATETIME2 (7) GENERATED ALWAYS AS ROW END HIDDEN DEFAULT (CONVERT([datetime2],'9999-12-31 23:59:59.9999999')) NOT NULL,
+    [Created]      DATETIMEOFFSET (7) NOT NULL,
+    [VersionStart] DATETIME2 (7) GENERATED ALWAYS AS ROW START HIDDEN DEFAULT (GETUTCDATE()) NOT NULL,
+    [VersionEnd]   DATETIME2 (7) GENERATED ALWAYS AS ROW END HIDDEN DEFAULT (CONVERT([datetime2],'9999-12-31 23:59:59.9999999')) NOT NULL,
     CONSTRAINT [PK_tbl_LLMProviderSetting] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_tbl_LLMProviderSetting_ProviderID] FOREIGN KEY ([ProviderId])
         REFERENCES [dbo].[tbl_LLMProvider] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
-    PERIOD FOR SYSTEM_TIME ([VersionStartUtc], [VersionEndUtc])
+    PERIOD FOR SYSTEM_TIME ([VersionStart], [VersionEnd])
 )
 WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE=[history].[tbl_LLMProviderSetting], DATA_CONSISTENCY_CHECK=ON));
 

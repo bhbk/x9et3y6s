@@ -35,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult UpdateV1([FromBody] JobV1 model)
         {
             if (!ModelState.IsValid)
@@ -50,8 +50,9 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 return NotFound(ModelState);
             }
 
+            job.Description = model.Description;
             job.IsEnabled = model.IsEnabled;
-            job.ModifiedUtc = DateTimeOffset.UtcNow;
+            job.Modified = DateTimeOffset.UtcNow;
 
             uow.Jobs.Put(job);
             uow.Commit();
@@ -61,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{jobId:guid}/settings"), HttpPut]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult UpdateSettingsV1([FromRoute] Guid jobId, [FromBody] List<JobSettingV1> model)
         {
             if (!ModelState.IsValid)
@@ -96,7 +97,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 uow.JobSettings.Put(setting);
             }
 
-            job.ModifiedUtc = DateTimeOffset.UtcNow;
+            job.Modified = DateTimeOffset.UtcNow;
             uow.Jobs.Put(job);
             uow.Commit();
 

@@ -11,9 +11,9 @@ namespace Bhbk.Lib.Identity.Primitives.Constants
         public const string AlertUserPolicy = "AlertUser";
         public const string AlertViewerPolicy = "AlertViewer";
 
-        /* Identity service role-based policies */
-        public const string IdentityAdminPolicy = "IdentityAdmin";
-        public const string IdentityUserPolicy = "IdentityUser";
-        public const string IdentityViewerPolicy = "IdentityViewer";
+        /* Entitlement-based policies (database-driven RBAC) */
+        public const string EntitlementAdminPolicy = "EntitlementAdmin";
+        public const string EntitlementUserPolicy = "EntitlementUser";
+        public const string EntitlementViewerPolicy = "EntitlementViewer";
     }
 }

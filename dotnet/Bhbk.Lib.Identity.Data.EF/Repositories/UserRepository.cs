@@ -38,7 +38,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public tbl_UserClaim AddClaim(tbl_UserClaim claim)
         {
-            claim.CreatedUtc = Clock.UtcDateTime;
+            claim.Created = Clock.UtcDateTime;
 
             _context.Set<tbl_UserClaim>().Add(claim);
 
@@ -47,7 +47,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public tbl_UserLoginProvider AddLoginProvider(tbl_UserLoginProvider claim)
         {
-            claim.CreatedUtc = Clock.UtcDateTime;
+            claim.Created = Clock.UtcDateTime;
 
             _context.Set<tbl_UserLoginProvider>().Add(claim);
 
@@ -56,7 +56,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public tbl_UserRole AddRole(tbl_UserRole role)
         {
-            role.CreatedUtc = Clock.UtcDateTime;
+            role.Created = Clock.UtcDateTime;
 
             _context.Set<tbl_UserRole>().Add(role);
 
@@ -87,7 +87,10 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public new tbl_User Delete(tbl_User user)
         {
-            var activity = _context.Set<tbl_AuthActivity>()
+            var activity = _context.Set<tbl_UserAuthActivity>()
+                .Where(x => x.UserId == user.Id);
+
+            var entitlements = _context.Set<tbl_UserEntitlement>()
                 .Where(x => x.UserId == user.Id);
 
             var refreshes = _context.Set<tbl_Refresh>()
@@ -100,6 +103,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
                 .Where(x => x.UserId == user.Id);
 
             _context.RemoveRange(activity);
+            _context.RemoveRange(entitlements);
             _context.RemoveRange(refreshes);
             _context.RemoveRange(settings);
             _context.RemoveRange(states);
@@ -259,10 +263,10 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
         {
             if (entity.IsLockedOut)
             {
-                if (entity.LockoutEndUtc.HasValue && entity.LockoutEndUtc <= DateTime.UtcNow)
+                if (entity.LockoutEnd.HasValue && entity.LockoutEnd <= DateTime.UtcNow)
                 {
                     entity.IsLockedOut = false;
-                    entity.LockoutEndUtc = null;
+                    entity.LockoutEnd = null;
 
                     Put(entity);
 
@@ -273,7 +277,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
             }
             else
             {
-                entity.LockoutEndUtc = null;
+                entity.LockoutEnd = null;
                 Put(entity);
 
                 return false;
@@ -386,7 +390,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
             entity.FirstName = user.FirstName;
             entity.LastName = user.LastName;
             entity.IsLockedOut = user.IsLockedOut;
-            entity.LockoutEndUtc = user.LockoutEndUtc.HasValue ? user.LockoutEndUtc.Value.ToUniversalTime() : user.LockoutEndUtc;
+            entity.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
             entity.IsDeletable = user.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;

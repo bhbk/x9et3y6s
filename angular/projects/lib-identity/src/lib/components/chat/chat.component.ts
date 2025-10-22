@@ -16,6 +16,7 @@ import { KENDO_INDICATORS } from '@progress/kendo-angular-indicators';
 import { KENDO_ICONS } from '@progress/kendo-angular-icons';
 import { AuthStore } from '../../stores/auth.store';
 import { ChatStore } from '../../stores/chat.store';
+import { ChatService } from '../../services/chat.service';
 import { ChatConversation, ChatFavorite } from '../../models/chat.model';
 import {
   paperPlaneIcon,
@@ -287,6 +288,8 @@ import {
                         [style.width.%]="100"
                         [rows]="3"
                         (keydown.enter)="onEnterKey($event)"
+                        (keydown.arrowUp)="onArrowUp($event)"
+                        (keydown.arrowDown)="onArrowDown($event)"
                         [disabled]="!isFullyConnected() || chatStore.isStreaming()"
                       ></kendo-textarea>
                       <div class="flex justify-end px-3 py-2 border-t border-gray-100">
@@ -298,7 +301,7 @@ import {
                         ></button>
                       </div>
                     </div>
-                    <p class="text-[11px] text-gray-400 mt-2">Shift+Enter for new line</p>
+                    <p class="text-[11px] text-gray-400 mt-2">Shift+Enter for new line &middot; Up/Down for history</p>
                   </div>
                 </div>
               </div>
@@ -317,20 +320,28 @@ import {
                 <div #messagesContainer class="absolute inset-0 overflow-y-auto hide-scrollbar" (scroll)="onMessagesScroll()">
                   <div class="max-w-3xl mx-auto px-6 py-8 pb-52 space-y-6">
 
-                    @for (msg of chatStore.displayMessages(); track msg.id) {
+                    @for (msg of chatStore.displayMessages(); track msg.id; let i = $index) {
+                      @if (isNewDateGroup(i)) {
+                        <div class="flex items-center gap-3 my-4">
+                          <div class="flex-1 border-t border-gray-200"></div>
+                          <span class="text-xs text-gray-400 whitespace-nowrap">{{ formatDateLabel(msg.created) }}</span>
+                          <div class="flex-1 border-t border-gray-200"></div>
+                        </div>
+                      }
                       @if (msg.role === 'user') {
                         <div class="flex justify-end">
-                          <div class="max-w-[75%] bg-blue-50 rounded-2xl px-4 py-3 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-                            {{ msg.content }}
+                          <div class="max-w-[75%] bg-blue-50 rounded-2xl px-4 py-3">
+                            <p class="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{{ msg.content }}</p>
+                            <p class="text-[11px] text-gray-400 mt-2 text-right">{{ formatTime(msg.created) }}</p>
                           </div>
                         </div>
                       } @else {
-                        <div>
+                        <div class="max-w-[85%] bg-gray-100 rounded-2xl px-4 py-3">
                           <p class="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{{ msg.content }}</p>
                           @if (msg.files?.length) {
                             <div class="mt-2 space-y-1.5">
                               @for (file of msg.files; track file.fileId) {
-                                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm">
                                   <kendo-svg-icon [icon]="downloadIcon" size="small" class="text-blue-500"></kendo-svg-icon>
                                   <button class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
                                           (click)="onDownloadFile(file.fileId, file.fileName)">
@@ -341,11 +352,12 @@ import {
                               }
                             </div>
                           }
-                          @if (isAdmin && (msg.inputTokens !== null || msg.outputTokens !== null)) {
-                            <p class="text-[11px] text-gray-400 mt-2">
-                              {{ msg.inputTokens || 0 }} in / {{ msg.outputTokens || 0 }} out tokens
-                            </p>
-                          }
+                          <div class="flex items-center justify-between mt-2 text-[11px] text-gray-400">
+                            <span>{{ formatTime(msg.created) }}</span>
+                            @if (isAdmin && (msg.inputTokens !== null || msg.outputTokens !== null)) {
+                              <span>{{ msg.inputTokens || 0 }} in / {{ msg.outputTokens || 0 }} out tokens</span>
+                            }
+                          </div>
                         </div>
                       }
                     }
@@ -392,6 +404,8 @@ import {
                           [style.width.%]="100"
                           [rows]="3"
                           (keydown.enter)="onEnterKey($event)"
+                          (keydown.arrowUp)="onArrowUp($event)"
+                          (keydown.arrowDown)="onArrowDown($event)"
                           [disabled]="!isFullyConnected() || chatStore.isStreaming()"
                         ></kendo-textarea>
                         <div class="flex justify-end px-3 py-2 border-t border-gray-100">
@@ -403,7 +417,7 @@ import {
                           ></button>
                         </div>
                       </div>
-                      <p class="text-[11px] text-gray-400 mt-2">Shift+Enter for new line</p>
+                      <p class="text-[11px] text-gray-400 mt-2">Shift+Enter for new line &middot; Up/Down for history</p>
                     </div>
                   </div>
                 </div>
@@ -479,6 +493,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   readonly authStore = inject(AuthStore);
   readonly chatStore = inject(ChatStore);
+  private readonly chatService = inject(ChatService);
 
   @ViewChild('messagesContainer') messagesContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('convRenameInput') convRenameInputRef?: ElementRef<HTMLInputElement>;
@@ -533,6 +548,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   private forceScrollToBottom = false;
   private shouldFocusRename = false;
 
+  /* prompt history (up/down arrow) */
+  private promptHistory: string[] = [];
+  private historyIndex = -1;
+  private currentDraft = '';
+
   private readonly defaultAdminFavorites: ChatFavorite[] = [
     { id: 'default-1', name: 'User count', prompt: 'How many users are in the system?' },
     { id: 'default-2', name: 'Recent activity', prompt: 'Show recent authentication activity' },
@@ -546,10 +566,6 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     { id: 'default-3', name: 'My profile', prompt: 'What are my profile details?' },
     { id: 'default-4', name: 'Active sessions', prompt: 'Do I have any active sessions?' }
   ];
-
-  private get favStorageKey(): string {
-    return this.isAdmin ? 'chat-favorites-admin' : 'chat-favorites-user';
-  }
 
   private get pinStorageKey(): string {
     return this.isAdmin ? 'chat-pinned-convs-admin' : 'chat-pinned-convs-user';
@@ -584,6 +600,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     this.loadFavorites();
     this.loadPinnedConvs();
+    this.loadPromptHistory();
     this.chatStore.init();
     this.chatStore.loadConversations({});
   }
@@ -725,24 +742,42 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   // ── Favorites ──────────────────────────────────────────────────────────────
 
   private loadFavorites(): void {
-    try {
-      const raw = localStorage.getItem(this.favStorageKey);
-      if (raw) {
-        this.favorites = JSON.parse(raw);
-      } else {
-        const defaults = this.isAdmin ? this.defaultAdminFavorites : this.defaultUserFavorites;
-        this.favorites = defaults.map(f => ({ ...f }));
-        this.saveFavorites();
+    this.chatService.getFavorites().subscribe({
+      next: (favorites) => {
+        if (favorites.length > 0) {
+          this.favorites = favorites;
+        } else {
+          this.seedDefaultFavorites();
+        }
+      },
+      error: () => {
+        this.favorites = [];
       }
-    } catch {
-      this.favorites = [];
-    }
+    });
   }
 
-  private saveFavorites(): void {
-    try {
-      localStorage.setItem(this.favStorageKey, JSON.stringify(this.favorites));
-    } catch { }
+  private seedDefaultFavorites(): void {
+    const defaults = this.isAdmin ? this.defaultAdminFavorites : this.defaultUserFavorites;
+    let remaining = defaults.length;
+    const seeded: ChatFavorite[] = [];
+
+    for (const fav of defaults) {
+      this.chatService.createFavorite(fav.name, fav.prompt).subscribe({
+        next: (created) => {
+          seeded.push(created);
+          remaining--;
+          if (remaining === 0) {
+            this.favorites = seeded;
+          }
+        },
+        error: () => {
+          remaining--;
+          if (remaining === 0) {
+            this.favorites = seeded;
+          }
+        }
+      });
+    }
   }
 
   sendFavorite(fav: ChatFavorite): void {
@@ -782,11 +817,14 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     const name = this.newFavName.trim();
     const prompt = this.newFavPrompt.trim();
     if (!name || !prompt) return;
-    this.favorites = [...this.favorites, { id: crypto.randomUUID(), name, prompt }];
-    this.saveFavorites();
     this.addingFavorite = false;
     this.newFavName = '';
     this.newFavPrompt = '';
+    this.chatService.createFavorite(name, prompt).subscribe({
+      next: (created) => {
+        this.favorites = [...this.favorites, created];
+      }
+    });
   }
 
   cancelAddFav(): void {
@@ -807,11 +845,16 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     const name = this.editingFavName.trim();
     const prompt = this.editingFavPrompt.trim();
     if (!name || !prompt || !this.editingFavId) return;
-    this.favorites = this.favorites.map(f =>
-      f.id === this.editingFavId ? { ...f, name, prompt } : f
-    );
-    this.saveFavorites();
-    this.editingFavId = null;
+    const fav = this.favorites.find(f => f.id === this.editingFavId);
+    const pinned = fav?.pinned ?? false;
+    this.chatService.updateFavorite(this.editingFavId, name, prompt, pinned).subscribe({
+      next: (updated) => {
+        this.favorites = this.favorites.map(f =>
+          f.id === updated.id ? updated : f
+        );
+        this.editingFavId = null;
+      }
+    });
   }
 
   cancelEditFav(): void {
@@ -825,9 +868,9 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   confirmDeleteFav(id: string): void {
-    this.favorites = this.favorites.filter(f => f.id !== id);
-    this.saveFavorites();
     this.deletingFavId = null;
+    this.favorites = this.favorites.filter(f => f.id !== id);
+    this.chatService.deleteFavorite(id).subscribe();
   }
 
   cancelDeleteFav(): void {
@@ -835,10 +878,16 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   togglePinFav(id: string): void {
-    this.favorites = this.favorites.map(f =>
-      f.id === id ? { ...f, pinned: !f.pinned } : f
-    );
-    this.saveFavorites();
+    const fav = this.favorites.find(f => f.id === id);
+    if (!fav) return;
+    const newPinned = !fav.pinned;
+    this.chatService.updateFavorite(id, fav.name, fav.prompt, newPinned).subscribe({
+      next: (updated) => {
+        this.favorites = this.favorites.map(f =>
+          f.id === updated.id ? updated : f
+        );
+      }
+    });
   }
 
   isFavPinned(id: string): boolean {
@@ -915,6 +964,17 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     } catch { }
   }
 
+  private loadPromptHistory(): void {
+    this.chatService.getPromptHistory().subscribe({
+      next: (entries) => {
+        this.promptHistory = entries.reverse().map(e => e.promptText);
+      },
+      error: () => {
+        this.promptHistory = [];
+      }
+    });
+  }
+
   // ── Sidebar ─────────────────────────────────────────────────────────────────
 
   openSidebar(): void {
@@ -939,6 +999,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   sendMessage(): void {
     const text = this.messageText.trim();
     if (!text) return;
+
+    this.promptHistory.push(text);
+    this.chatService.addPromptHistory(text).subscribe();
+    this.historyIndex = -1;
+    this.currentDraft = '';
+
     this.messageText = '';
     this.forceScrollToBottom = true;
 
@@ -959,8 +1025,70 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  onArrowUp(event: Event): void {
+    if (this.promptHistory.length === 0) return;
+    const textarea = this.getTextareaElement(event);
+    if (textarea && textarea.selectionStart !== 0) return;
+
+    event.preventDefault();
+    if (this.historyIndex === -1) {
+      this.currentDraft = this.messageText;
+    }
+    if (this.historyIndex < this.promptHistory.length - 1) {
+      this.historyIndex++;
+      this.messageText = this.promptHistory[this.promptHistory.length - 1 - this.historyIndex];
+    }
+  }
+
+  onArrowDown(event: Event): void {
+    if (this.historyIndex === -1) return;
+    const textarea = this.getTextareaElement(event);
+    if (textarea && textarea.selectionStart !== textarea.value.length) return;
+
+    event.preventDefault();
+    this.historyIndex--;
+    if (this.historyIndex === -1) {
+      this.messageText = this.currentDraft;
+    } else {
+      this.messageText = this.promptHistory[this.promptHistory.length - 1 - this.historyIndex];
+    }
+  }
+
+  private getTextareaElement(event: Event): HTMLTextAreaElement | null {
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'TEXTAREA') return target as HTMLTextAreaElement;
+    return target.querySelector('textarea');
+  }
+
   onDownloadFile(fileId: string, fileName: string): void {
     this.chatStore.downloadFile(fileId, fileName);
+  }
+
+  isNewDateGroup(index: number): boolean {
+    const msgs = this.chatStore.displayMessages();
+    if (index === 0) return true;
+    const curr = new Date(msgs[index].created).toDateString();
+    const prev = new Date(msgs[index - 1].created).toDateString();
+    return curr !== prev;
+  }
+
+  formatDateLabel(dateStr: string): string {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) return 'Today';
+    if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+
+    const month = date.toLocaleString('default', { month: 'short' });
+    const day = date.getDate();
+    if (date.getFullYear() === today.getFullYear()) return `${month} ${day}`;
+    return `${month} ${day}, ${date.getFullYear()}`;
+  }
+
+  formatTime(dateStr: string): string {
+    return new Date(dateStr).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   }
 
   formatFileSize(bytes: number): string {

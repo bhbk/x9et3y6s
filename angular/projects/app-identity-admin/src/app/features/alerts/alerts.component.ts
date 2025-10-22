@@ -124,15 +124,15 @@ import { DateTime } from 'luxon';
                     </ng-template>
                   </kendo-grid-column>
 
-                  <kendo-grid-column field="createdUtc" title="Created" [width]="170">
+                  <kendo-grid-column field="created" title="Created" [width]="170">
                     <ng-template kendoGridCellTemplate let-dataItem>
-                      <span class="text-sm">{{ formatDate(dataItem.createdUtc) }}</span>
+                      <span class="text-sm">{{ formatDate(dataItem.created) }}</span>
                     </ng-template>
                   </kendo-grid-column>
 
-                  <kendo-grid-column field="sendAtUtc" title="Send At" [width]="170">
+                  <kendo-grid-column field="sendAt" title="Send At" [width]="170">
                     <ng-template kendoGridCellTemplate let-dataItem>
-                      <span class="text-sm">{{ formatDate(dataItem.sendAtUtc) }}</span>
+                      <span class="text-sm">{{ formatDate(dataItem.sendAt) }}</span>
                     </ng-template>
                   </kendo-grid-column>
 
@@ -211,15 +211,15 @@ import { DateTime } from 'luxon';
                     </ng-template>
                   </kendo-grid-column>
 
-                  <kendo-grid-column field="createdUtc" title="Created" [width]="170">
+                  <kendo-grid-column field="created" title="Created" [width]="170">
                     <ng-template kendoGridCellTemplate let-dataItem>
-                      <span class="text-sm">{{ formatDate(dataItem.createdUtc) }}</span>
+                      <span class="text-sm">{{ formatDate(dataItem.created) }}</span>
                     </ng-template>
                   </kendo-grid-column>
 
-                  <kendo-grid-column field="sendAtUtc" title="Send At" [width]="170">
+                  <kendo-grid-column field="sendAt" title="Send At" [width]="170">
                     <ng-template kendoGridCellTemplate let-dataItem>
-                      <span class="text-sm">{{ formatDate(dataItem.sendAtUtc) }}</span>
+                      <span class="text-sm">{{ formatDate(dataItem.sendAt) }}</span>
                     </ng-template>
                   </kendo-grid-column>
 
@@ -270,13 +270,13 @@ export class AlertsComponent implements OnInit {
   // Email grid state
   readonly emailGridData = signal<GridDataResult>({ data: [], total: 0 });
   readonly emailSkip = signal(0);
-  readonly emailSort = signal<SortDescriptor[]>([{ field: 'createdUtc', dir: 'desc' }]);
+  readonly emailSort = signal<SortDescriptor[]>([{ field: 'created', dir: 'desc' }]);
   readonly emailPageSize = signal(10);
 
   // Text grid state
   readonly textGridData = signal<GridDataResult>({ data: [], total: 0 });
   readonly textSkip = signal(0);
-  readonly textSort = signal<SortDescriptor[]>([{ field: 'createdUtc', dir: 'desc' }]);
+  readonly textSort = signal<SortDescriptor[]>([{ field: 'created', dir: 'desc' }]);
   readonly textPageSize = signal(10);
 
   // Shared state
@@ -389,7 +389,7 @@ export class AlertsComponent implements OnInit {
 
   getStatus(item: EmailQueueV1 | TextQueueV1): AlertDeliveryStatus {
     if (item.isCancelled) return 'Cancelled';
-    if (item.deliveredUtc) return 'Delivered';
+    if (item.delivered) return 'Delivered';
     return 'Pending';
   }
 
@@ -447,12 +447,12 @@ export class AlertsComponent implements OnInit {
 
     for (const item of this.emailGridData().data as EmailQueueV1[]) {
       if (item.isCancelled) cancelled++;
-      else if (!item.deliveredUtc) pending++;
+      else if (!item.delivered) pending++;
     }
 
     for (const item of this.textGridData().data as TextQueueV1[]) {
       if (item.isCancelled) cancelled++;
-      else if (!item.deliveredUtc) pending++;
+      else if (!item.delivered) pending++;
     }
 
     this.pendingCount.set(pending);

@@ -54,14 +54,14 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
 
-            var job = uow.Jobs.Get(x => x.Name == "TextActivity").Single();
+            var job = uow.Jobs.Get(x => x.Name == "Text Activity").Single();
             var expire = int.Parse(uow.JobSettings.Get(x => x.JobId == job.Id && x.ConfigKey == "ExpireDelay").Single().ConfigValue);
 
             foreach (var entry in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>()
-                .Where(x => x.CreatedUtc < DateTime.UtcNow.AddSeconds(-(expire))).ToLambda()))
+                .Where(x => x.Created < DateTime.UtcNow.AddSeconds(-(expire))).ToLambda()))
             {
                 Log.Warning($"'{callPath}' is deleting text (ID=" + entry.Id.ToString() + ") that was created on "
-                    + entry.CreatedUtc.ToLocalTime());
+                    + entry.Created.ToLocalTime());
 
                 uow.TextQueue.Delete(entry);
             }

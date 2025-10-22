@@ -11,7 +11,7 @@ export interface ClaimV1 {
   value: string;
   valueType?: string;
   isDeletable: boolean;
-  createdUtc: string;
+  created: string;
 }
 
 export interface ClaimCreate {

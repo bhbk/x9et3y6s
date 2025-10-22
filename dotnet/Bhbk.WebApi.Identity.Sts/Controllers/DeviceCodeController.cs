@@ -129,8 +129,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     StateValue = nonce,
                     StateType = ConsumerType.Device.ToString(),
                     StateConsume = false,
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
             uow.Commit();
@@ -191,8 +191,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             /* check if state is valid */
             var state = uow.States.Get(x => x.StateValue == input.device_code
                 && x.StateType == ConsumerType.Device.ToString()
-                && x.ValidFromUtc < DateTime.UtcNow
-                && x.ValidToUtc > DateTime.UtcNow).SingleOrDefault();
+                && x.ValidFrom < DateTime.UtcNow
+                && x.ValidTo > DateTime.UtcNow).SingleOrDefault();
 
             if (state == null
                 || state.StateConsume == true)
@@ -201,9 +201,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 return BadRequest(ModelState);
             }
             /* check if device is polling too frequently */
-            else if (uint.Parse(polling.ConfigValue) <= (state.LastPollingUtc.Subtract(DateTime.UtcNow)).TotalSeconds)
+            else if (uint.Parse(polling.ConfigValue) <= (state.LastPolling.Subtract(DateTime.UtcNow)).TotalSeconds)
             {
-                state.LastPollingUtc = DateTime.UtcNow;
+                state.LastPolling = DateTime.UtcNow;
                 state.StateConsume = false;
 
                 uow.States.Put(state);
@@ -244,8 +244,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             if (!new TimeBasedTokenFactory(8, 10).Validate(user.SecurityStamp, input.user_code, user.Id.ToString()))
             {
-                var failActivity = uow.AuthActivity.Post(
-                    map.Map<tbl_AuthActivity>(new AuthActivityV1()
+                var failActivity = uow.UserAuthActivities.Post(
+                    map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                     {
                         UserId = user.Id,
                         LoginType = GrantFlowType.DeviceCodeV2.ToString(),
@@ -254,11 +254,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
 
-                uow.AuthActivityAudiences.Post(new tbl_AuthActivityAudience
+                uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
                 {
-                    AuthActivityId = failActivity.Id,
+                    UserAuthActivityId = failActivity.Id,
                     AudienceId = audience.Id,
-                    CreatedUtc = failActivity.CreatedUtc,
+                    Created = failActivity.Created,
                 });
 
                 uow.Commit();
@@ -268,7 +268,7 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             }
 
             /* no reuse of state after this */
-            state.LastPollingUtc = DateTime.UtcNow;
+            state.LastPolling = DateTime.UtcNow;
             state.StateConsume = true;
 
             /* adjust state */
@@ -277,8 +277,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var dc_claims = uow.Users.GenerateAccessClaims(issuer, user);
             var dc = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, dc_claims);
 
-            var dcActivity = uow.AuthActivity.Post(
-                map.Map<tbl_AuthActivity>(new AuthActivityV1()
+            var dcActivity = uow.UserAuthActivities.Post(
+                map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                 {
                     UserId = user.Id,
                     LoginType = GrantFlowType.DeviceCodeV2.ToString(),
@@ -287,11 +287,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
-            uow.AuthActivityAudiences.Post(new tbl_AuthActivityAudience
+            uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
             {
-                AuthActivityId = dcActivity.Id,
+                UserAuthActivityId = dcActivity.Id,
                 AudienceId = audience.Id,
-                CreatedUtc = dcActivity.CreatedUtc,
+                Created = dcActivity.Created,
             });
 
             var rt_claims = uow.Users.GenerateRefreshClaims(issuer, user);
@@ -304,14 +304,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserId = user.Id,
                     RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = rt.RawData,
-                    ValidFromUtc = rt.ValidFrom,
-                    ValidToUtc = rt.ValidTo,
+                    ValidFrom = rt.ValidFrom,
+                    ValidTo = rt.ValidTo,
                     IpAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     UserAgent = Request.Headers["User-Agent"].ToString(),
                 }));
 
-            var rtActivity = uow.AuthActivity.Post(
-                map.Map<tbl_AuthActivity>(new AuthActivityV1()
+            var rtActivity = uow.UserAuthActivities.Post(
+                map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                 {
                     UserId = user.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
@@ -320,11 +320,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
-            uow.AuthActivityAudiences.Post(new tbl_AuthActivityAudience
+            uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
             {
-                AuthActivityId = rtActivity.Id,
+                UserAuthActivityId = rtActivity.Id,
                 AudienceId = audience.Id,
-                CreatedUtc = rtActivity.CreatedUtc,
+                Created = rtActivity.Created,
             });
 
             uow.Commit();

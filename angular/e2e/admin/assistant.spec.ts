@@ -157,7 +157,7 @@ test.describe('Admin Chat Creation', () => {
     expect(response.status).toBe(200);
     expect(response.data).toHaveProperty('id');
     expect(response.data).toHaveProperty('title');
-    expect(response.data).toHaveProperty('createdUtc');
+    expect(response.data).toHaveProperty('created');
   });
 
   test('chat input is not available when service is disconnected', async ({ adminPage }) => {
@@ -273,9 +273,9 @@ const RS = '\x1e'; // SignalR record separator
 const SCROLL_CONVERSATION = {
   id: SCROLL_CONV_ID,
   title: 'Scroll Test Chat',
-  startedUtc: '2026-01-01T00:00:00Z',
-  endedUtc: null,
-  createdUtc: '2026-01-01T00:00:00Z',
+  started: '2026-01-01T00:00:00Z',
+  ended: null,
+  created: '2026-01-01T00:00:00Z',
 };
 
 function generateMessages(count: number) {
@@ -288,7 +288,7 @@ function generateMessages(count: number) {
         : `This is assistant response number ${i + 1}. It contains some information about the identity system configuration and settings that the administrator asked about.`,
     inputTokens: i % 2 === 1 ? 100 : null,
     outputTokens: i % 2 === 1 ? 50 : null,
-    createdUtc: new Date(Date.now() - (count - i) * 60000).toISOString(),
+    created: new Date(Date.now() - (count - i) * 60000).toISOString(),
   }));
 }
 
@@ -408,7 +408,7 @@ async function setupConnectedChat(page: Page): Promise<{ getWs: () => Promise<Mo
         body: JSON.stringify({
           id: crypto.randomUUID(),
           title: 'New Chat',
-          createdUtc: new Date().toISOString(),
+          created: new Date().toISOString(),
         }),
       });
     }

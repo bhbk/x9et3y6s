@@ -5,6 +5,7 @@ export * from './app-config.model';
 export * from './auth.model';
 
 // Admin entities
+export * from './entitlement.model';
 export * from './issuer.model';
 export * from './audience.model';
 export * from './role.model';
@@ -12,7 +13,7 @@ export * from './claim.model';
 export * from './login-provider.model';
 export * from './user.model';
 export * from './refresh.model';
-export * from './auth-activity.model';
+export * from './user-auth-activity.model';
 export * from './setting.model';
 export * from './alert.model';
 

@@ -11,7 +11,7 @@ export interface IssuerV1 {
   description?: string;
   isEnabled: boolean;
   isDeletable: boolean;
-  createdUtc: string;
+  created: string;
   audiences?: AudienceV1[];
 }
 

@@ -10,7 +10,9 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public tbl_Audience()
         {
             tbl_AudienceRoles = new HashSet<tbl_AudienceRole>();
-            tbl_AuthActivityAudiences = new HashSet<tbl_AuthActivityAudience>();
+            tbl_AudienceAuthActivities = new HashSet<tbl_AudienceAuthActivity>();
+            tbl_UserEntitlements = new HashSet<tbl_UserEntitlement>();
+            tbl_AudienceEntitlements = new HashSet<tbl_AudienceEntitlement>();
             tbl_Refreshes = new HashSet<tbl_Refresh>();
             tbl_Roles = new HashSet<tbl_Role>();
             tbl_Settings = new HashSet<tbl_Setting>();
@@ -28,12 +30,14 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string SecurityStamp { get; set; }
         public bool IsLockedOut { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset? LockoutEndUtc { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual tbl_Issuer Issuer { get; set; }
         public virtual ICollection<tbl_AudienceRole> tbl_AudienceRoles { get; set; }
-        public virtual ICollection<tbl_AuthActivityAudience> tbl_AuthActivityAudiences { get; set; }
+        public virtual ICollection<tbl_AudienceAuthActivity> tbl_AudienceAuthActivities { get; set; }
+        public virtual ICollection<tbl_UserEntitlement> tbl_UserEntitlements { get; set; }
+        public virtual ICollection<tbl_AudienceEntitlement> tbl_AudienceEntitlements { get; set; }
         public virtual ICollection<tbl_Refresh> tbl_Refreshes { get; set; }
         public virtual ICollection<tbl_Role> tbl_Roles { get; set; }
         public virtual ICollection<tbl_Setting> tbl_Settings { get; set; }

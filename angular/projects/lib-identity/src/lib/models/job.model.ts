@@ -1,10 +1,11 @@
 export interface JobV1 {
   id: string;
   name: string;
+  description?: string;
   isEnabled: boolean;
   isDeletable: boolean;
-  createdUtc: string;
-  modifiedUtc?: string;
+  created: string;
+  modified?: string;
   settings: JobSettingV1[];
 }
 
@@ -15,5 +16,5 @@ export interface JobSettingV1 {
   configValue: string;
   isSecret: boolean;
   isDeletable: boolean;
-  createdUtc: string;
+  created: string;
 }

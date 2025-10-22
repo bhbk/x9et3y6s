@@ -107,15 +107,15 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             /* check if state is valid */
             var state = uow.States.Get(x => x.StateValue == input.state
                 && x.StateType == ConsumerType.User.ToString()
-                && x.ValidFromUtc < DateTime.UtcNow
-                && x.ValidToUtc > DateTime.UtcNow).SingleOrDefault();
+                && x.ValidFrom < DateTime.UtcNow
+                && x.ValidTo > DateTime.UtcNow).SingleOrDefault();
 
             if (state == null
                 || state.StateConsume == true
                 || state.UserId != user.Id)
             {
-                var failActivity = uow.AuthActivity.Post(
-                    map.Map<tbl_AuthActivity>(new AuthActivityV1()
+                var failActivity = uow.UserAuthActivities.Post(
+                    map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                     {
                         UserId = user.Id,
                         LoginType = GrantFlowType.ImplicitV2.ToString(),
@@ -124,11 +124,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
 
-                uow.AuthActivityAudiences.Post(new tbl_AuthActivityAudience
+                uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
                 {
-                    AuthActivityId = failActivity.Id,
+                    UserAuthActivityId = failActivity.Id,
                     AudienceId = audience.Id,
-                    CreatedUtc = failActivity.CreatedUtc,
+                    Created = failActivity.Created,
                 });
 
                 uow.Commit();
@@ -162,8 +162,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var imp_claims = uow.Users.GenerateAccessClaims(issuer, user);
             var imp = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, imp_claims);
 
-            var impActivity = uow.AuthActivity.Post(
-                map.Map<tbl_AuthActivity>(new AuthActivityV1()
+            var impActivity = uow.UserAuthActivities.Post(
+                map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                 {
                     UserId = user.Id,
                     LoginType = GrantFlowType.ImplicitV2.ToString(),
@@ -172,11 +172,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
-            uow.AuthActivityAudiences.Post(new tbl_AuthActivityAudience
+            uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
             {
-                AuthActivityId = impActivity.Id,
+                UserAuthActivityId = impActivity.Id,
                 AudienceId = audience.Id,
-                CreatedUtc = impActivity.CreatedUtc,
+                Created = impActivity.Created,
             });
 
             uow.Commit();

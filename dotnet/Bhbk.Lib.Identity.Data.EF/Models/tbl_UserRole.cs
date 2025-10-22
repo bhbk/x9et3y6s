@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public Guid UserId { get; set; }
         public Guid RoleId { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual tbl_Role Role { get; set; }
         public virtual tbl_User User { get; set; }

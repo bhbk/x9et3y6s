@@ -13,9 +13,9 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public Guid? UserId { get; set; }
         public string RefreshValue { get; set; }
         public string RefreshType { get; set; }
-        public DateTimeOffset ValidFromUtc { get; set; }
-        public DateTimeOffset ValidToUtc { get; set; }
-        public DateTimeOffset IssuedUtc { get; set; }
+        public DateTimeOffset ValidFrom { get; set; }
+        public DateTimeOffset ValidTo { get; set; }
+        public DateTimeOffset Issued { get; set; }
         public string IpAddress { get; set; }
         public string UserAgent { get; set; }
         public string DeviceName { get; set; }

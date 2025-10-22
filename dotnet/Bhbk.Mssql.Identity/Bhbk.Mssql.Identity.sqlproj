@@ -257,7 +257,7 @@
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
     <Build Include="dbo\Tables\tbl_TextActivity.sql" />
-    <Build Include="dbo\Tables\tbl_AuthActivity.sql">
+    <Build Include="dbo\Tables\tbl_UserAuthActivity.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
@@ -318,7 +318,7 @@
     <None Include="Maintenance\Test_PreRefresh.sql" />
     <None Include="Maintenance\Debug_PostRefresh.sql" />
     <None Include="Maintenance\Debug_PreRefresh.sql" />
-    <Build Include="dbo\Tables\tbl_AuthActivityAudience.sql" />
+    <Build Include="dbo\Tables\tbl_AudienceAuthActivity.sql" />
     <Build Include="dbo\Tables\tbl_ChatConversation.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
@@ -336,6 +336,14 @@
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
     <Build Include="history\Tables\tbl_ChatPrompt.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="dbo\Tables\tbl_ChatPromptHistory.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="dbo\Tables\tbl_ChatFavorite.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
@@ -368,6 +376,38 @@
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
     <Build Include="history\Tables\tbl_JobSetting.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="dbo\Tables\tbl_EntitlementType.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="dbo\Tables\tbl_EntitlementScope.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="dbo\Tables\tbl_UserEntitlement.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="dbo\Tables\tbl_AudienceEntitlement.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="history\Tables\tbl_EntitlementType.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="history\Tables\tbl_EntitlementScope.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="history\Tables\tbl_UserEntitlement.sql">
+      <AnsiNulls>On</AnsiNulls>
+      <QuotedIdentifier>On</QuotedIdentifier>
+    </Build>
+    <Build Include="history\Tables\tbl_AudienceEntitlement.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>

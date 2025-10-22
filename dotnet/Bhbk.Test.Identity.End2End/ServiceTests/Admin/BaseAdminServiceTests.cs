@@ -76,6 +76,10 @@ namespace Bhbk.Test.Identity.End2End.AdminServiceTests
                     data.CreateAudienceRoles();
                     data.CreateUserLoginProviders();
                     data.CreateUserRoles();
+                    data.CreateEntitlementTypes();
+                    data.CreateEntitlementScopes();
+                    data.CreateUserEntitlements();
+                    data.CreateAudienceEntitlements();
 
                     return uow;
                 });
@@ -150,14 +154,6 @@ namespace Bhbk.Test.Identity.End2End.AdminServiceTests
                         servers.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                     });
 
-                    /* role-based policies for Identity service */
-                    opt.AddPolicy(PolicyConstants.IdentityAdminPolicy, policy =>
-                        policy.RequireRole("Identity.Admins"));
-                    opt.AddPolicy(PolicyConstants.IdentityUserPolicy, policy =>
-                        policy.RequireRole("Identity.Admins", "Identity.Users"));
-                    opt.AddPolicy(PolicyConstants.IdentityViewerPolicy, policy =>
-                        policy.RequireRole("Identity.Admins", "Identity.Users", "Identity.Viewers"));
-
                     /* role-based policies for Alert service */
                     opt.AddPolicy(PolicyConstants.AlertAdminPolicy, policy =>
                         policy.RequireRole("Alert.Admins"));
@@ -165,7 +161,16 @@ namespace Bhbk.Test.Identity.End2End.AdminServiceTests
                         policy.RequireRole("Alert.Admins", "Alert.Users"));
                     opt.AddPolicy(PolicyConstants.AlertViewerPolicy, policy =>
                         policy.RequireRole("Alert.Admins", "Alert.Users", "Alert.Viewers"));
+
+                    /* entitlement-based policies (database-driven RBAC) */
+                    opt.AddPolicy(PolicyConstants.EntitlementAdminPolicy, policy =>
+                        policy.Requirements.Add(new IdentityEntitlementRequirement("Admin")));
+                    opt.AddPolicy(PolicyConstants.EntitlementUserPolicy, policy =>
+                        policy.Requirements.Add(new IdentityEntitlementRequirement("User")));
+                    opt.AddPolicy(PolicyConstants.EntitlementViewerPolicy, policy =>
+                        policy.Requirements.Add(new IdentityEntitlementRequirement("Viewer")));
                 });
+                sc.AddScoped<IAuthorizationHandler, IdentityEntitlementAuthorize>();
                 sc.AddSwaggerGen(opt =>
                 {
                     opt.SwaggerDoc("v1", new OpenApiInfo { Title = "Reference", Version = "v1" });

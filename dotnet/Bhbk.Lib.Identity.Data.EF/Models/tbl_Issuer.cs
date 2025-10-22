@@ -11,6 +11,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         {
             tbl_Audiences = new HashSet<tbl_Audience>();
             tbl_Claims = new HashSet<tbl_Claim>();
+            tbl_UserEntitlements = new HashSet<tbl_UserEntitlement>();
+            tbl_AudienceEntitlements = new HashSet<tbl_AudienceEntitlement>();
             tbl_Refreshes = new HashSet<tbl_Refresh>();
             tbl_Settings = new HashSet<tbl_Setting>();
             tbl_States = new HashSet<tbl_State>();
@@ -22,10 +24,12 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string IssuerKey { get; set; }
         public bool IsEnabled { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual ICollection<tbl_Audience> tbl_Audiences { get; set; }
         public virtual ICollection<tbl_Claim> tbl_Claims { get; set; }
+        public virtual ICollection<tbl_UserEntitlement> tbl_UserEntitlements { get; set; }
+        public virtual ICollection<tbl_AudienceEntitlement> tbl_AudienceEntitlements { get; set; }
         public virtual ICollection<tbl_Refresh> tbl_Refreshes { get; set; }
         public virtual ICollection<tbl_Setting> tbl_Settings { get; set; }
         public virtual ICollection<tbl_State> tbl_States { get; set; }

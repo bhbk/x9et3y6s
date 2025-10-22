@@ -56,7 +56,7 @@ export interface AuthState {
   error: string | null;
 }
 
-// Authenticated user info (extracted from JWT)
+// Authenticated user info (extracted from JWT + API data)
 export interface AuthUser {
   id: string;
   issuer: string;
@@ -66,4 +66,13 @@ export interface AuthUser {
   firstName?: string;
   lastName?: string;
   roles: string[];
+  entitlements?: AuthEntitlement[];
+}
+
+// Entitlement info loaded from the API after authentication
+export interface AuthEntitlement {
+  entitlementTypeName: string;
+  entitlementScopeName: string;
+  issuerName?: string;
+  audienceName?: string;
 }

@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard, roleGuard } from 'lib-identity';
+import { authGuard, entitlementGuard, guestGuard } from 'lib-identity';
 
 export const routes: Routes = [
   // Login page - only for unauthenticated users
@@ -14,11 +14,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
   },
 
-  // All admin routes require authentication and admin role
+  // All admin routes require authentication, admin role, and entitlement
   {
     path: '',
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['Identity.Admins'] },
+    canActivate: [authGuard, entitlementGuard],
+    data: { entitlements: ['Viewer'] },
     loadComponent: () => import('./layout/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     children: [
       {
@@ -40,6 +40,10 @@ export const routes: Routes = [
       {
         path: 'roles',
         loadComponent: () => import('./features/roles/roles.component').then(m => m.RolesComponent)
+      },
+      {
+        path: 'entitlements',
+        loadComponent: () => import('./features/entitlements/entitlements-page.component').then(m => m.EntitlementsPageComponent)
       },
       {
         path: 'claims',

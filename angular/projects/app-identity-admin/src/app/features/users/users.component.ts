@@ -112,9 +112,9 @@ import { DateTime } from 'luxon';
             </ng-template>
           </kendo-grid-column>
 
-          <kendo-grid-column field="createdUtc" title="Created" [width]="150">
+          <kendo-grid-column field="created" title="Created" [width]="150">
             <ng-template kendoGridCellTemplate let-dataItem>
-              <span class="text-sm text-gray-500">{{ formatDate(dataItem.createdUtc) }}</span>
+              <span class="text-sm text-gray-500">{{ formatDate(dataItem.created) }}</span>
             </ng-template>
           </kendo-grid-column>
 

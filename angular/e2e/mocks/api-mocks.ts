@@ -6,12 +6,18 @@ import {
   USERS,
   CLAIMS,
   LOGIN_PROVIDERS,
-  AUTH_ACTIVITIES,
+  USER_AUTH_ACTIVITIES,
   REFRESHES,
+  ENTITLEMENTS,
+  AUDIENCE_ENTITLEMENTS,
   QUOTE,
   QUOTES,
   EMAIL_QUEUE,
   TEXT_QUEUE,
+  JOBS,
+  LLM_PROVIDERS,
+  PROMPT_HISTORY,
+  CHAT_FAVORITES,
   pagedResult,
 } from './mock-data';
 
@@ -29,9 +35,9 @@ function json(route: Route, body: unknown, status = 200) {
   });
 }
 
-/** Helper to respond with empty 200 */
+/** Helper to respond with empty 200 (JSON content-type so Angular's withFetch() resolves) */
 function ok(route: Route) {
-  return route.fulfill({ status: 200 });
+  return route.fulfill({ status: 200, contentType: 'application/json', body: 'null' });
 }
 
 /** Helper to respond with 400 (OAuth2 token error per RFC 6749 §5.2) */
@@ -73,6 +79,12 @@ export async function mockStsLogin(page: Page) {
   });
 }
 
+/** Mock the password reset request endpoint (public, STS) */
+export async function mockStsPasswordReset(page: Page) {
+  await page.route(`${STS_API}/oauth2/v1/password/reset`, (route) => ok(route));
+  await page.route(`${STS_API}/oauth2/v1/password/reset/confirm`, (route) => ok(route));
+}
+
 /** Mock the refresh token endpoint */
 export async function mockStsRefresh(page: Page) {
   await page.route(`${STS_API}/oauth2/v2/ropg-rt`, async (route) => {
@@ -108,7 +120,7 @@ export async function mockAdminApi(page: Page) {
       return json(route, {
         id: crypto.randomUUID(),
         ...body,
-        createdUtc: new Date().toISOString(),
+        created: new Date().toISOString(),
       });
     }
     if (method === 'PUT') {
@@ -135,7 +147,7 @@ export async function mockAdminApi(page: Page) {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
-      return json(route, { id: crypto.randomUUID(), ...body, createdUtc: new Date().toISOString() });
+      return json(route, { id: crypto.randomUUID(), ...body, created: new Date().toISOString() });
     }
     if (method === 'PUT') return json(route, route.request().postDataJSON());
     return route.fallback();
@@ -158,7 +170,7 @@ export async function mockAdminApi(page: Page) {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
-      return json(route, { id: crypto.randomUUID(), ...body, createdUtc: new Date().toISOString() });
+      return json(route, { id: crypto.randomUUID(), ...body, created: new Date().toISOString() });
     }
     if (method === 'PUT') return json(route, route.request().postDataJSON());
     return route.fallback();
@@ -187,7 +199,7 @@ export async function mockAdminApi(page: Page) {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
-      return json(route, { id: crypto.randomUUID(), ...body, createdUtc: new Date().toISOString() });
+      return json(route, { id: crypto.randomUUID(), ...body, created: new Date().toISOString() });
     }
     if (method === 'PUT') return json(route, route.request().postDataJSON());
     return route.fallback();
@@ -210,7 +222,7 @@ export async function mockAdminApi(page: Page) {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
-      return json(route, { id: crypto.randomUUID(), ...body, createdUtc: new Date().toISOString() });
+      return json(route, { id: crypto.randomUUID(), ...body, created: new Date().toISOString() });
     }
     if (method === 'PUT') return json(route, route.request().postDataJSON());
     return route.fallback();
@@ -229,7 +241,7 @@ export async function mockAdminApi(page: Page) {
     const method = route.request().method();
     if (method === 'POST') {
       const body = route.request().postDataJSON();
-      return json(route, { id: crypto.randomUUID(), ...body, createdUtc: new Date().toISOString() });
+      return json(route, { id: crypto.randomUUID(), ...body, created: new Date().toISOString() });
     }
     if (method === 'PUT') return json(route, route.request().postDataJSON());
     return route.fallback();
@@ -237,10 +249,10 @@ export async function mockAdminApi(page: Page) {
 
   // Auth Activity
   await page.route(`${ADMIN_API}/activities/v1/page`, (route) =>
-    json(route, pagedResult(AUTH_ACTIVITIES)),
+    json(route, pagedResult(USER_AUTH_ACTIVITIES)),
   );
   await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/activities/v1/[0-9a-f-]+$`), (route) =>
-    json(route, AUTH_ACTIVITIES[0]),
+    json(route, USER_AUTH_ACTIVITIES[0]),
   );
 
   // Quotes
@@ -278,6 +290,113 @@ export async function mockAdminApi(page: Page) {
     ok(route),
   );
 
+  // Entitlements (shared lookups)
+  await page.route(`${ADMIN_API}/entitlements/v1/types`, (route) =>
+    json(route, [
+      { id: 'tttt0001-0001-0001-0001-000000000001', name: 'Admin', sortOrder: 1, isEnabled: true, isDeletable: false },
+      { id: 'tttt0001-0001-0001-0001-000000000002', name: 'User', sortOrder: 2, isEnabled: true, isDeletable: false },
+      { id: 'tttt0001-0001-0001-0001-000000000003', name: 'Viewer', sortOrder: 3, isEnabled: true, isDeletable: false },
+    ]),
+  );
+  await page.route(`${ADMIN_API}/entitlements/v1/scopes`, (route) =>
+    json(route, [
+      { id: 'ssss0001-0001-0001-0001-000000000001', name: 'Global', sortOrder: 1, isEnabled: true },
+      { id: 'ssss0001-0001-0001-0001-000000000002', name: 'Issuer', sortOrder: 2, isEnabled: true },
+      { id: 'ssss0001-0001-0001-0001-000000000003', name: 'Audience', sortOrder: 3, isEnabled: true },
+    ]),
+  );
+
+  // User Entitlements
+  await page.route(`${ADMIN_API}/entitlements/v1/users/me`, (route) =>
+    json(route, ENTITLEMENTS.filter(e => e.userName === 'admin@local')),
+  );
+  await page.route(`${ADMIN_API}/entitlements/v1/users/page`, (route) =>
+    json(route, pagedResult(ENTITLEMENTS)),
+  );
+
+  // Audience Entitlements
+  await page.route(`${ADMIN_API}/entitlements/v1/audiences/page`, (route) =>
+    json(route, pagedResult(AUDIENCE_ENTITLEMENTS)),
+  );
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/entitlements/v1/audiences/[0-9a-f-]+$`), (route) => {
+    if (route.request().method() === 'GET') return json(route, AUDIENCE_ENTITLEMENTS[0]);
+    if (route.request().method() === 'DELETE') return ok(route);
+    return json(route, AUDIENCE_ENTITLEMENTS[0]);
+  });
+  await page.route(`${ADMIN_API}/entitlements/v1/audiences`, (route) => {
+    const method = route.request().method();
+    if (method === 'POST') {
+      const body = route.request().postDataJSON();
+      return json(route, { id: crypto.randomUUID(), ...body, created: new Date().toISOString() });
+    }
+    if (method === 'PUT') return json(route, route.request().postDataJSON());
+    return route.fallback();
+  });
+
+  // Jobs
+  await page.route(`${ADMIN_API}/jobs/v1`, (route) => {
+    const method = route.request().method();
+    if (method === 'GET') return json(route, JOBS);
+    if (method === 'PUT') return json(route, route.request().postDataJSON());
+    return route.fallback();
+  });
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/jobs/v1/[0-9a-f-]+/settings$`), (route) =>
+    ok(route),
+  );
+
+  // LLM Providers
+  await page.route(`${ADMIN_API}/llm-providers/v1/order`, (route) => ok(route));
+  await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/llm-providers/v1/[0-9a-f-]+/settings$`), (route) =>
+    ok(route),
+  );
+  await page.route(`${ADMIN_API}/llm-providers/v1`, (route) => {
+    const method = route.request().method();
+    if (method === 'GET') return json(route, LLM_PROVIDERS);
+    if (method === 'PUT') return json(route, route.request().postDataJSON());
+    return route.fallback();
+  });
+
+  // Chat API — favorites
+  await page.route(`${ADMIN_API}/chat/favorites`, (route) => {
+    if (route.request().method() === 'GET') return json(route, CHAT_FAVORITES);
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      return json(route, {
+        id: crypto.randomUUID(),
+        name: body.name,
+        prompt: body.prompt,
+        pinned: false,
+        created: new Date().toISOString(),
+      });
+    }
+    return route.fallback();
+  });
+  await page.route(
+    new RegExp(`${escapeRegex(ADMIN_API)}/chat/favorites/[0-9a-f-]+$`),
+    (route) => {
+      if (route.request().method() === 'PUT') {
+        const body = route.request().postDataJSON();
+        return json(route, { ...body, id: route.request().url().split('/').pop(), created: new Date().toISOString() });
+      }
+      if (route.request().method() === 'DELETE') return ok(route);
+      return route.fallback();
+    },
+  );
+
+  // Chat API — prompt history
+  await page.route(`${ADMIN_API}/chat/prompt-history`, (route) => {
+    if (route.request().method() === 'GET') return json(route, PROMPT_HISTORY);
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      return json(route, {
+        id: crypto.randomUUID(),
+        promptText: body.promptText,
+        created: new Date().toISOString(),
+      });
+    }
+    return route.fallback();
+  });
+
   // Chat API — conversations REST endpoint (used by ChatComponent.ngOnInit)
   await page.route(`${ADMIN_API}/chat/**`, (route) => {
     if (route.request().method() === 'GET') return json(route, []);
@@ -285,7 +404,7 @@ export async function mockAdminApi(page: Page) {
       return json(route, {
         id: crypto.randomUUID(),
         title: 'New Chat',
-        createdUtc: new Date().toISOString(),
+        created: new Date().toISOString(),
         updatedUtc: new Date().toISOString(),
       });
     }
@@ -335,6 +454,47 @@ export async function mockUserApi(page: Page) {
   await page.route(`${USER_API}/credentials/v1/email/confirm`, (route) => ok(route));
   await page.route(`${USER_API}/credentials/v1/phone/confirm`, (route) => ok(route));
 
+  // Chat API — favorites
+  await page.route(`${USER_API}/chat/favorites`, (route) => {
+    if (route.request().method() === 'GET') return json(route, CHAT_FAVORITES);
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      return json(route, {
+        id: crypto.randomUUID(),
+        name: body.name,
+        prompt: body.prompt,
+        pinned: false,
+        created: new Date().toISOString(),
+      });
+    }
+    return route.fallback();
+  });
+  await page.route(
+    new RegExp(`${escapeRegex(USER_API)}/chat/favorites/[0-9a-f-]+$`),
+    (route) => {
+      if (route.request().method() === 'PUT') {
+        const body = route.request().postDataJSON();
+        return json(route, { ...body, id: route.request().url().split('/').pop(), created: new Date().toISOString() });
+      }
+      if (route.request().method() === 'DELETE') return ok(route);
+      return route.fallback();
+    },
+  );
+
+  // Chat API — prompt history
+  await page.route(`${USER_API}/chat/prompt-history`, (route) => {
+    if (route.request().method() === 'GET') return json(route, PROMPT_HISTORY);
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      return json(route, {
+        id: crypto.randomUUID(),
+        promptText: body.promptText,
+        created: new Date().toISOString(),
+      });
+    }
+    return route.fallback();
+  });
+
   // Chat API — conversations REST endpoint
   await page.route(`${USER_API}/chat/**`, (route) => {
     if (route.request().method() === 'GET') return json(route, []);
@@ -342,7 +502,7 @@ export async function mockUserApi(page: Page) {
       return json(route, {
         id: crypto.randomUUID(),
         title: 'New Chat',
-        createdUtc: new Date().toISOString(),
+        created: new Date().toISOString(),
         updatedUtc: new Date().toISOString(),
       });
     }

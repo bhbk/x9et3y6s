@@ -10,7 +10,7 @@ export interface RoleV1 {
   description?: string;
   isEnabled: boolean;
   isDeletable: boolean;
-  createdUtc: string;
+  created: string;
 }
 
 export interface RoleCreate {

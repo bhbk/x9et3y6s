@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         [Route("v1"), HttpPost]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult CreateV1([FromBody] QuoteV1 model)
         {
             if (!ModelState.IsValid)
@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
         [Route("v1/{quoteID:guid}"), HttpDelete]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult DeleteV1([FromRoute] Guid quoteID)
         {
             var quote = uow.Quotes.Get(x => x.Id == quoteID).SingleOrDefault();
@@ -96,7 +96,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
         }
         [Route("v1"), HttpPut]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult UpdateV1([FromBody] QuoteV1 model)
         {
             if (!ModelState.IsValid)

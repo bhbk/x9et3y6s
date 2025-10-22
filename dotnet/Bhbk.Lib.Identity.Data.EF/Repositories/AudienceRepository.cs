@@ -31,7 +31,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public tbl_AudienceRole AddRole(tbl_AudienceRole role)
         {
-            role.CreatedUtc = Clock.UtcDateTime;
+            role.Created = Clock.UtcDateTime;
 
             _context.Set<tbl_AudienceRole>().Add(role);
 
@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public new tbl_Audience Delete(tbl_Audience audience)
         {
-            var activityAudiences = _context.Set<tbl_AuthActivityAudience>()
+            var activityAudiences = _context.Set<tbl_AudienceAuthActivity>()
                 .Where(x => x.AudienceId == audience.Id);
 
             var refreshes = _context.Set<tbl_Refresh>()

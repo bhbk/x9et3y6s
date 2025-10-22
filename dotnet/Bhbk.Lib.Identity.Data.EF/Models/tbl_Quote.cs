@@ -13,7 +13,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string TssId { get; set; }
         public string TssTitle { get; set; }
         public string TssCategory { get; set; }
-        public DateTime? TssDate { get; set; }
+        public DateTimeOffset? TssDate { get; set; }
         public string TssTags { get; set; }
         public int? TssLength { get; set; }
         public string TssBackground { get; set; }

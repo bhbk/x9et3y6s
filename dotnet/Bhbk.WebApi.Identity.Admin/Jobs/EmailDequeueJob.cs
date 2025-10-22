@@ -58,12 +58,12 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
 
-            var job = uow.Jobs.Get(x => x.Name == "EmailDequeue").Single();
+            var job = uow.Jobs.Get(x => x.Name == "Email Dequeue").Single();
             var sendgridApiKey = uow.JobSettings.Get(x => x.JobId == job.Id && x.ConfigKey == "SendgridApiKey").Single().ConfigValue;
 
             foreach (var msg in uow.EmailQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_EmailQueue>()
-                .Where(x => x.SendAtUtc < DateTime.UtcNow
-                    && x.DeliveredUtc.HasValue == false && x.IsCancelled == false).ToLambda()))
+                .Where(x => x.SendAt < DateTime.UtcNow
+                    && x.Delivered.HasValue == false && x.IsCancelled == false).ToLambda()))
             {
                 switch (uow.InstanceType)
                 {
@@ -83,7 +83,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                                         SendgridStatus = response.StatusCode.ToString(),
                                     });
 
-                                msg.DeliveredUtc = DateTime.UtcNow;
+                                msg.Delivered = DateTime.UtcNow;
                                 uow.EmailQueue.Put(msg);
 
                                 Log.Information($"'{callPath}' hand-off of email (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
@@ -101,7 +101,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                                         "Error=" + response.StatusCode);
                             }
 #elif !RELEASE
-                            msg.DeliveredUtc = DateTime.UtcNow;
+                            msg.Delivered = DateTime.UtcNow;
                             uow.EmailQueue.Put(msg);
 
                             Log.Information($"'{callPath}' fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");
@@ -111,7 +111,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
 
                     default:
                         {
-                            msg.DeliveredUtc = DateTime.UtcNow;
+                            msg.Delivered = DateTime.UtcNow;
                             uow.EmailQueue.Put(msg);
 
                             Log.Information($"'{callPath}' fake hand-off of email (ID=" + msg.Id.ToString() + ") was successfull.");

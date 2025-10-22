@@ -77,6 +77,10 @@ namespace Bhbk.Cli.Identity.Commands
                     data.CreateUsers();
                     data.CreateUserLoginProviders();
                     data.CreateUserRoles();
+                    data.CreateEntitlementTypes();
+                    data.CreateEntitlementScopes();
+                    data.CreateUserEntitlements();
+                    data.CreateAudienceEntitlements();
 
                     Console.WriteLine("\tCompleted create default data...");
                     Console.WriteLine();

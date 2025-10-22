@@ -100,15 +100,15 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
                 case "sessions":
                 {
                     var refreshes = _uow.Refreshes.Get(x => x.UserId == _userId)
-                        .OrderByDescending(x => x.IssuedUtc)
+                        .OrderByDescending(x => x.Issued)
                         .ToList();
                     return JArray.FromObject(refreshes, serializer);
                 }
 
                 case "activity":
                 {
-                    var activity = _uow.AuthActivity.Get(x => x.UserId == _userId)
-                        .OrderByDescending(x => x.CreatedUtc)
+                    var activity = _uow.UserAuthActivities.Get(x => x.UserId == _userId)
+                        .OrderByDescending(x => x.Created)
                         .Take(500)
                         .ToList();
                     return JArray.FromObject(activity, serializer);

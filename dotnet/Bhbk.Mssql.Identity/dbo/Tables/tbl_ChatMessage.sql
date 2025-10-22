@@ -7,7 +7,7 @@ CREATE TABLE [dbo].[tbl_ChatMessage] (
     [ToolResults]    NVARCHAR (MAX)     NULL,
     [InputTokens]    INT                NULL,
     [OutputTokens]   INT                NULL,
-    [CreatedUtc]     DATETIMEOFFSET (7) NOT NULL,
+    [Created]     DATETIMEOFFSET (7) NOT NULL,
     CONSTRAINT [PK_tbl_ChatMessage] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_tbl_ChatMessage_ConversationID] FOREIGN KEY ([ConversationId]) REFERENCES [dbo].[tbl_ChatConversation] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );

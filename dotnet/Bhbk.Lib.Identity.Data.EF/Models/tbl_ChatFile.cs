@@ -14,8 +14,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public long FileSize { get; set; }
         public byte[] FileContent { get; set; }
         public string Summary { get; set; }
-        public DateTimeOffset ExpiresUtc { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Expires { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual tbl_ChatConversation Conversation { get; set; }
         public virtual tbl_ChatMessage Message { get; set; }

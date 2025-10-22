@@ -20,10 +20,10 @@ export interface UserV1 {
   emailConfirmed: boolean;
   passwordConfirmed: boolean;
   phoneNumberConfirmed?: boolean;
-  lockoutEndUtc?: string;
+  lockoutEnd?: string;
   concurrencyStamp?: string;
   securityStamp?: string;
-  createdUtc: string;
+  created: string;
   roles?: RoleV1[];
   claims?: ClaimV1[];
   loginProviders?: LoginProviderV1[];

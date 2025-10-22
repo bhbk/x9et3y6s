@@ -137,7 +137,7 @@ namespace Bhbk.WebApi.Identity.Admin
 
                 /* https://www.freeformatter.com/cron-expression-generator-quartz.html */
 
-                if (jobSettings.TryGetValue("MaintainActivity", out var maintainActivity) && maintainActivity.IsEnabled)
+                if (jobSettings.TryGetValue("Maintain Activity", out var maintainActivity) && maintainActivity.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(MaintainActivityJob).Name, workerName);
                     jobs.AddJob<MaintainActivityJob>(opt => opt
@@ -157,7 +157,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     }
                 }
 
-                if (jobSettings.TryGetValue("MaintainUsers", out var maintainUsers) && maintainUsers.IsEnabled)
+                if (jobSettings.TryGetValue("Maintain Users", out var maintainUsers) && maintainUsers.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(MaintainUsersJob).Name, workerName);
                     jobs.AddJob<MaintainUsersJob>(opt => opt
@@ -177,7 +177,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     }
                 }
 
-                if (jobSettings.TryGetValue("EmailActivity", out var emailActivity) && emailActivity.IsEnabled)
+                if (jobSettings.TryGetValue("Email Activity", out var emailActivity) && emailActivity.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(EmailActivityJob).Name, workerName);
                     jobs.AddJob<EmailActivityJob>(opt => opt
@@ -197,7 +197,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     }
                 }
 
-                if (jobSettings.TryGetValue("EmailDequeue", out var emailDequeue) && emailDequeue.IsEnabled)
+                if (jobSettings.TryGetValue("Email Dequeue", out var emailDequeue) && emailDequeue.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(EmailDequeueJob).Name, workerName);
                     jobs.AddJob<EmailDequeueJob>(opt => opt
@@ -217,7 +217,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     }
                 }
 
-                if (jobSettings.TryGetValue("TextActivity", out var textActivity) && textActivity.IsEnabled)
+                if (jobSettings.TryGetValue("Text Activity", out var textActivity) && textActivity.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(TextActivityJob).Name, workerName);
                     jobs.AddJob<TextActivityJob>(opt => opt
@@ -237,7 +237,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     }
                 }
 
-                if (jobSettings.TryGetValue("TextDequeue", out var textDequeue) && textDequeue.IsEnabled)
+                if (jobSettings.TryGetValue("Text Dequeue", out var textDequeue) && textDequeue.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(TextDequeueJob).Name, workerName);
                     jobs.AddJob<TextDequeueJob>(opt => opt
@@ -257,7 +257,7 @@ namespace Bhbk.WebApi.Identity.Admin
                     }
                 }
 
-                if (jobSettings.TryGetValue("MaintainChatFiles", out var maintainChatFiles) && maintainChatFiles.IsEnabled)
+                if (jobSettings.TryGetValue("Maintain Chat Files", out var maintainChatFiles) && maintainChatFiles.IsEnabled)
                 {
                     var jobKey = new JobKey(typeof(MaintainChatFilesJob).Name, workerName);
                     jobs.AddJob<MaintainChatFilesJob>(opt => opt
@@ -383,14 +383,6 @@ namespace Bhbk.WebApi.Identity.Admin
                     servers.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                 });
 
-                /* role-based policies for Identity service */
-                opt.AddPolicy(PolicyConstants.IdentityAdminPolicy, policy =>
-                    policy.RequireRole(authSettings.Roles.IdentityAdmins));
-                opt.AddPolicy(PolicyConstants.IdentityUserPolicy, policy =>
-                    policy.RequireRole(authSettings.Roles.IdentityAdmins, authSettings.Roles.IdentityUsers));
-                opt.AddPolicy(PolicyConstants.IdentityViewerPolicy, policy =>
-                    policy.RequireRole(authSettings.Roles.IdentityAdmins, authSettings.Roles.IdentityUsers, authSettings.Roles.IdentityViewers));
-
                 /* role-based policies for Alert service */
                 opt.AddPolicy(PolicyConstants.AlertAdminPolicy, policy =>
                     policy.RequireRole(authSettings.Roles.AlertAdmins));
@@ -398,7 +390,16 @@ namespace Bhbk.WebApi.Identity.Admin
                     policy.RequireRole(authSettings.Roles.AlertAdmins, authSettings.Roles.AlertUsers));
                 opt.AddPolicy(PolicyConstants.AlertViewerPolicy, policy =>
                     policy.RequireRole(authSettings.Roles.AlertAdmins, authSettings.Roles.AlertUsers, authSettings.Roles.AlertViewers));
+
+                /* entitlement-based policies (database-driven RBAC) */
+                opt.AddPolicy(PolicyConstants.EntitlementAdminPolicy, policy =>
+                    policy.Requirements.Add(new IdentityEntitlementRequirement("Admin")));
+                opt.AddPolicy(PolicyConstants.EntitlementUserPolicy, policy =>
+                    policy.Requirements.Add(new IdentityEntitlementRequirement("User")));
+                opt.AddPolicy(PolicyConstants.EntitlementViewerPolicy, policy =>
+                    policy.Requirements.Add(new IdentityEntitlementRequirement("Viewer")));
             });
+            sc.AddScoped<IAuthorizationHandler, IdentityEntitlementAuthorize>();
             sc.AddSwaggerGen(opt =>
             {
                 opt.SwaggerDoc("v1", new OpenApiInfo { Title = "Reference", Version = "v1" });

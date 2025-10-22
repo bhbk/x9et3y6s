@@ -61,14 +61,14 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
         {
             var callPath = $"{MethodBase.GetCurrentMethod().DeclaringType.Name}.{MethodBase.GetCurrentMethod().Name}";
 
-            var job = uow.Jobs.Get(x => x.Name == "TextDequeue").Single();
+            var job = uow.Jobs.Get(x => x.Name == "Text Dequeue").Single();
             var jobSettings = uow.JobSettings.Get(x => x.JobId == job.Id).ToList();
             var twilioSid = jobSettings.Single(x => x.ConfigKey == "TwilioSid").ConfigValue;
             var twilioToken = jobSettings.Single(x => x.ConfigKey == "TwilioToken").ConfigValue;
 
             foreach (var msg in uow.TextQueue.Get(QueryExpressionFactory.GetQueryExpression<tbl_TextQueue>()
-                .Where(x => x.SendAtUtc < DateTime.UtcNow
-                    && x.DeliveredUtc.HasValue == false && x.IsCancelled == false).ToLambda()))
+                .Where(x => x.SendAt < DateTime.UtcNow
+                    && x.Delivered.HasValue == false && x.IsCancelled == false).ToLambda()))
             {
                 switch (uow.InstanceType)
                 {
@@ -88,7 +88,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                                         TwilioStatus = response.Status.ToString(),
                                     });
 
-                                msg.DeliveredUtc = DateTime.UtcNow;
+                                msg.Delivered = DateTime.UtcNow;
                                 uow.TextQueue.Put(msg);
 
                                 Log.Information($"'{callPath}' hand-off of text (ID=" + msg.Id.ToString() + ") to upstream provider was successfull.");
@@ -107,7 +107,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                                         "Error=" + ex.Code.ToString());
                             }
 #elif !RELEASE
-                            msg.DeliveredUtc = DateTime.UtcNow;
+                            msg.Delivered = DateTime.UtcNow;
                             uow.TextQueue.Put(msg);
 
                             Log.Information($"'{callPath}' fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");
@@ -117,7 +117,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
 
                     default:
                         {
-                            msg.DeliveredUtc = DateTime.UtcNow;
+                            msg.Delivered = DateTime.UtcNow;
                             uow.TextQueue.Put(msg);
 
                             Log.Information($"'{callPath}' fake hand-off of text (ID=" + msg.Id.ToString() + ") was successfull.");

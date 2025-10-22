@@ -8,15 +8,21 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
     public interface IUnitOfWork : IGenericUnitOfWork
     {
         public AudienceRepository Audiences { get; }
-        public IGenericRepository<tbl_AuthActivity> AuthActivity { get; }
-        public IGenericRepository<tbl_AuthActivityAudience> AuthActivityAudiences { get; }
+        public IGenericRepository<tbl_UserAuthActivity> UserAuthActivities { get; }
+        public IGenericRepository<tbl_AudienceAuthActivity> AudienceAuthActivities { get; }
         public IGenericRepository<tbl_ChatConversation> ChatConversations { get; }
+        public IGenericRepository<tbl_ChatFavorite> ChatFavorites { get; }
         public IGenericRepository<tbl_ChatFile> ChatFiles { get; }
         public IGenericRepository<tbl_ChatMessage> ChatMessages { get; }
         public IGenericRepository<tbl_ChatPrompt> ChatPrompts { get; }
+        public IGenericRepository<tbl_ChatPromptHistory> ChatPromptHistories { get; }
         public IGenericRepository<tbl_Claim> Claims { get; }
         public IGenericRepository<tbl_EmailActivity> EmailActivity { get; }
         public IGenericRepository<tbl_EmailQueue> EmailQueue { get; }
+        public IGenericRepository<tbl_UserEntitlement> UserEntitlements { get; }
+        public IGenericRepository<tbl_AudienceEntitlement> AudienceEntitlements { get; }
+        public IGenericRepository<tbl_EntitlementScope> EntitlementScopes { get; }
+        public IGenericRepository<tbl_EntitlementType> EntitlementTypes { get; }
         public IGenericRepository<tbl_Issuer> Issuers { get; }
         public IGenericRepository<tbl_Job> Jobs { get; }
         public IGenericRepository<tbl_JobSetting> JobSettings { get; }

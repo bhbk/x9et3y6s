@@ -35,7 +35,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult UpdateV1([FromBody] LLMProviderV1 model)
         {
             if (!ModelState.IsValid)
@@ -52,7 +52,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             provider.Name = model.Name;
             provider.IsEnabled = model.IsEnabled;
-            provider.ModifiedUtc = DateTimeOffset.UtcNow;
+            provider.Modified = DateTimeOffset.UtcNow;
 
             uow.LLMProviders.Put(provider);
             uow.Commit();
@@ -62,7 +62,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/order"), HttpPut]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult UpdateOrderV1([FromBody] List<LLMProviderOrderV1> model)
         {
             if (!ModelState.IsValid)
@@ -80,7 +80,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 }
 
                 provider.FailoverOrder = item.FailoverOrder;
-                provider.ModifiedUtc = DateTimeOffset.UtcNow;
+                provider.Modified = DateTimeOffset.UtcNow;
 
                 uow.LLMProviders.Put(provider);
             }
@@ -92,7 +92,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{providerId:guid}/settings"), HttpPut]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult UpdateSettingsV1([FromRoute] Guid providerId, [FromBody] List<LLMProviderSettingV1> model)
         {
             if (!ModelState.IsValid)
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                 uow.LLMProviderSettings.Put(setting);
             }
 
-            provider.ModifiedUtc = DateTimeOffset.UtcNow;
+            provider.Modified = DateTimeOffset.UtcNow;
             uow.LLMProviders.Put(provider);
             uow.Commit();
 

@@ -17,9 +17,9 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string ToPhoneNumber { get; set; }
         public string Body { get; set; }
         public bool IsCancelled { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
-        public DateTimeOffset SendAtUtc { get; set; }
-        public DateTimeOffset? DeliveredUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset SendAt { get; set; }
+        public DateTimeOffset? Delivered { get; set; }
 
         public virtual ICollection<tbl_TextActivity> tbl_TextActivities { get; set; }
     }

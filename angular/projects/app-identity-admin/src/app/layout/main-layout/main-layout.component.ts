@@ -19,6 +19,7 @@ import {
   sparklesIcon,
   clockIcon,
   envelopeIcon,
+  checkCircleIcon,
 } from '@progress/kendo-svg-icons';
 
 @Component({
@@ -114,20 +115,25 @@ import {
               <kendo-svg-icon [icon]="gearIcon" size="medium"></kendo-svg-icon>
               Audiences
             </a>
-            <a routerLink="/users" routerLinkActive="bg-blue-50 text-blue-600"
-               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
-              <kendo-svg-icon [icon]="userIcon" size="medium"></kendo-svg-icon>
-              Users
-            </a>
             <a routerLink="/roles" routerLinkActive="bg-blue-50 text-blue-600"
                class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="lockIcon" size="medium"></kendo-svg-icon>
               Roles
             </a>
+            <a routerLink="/users" routerLinkActive="bg-blue-50 text-blue-600"
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
+              <kendo-svg-icon [icon]="userIcon" size="medium"></kendo-svg-icon>
+              Users
+            </a>
             <a routerLink="/claims" routerLinkActive="bg-blue-50 text-blue-600"
                class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
               <kendo-svg-icon [icon]="clipboardIcon" size="medium"></kendo-svg-icon>
               Claims
+            </a>
+            <a routerLink="/entitlements" routerLinkActive="bg-blue-50 text-blue-600"
+               class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
+              <kendo-svg-icon [icon]="entitlementsIcon" size="medium"></kendo-svg-icon>
+              Entitlements
             </a>
             <a routerLink="/login-providers" routerLinkActive="bg-blue-50 text-blue-600"
                class="flex items-center gap-3 px-3 py-2 rounded-full text-gray-700 hover:bg-gray-100 transition-colors">
@@ -180,6 +186,7 @@ export class MainLayoutComponent implements OnInit {
   readonly sparklesIcon = sparklesIcon;
   readonly jobsIcon = clockIcon;
   readonly envelopeIcon = envelopeIcon;
+  readonly entitlementsIcon = checkCircleIcon;
   readonly hamburgerIcon = gridIcon;
 
   readonly menuOpen = signal(false);

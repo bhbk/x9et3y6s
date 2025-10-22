@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { AuthActivityService, AuthActivityV1, UserService, AudienceService, UserV1, AudienceV1 } from 'lib-identity';
+import { UserAuthActivityService, UserAuthActivityV1, UserService, AudienceService, UserV1, AudienceV1 } from 'lib-identity';
 import { KENDO_GRID, GridDataResult, PageChangeEvent, SortSettings, FilterableSettings, PagerSettings } from '@progress/kendo-angular-grid';
 import { KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { KENDO_LABELS } from '@progress/kendo-angular-label';
@@ -79,9 +79,9 @@ import { DateTime } from 'luxon';
           (pageChange)="onPageChange($event)"
           (sortChange)="onSortChange($event)"
         >
-          <kendo-grid-column field="createdUtc" title="Time" [width]="180">
+          <kendo-grid-column field="created" title="Time" [width]="180">
             <ng-template kendoGridCellTemplate let-dataItem>
-              <span class="text-sm">{{ formatDate(dataItem.createdUtc) }}</span>
+              <span class="text-sm">{{ formatDate(dataItem.created) }}</span>
             </ng-template>
           </kendo-grid-column>
 
@@ -169,7 +169,7 @@ import { DateTime } from 'luxon';
   `
 })
 export class ActivityComponent implements OnInit {
-  private readonly activityService = inject(AuthActivityService);
+  private readonly activityService = inject(UserAuthActivityService);
   private readonly userService = inject(UserService);
   private readonly audienceService = inject(AudienceService);
 
@@ -190,7 +190,7 @@ export class ActivityComponent implements OnInit {
   readonly audiences = signal<Map<string, AudienceV1>>(new Map());
   readonly gridData = signal<GridDataResult>({ data: [], total: 0 });
   readonly skip = signal(0);
-  readonly sort = signal<SortDescriptor[]>([{ field: 'createdUtc', dir: 'desc' }]);
+  readonly sort = signal<SortDescriptor[]>([{ field: 'created', dir: 'desc' }]);
   readonly isLoading = signal(false);
   readonly isInitialLoad = signal(true);
   readonly error = signal<string | null>(null);

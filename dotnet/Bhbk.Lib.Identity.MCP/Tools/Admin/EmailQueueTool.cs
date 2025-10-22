@@ -91,7 +91,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         private MCPToolResult ListEmails(int skip, int take)
         {
             var emails = _uow.EmailQueue.Get(x => true)
-                .OrderByDescending(x => x.CreatedUtc)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
@@ -126,7 +126,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
                     (x.ToDisplay != null && x.ToDisplay.ToLower().Contains(lowerQuery)) ||
                     (x.FromEmail != null && x.FromEmail.ToLower().Contains(lowerQuery)) ||
                     (x.Subject != null && x.Subject.ToLower().Contains(lowerQuery)))
-                .OrderByDescending(x => x.CreatedUtc)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
@@ -145,9 +145,9 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         {
             var emails = status switch
             {
-                "pending" => _uow.EmailQueue.Get(x => !x.IsCancelled && x.DeliveredUtc == null),
+                "pending" => _uow.EmailQueue.Get(x => !x.IsCancelled && x.Delivered == null),
                 "cancelled" => _uow.EmailQueue.Get(x => x.IsCancelled),
-                "delivered" => _uow.EmailQueue.Get(x => x.DeliveredUtc != null && !x.IsCancelled),
+                "delivered" => _uow.EmailQueue.Get(x => x.Delivered != null && !x.IsCancelled),
                 _ => null
             };
 
@@ -156,7 +156,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
 
             var total = emails.Count();
             var paged = emails
-                .OrderByDescending(x => x.CreatedUtc)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();

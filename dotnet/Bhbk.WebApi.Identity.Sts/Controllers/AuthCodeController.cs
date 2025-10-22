@@ -149,8 +149,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     StateValue = AlphaNumeric.CreateString(32),
                     StateType = ConsumerType.User.ToString(),
                     StateConsume = false,
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                 }));
 
             uow.Commit();
@@ -281,8 +281,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             /* check if state is valid */
             var state = uow.States.Get(x => x.StateValue == input.state
-                && x.ValidFromUtc < DateTime.UtcNow
-                && x.ValidToUtc > DateTime.UtcNow
+                && x.ValidFrom < DateTime.UtcNow
+                && x.ValidTo > DateTime.UtcNow
                 && x.StateType == ConsumerType.User.ToString()).SingleOrDefault();
 
             if (state == null)
@@ -294,8 +294,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             /* check that payload can be decrypted and validated */
             if (!new PasswordTokenFactory(uow.InstanceType.ToString()).Validate(user.SecurityStamp, input.code, user.Id.ToString(), user.SecurityStamp))
             {
-                var failActivity = uow.AuthActivity.Post(
-                    map.Map<tbl_AuthActivity>(new AuthActivityV1()
+                var failActivity = uow.UserAuthActivities.Post(
+                    map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                     {
                         UserId = user.Id,
                         LoginType = GrantFlowType.AuthorizationCodeV2.ToString(),
@@ -306,11 +306,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
                 foreach (var aud in audiences)
                 {
-                    uow.AuthActivityAudiences.Post(new tbl_AuthActivityAudience
+                    uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
                     {
-                        AuthActivityId = failActivity.Id,
+                        UserAuthActivityId = failActivity.Id,
                         AudienceId = aud.Id,
-                        CreatedUtc = failActivity.CreatedUtc,
+                        Created = failActivity.Created,
                     });
                 }
 
@@ -323,8 +323,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var ac_claims = uow.Users.GenerateAccessClaims(issuer, user);
             var ac = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audiences.Select(x => x.Name).ToList(), ac_claims);
 
-            var acActivity = uow.AuthActivity.Post(
-                map.Map<tbl_AuthActivity>(new AuthActivityV1()
+            var acActivity = uow.UserAuthActivities.Post(
+                map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                 {
                     UserId = user.Id,
                     LoginType = GrantFlowType.AuthorizationCodeV2.ToString(),
@@ -335,11 +335,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             foreach (var aud in audiences)
             {
-                uow.AuthActivityAudiences.Post(new tbl_AuthActivityAudience
+                uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
                 {
-                    AuthActivityId = acActivity.Id,
+                    UserAuthActivityId = acActivity.Id,
                     AudienceId = aud.Id,
-                    CreatedUtc = acActivity.CreatedUtc,
+                    Created = acActivity.Created,
                 });
             }
 
@@ -353,14 +353,14 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserId = user.Id,
                     RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = rt.RawData,
-                    ValidFromUtc = rt.ValidFrom,
-                    ValidToUtc = rt.ValidTo,
+                    ValidFrom = rt.ValidFrom,
+                    ValidTo = rt.ValidTo,
                     IpAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     UserAgent = Request.Headers["User-Agent"].ToString(),
                 }));
 
-            var rtActivity = uow.AuthActivity.Post(
-                map.Map<tbl_AuthActivity>(new AuthActivityV1()
+            var rtActivity = uow.UserAuthActivities.Post(
+                map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                 {
                     UserId = user.Id,
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
@@ -371,11 +371,11 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
 
             foreach (var aud in audiences)
             {
-                uow.AuthActivityAudiences.Post(new tbl_AuthActivityAudience
+                uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
                 {
-                    AuthActivityId = rtActivity.Id,
+                    UserAuthActivityId = rtActivity.Id,
                     AudienceId = aud.Id,
-                    CreatedUtc = rtActivity.CreatedUtc,
+                    Created = rtActivity.Created,
                 });
             }
 

@@ -1,9 +1,9 @@
 /**
- * Auth Activity Models
- * Maps to: Bhbk.Lib.Identity.Models.Admin.AuthActivity
+ * User Auth Activity Models
+ * Maps to: Bhbk.Lib.Identity.Models.Admin.UserAuthActivity
  */
 
-export interface AuthActivityV1 {
+export interface UserAuthActivityV1 {
   id: string;
   audienceIds: string[];
   userId?: string;
@@ -11,7 +11,7 @@ export interface AuthActivityV1 {
   loginOutcome: string;
   localEndpoint?: string;
   remoteEndpoint?: string;
-  createdUtc: string;
+  created: string;
 }
 
 // Login outcome types

@@ -84,8 +84,8 @@ import { DateTime } from 'luxon';
                       </p>
                     }
                     <div class="mt-2 text-xs text-gray-400 space-y-0.5">
-                      <p>Created: {{ formatDate(session.issuedUtc) }}</p>
-                      <p>Expires: {{ formatDate(session.validToUtc) }}</p>
+                      <p>Created: {{ formatDate(session.issued) }}</p>
+                      <p>Expires: {{ formatDate(session.validTo) }}</p>
                     </div>
                   </div>
                 </div>

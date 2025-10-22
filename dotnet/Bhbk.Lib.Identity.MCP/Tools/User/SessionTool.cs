@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
         private MCPToolResult GetRefreshTokens(int skip, int take)
         {
             var refreshes = _uow.Refreshes.Get(x => x.UserId == _userId)
-                .OrderByDescending(x => x.IssuedUtc)
+                .OrderByDescending(x => x.Issued)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
@@ -85,13 +85,13 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
 
         private MCPToolResult GetActivity(int skip, int take)
         {
-            var activities = _uow.AuthActivity.Get(x => x.UserId == _userId)
-                .OrderByDescending(x => x.CreatedUtc)
+            var activities = _uow.UserAuthActivities.Get(x => x.UserId == _userId)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
 
-            var total = _uow.AuthActivity.Get(x => x.UserId == _userId).Count();
+            var total = _uow.UserAuthActivities.Get(x => x.UserId == _userId).Count();
             var result = new JObject
             {
                 ["total"] = total,

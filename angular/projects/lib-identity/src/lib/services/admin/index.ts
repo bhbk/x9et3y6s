@@ -1,4 +1,6 @@
 export * from './base-admin.service';
+export * from './entitlement.service';
+export * from './audience-entitlement.service';
 export * from './issuer.service';
 export * from './audience.service';
 export * from './role.service';
@@ -6,7 +8,7 @@ export * from './claim.service';
 export * from './login-provider.service';
 export * from './user.service';
 export * from './refresh.service';
-export * from './auth-activity.service';
+export * from './user-auth-activity.service';
 export * from './setting.service';
 export * from './quote.service';
 export * from './llm-provider.service';

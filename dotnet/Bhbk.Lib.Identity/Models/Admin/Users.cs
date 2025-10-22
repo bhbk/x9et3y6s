@@ -34,7 +34,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public string SecurityStamp { get; set; }
 
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
     }
 
     public class UserV1 : Users
@@ -44,7 +44,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
 
         public bool EmailConfirmed { get; set; }
 
-        public Nullable<DateTimeOffset> LockoutEndUtc { get; set; }
+        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
 
         public bool PasswordConfirmed { get; set; }
 

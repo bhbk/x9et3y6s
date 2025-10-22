@@ -29,13 +29,13 @@ export const ChatStore = signalStore(
     sortedMessages: computed(() => {
       const messages = store.messages();
       return [...messages].sort((a, b) =>
-        new Date(a.createdUtc).getTime() - new Date(b.createdUtc).getTime()
+        new Date(a.created).getTime() - new Date(b.created).getTime()
       );
     }),
     displayMessages: computed(() => {
       const msgs = store.messages();
       const sorted = [...msgs].sort((a, b) =>
-        new Date(a.createdUtc).getTime() - new Date(b.createdUtc).getTime()
+        new Date(a.created).getTime() - new Date(b.created).getTime()
       );
       const streamingContent = store.streamingContent();
       const isStreaming = store.isStreaming();
@@ -50,7 +50,7 @@ export const ChatStore = signalStore(
             content: streamingContent,
             inputTokens: null,
             outputTokens: null,
-            createdUtc: new Date().toISOString()
+            created: new Date().toISOString()
           }
         ];
       }
@@ -186,7 +186,7 @@ export const ChatStore = signalStore(
               content: store.streamingContent(),
               inputTokens: chunk.inputTokens,
               outputTokens: chunk.outputTokens,
-              createdUtc: new Date().toISOString(),
+              created: new Date().toISOString(),
               files
             };
             patchState(store, {
@@ -371,7 +371,7 @@ export const ChatStore = signalStore(
           content: message,
           inputTokens: null,
           outputTokens: null,
-          createdUtc: new Date().toISOString()
+          created: new Date().toISOString()
         };
 
         patchState(store, {

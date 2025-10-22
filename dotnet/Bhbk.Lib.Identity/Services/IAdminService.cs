@@ -17,7 +17,7 @@ namespace Bhbk.Lib.Identity.Services
         /*
          * activity
          */
-        ValueTask<PagerStateResult<AuthActivityV1>> Activity_GetV1(PagerState model);
+        ValueTask<PagerStateResult<UserAuthActivityV1>> Activity_GetV1(PagerState model);
 
         /*
          * audiences

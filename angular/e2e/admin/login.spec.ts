@@ -49,26 +49,22 @@ test.describe('Admin Cross-SPA Transfer', () => {
   });
 
   test('transfer screen shows for at least 1 second when token param is present', async ({ page }) => {
-    // Generate a valid admin JWT to pass as query parameter
     const token = createMockJwt('admin@local');
 
-    // Navigate to login with the token query parameter (simulates cross-SPA link)
     await page.goto(`/login?token=${encodeURIComponent(token)}`, { waitUntil: 'domcontentloaded' });
 
-    // The transfer screen should be visible
+    /* Transfer UI should appear while token is being hydrated */
     const transferHeading = page.getByText('Signing you in...');
     await expect(transferHeading).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('Transferring your session securely')).toBeVisible();
 
-    // Record when the transfer screen appeared
     const transferVisibleAt = Date.now();
 
-    // Wait for navigation to dashboard
+    /* Should navigate to dashboard after the minimum delay */
     await page.waitForURL('**/dashboard', { timeout: 10000 });
 
-    // Verify at least 1 second elapsed while the transfer screen was showing
     const elapsed = Date.now() - transferVisibleAt;
-    expect(elapsed).toBeGreaterThanOrEqual(900); // 900ms to account for timing jitter
+    expect(elapsed).toBeGreaterThanOrEqual(900);
   });
 
   test('transfer screen shows even when localStorage already has a valid token', async ({ page }) => {

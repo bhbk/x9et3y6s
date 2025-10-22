@@ -10,7 +10,7 @@ export interface LoginProviderV1 {
   providerKey?: string;
   isEnabled: boolean;
   isDeletable: boolean;
-  createdUtc: string;
+  created: string;
 }
 
 export interface LoginProviderCreate {

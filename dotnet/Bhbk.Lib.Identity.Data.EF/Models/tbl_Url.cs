@@ -13,7 +13,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string UrlPath { get; set; }
         public bool IsEnabled { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual tbl_Audience Audience { get; set; }
     }

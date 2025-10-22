@@ -24,9 +24,9 @@ namespace Bhbk.Lib.Identity.LLM.Services
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 Title = title ?? "New Conversation",
-                StartedUtc = DateTimeOffset.UtcNow,
+                Started = DateTimeOffset.UtcNow,
                 IsDeleted = false,
-                CreatedUtc = DateTimeOffset.UtcNow
+                Created = DateTimeOffset.UtcNow
             };
 
             _uow.ChatConversations.Post(conversation);
@@ -43,7 +43,7 @@ namespace Bhbk.Lib.Identity.LLM.Services
         public IEnumerable<tbl_ChatConversation> GetUserConversations(Guid userId, int skip = 0, int take = 20)
         {
             return _uow.ChatConversations.Get(x => x.UserId == userId && !x.IsDeleted)
-                .OrderByDescending(x => x.CreatedUtc)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
@@ -52,7 +52,7 @@ namespace Bhbk.Lib.Identity.LLM.Services
         public IEnumerable<tbl_ChatMessage> GetConversationMessages(Guid conversationId)
         {
             return _uow.ChatMessages.Get(x => x.ConversationId == conversationId)
-                .OrderBy(x => x.CreatedUtc)
+                .OrderBy(x => x.Created)
                 .ToList();
         }
 
@@ -75,7 +75,7 @@ namespace Bhbk.Lib.Identity.LLM.Services
                 ToolResults = toolResults,
                 InputTokens = inputTokens,
                 OutputTokens = outputTokens,
-                CreatedUtc = DateTimeOffset.UtcNow
+                Created = DateTimeOffset.UtcNow
             };
 
             _uow.ChatMessages.Post(message);
@@ -90,7 +90,7 @@ namespace Bhbk.Lib.Identity.LLM.Services
             if (conversation != null)
             {
                 conversation.Title = title;
-                conversation.ModifiedUtc = DateTimeOffset.UtcNow;
+                conversation.Modified = DateTimeOffset.UtcNow;
                 _uow.ChatConversations.Put(conversation);
                 _uow.Commit();
             }
@@ -101,8 +101,8 @@ namespace Bhbk.Lib.Identity.LLM.Services
             var conversation = GetConversation(conversationId);
             if (conversation != null)
             {
-                conversation.EndedUtc = DateTimeOffset.UtcNow;
-                conversation.ModifiedUtc = DateTimeOffset.UtcNow;
+                conversation.Ended = DateTimeOffset.UtcNow;
+                conversation.Modified = DateTimeOffset.UtcNow;
                 _uow.ChatConversations.Put(conversation);
                 _uow.Commit();
             }
@@ -114,7 +114,7 @@ namespace Bhbk.Lib.Identity.LLM.Services
             if (conversation != null)
             {
                 conversation.IsDeleted = true;
-                conversation.ModifiedUtc = DateTimeOffset.UtcNow;
+                conversation.Modified = DateTimeOffset.UtcNow;
                 _uow.ChatConversations.Put(conversation);
                 _uow.Commit();
             }

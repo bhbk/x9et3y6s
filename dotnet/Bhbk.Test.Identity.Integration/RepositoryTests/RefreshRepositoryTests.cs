@@ -53,8 +53,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                     UserId = user.Id,
                     RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = Base64.CreateString(8),
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = DateTime.UtcNow.AddSeconds(60),
                 }));
             UoW.Commit();
 

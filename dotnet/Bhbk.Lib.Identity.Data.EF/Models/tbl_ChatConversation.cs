@@ -16,11 +16,11 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public string Title { get; set; }
-        public DateTimeOffset StartedUtc { get; set; }
-        public DateTimeOffset? EndedUtc { get; set; }
+        public DateTimeOffset Started { get; set; }
+        public DateTimeOffset? Ended { get; set; }
         public bool IsDeleted { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
-        public DateTimeOffset? ModifiedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset? Modified { get; set; }
 
         public virtual tbl_User User { get; set; }
         public virtual ICollection<tbl_ChatFile> tbl_ChatFiles { get; set; }

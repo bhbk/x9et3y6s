@@ -12,7 +12,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string Content { get; set; }
         public bool IsEnabled { get; set; }
         public int SortOrder { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
-        public DateTimeOffset? ModifiedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset? Modified { get; set; }
     }
 }

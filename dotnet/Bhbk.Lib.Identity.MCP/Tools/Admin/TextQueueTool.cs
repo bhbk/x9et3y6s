@@ -91,7 +91,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         private MCPToolResult ListTexts(int skip, int take)
         {
             var texts = _uow.TextQueue.Get(x => true)
-                .OrderByDescending(x => x.CreatedUtc)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
@@ -125,7 +125,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
                     x.ToPhoneNumber.ToLower().Contains(lowerQuery) ||
                     (x.FromPhoneNumber != null && x.FromPhoneNumber.ToLower().Contains(lowerQuery)) ||
                     (x.Body != null && x.Body.ToLower().Contains(lowerQuery)))
-                .OrderByDescending(x => x.CreatedUtc)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
@@ -144,9 +144,9 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         {
             var texts = status switch
             {
-                "pending" => _uow.TextQueue.Get(x => !x.IsCancelled && x.DeliveredUtc == null),
+                "pending" => _uow.TextQueue.Get(x => !x.IsCancelled && x.Delivered == null),
                 "cancelled" => _uow.TextQueue.Get(x => x.IsCancelled),
-                "delivered" => _uow.TextQueue.Get(x => x.DeliveredUtc != null && !x.IsCancelled),
+                "delivered" => _uow.TextQueue.Get(x => x.Delivered != null && !x.IsCancelled),
                 _ => null
             };
 
@@ -155,7 +155,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
 
             var total = texts.Count();
             var paged = texts
-                .OrderByDescending(x => x.CreatedUtc)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();

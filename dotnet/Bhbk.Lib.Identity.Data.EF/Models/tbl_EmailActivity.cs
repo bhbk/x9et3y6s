@@ -11,7 +11,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public Guid EmailId { get; set; }
         public string SendgridId { get; set; }
         public string SendgridStatus { get; set; }
-        public DateTimeOffset StatusAtUtc { get; set; }
+        public DateTimeOffset StatusAt { get; set; }
 
         public virtual tbl_EmailQueue Email { get; set; }
     }

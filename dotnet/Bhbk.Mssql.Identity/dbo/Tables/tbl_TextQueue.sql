@@ -4,9 +4,9 @@
     [ToPhoneNumber]   VARCHAR (15)       NOT NULL,
     [Body]            VARCHAR (MAX)      NOT NULL,
     [IsCancelled]     BIT                NOT NULL,
-    [CreatedUtc]      DATETIMEOFFSET (7) NOT NULL,
-    [SendAtUtc]       DATETIMEOFFSET (7) NOT NULL,
-    [DeliveredUtc]    DATETIMEOFFSET (7) NULL,
+    [Created]      DATETIMEOFFSET (7) NOT NULL,
+    [SendAt]       DATETIMEOFFSET (7) NOT NULL,
+    [Delivered]    DATETIMEOFFSET (7) NULL,
     CONSTRAINT [PK_tbl_TextQueue] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

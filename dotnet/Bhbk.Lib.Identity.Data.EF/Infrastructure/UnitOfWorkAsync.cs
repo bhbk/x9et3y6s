@@ -15,15 +15,20 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
     {
         private readonly ILoggerFactory _logger;
         public AudienceRepositoryAsync Audiences { get; private set; }
-        public IGenericRepositoryAsync<tbl_AuthActivity> AuthActivity { get; private set; }
-        public IGenericRepositoryAsync<tbl_AuthActivityAudience> AuthActivityAudiences { get; private set; }
+        public IGenericRepositoryAsync<tbl_UserAuthActivity> UserAuthActivities { get; private set; }
+        public IGenericRepositoryAsync<tbl_AudienceAuthActivity> AudienceAuthActivities { get; private set; }
         public IGenericRepositoryAsync<tbl_ChatConversation> ChatConversations { get; private set; }
+        public IGenericRepositoryAsync<tbl_ChatFavorite> ChatFavorites { get; private set; }
         public IGenericRepositoryAsync<tbl_ChatFile> ChatFiles { get; private set; }
         public IGenericRepositoryAsync<tbl_ChatMessage> ChatMessages { get; private set; }
         public IGenericRepositoryAsync<tbl_ChatPrompt> ChatPrompts { get; private set; }
         public IGenericRepositoryAsync<tbl_Claim> Claims { get; private set; }
         public IGenericRepositoryAsync<tbl_EmailActivity> EmailActivity { get; private set; }
         public IGenericRepositoryAsync<tbl_EmailQueue> EmailQueue { get; private set; }
+        public IGenericRepositoryAsync<tbl_UserEntitlement> UserEntitlements { get; private set; }
+        public IGenericRepositoryAsync<tbl_AudienceEntitlement> AudienceEntitlements { get; private set; }
+        public IGenericRepositoryAsync<tbl_EntitlementScope> EntitlementScopes { get; private set; }
+        public IGenericRepositoryAsync<tbl_EntitlementType> EntitlementTypes { get; private set; }
         public IGenericRepositoryAsync<tbl_Issuer> Issuers { get; private set; }
         public IGenericRepositoryAsync<tbl_Job> Jobs { get; private set; }
         public IGenericRepositoryAsync<tbl_JobSetting> JobSettings { get; private set; }
@@ -107,15 +112,20 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
             var context = (IdentityEntities)DbContext;
 
             Audiences = new AudienceRepositoryAsync(context, env);
-            AuthActivity = new GenericRepositoryAsync<tbl_AuthActivity>(context);
-            AuthActivityAudiences = new GenericRepositoryAsync<tbl_AuthActivityAudience>(context);
+            UserAuthActivities = new GenericRepositoryAsync<tbl_UserAuthActivity>(context);
+            AudienceAuthActivities = new GenericRepositoryAsync<tbl_AudienceAuthActivity>(context);
             ChatConversations = new GenericRepositoryAsync<tbl_ChatConversation>(context);
+            ChatFavorites = new GenericRepositoryAsync<tbl_ChatFavorite>(context);
             ChatFiles = new GenericRepositoryAsync<tbl_ChatFile>(context);
             ChatMessages = new GenericRepositoryAsync<tbl_ChatMessage>(context);
             ChatPrompts = new GenericRepositoryAsync<tbl_ChatPrompt>(context);
             Claims = new GenericRepositoryAsync<tbl_Claim>(context);
             EmailQueue = new GenericRepositoryAsync<tbl_EmailQueue>(context);
             EmailActivity = new GenericRepositoryAsync<tbl_EmailActivity>(context);
+            UserEntitlements = new GenericRepositoryAsync<tbl_UserEntitlement>(context);
+            AudienceEntitlements = new GenericRepositoryAsync<tbl_AudienceEntitlement>(context);
+            EntitlementScopes = new GenericRepositoryAsync<tbl_EntitlementScope>(context);
+            EntitlementTypes = new GenericRepositoryAsync<tbl_EntitlementType>(context);
             Issuers = new GenericRepositoryAsync<tbl_Issuer>(context);
             Jobs = new GenericRepositoryAsync<tbl_Job>(context);
             JobSettings = new GenericRepositoryAsync<tbl_JobSetting>(context);

@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace Bhbk.WebApi.Identity.Admin.Controllers
 {
-    [Authorize(Policy = PolicyConstants.IdentityViewerPolicy)]
+    [Authorize(Policy = PolicyConstants.EntitlementViewerPolicy)]
     public class BaseController : Controller
     {
         protected IMapper map { get => ControllerContext.HttpContext.RequestServices.GetRequiredService<IMapper>(); }

@@ -9,8 +9,11 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
     {
         public tbl_User()
         {
-            tbl_AuthActivities = new HashSet<tbl_AuthActivity>();
+            tbl_UserAuthActivities = new HashSet<tbl_UserAuthActivity>();
             tbl_ChatConversations = new HashSet<tbl_ChatConversation>();
+            tbl_ChatFavorites = new HashSet<tbl_ChatFavorite>();
+            tbl_ChatPromptHistories = new HashSet<tbl_ChatPromptHistory>();
+            tbl_UserEntitlements = new HashSet<tbl_UserEntitlement>();
             tbl_Refreshes = new HashSet<tbl_Refresh>();
             tbl_Settings = new HashSet<tbl_Setting>();
             tbl_States = new HashSet<tbl_State>();
@@ -35,11 +38,14 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public bool IsHumanBeing { get; set; }
         public bool IsLockedOut { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset? LockoutEndUtc { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
+        public DateTimeOffset Created { get; set; }
 
-        public virtual ICollection<tbl_AuthActivity> tbl_AuthActivities { get; set; }
+        public virtual ICollection<tbl_UserAuthActivity> tbl_UserAuthActivities { get; set; }
         public virtual ICollection<tbl_ChatConversation> tbl_ChatConversations { get; set; }
+        public virtual ICollection<tbl_ChatFavorite> tbl_ChatFavorites { get; set; }
+        public virtual ICollection<tbl_ChatPromptHistory> tbl_ChatPromptHistories { get; set; }
+        public virtual ICollection<tbl_UserEntitlement> tbl_UserEntitlements { get; set; }
         public virtual ICollection<tbl_Refresh> tbl_Refreshes { get; set; }
         public virtual ICollection<tbl_Setting> tbl_Settings { get; set; }
         public virtual ICollection<tbl_State> tbl_States { get; set; }

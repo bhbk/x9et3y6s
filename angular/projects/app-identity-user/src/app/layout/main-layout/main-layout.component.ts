@@ -120,7 +120,7 @@ export class MainLayoutComponent implements OnInit {
   readonly commentIcon = commentIcon;
 
   readonly menuOpen = signal(false);
-  readonly isAdmin = computed(() => this.authStore.hasRole()('Identity.Admins'));
+  readonly isAdmin = computed(() => this.authStore.hasEntitlement()('Viewer'));
 
   ngOnInit(): void {
     this.chatStore.init();

@@ -9,14 +9,14 @@
     [SecurityStamp]      NVARCHAR (256)     NULL,
     [IsLockedOut]        BIT                NOT NULL,
     [IsDeletable]        BIT                NOT NULL,
-    [LockoutEndUtc]      DATETIMEOFFSET (7) NULL,
-    [CreatedUtc]         DATETIMEOFFSET (7) NOT NULL,
-    [VersionStartUtc]    DATETIME2 (7)      NOT NULL,
-    [VersionEndUtc]      DATETIME2 (7)      NOT NULL
+    [LockoutEnd]      DATETIMEOFFSET (7) NULL,
+    [Created]         DATETIMEOFFSET (7) NOT NULL,
+    [VersionStart]    DATETIME2 (7)      NOT NULL,
+    [VersionEnd]      DATETIME2 (7)      NOT NULL
 );
 
 
 GO
 CREATE CLUSTERED INDEX [ix_tbl_Audience]
-    ON [history].[tbl_Audience]([VersionEndUtc] ASC, [VersionStartUtc] ASC) WITH (DATA_COMPRESSION = PAGE);
+    ON [history].[tbl_Audience]([VersionEnd] ASC, [VersionStart] ASC) WITH (DATA_COMPRESSION = PAGE);
 

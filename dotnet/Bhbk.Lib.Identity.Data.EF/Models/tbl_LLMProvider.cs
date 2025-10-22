@@ -17,8 +17,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public bool IsEnabled { get; set; }
         public int FailoverOrder { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
-        public DateTimeOffset? ModifiedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset? Modified { get; set; }
 
         public virtual ICollection<tbl_LLMProviderSetting> tbl_LLMProviderSettings { get; set; }
     }

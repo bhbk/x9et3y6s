@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[tbl_Quote] (
     [TssId]         VARCHAR (128)    NULL,
     [TssTitle]      VARCHAR (256)    NULL,
     [TssCategory]   VARCHAR (256)    NULL,
-    [TssDate]       DATETIME2 (7)    NULL,
+    [TssDate]       DATETIMEOFFSET (7) NULL,
     [TssTags]       VARCHAR (256)    NULL,
     [TssLength]     INT              NULL,
     [TssBackground] VARCHAR (512)    NULL,

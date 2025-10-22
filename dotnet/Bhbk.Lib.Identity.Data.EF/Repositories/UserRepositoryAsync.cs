@@ -33,21 +33,21 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public async ValueTask<tbl_UserClaim> AddClaimAsync(tbl_UserClaim claim, CancellationToken ct = default)
         {
-            claim.CreatedUtc = Clock.UtcDateTime;
+            claim.Created = Clock.UtcDateTime;
             await _context.Set<tbl_UserClaim>().AddAsync(claim, ct);
             return claim;
         }
 
         public async ValueTask<tbl_UserLoginProvider> AddLoginProviderAsync(tbl_UserLoginProvider login, CancellationToken ct = default)
         {
-            login.CreatedUtc = Clock.UtcDateTime;
+            login.Created = Clock.UtcDateTime;
             await _context.Set<tbl_UserLoginProvider>().AddAsync(login, ct);
             return login;
         }
 
         public async ValueTask<tbl_UserRole> AddRoleAsync(tbl_UserRole role, CancellationToken ct = default)
         {
-            role.CreatedUtc = Clock.UtcDateTime;
+            role.Created = Clock.UtcDateTime;
             await _context.Set<tbl_UserRole>().AddAsync(role, ct);
             return role;
         }
@@ -75,7 +75,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public new async ValueTask<tbl_User> DeleteAsync(tbl_User user, CancellationToken ct = default)
         {
-            var activity = _context.Set<tbl_AuthActivity>().Where(x => x.UserId == user.Id);
+            var activity = _context.Set<tbl_UserAuthActivity>().Where(x => x.UserId == user.Id);
             var refreshes = _context.Set<tbl_Refresh>().Where(x => x.UserId == user.Id);
             var settings = _context.Set<tbl_Setting>().Where(x => x.UserId == user.Id);
             var states = _context.Set<tbl_State>().Where(x => x.UserId == user.Id);
@@ -186,10 +186,10 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
         {
             if (entity.IsLockedOut)
             {
-                if (entity.LockoutEndUtc.HasValue && entity.LockoutEndUtc <= DateTime.UtcNow)
+                if (entity.LockoutEnd.HasValue && entity.LockoutEnd <= DateTime.UtcNow)
                 {
                     entity.IsLockedOut = false;
-                    entity.LockoutEndUtc = null;
+                    entity.LockoutEnd = null;
                     await PutAsync(entity, ct);
                     return false;
                 }
@@ -198,7 +198,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
             }
             else
             {
-                entity.LockoutEndUtc = null;
+                entity.LockoutEnd = null;
                 await PutAsync(entity, ct);
                 return false;
             }
@@ -298,7 +298,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
             entity.FirstName = user.FirstName;
             entity.LastName = user.LastName;
             entity.IsLockedOut = user.IsLockedOut;
-            entity.LockoutEndUtc = user.LockoutEndUtc.HasValue ? user.LockoutEndUtc.Value.ToUniversalTime() : user.LockoutEndUtc;
+            entity.LockoutEnd = user.LockoutEnd.HasValue ? user.LockoutEnd.Value.ToUniversalTime() : user.LockoutEnd;
             entity.IsDeletable = user.IsDeletable;
 
             _context.Entry(entity).State = EntityState.Modified;

@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public async ValueTask<tbl_AudienceRole> AddRoleAsync(tbl_AudienceRole role, CancellationToken ct = default)
         {
-            role.CreatedUtc = Clock.UtcDateTime;
+            role.Created = Clock.UtcDateTime;
             await _context.Set<tbl_AudienceRole>().AddAsync(role, ct);
             return role;
         }
@@ -58,7 +58,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public new async ValueTask<tbl_Audience> DeleteAsync(tbl_Audience audience, CancellationToken ct = default)
         {
-            var activityAudiences = _context.Set<tbl_AuthActivityAudience>().Where(x => x.AudienceId == audience.Id);
+            var activityAudiences = _context.Set<tbl_AudienceAuthActivity>().Where(x => x.AudienceId == audience.Id);
             var refreshes = _context.Set<tbl_Refresh>().Where(x => x.AudienceId == audience.Id);
             var settings = _context.Set<tbl_Setting>().Where(x => x.AudienceId == audience.Id);
             var states = _context.Set<tbl_State>().Where(x => x.AudienceId == audience.Id);

@@ -20,7 +20,7 @@ test.describe('User Portal Profile', () => {
 
     // Set up request listener BEFORE modifying the form
     const updatePromise = userPage.waitForRequest((req) =>
-      req.url().includes('/profile/v1') && req.method() === 'PUT',
+      req.url().includes('/profiles/v1') && req.method() === 'PUT',
     );
 
     // Clear and type new value — triggers Angular form dirty state

@@ -48,7 +48,12 @@ import {
 
               <!-- card header -->
               <div class="flex items-center gap-3 px-4 py-3">
-                <span class="font-medium text-gray-900 flex-1">{{ job.name }}</span>
+                <div class="flex-1">
+                  <span class="font-medium text-gray-900">{{ job.name }}</span>
+                  @if (job.description) {
+                    <p class="text-sm text-gray-500 mt-0.5">{{ job.description }}</p>
+                  }
+                </div>
 
                 <span class="text-xs font-mono text-gray-400 mr-2" [title]="getScheduleTooltip(job)">
                   {{ getScheduleDisplay(job) }}

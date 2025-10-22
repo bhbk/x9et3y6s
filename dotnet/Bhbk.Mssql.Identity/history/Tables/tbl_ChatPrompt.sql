@@ -5,13 +5,13 @@ CREATE TABLE [history].[tbl_ChatPrompt] (
     [Content]         NVARCHAR (MAX)     NOT NULL,
     [IsEnabled]       BIT                NOT NULL,
     [SortOrder]       INT                NOT NULL,
-    [CreatedUtc]      DATETIMEOFFSET (7) NOT NULL,
-    [ModifiedUtc]     DATETIMEOFFSET (7) NULL,
-    [VersionStartUtc] DATETIME2 (7)      NOT NULL,
-    [VersionEndUtc]   DATETIME2 (7)      NOT NULL
+    [Created]      DATETIMEOFFSET (7) NOT NULL,
+    [Modified]     DATETIMEOFFSET (7) NULL,
+    [VersionStart] DATETIME2 (7)      NOT NULL,
+    [VersionEnd]   DATETIME2 (7)      NOT NULL
 );
 
 
 GO
 CREATE CLUSTERED INDEX [ix_tbl_ChatPrompt]
-    ON [history].[tbl_ChatPrompt]([VersionEndUtc] ASC, [VersionStartUtc] ASC) WITH (DATA_COMPRESSION = PAGE);
+    ON [history].[tbl_ChatPrompt]([VersionEnd] ASC, [VersionStart] ASC) WITH (DATA_COMPRESSION = PAGE);

@@ -100,7 +100,8 @@
     ],
     "Jobs": [
       {
-        "Name": "MaintainActivity",
+        "Name": "Maintain Activity",
+        "Description": "Groom transient and auditable auth activity records based on retention policies",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "0 * * ? * * *", "IsSecret": false },
@@ -109,35 +110,40 @@
         ]
       },
       {
-        "Name": "MaintainUsers",
+        "Name": "Maintain Users",
+        "Description": "Lock out users with expired confirmation tokens or failed login thresholds",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "30 * * ? * * *", "IsSecret": false }
         ]
       },
       {
-        "Name": "MaintainQuotes",
+        "Name": "Maintain Quotes",
+        "Description": "Fetch and rotate motivational quotes from external sources",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "0 0 */2 ? * * *", "IsSecret": false }
         ]
       },
       {
-        "Name": "MaintainRefreshes",
+        "Name": "Maintain Refreshes",
+        "Description": "Purge expired OAuth2 refresh tokens",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "0 * * ? * * *", "IsSecret": false }
         ]
       },
       {
-        "Name": "MaintainStates",
+        "Name": "Maintain States",
+        "Description": "Clean up expired OAuth2 authorization code and device code states",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "30 * * ? * * *", "IsSecret": false }
         ]
       },
       {
-        "Name": "EmailActivity",
+        "Name": "Email Activity",
+        "Description": "Expire stale email queue entries that exceed the delivery window",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "0 0/2 * ? * * *", "IsSecret": false },
@@ -145,7 +151,8 @@
         ]
       },
       {
-        "Name": "EmailDequeue",
+        "Name": "Email Dequeue",
+        "Description": "Send queued email notifications via SendGrid",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "0 * * ? * * *", "IsSecret": false },
@@ -153,7 +160,8 @@
         ]
       },
       {
-        "Name": "TextActivity",
+        "Name": "Text Activity",
+        "Description": "Expire stale text queue entries that exceed the delivery window",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "30 0/2 * ? * * *", "IsSecret": false },
@@ -161,7 +169,8 @@
         ]
       },
       {
-        "Name": "TextDequeue",
+        "Name": "Text Dequeue",
+        "Description": "Send queued SMS notifications via Twilio",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "30 * * ? * * *", "IsSecret": false },
@@ -170,7 +179,8 @@
         ]
       },
       {
-        "Name": "MaintainChatFiles",
+        "Name": "Maintain Chat Files",
+        "Description": "Delete expired chat file attachments and reclaim storage",
         "IsEnabled": true,
         "Settings": [
           { "ConfigKey": "Schedule", "ConfigValue": "0 0 * ? * * *", "IsSecret": false }
@@ -194,6 +204,22 @@
       { "Name": "Identity.Admins", "AudienceName": "Identity" },
       { "Name": "Identity.Users", "AudienceName": "Identity" },
       { "Name": "Identity.Viewers", "AudienceName": "Identity" }
+    ],
+    "EntitlementTypes": [
+      { "Name": "Admin", "Description": "Full administrative access", "SortOrder": 1 },
+      { "Name": "User", "Description": "Standard user access", "SortOrder": 2 },
+      { "Name": "Viewer", "Description": "Read-only access", "SortOrder": 3 }
+    ],
+    "EntitlementScopes": [
+      { "Name": "Global", "Description": "Applies to all issuers and audiences", "SortOrder": 1 },
+      { "Name": "Issuer", "Description": "Applies to a specific issuer", "SortOrder": 2 },
+      { "Name": "Audience", "Description": "Applies to a specific audience", "SortOrder": 3 }
+    ],
+    "UserEntitlements": [
+      { "UserName": "admin@local", "EntitlementTypeName": "Admin", "EntitlementScopeName": "Global" }
+    ],
+    "AudienceEntitlements": [
+      { "AudienceName": "Identity", "EntitlementTypeName": "Admin", "EntitlementScopeName": "Global" }
     ],
     "Users": [
       {

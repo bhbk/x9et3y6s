@@ -32,22 +32,22 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    var job = uow.Jobs.Get(x => x.Name == "MaintainActivity").Single();
+                    var job = uow.Jobs.Get(x => x.Name == "Maintain Activity").Single();
                     var jobSettings = uow.JobSettings.Get(x => x.JobId == job.Id).ToList();
 
                     var auditable = int.Parse(jobSettings.Single(x => x.ConfigKey == "HoldAuditable").ConfigValue);
                     var transient = int.Parse(jobSettings.Single(x => x.ConfigKey == "HoldTransient").ConfigValue);
 
-                    var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_AuthActivity>()
-                        .Where(x => (x.CreatedUtc.AddSeconds(transient) < DateTime.UtcNow)
-                            || (x.CreatedUtc.AddSeconds(auditable) < DateTime.UtcNow)).ToLambda();
+                    var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_UserAuthActivity>()
+                        .Where(x => (x.Created.AddSeconds(transient) < DateTime.UtcNow)
+                            || (x.Created.AddSeconds(auditable) < DateTime.UtcNow)).ToLambda();
 
-                    var expired = uow.AuthActivity.Get(expiredExpr);
+                    var expired = uow.UserAuthActivities.Get(expiredExpr);
                     var expiredCount = expired.Count();
 
                     if (expired.Any())
                     {
-                        uow.AuthActivity.Delete(expired);
+                        uow.UserAuthActivities.Delete(expired);
                         uow.Commit();
 
                         Log.Information($"'{callPath}' success on " + DateTime.UtcNow.ToString() + ". Delete " 

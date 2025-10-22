@@ -4,9 +4,9 @@
 export interface ChatConversation {
   id: string;
   title: string | null;
-  startedUtc: string;
-  endedUtc: string | null;
-  createdUtc: string;
+  started: string;
+  ended: string | null;
+  created: string;
 }
 
 /**
@@ -18,7 +18,7 @@ export interface ChatMessage {
   content: string;
   inputTokens: number | null;
   outputTokens: number | null;
-  createdUtc: string;
+  created: string;
   files?: ChatFileReference[];
 }
 
@@ -60,6 +60,15 @@ export interface CreateConversationRequest {
 export interface ChatLLMStatus {
   llmAvailable: boolean;
   providerName: string | null;
+}
+
+/**
+ * Prompt history entry stored server-side
+ */
+export interface ChatPromptHistoryEntry {
+  id: string;
+  promptText: string;
+  created: string;
 }
 
 /**

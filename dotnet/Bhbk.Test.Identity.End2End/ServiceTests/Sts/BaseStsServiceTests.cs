@@ -144,14 +144,15 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                         servers.Requirements.Add(new IdentityServicesAuthorizeRequirement());
                     });
 
-                    /* role-based policies for Identity service */
-                    opt.AddPolicy(PolicyConstants.IdentityAdminPolicy, policy =>
-                        policy.RequireRole("Identity.Admins"));
-                    opt.AddPolicy(PolicyConstants.IdentityUserPolicy, policy =>
-                        policy.RequireRole("Identity.Admins", "Identity.Users"));
-                    opt.AddPolicy(PolicyConstants.IdentityViewerPolicy, policy =>
-                        policy.RequireRole("Identity.Admins", "Identity.Users", "Identity.Viewers"));
+                    /* entitlement-based policies (database-driven RBAC) */
+                    opt.AddPolicy(PolicyConstants.EntitlementAdminPolicy, policy =>
+                        policy.Requirements.Add(new IdentityEntitlementRequirement("Admin")));
+                    opt.AddPolicy(PolicyConstants.EntitlementUserPolicy, policy =>
+                        policy.Requirements.Add(new IdentityEntitlementRequirement("User")));
+                    opt.AddPolicy(PolicyConstants.EntitlementViewerPolicy, policy =>
+                        policy.Requirements.Add(new IdentityEntitlementRequirement("Viewer")));
                 });
+                sc.AddScoped<IAuthorizationHandler, IdentityEntitlementAuthorize>();
                 sc.AddSwaggerGen(opt =>
                 {
                     opt.SwaggerDoc("v1", new OpenApiInfo { Title = "Reference", Version = "v1" });

@@ -30,7 +30,7 @@ test.describe('Admin Claims', () => {
     await dialog.fillField('Value', 'e2e-test-value');
 
     const createPromise = adminPage.waitForRequest((req) =>
-      req.url().includes('/claim/v1') && req.method() === 'POST' && !req.url().includes('/page'),
+      req.url().includes('/claims/v1') && req.method() === 'POST' && !req.url().includes('/page'),
     );
     await dialog.clickAction('Create');
     const createReq = await createPromise;

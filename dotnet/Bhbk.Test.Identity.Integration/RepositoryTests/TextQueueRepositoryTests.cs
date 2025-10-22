@@ -42,7 +42,7 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                     FromPhoneNumber = TestData.User.PhoneNumber,
                     ToPhoneNumber = TestData.User.PhoneNumber,
                     Body = "Body-" + Base64.CreateString(32),
-                    SendAtUtc = DateTime.UtcNow,
+                    SendAt = DateTime.UtcNow,
                 }));
             UoW.Commit();
 

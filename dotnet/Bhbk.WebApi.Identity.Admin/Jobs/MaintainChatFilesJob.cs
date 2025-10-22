@@ -28,7 +28,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    var expired = uow.ChatFiles.Get(x => x.ExpiresUtc < DateTimeOffset.UtcNow);
+                    var expired = uow.ChatFiles.Get(x => x.Expires < DateTimeOffset.UtcNow);
                     var expiredCount = expired.Count();
 
                     if (expired.Any())

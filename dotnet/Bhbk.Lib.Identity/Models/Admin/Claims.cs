@@ -29,6 +29,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public Guid Id { get; set; }
 
         [Required]
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
     }
 }

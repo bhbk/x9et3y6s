@@ -12,9 +12,6 @@ namespace Bhbk.Lib.Identity.Domain.Configuration
         public string AlertAdmins { get; set; }
         public string AlertUsers { get; set; }
         public string AlertViewers { get; set; }
-        public string IdentityAdmins { get; set; }
-        public string IdentityUsers { get; set; }
-        public string IdentityViewers { get; set; }
     }
 
     public class IdentityProviderSettings
@@ -33,12 +30,17 @@ namespace Bhbk.Lib.Identity.Domain.Configuration
         public List<SeedJobSettings> Jobs { get; set; }
         public List<SeedAudienceSettings> Audiences { get; set; }
         public List<SeedRoleSettings> Roles { get; set; }
+        public List<SeedEntitlementTypeSettings> EntitlementTypes { get; set; }
+        public List<SeedEntitlementScopeSettings> EntitlementScopes { get; set; }
+        public List<SeedUserEntitlementSettings> UserEntitlements { get; set; }
+        public List<SeedAudienceEntitlementSettings> AudienceEntitlements { get; set; }
         public List<SeedUserSettings> Users { get; set; }
     }
 
     public class SeedJobSettings
     {
         public string Name { get; set; }
+        public string Description { get; set; }
         public bool IsEnabled { get; set; }
         public List<SeedJobSettingItem> Settings { get; set; }
     }
@@ -87,6 +89,37 @@ namespace Bhbk.Lib.Identity.Domain.Configuration
     {
         public string Name { get; set; }
         public string AudienceName { get; set; }
+    }
+
+    public class SeedEntitlementTypeSettings
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int SortOrder { get; set; }
+    }
+
+    public class SeedEntitlementScopeSettings
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int SortOrder { get; set; }
+    }
+
+    public class SeedUserEntitlementSettings
+    {
+        public string UserName { get; set; }
+        public string EntitlementTypeName { get; set; }
+        public string EntitlementScopeName { get; set; }
+        public string IssuerName { get; set; }
+        public string AudienceName { get; set; }
+    }
+
+    public class SeedAudienceEntitlementSettings
+    {
+        public string AudienceName { get; set; }
+        public string EntitlementTypeName { get; set; }
+        public string EntitlementScopeName { get; set; }
+        public string IssuerName { get; set; }
     }
 
     public class SeedUserSettings

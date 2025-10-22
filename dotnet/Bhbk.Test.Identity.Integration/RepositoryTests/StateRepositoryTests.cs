@@ -54,8 +54,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                     StateValue = AlphaNumeric.CreateString(32),
                     StateType = ConsumerType.Device.ToString(),
                     StateConsume = false,
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = DateTime.UtcNow.AddSeconds(60),
                 }));
             UoW.Commit();
 

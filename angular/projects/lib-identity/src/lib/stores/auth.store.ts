@@ -4,7 +4,8 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap, catchError, of, filter, interval, takeUntil, Subject, firstValueFrom } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
-import { AuthState, AuthUser, JwtPayload, UserJwtV2 } from '../models';
+import { EntitlementService } from '../services/admin/entitlement.service';
+import { AuthState, AuthUser, AuthEntitlement, JwtPayload, UserJwtV2 } from '../models';
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -45,9 +46,20 @@ export const AuthStore = signalStore(
     hasRole: computed(() => (role: string) => {
       const user = store.user();
       return user?.roles?.includes(role) ?? false;
+    }),
+    hasEntitlement: computed(() => (minimumType: string) => {
+      const user = store.user();
+      if (!user?.entitlements?.length) return false;
+      const hierarchy = ['Admin', 'User', 'Viewer'];
+      const requiredLevel = hierarchy.indexOf(minimumType);
+      if (requiredLevel < 0) return false;
+      return user.entitlements.some(e => {
+        const typeLevel = hierarchy.indexOf(e.entitlementTypeName);
+        return typeLevel >= 0 && typeLevel <= requiredLevel;
+      });
     })
   })),
-  withMethods((store, authService = inject(AuthService), configService = inject(ConfigService)) => {
+  withMethods((store, authService = inject(AuthService), configService = inject(ConfigService), entitlementService = inject(EntitlementService)) => {
     const refreshSubject = new Subject<void>();
 
     // Parse JWT payload
@@ -156,6 +168,31 @@ export const AuthStore = signalStore(
       }
     };
 
+    /* Load entitlements from the API and patch them into the user state.
+       Sets isLoading to false when done so callers can keep isLoading true
+       until entitlements arrive. */
+    const loadEntitlements = () => {
+      entitlementService.getMyEntitlements().subscribe({
+        next: (entitlements) => {
+          const user = store.user();
+          if (user) {
+            const mapped: AuthEntitlement[] = entitlements.map(e => ({
+              entitlementTypeName: e.entitlementTypeName ?? '',
+              entitlementScopeName: e.entitlementScopeName ?? '',
+              issuerName: e.issuerName,
+              audienceName: e.audienceName,
+            }));
+            patchState(store, { user: { ...user, entitlements: mapped }, isLoading: false });
+          } else {
+            patchState(store, { isLoading: false });
+          }
+        },
+        error: () => {
+          patchState(store, { isLoading: false });
+        }
+      });
+    };
+
     // Handle successful authentication
     const handleAuthSuccess = (jwt: UserJwtV2, rememberMe?: boolean) => {
       const user = extractUser(jwt);
@@ -168,9 +205,11 @@ export const AuthStore = signalStore(
         accessToken: jwt.access_token,
         tokenExpiry: expiry,
         user,
-        isLoading: false,
         error: null
       });
+
+      /* isLoading stays true — loadEntitlements sets it false when done */
+      loadEntitlements();
     };
 
     // Handle authentication error
@@ -255,9 +294,12 @@ export const AuthStore = signalStore(
               accessToken: stored.accessToken,
               tokenExpiry: stored.expiry,
               user,
-              isLoading: false,
+              isLoading: true,
               error: null
             });
+
+            /* isLoading stays true — loadEntitlements sets it false when done */
+            loadEntitlements();
           }
         }
       },

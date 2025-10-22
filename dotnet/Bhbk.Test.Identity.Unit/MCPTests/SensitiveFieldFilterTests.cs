@@ -196,7 +196,7 @@ namespace Bhbk.Test.Identity.Unit.MCPTests
                 ["FirstName"] = "Test",
                 ["LastName"] = "User",
                 ["IsEnabled"] = true,
-                ["CreatedUtc"] = "2024-01-01T00:00:00Z"
+                ["Created"] = "2024-01-01T00:00:00Z"
             };
 
             var result = SensitiveFieldFilter.Filter(data) as JObject;
@@ -208,7 +208,7 @@ namespace Bhbk.Test.Identity.Unit.MCPTests
             result.Should().ContainKey("FirstName");
             result.Should().ContainKey("LastName");
             result.Should().ContainKey("IsEnabled");
-            result.Should().ContainKey("CreatedUtc");
+            result.Should().ContainKey("Created");
         }
 
         [Fact]

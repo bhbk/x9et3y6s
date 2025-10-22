@@ -26,7 +26,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         [Route("v1/{audienceID:guid}/add-to-role/{roleID:guid}"), HttpGet]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult AddToRoleV1([FromRoute] Guid audienceID, [FromRoute] Guid roleID)
         {
             var audience = uow.Audiences.Get(x => x.Id == audienceID)
@@ -64,7 +64,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPost]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult CreateV1([FromBody] AudienceV1 model)
         {
             if (!ModelState.IsValid)
@@ -86,7 +86,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{audienceID:guid}"), HttpDelete]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult DeleteV1([FromRoute] Guid audienceID)
         {
             var audience = uow.Audiences.Get(x => x.Id == audienceID)
@@ -112,7 +112,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{audienceID:guid}/refresh"), HttpDelete]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult DeleteRefreshesV1([FromRoute] Guid audienceID)
         {
             var audience = uow.Audiences.Get(x => x.Id == audienceID)
@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{audienceID:guid}/refresh/{refreshID}"), HttpDelete]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult DeleteRefreshV1([FromRoute] Guid audienceID, [FromRoute] Guid refreshID)
         {
             var expr = QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
@@ -275,7 +275,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{audienceID:guid}/remove-from-role/{roleID:guid}"), HttpDelete]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult RemoveFromRoleV1([FromRoute] Guid audienceID, [FromRoute] Guid roleID)
         {
             var audience = uow.Audiences.Get(x => x.Id == audienceID)
@@ -312,7 +312,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{audienceID:guid}/remove-password"), HttpGet]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult RemovePasswordV1([FromRoute] Guid audienceID)
         {
             if (!ModelState.IsValid)
@@ -341,7 +341,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{audienceID:guid}/set-password"), HttpPut]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult SetPasswordV1([FromRoute] Guid audienceID, [FromBody] PasswordAddV1 model)
         {
             if (!ModelState.IsValid)
@@ -371,7 +371,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult UpdateV1([FromBody] AudienceV1 model)
         {
             if (!ModelState.IsValid)

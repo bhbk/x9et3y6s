@@ -286,7 +286,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                 var user = uow.Users.Get(x => x.UserName == _factory.TestData.User.UserName).Single();
 
                 user.IsLockedOut = true;
-                user.LockoutEndUtc = DateTime.UtcNow.AddSeconds(60);
+                user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
 
                 uow.Users.Put(user);
                 uow.Commit();
@@ -687,7 +687,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
 
                 /* now lock out the user */
                 user.IsLockedOut = true;
-                user.LockoutEndUtc = DateTime.UtcNow.AddSeconds(60);
+                user.LockoutEnd = DateTime.UtcNow.AddSeconds(60);
                 uow.Users.Put(user);
                 uow.Commit();
 
@@ -755,7 +755,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
         [Fact]
         public async Task Sts_OAuth2_ResourceOwnerV1_Refresh_Fail_Time()
         {
-            /* test refresh token that is not yet valid (ValidFromUtc in the future) */
+            /* test refresh token that is not yet valid (ValidFrom in the future) */
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -789,7 +789,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                 grant.Should().BeAssignableTo<UserJwtV1>();
 
                 /* manipulate the refresh token time window to be not yet valid */
-                var existingRefresh = uow.Refreshes.Get(x => x.UserId == user.Id).OrderByDescending(x => x.IssuedUtc).First();
+                var existingRefresh = uow.Refreshes.Get(x => x.UserId == user.Id).OrderByDescending(x => x.Issued).First();
                 var refreshValue = existingRefresh.RefreshValue;
                 uow.Refreshes.Delete(existingRefresh);
                 uow.Commit();
@@ -802,9 +802,9 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                     UserId = existingRefresh.UserId,
                     RefreshValue = refreshValue,
                     RefreshType = existingRefresh.RefreshType,
-                    ValidFromUtc = DateTime.UtcNow.AddYears(1),
-                    ValidToUtc = DateTime.UtcNow.AddYears(2),
-                    IssuedUtc = DateTime.UtcNow,
+                    ValidFrom = DateTime.UtcNow.AddYears(1),
+                    ValidTo = DateTime.UtcNow.AddYears(2),
+                    Issued = DateTime.UtcNow,
                 });
                 uow.Commit();
 
@@ -820,7 +820,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
 
-            /* test refresh token that is expired (ValidToUtc in the past) */
+            /* test refresh token that is expired (ValidTo in the past) */
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -854,7 +854,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                 grant.Should().BeAssignableTo<UserJwtV1>();
 
                 /* manipulate the refresh token time window to be expired */
-                var existingRefresh = uow.Refreshes.Get(x => x.UserId == user.Id).OrderByDescending(x => x.IssuedUtc).First();
+                var existingRefresh = uow.Refreshes.Get(x => x.UserId == user.Id).OrderByDescending(x => x.Issued).First();
                 var refreshValue = existingRefresh.RefreshValue;
                 uow.Refreshes.Delete(existingRefresh);
                 uow.Commit();
@@ -867,9 +867,9 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                     UserId = existingRefresh.UserId,
                     RefreshValue = refreshValue,
                     RefreshType = existingRefresh.RefreshType,
-                    ValidFromUtc = DateTime.UtcNow.AddYears(-2),
-                    ValidToUtc = DateTime.UtcNow.AddYears(-1),
-                    IssuedUtc = DateTime.UtcNow,
+                    ValidFrom = DateTime.UtcNow.AddYears(-2),
+                    ValidTo = DateTime.UtcNow.AddYears(-1),
+                    Issued = DateTime.UtcNow,
                 });
                 uow.Commit();
 
@@ -1154,7 +1154,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                 var user = uow.Users.Get(x => x.UserName == _factory.TestData.User.UserName).Single();
 
                 user.IsLockedOut = true;
-                user.LockoutEndUtc = DateTime.UtcNow.AddMinutes(60);
+                user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
 
                 uow.Users.Put(user);
                 uow.Commit();
@@ -1588,7 +1588,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
         [Fact]
         public async Task Sts_OAuth2_ResourceOwnerV2_Refresh_Fail_Time()
         {
-            /* test refresh token that is not yet valid (ValidFromUtc in the future) */
+            /* test refresh token that is not yet valid (ValidFrom in the future) */
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -1622,7 +1622,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                 grant.Should().BeAssignableTo<UserJwtV2>();
 
                 /* manipulate the refresh token time window to be not yet valid */
-                var existingRefresh = uow.Refreshes.Get(x => x.UserId == user.Id).OrderByDescending(x => x.IssuedUtc).First();
+                var existingRefresh = uow.Refreshes.Get(x => x.UserId == user.Id).OrderByDescending(x => x.Issued).First();
                 var refreshValue = existingRefresh.RefreshValue;
                 uow.Refreshes.Delete(existingRefresh);
                 uow.Commit();
@@ -1635,9 +1635,9 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                     UserId = existingRefresh.UserId,
                     RefreshValue = refreshValue,
                     RefreshType = existingRefresh.RefreshType,
-                    ValidFromUtc = DateTime.UtcNow.AddYears(1),
-                    ValidToUtc = DateTime.UtcNow.AddYears(2),
-                    IssuedUtc = DateTime.UtcNow,
+                    ValidFrom = DateTime.UtcNow.AddYears(1),
+                    ValidTo = DateTime.UtcNow.AddYears(2),
+                    Issued = DateTime.UtcNow,
                 });
                 uow.Commit();
 
@@ -1653,7 +1653,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                 result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
 
-            /* test refresh token that is expired (ValidToUtc in the past) */
+            /* test refresh token that is expired (ValidTo in the past) */
             using (var owin = _factory.CreateClient())
             using (var scope = _factory.Server.Host.Services.CreateScope())
             {
@@ -1687,7 +1687,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                 grant.Should().BeAssignableTo<UserJwtV2>();
 
                 /* manipulate the refresh token time window to be expired */
-                var existingRefresh = uow.Refreshes.Get(x => x.UserId == user.Id).OrderByDescending(x => x.IssuedUtc).First();
+                var existingRefresh = uow.Refreshes.Get(x => x.UserId == user.Id).OrderByDescending(x => x.Issued).First();
                 var refreshValue = existingRefresh.RefreshValue;
                 uow.Refreshes.Delete(existingRefresh);
                 uow.Commit();
@@ -1700,9 +1700,9 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                     UserId = existingRefresh.UserId,
                     RefreshValue = refreshValue,
                     RefreshType = existingRefresh.RefreshType,
-                    ValidFromUtc = DateTime.UtcNow.AddYears(-2),
-                    ValidToUtc = DateTime.UtcNow.AddYears(-1),
-                    IssuedUtc = DateTime.UtcNow,
+                    ValidFrom = DateTime.UtcNow.AddYears(-2),
+                    ValidTo = DateTime.UtcNow.AddYears(-1),
+                    Issued = DateTime.UtcNow,
                 });
                 uow.Commit();
 
@@ -1764,7 +1764,7 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
 
                 /* now lock out the user */
                 user.IsLockedOut = true;
-                user.LockoutEndUtc = DateTime.UtcNow.AddMinutes(60);
+                user.LockoutEnd = DateTime.UtcNow.AddMinutes(60);
 
                 uow.Users.Put(user);
                 uow.Commit();

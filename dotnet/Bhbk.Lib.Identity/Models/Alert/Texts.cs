@@ -19,11 +19,11 @@ namespace Bhbk.Lib.Identity.Models.Alert
         public bool IsCancelled { get; set; }
 
         [Required]
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         [Required]
-        public DateTimeOffset SendAtUtc { get; set; }
-        public Nullable<DateTimeOffset> DeliveredUtc { get; set; }
+        public DateTimeOffset SendAt { get; set; }
+        public Nullable<DateTimeOffset> Delivered { get; set; }
     }
 
     public class TextV1 : Texts

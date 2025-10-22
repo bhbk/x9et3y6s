@@ -10,9 +10,9 @@ export interface RefreshV1 {
   userId?: string;
   refreshValue?: string;
   refreshType: string;
-  validFromUtc: string;
-  validToUtc: string;
-  issuedUtc: string;
+  validFrom: string;
+  validTo: string;
+  issued: string;
   // Session metadata
   ipAddress?: string;
   userAgent?: string;

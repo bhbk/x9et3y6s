@@ -177,7 +177,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     // Initialize from storage in case user has valid session
     this.authStore.initFromStorage();
     if (this.authStore.isAuthenticated() && !this.authStore.isTokenExpired()) {
-      this.router.navigateByUrl(this.returnUrl);
+      /* Entitlements load async — let the effect navigate once they arrive */
+      this.pendingNavigation = true;
     }
   }
 
@@ -185,8 +186,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.pendingNavigation = false;
   }
 
+  private static readonly TRANSFER_MIN_MS = 1000;
+
   private hydrateFromToken(token: string): void {
     this.isTransferring.set(true);
+    const startTime = Date.now();
+
     try {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -201,11 +206,21 @@ export class LoginComponent implements OnInit, OnDestroy {
           savedAt: new Date().toISOString()
         }));
         localStorage.setItem('identity_remember_me', 'true');
-        this.authStore.initFromStorage();
-        if (this.authStore.isAuthenticated() && !this.authStore.isTokenExpired()) {
-          setTimeout(() => this.router.navigateByUrl(this.returnUrl), 1000);
-          return;
-        }
+
+        /* Show transfer screen for at least TRANSFER_MIN_MS so the user
+           sees the progress animation before being redirected */
+        const elapsed = Date.now() - startTime;
+        const delay = Math.max(0, LoginComponent.TRANSFER_MIN_MS - elapsed);
+
+        setTimeout(() => {
+          this.authStore.initFromStorage();
+          if (this.authStore.isAuthenticated() && !this.authStore.isTokenExpired()) {
+            this.pendingNavigation = true;
+            return;
+          }
+          this.isTransferring.set(false);
+        }, delay);
+        return;
       }
     } catch (e) {
       console.error('Token hydration failed:', e);

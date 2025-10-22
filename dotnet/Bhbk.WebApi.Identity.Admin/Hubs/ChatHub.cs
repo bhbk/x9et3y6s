@@ -134,7 +134,7 @@ namespace Bhbk.WebApi.Identity.Admin.Hubs
                 {
                     id = conversation.Id,
                     title = conversation.Title,
-                    startedUtc = conversation.StartedUtc
+                    started = conversation.Started
                 });
             }
             catch (Exception ex)

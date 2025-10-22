@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string ProviderKey { get; set; }
         public bool IsEnabled { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual ICollection<tbl_UserLoginProvider> tbl_UserLoginProviders { get; set; }
     }

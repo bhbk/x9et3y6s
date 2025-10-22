@@ -4,7 +4,7 @@ import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import * as signalR from '@microsoft/signalr';
 import { ConfigService } from './config.service';
 import { AuthStore } from '../stores/auth.store';
-import { ChatConversation, ChatMessage, ChatStreamChunk, ChatLLMStatus, CreateConversationRequest } from '../models/chat.model';
+import { ChatConversation, ChatMessage, ChatStreamChunk, ChatLLMStatus, CreateConversationRequest, ChatPromptHistoryEntry, ChatFavorite } from '../models/chat.model';
 
 /**
  * Chat service for REST API calls and SignalR streaming
@@ -96,6 +96,45 @@ export class ChatService {
   getMessages(conversationId: string): Observable<ChatMessage[]> {
     return this.http.get<ChatMessage[]>(
       `${this.getBaseUrl()}${this.config.pathBase}/chat/conversations/${conversationId}/messages`
+    );
+  }
+
+  getPromptHistory(): Observable<ChatPromptHistoryEntry[]> {
+    return this.http.get<ChatPromptHistoryEntry[]>(
+      `${this.getBaseUrl()}${this.config.pathBase}/chat/prompt-history`
+    );
+  }
+
+  addPromptHistory(promptText: string): Observable<ChatPromptHistoryEntry> {
+    return this.http.post<ChatPromptHistoryEntry>(
+      `${this.getBaseUrl()}${this.config.pathBase}/chat/prompt-history`,
+      { promptText }
+    );
+  }
+
+  getFavorites(): Observable<ChatFavorite[]> {
+    return this.http.get<ChatFavorite[]>(
+      `${this.getBaseUrl()}${this.config.pathBase}/chat/favorites`
+    );
+  }
+
+  createFavorite(name: string, prompt: string): Observable<ChatFavorite> {
+    return this.http.post<ChatFavorite>(
+      `${this.getBaseUrl()}${this.config.pathBase}/chat/favorites`,
+      { name, prompt }
+    );
+  }
+
+  updateFavorite(id: string, name: string, prompt: string, pinned: boolean): Observable<ChatFavorite> {
+    return this.http.put<ChatFavorite>(
+      `${this.getBaseUrl()}${this.config.pathBase}/chat/favorites/${id}`,
+      { name, prompt, pinned }
+    );
+  }
+
+  deleteFavorite(id: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.getBaseUrl()}${this.config.pathBase}/chat/favorites/${id}`
     );
   }
 

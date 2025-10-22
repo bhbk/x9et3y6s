@@ -23,6 +23,8 @@ namespace Bhbk.Lib.Identity.Domain.Factories
         private tbl_LoginProvider foundLoginProvider;
         private Dictionary<string, tbl_Audience> foundAudiences = new Dictionary<string, tbl_Audience>();
         private Dictionary<string, tbl_Role> foundRoles = new Dictionary<string, tbl_Role>();
+        private Dictionary<string, tbl_EntitlementType> foundEntitlementTypes = new Dictionary<string, tbl_EntitlementType>();
+        private Dictionary<string, tbl_EntitlementScope> foundEntitlementScopes = new Dictionary<string, tbl_EntitlementScope>();
         private Dictionary<string, tbl_User> foundUsers = new Dictionary<string, tbl_User>();
         private tbl_Setting foundGlobalLegacyClaims, foundGlobalLegacyIssuer, foundGlobalTotpExpire;
 
@@ -100,11 +102,211 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                                 AudienceId = audience.Id,
                                 RoleId = role.Id,
                                 IsDeletable = true,
-                                CreatedUtc = DateTime.UtcNow,
+                                Created = DateTime.UtcNow,
                             });
 
                         _uow.Commit();
                     }
+                }
+            }
+        }
+
+        public void CreateEntitlementTypes()
+        {
+            if (_seedData.EntitlementTypes == null)
+                return;
+
+            foreach (var typeSeed in _seedData.EntitlementTypes)
+            {
+                var foundType = _uow.EntitlementTypes.Get(QueryExpressionFactory.GetQueryExpression<tbl_EntitlementType>()
+                    .Where(x => x.Name == typeSeed.Name).ToLambda())
+                    .FirstOrDefault();
+
+                if (foundType == null)
+                {
+                    foundType = _uow.EntitlementTypes.Post(
+                        new tbl_EntitlementType
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = typeSeed.Name,
+                            Description = typeSeed.Description,
+                            SortOrder = typeSeed.SortOrder,
+                            IsEnabled = true,
+                            IsDeletable = false,
+                            Created = DateTimeOffset.UtcNow,
+                        });
+
+                    _uow.Commit();
+                }
+
+                foundEntitlementTypes[typeSeed.Name] = foundType;
+            }
+        }
+
+        public void CreateEntitlementScopes()
+        {
+            if (_seedData.EntitlementScopes == null)
+                return;
+
+            foreach (var scopeSeed in _seedData.EntitlementScopes)
+            {
+                var foundScope = _uow.EntitlementScopes.Get(QueryExpressionFactory.GetQueryExpression<tbl_EntitlementScope>()
+                    .Where(x => x.Name == scopeSeed.Name).ToLambda())
+                    .FirstOrDefault();
+
+                if (foundScope == null)
+                {
+                    foundScope = _uow.EntitlementScopes.Post(
+                        new tbl_EntitlementScope
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = scopeSeed.Name,
+                            Description = scopeSeed.Description,
+                            SortOrder = scopeSeed.SortOrder,
+                            IsEnabled = true,
+                            Created = DateTimeOffset.UtcNow,
+                        });
+
+                    _uow.Commit();
+                }
+
+                foundEntitlementScopes[scopeSeed.Name] = foundScope;
+            }
+        }
+
+        public void CreateUserEntitlements()
+        {
+            if (_seedData.UserEntitlements == null)
+                return;
+
+            if (foundUsers.Count == 0)
+                CreateUsers();
+
+            if (foundEntitlementTypes.Count == 0)
+                CreateEntitlementTypes();
+
+            if (foundEntitlementScopes.Count == 0)
+                CreateEntitlementScopes();
+
+            foreach (var entSeed in _seedData.UserEntitlements)
+            {
+                if (!foundUsers.TryGetValue(entSeed.UserName, out var user))
+                    continue;
+
+                if (!foundEntitlementTypes.TryGetValue(entSeed.EntitlementTypeName, out var entType))
+                    continue;
+
+                if (!foundEntitlementScopes.TryGetValue(entSeed.EntitlementScopeName, out var entScope))
+                    continue;
+
+                Guid? issuerId = null;
+                Guid? audienceId = null;
+
+                if (!string.IsNullOrEmpty(entSeed.IssuerName))
+                {
+                    var issuer = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
+                        .Where(x => x.Name == entSeed.IssuerName).ToLambda())
+                        .FirstOrDefault();
+
+                    if (issuer != null)
+                        issuerId = issuer.Id;
+                }
+
+                if (!string.IsNullOrEmpty(entSeed.AudienceName))
+                {
+                    if (foundAudiences.TryGetValue(entSeed.AudienceName, out var audience))
+                        audienceId = audience.Id;
+                }
+
+                var found = _uow.UserEntitlements.Get(x =>
+                    x.UserId == user.Id
+                    && x.EntitlementTypeId == entType.Id
+                    && x.EntitlementScopeId == entScope.Id
+                    && x.IssuerId == issuerId
+                    && x.AudienceId == audienceId)
+                    .FirstOrDefault();
+
+                if (found == null)
+                {
+                    _uow.UserEntitlements.Post(
+                        new tbl_UserEntitlement
+                        {
+                            Id = Guid.NewGuid(),
+                            UserId = user.Id,
+                            EntitlementTypeId = entType.Id,
+                            EntitlementScopeId = entScope.Id,
+                            IssuerId = issuerId,
+                            AudienceId = audienceId,
+                            IsEnabled = true,
+                            IsDeletable = false,
+                            Created = DateTimeOffset.UtcNow,
+                        });
+
+                    _uow.Commit();
+                }
+            }
+        }
+
+        public void CreateAudienceEntitlements()
+        {
+            if (_seedData.AudienceEntitlements == null)
+                return;
+
+            if (foundAudiences.Count == 0)
+                CreateAudiences();
+
+            if (foundEntitlementTypes.Count == 0)
+                CreateEntitlementTypes();
+
+            if (foundEntitlementScopes.Count == 0)
+                CreateEntitlementScopes();
+
+            foreach (var entSeed in _seedData.AudienceEntitlements)
+            {
+                if (!foundAudiences.TryGetValue(entSeed.AudienceName, out var audience))
+                    continue;
+
+                if (!foundEntitlementTypes.TryGetValue(entSeed.EntitlementTypeName, out var entType))
+                    continue;
+
+                if (!foundEntitlementScopes.TryGetValue(entSeed.EntitlementScopeName, out var entScope))
+                    continue;
+
+                Guid? issuerId = null;
+
+                if (!string.IsNullOrEmpty(entSeed.IssuerName))
+                {
+                    var issuer = _uow.Issuers.Get(QueryExpressionFactory.GetQueryExpression<tbl_Issuer>()
+                        .Where(x => x.Name == entSeed.IssuerName).ToLambda())
+                        .FirstOrDefault();
+
+                    if (issuer != null)
+                        issuerId = issuer.Id;
+                }
+
+                var found = _uow.AudienceEntitlements.Get(x =>
+                    x.AudienceId == audience.Id
+                    && x.EntitlementTypeId == entType.Id
+                    && x.EntitlementScopeId == entScope.Id
+                    && x.IssuerId == issuerId)
+                    .FirstOrDefault();
+
+                if (found == null)
+                {
+                    _uow.AudienceEntitlements.Post(
+                        new tbl_AudienceEntitlement
+                        {
+                            Id = Guid.NewGuid(),
+                            AudienceId = audience.Id,
+                            EntitlementTypeId = entType.Id,
+                            EntitlementScopeId = entScope.Id,
+                            IssuerId = issuerId,
+                            IsEnabled = true,
+                            IsDeletable = false,
+                            Created = DateTimeOffset.UtcNow,
+                        });
+
+                    _uow.Commit();
                 }
             }
         }
@@ -221,9 +423,10 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                         {
                             Id = Guid.NewGuid(),
                             Name = jobSeed.Name,
+                            Description = jobSeed.Description,
                             IsEnabled = jobSeed.IsEnabled,
                             IsDeletable = false,
-                            CreatedUtc = DateTimeOffset.UtcNow,
+                            Created = DateTimeOffset.UtcNow,
                         });
 
                     _uow.Commit();
@@ -249,7 +452,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                                 ConfigValue = settingSeed.ConfigValue,
                                 IsSecret = settingSeed.IsSecret,
                                 IsDeletable = false,
-                                CreatedUtc = DateTimeOffset.UtcNow,
+                                Created = DateTimeOffset.UtcNow,
                             });
 
                         _uow.Commit();
@@ -279,7 +482,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                             IsEnabled = providerSeed.IsEnabled,
                             FailoverOrder = providerSeed.FailoverOrder,
                             IsDeletable = false,
-                            CreatedUtc = DateTimeOffset.UtcNow,
+                            Created = DateTimeOffset.UtcNow,
                         });
 
                     _uow.Commit();
@@ -305,7 +508,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                                 ConfigValue = settingSeed.ConfigValue,
                                 IsSecret = settingSeed.IsSecret,
                                 IsDeletable = false,
-                                CreatedUtc = DateTimeOffset.UtcNow,
+                                Created = DateTimeOffset.UtcNow,
                             });
 
                         _uow.Commit();
@@ -472,7 +675,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                             UserId = user.Id,
                             LoginProviderId = foundLoginProvider.Id,
                             IsDeletable = true,
-                            CreatedUtc = DateTime.UtcNow,
+                            Created = DateTime.UtcNow,
                         });
 
                     _uow.Commit();
@@ -509,7 +712,7 @@ namespace Bhbk.Lib.Identity.Domain.Factories
                                 UserId = user.Id,
                                 RoleId = role.Id,
                                 IsDeletable = true,
-                                CreatedUtc = DateTime.UtcNow,
+                                Created = DateTime.UtcNow,
                             });
 
                         _uow.Commit();

@@ -8,15 +8,20 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
     public interface IUnitOfWorkAsync : IGenericUnitOfWorkAsync
     {
         public AudienceRepositoryAsync Audiences { get; }
-        public IGenericRepositoryAsync<tbl_AuthActivity> AuthActivity { get; }
-        public IGenericRepositoryAsync<tbl_AuthActivityAudience> AuthActivityAudiences { get; }
+        public IGenericRepositoryAsync<tbl_UserAuthActivity> UserAuthActivities { get; }
+        public IGenericRepositoryAsync<tbl_AudienceAuthActivity> AudienceAuthActivities { get; }
         public IGenericRepositoryAsync<tbl_ChatConversation> ChatConversations { get; }
+        public IGenericRepositoryAsync<tbl_ChatFavorite> ChatFavorites { get; }
         public IGenericRepositoryAsync<tbl_ChatFile> ChatFiles { get; }
         public IGenericRepositoryAsync<tbl_ChatMessage> ChatMessages { get; }
         public IGenericRepositoryAsync<tbl_ChatPrompt> ChatPrompts { get; }
         public IGenericRepositoryAsync<tbl_Claim> Claims { get; }
         public IGenericRepositoryAsync<tbl_EmailActivity> EmailActivity { get; }
         public IGenericRepositoryAsync<tbl_EmailQueue> EmailQueue { get; }
+        public IGenericRepositoryAsync<tbl_UserEntitlement> UserEntitlements { get; }
+        public IGenericRepositoryAsync<tbl_AudienceEntitlement> AudienceEntitlements { get; }
+        public IGenericRepositoryAsync<tbl_EntitlementScope> EntitlementScopes { get; }
+        public IGenericRepositoryAsync<tbl_EntitlementType> EntitlementTypes { get; }
         public IGenericRepositoryAsync<tbl_Issuer> Issuers { get; }
         public IGenericRepositoryAsync<tbl_Job> Jobs { get; }
         public IGenericRepositoryAsync<tbl_JobSetting> JobSettings { get; }

@@ -9,6 +9,8 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public string Name { get; set; }
 
+        public string Description { get; set; }
+
         [Required]
         public bool IsEnabled { get; set; }
 
@@ -22,9 +24,9 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public Guid Id { get; set; }
 
         [Required]
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
-        public DateTimeOffset? ModifiedUtc { get; set; }
+        public DateTimeOffset? Modified { get; set; }
 
         public List<JobSettingV1> Settings { get; set; }
     }
@@ -48,6 +50,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public bool IsDeletable { get; set; }
 
         [Required]
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
     }
 }

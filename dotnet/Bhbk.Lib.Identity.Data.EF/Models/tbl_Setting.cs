@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string ConfigKey { get; set; }
         public string ConfigValue { get; set; }
         public bool IsDeletable { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual tbl_Audience Audience { get; set; }
         public virtual tbl_Issuer Issuer { get; set; }

@@ -22,7 +22,7 @@ namespace Bhbk.Cli.Identity.Factories
 
                 Console.Out.WriteLine($"  [audience GUID] {audience.Id} [name] {audience.Name}{(!audience.IsDeletable ? " is not deletable" : null)}" +
                     $" [password] {(string.IsNullOrEmpty(audience.PasswordHashPBKDF2) ? "missing" : "present")}" +
-                    $" [created] {audience.CreatedUtc.LocalDateTime}");
+                    $" [created] {audience.Created.LocalDateTime}");
 
                 if (detail.HasValue && detail.Value)
                 {
@@ -65,7 +65,7 @@ namespace Bhbk.Cli.Identity.Factories
                     Console.ForegroundColor = ConsoleColor.White;
 
                 Console.Out.WriteLine($"  [issuer GUID] {issuer.Id} [name] {issuer.Name} {(!issuer.IsDeletable ? "is not deletable " : null)}" +
-                    $"[created] {issuer.CreatedUtc.LocalDateTime}");
+                    $"[created] {issuer.Created.LocalDateTime}");
 
                 if (detail.HasValue && detail.Value)
                 {
@@ -99,7 +99,7 @@ namespace Bhbk.Cli.Identity.Factories
                     Console.ForegroundColor = ConsoleColor.White;
 
                 Console.Out.WriteLine($"  [login provider GUID] {loginProvider.Id} [name] {loginProvider.Name} {(!loginProvider.IsDeletable ? "is not deletable " : null)}" +
-                    $"[created] {loginProvider.CreatedUtc.LocalDateTime}");
+                    $"[created] {loginProvider.Created.LocalDateTime}");
 
                 if (detail.HasValue && detail.Value)
                 {
@@ -133,7 +133,7 @@ namespace Bhbk.Cli.Identity.Factories
                     Console.ForegroundColor = ConsoleColor.White;
 
                 Console.Out.WriteLine($"  [role GUID] {role.Id} [name] {role.Name} {(!role.IsDeletable ? "is not deletable " : null)}" +
-                    $"[created] {role.CreatedUtc.LocalDateTime}");
+                    $"[created] {role.Created.LocalDateTime}");
 
                 if (detail.HasValue && detail.Value)
                 {
@@ -168,7 +168,7 @@ namespace Bhbk.Cli.Identity.Factories
 
                 Console.Out.WriteLine($"  [user GUID] {user.Id} [name] {user.UserName} {(!user.IsDeletable ? "is not deletable " : null)}" +
                     $" [password] {(string.IsNullOrEmpty(user.PasswordHashPBKDF2) ? "missing" : "present")}" +
-                    $" [created] {user.CreatedUtc.LocalDateTime}");
+                    $" [created] {user.Created.LocalDateTime}");
 
                 if (detail.HasValue && detail.Value)
                 {

@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.MCP.Tools.Admin
 {
-    public class AuthActivityTool : IMCPTool
+    public class UserAuthActivityTool : IMCPTool
     {
         private readonly IUnitOfWork _uow;
 
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
-            Name = "authactivity",
+            Name = "userauthactivities",
             Description = "Query authentication activity logs.",
             Scope = MCPScope.Admin,
             InputSchema = JObject.Parse(@"{
@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
             }")
         };
 
-        public AuthActivityTool(IUnitOfWork uow)
+        public UserAuthActivityTool(IUnitOfWork uow)
         {
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
         }
@@ -84,19 +84,19 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
 
         private MCPToolResult CountActivity()
         {
-            var total = _uow.AuthActivity.Get(x => true).Count();
+            var total = _uow.UserAuthActivities.Get(x => true).Count();
             return MCPToolResult.Ok(new JObject { ["total"] = total });
         }
 
         private MCPToolResult ListActivity(int skip, int take)
         {
-            var activities = _uow.AuthActivity.Get(x => true)
-                .OrderByDescending(x => x.CreatedUtc)
+            var activities = _uow.UserAuthActivities.Get(x => true)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
 
-            var total = _uow.AuthActivity.Get(x => true).Count();
+            var total = _uow.UserAuthActivities.Get(x => true).Count();
             var result = new JObject
             {
                 ["total"] = total,
@@ -110,7 +110,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
 
         private MCPToolResult GetActivity(Guid id)
         {
-            var activity = _uow.AuthActivity.Get(x => x.Id == id).FirstOrDefault();
+            var activity = _uow.UserAuthActivities.Get(x => x.Id == id).FirstOrDefault();
             if (activity == null)
                 return MCPToolResult.Fail($"Activity not found: {id}");
 
@@ -124,8 +124,8 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
             if (user == null)
                 return MCPToolResult.Fail($"User not found: {userId}");
 
-            var activities = _uow.AuthActivity.Get(x => x.UserId == userId)
-                .OrderByDescending(x => x.CreatedUtc)
+            var activities = _uow.UserAuthActivities.Get(x => x.UserId == userId)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
@@ -144,11 +144,11 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
         private MCPToolResult SearchActivity(string query, int skip, int take)
         {
             var lowerQuery = query.ToLower();
-            var activities = _uow.AuthActivity.Get(x =>
+            var activities = _uow.UserAuthActivities.Get(x =>
                     x.LoginType.ToLower().Contains(lowerQuery) ||
                     (x.LocalEndpoint != null && x.LocalEndpoint.ToLower().Contains(lowerQuery)) ||
                     (x.RemoteEndpoint != null && x.RemoteEndpoint.ToLower().Contains(lowerQuery)))
-                .OrderByDescending(x => x.CreatedUtc)
+                .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();

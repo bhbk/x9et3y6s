@@ -27,7 +27,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public Guid Id { get; set; }
 
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual ICollection<UserV1> Users { get; set; }
 

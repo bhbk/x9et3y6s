@@ -33,7 +33,7 @@ namespace Bhbk.Lib.Identity.MCP.Context
             _registry.Register(new RoleTool(UnitOfWork));
             _registry.Register(new ClaimTool(UnitOfWork));
             _registry.Register(new LoginProviderTool(UnitOfWork));
-            _registry.Register(new AuthActivityTool(UnitOfWork));
+            _registry.Register(new UserAuthActivityTool(UnitOfWork));
             _registry.Register(new SettingTool(UnitOfWork));
             _registry.Register(new QuoteTool(UnitOfWork));
             _registry.Register(new LLMProviderTool(UnitOfWork));

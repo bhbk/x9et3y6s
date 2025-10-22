@@ -247,8 +247,8 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
+                        ValidFrom = DateTime.UtcNow,
+                        ValidTo = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.Commit();
@@ -303,8 +303,8 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
+                        ValidFrom = DateTime.UtcNow,
+                        ValidTo = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.Commit();
@@ -359,8 +359,8 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
+                        ValidFrom = DateTime.UtcNow,
+                        ValidTo = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.Commit();
@@ -415,8 +415,8 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
+                        ValidFrom = DateTime.UtcNow,
+                        ValidTo = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.Commit();
@@ -472,8 +472,8 @@ namespace Bhbk.Test.Identity.End2End.StsServiceTests
                         StateValue = AlphaNumeric.CreateString(32),
                         StateType = ConsumerType.Device.ToString(),
                         StateConsume = false,
-                        ValidFromUtc = DateTime.UtcNow,
-                        ValidToUtc = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
+                        ValidFrom = DateTime.UtcNow,
+                        ValidTo = DateTime.UtcNow.AddSeconds(uint.Parse(expire.ConfigValue)),
                     }));
 
                 uow.Commit();

@@ -12,10 +12,10 @@ export interface AudienceV1 {
   description?: string;
   isLockedOut: boolean;
   isDeletable: boolean;
-  lockoutEndUtc?: string;
+  lockoutEnd?: string;
   concurrencyStamp?: string;
   securityStamp?: string;
-  createdUtc: string;
+  created: string;
   roles?: RoleV1[];
 }
 

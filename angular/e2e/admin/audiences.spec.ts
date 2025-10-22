@@ -29,7 +29,7 @@ test.describe('Admin Audiences', () => {
     await dialog.fillField('Name', `E2E-Audience-${Date.now()}`);
 
     const createPromise = adminPage.waitForRequest((req) =>
-      req.url().includes('/audience/v1') && req.method() === 'POST' && !req.url().includes('/page'),
+      req.url().includes('/audiences/v1') && req.method() === 'POST' && !req.url().includes('/page'),
     );
     await dialog.clickAction('Create');
     const createReq = await createPromise;

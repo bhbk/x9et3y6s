@@ -72,18 +72,18 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
 
                 _uow.Commit();
 
-                var activity = _uow.AuthActivity.Post(
-                    _map.Map<tbl_AuthActivity>(new AuthActivityV1()
+                var activity = _uow.UserAuthActivities.Post(
+                    _map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                     {
                         LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
-                _uow.AuthActivityAudiences.Post(new tbl_AuthActivityAudience
+                _uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
                 {
-                    AuthActivityId = activity.Id,
+                    UserAuthActivityId = activity.Id,
                     AudienceId = foundAudience.Id,
-                    CreatedUtc = activity.CreatedUtc,
+                    Created = activity.Created,
                 });
 
                 _uow.Commit();
@@ -119,8 +119,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                     AudienceId = foundAudience.Id,
                     RefreshType = ConsumerType.Client.ToString(),
                     RefreshValue = AlphaNumeric.CreateString(8),
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = DateTime.UtcNow.AddSeconds(60),
                 }));
 
             _uow.Commit();
@@ -146,7 +146,7 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                         AudienceId = foundAudience.Id,
                         RoleId = foundRole.Id,
                         IsDeletable = true,
-                        CreatedUtc = DateTime.UtcNow,
+                        Created = DateTime.UtcNow,
                     });
 
                 _uow.Commit();
@@ -201,8 +201,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                         ToEmail = foundUser.EmailAddress,
                         Subject = "Subject-" + Base64.CreateString(4),
                         Body = "Body-" + Base64.CreateString(32),
-                        CreatedUtc = now,
-                        SendAtUtc = now,
+                        Created = now,
+                        SendAt = now,
                     }));
             }
 
@@ -456,8 +456,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                         FromPhoneNumber = _testData.User.PhoneNumber,
                         ToPhoneNumber = _testData.User.PhoneNumber,
                         Body = "Body-" + Base64.CreateString(32),
-                        CreatedUtc = now,
-                        SendAtUtc = now,
+                        Created = now,
+                        SendAt = now,
                     }));
             }
 
@@ -523,8 +523,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
 
                 _uow.Commit();
 
-                _uow.AuthActivity.Post(
-                    _map.Map<tbl_AuthActivity>(new AuthActivityV1()
+                _uow.UserAuthActivities.Post(
+                    _map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
                     {
                         UserId = foundUser.Id,
                         LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
@@ -559,7 +559,7 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                         UserId = foundUser.Id,
                         ClaimId = foundClaim.Id,
                         IsDeletable = true,
-                        CreatedUtc = DateTime.UtcNow,
+                        Created = DateTime.UtcNow,
                     });
 
                 _uow.Commit();
@@ -586,7 +586,7 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                         UserId = foundUser.Id,
                         LoginProviderId = foundLoginProvider.Id,
                         IsDeletable = true,
-                        CreatedUtc = DateTime.UtcNow,
+                        Created = DateTime.UtcNow,
                     });
 
                 _uow.Commit();
@@ -616,8 +616,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                     UserId = foundUser.Id,
                     RefreshType = ConsumerType.User.ToString(),
                     RefreshValue = AlphaNumeric.CreateString(8),
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = DateTime.UtcNow.AddSeconds(60),
                 }));
 
             _uow.Commit();
@@ -643,7 +643,7 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                         UserId = foundUser.Id,
                         RoleId = foundRole.Id,
                         IsDeletable = true,
-                        CreatedUtc = DateTime.UtcNow,
+                        Created = DateTime.UtcNow,
                     });
 
                 _uow.Commit();
@@ -674,8 +674,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                     StateValue = AlphaNumeric.CreateString(32),
                     StateType = ConsumerType.Device.ToString(),
                     StateConsume = true,
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = DateTime.UtcNow.AddSeconds(60),
                 }));
 
             _uow.States.Post(
@@ -687,8 +687,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
                     StateValue = AlphaNumeric.CreateString(32),
                     StateType = ConsumerType.User.ToString(),
                     StateConsume = false,
-                    ValidFromUtc = DateTime.UtcNow,
-                    ValidToUtc = DateTime.UtcNow.AddSeconds(60),
+                    ValidFrom = DateTime.UtcNow,
+                    ValidTo = DateTime.UtcNow.AddSeconds(60),
                 }));
 
             _uow.Commit();

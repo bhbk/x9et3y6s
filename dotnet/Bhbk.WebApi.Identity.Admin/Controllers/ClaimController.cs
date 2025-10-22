@@ -24,7 +24,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
     {
         [Route("v1"), HttpPost]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult CreateV1([FromBody] ClaimV1 model)
         {
             if (!ModelState.IsValid)
@@ -47,7 +47,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1/{claimID:guid}"), HttpDelete]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult DeleteV1([FromRoute] Guid claimID)
         {
             var claim = uow.Claims.Get(QueryExpressionFactory.GetQueryExpression<tbl_Claim>()
@@ -127,7 +127,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
         [Route("v1"), HttpPut]
         [Authorize(Policy = PolicyConstants.OAuth2ROPGrants)]
-        [Authorize(Policy = PolicyConstants.IdentityAdminPolicy)]
+        [Authorize(Policy = PolicyConstants.EntitlementAdminPolicy)]
         public IActionResult UpdateV1([FromBody] ClaimV1 model)
         {
             if (!ModelState.IsValid)

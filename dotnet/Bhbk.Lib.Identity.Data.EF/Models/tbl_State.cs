@@ -15,10 +15,10 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string StateType { get; set; }
         public bool? StateDecision { get; set; }
         public bool StateConsume { get; set; }
-        public DateTimeOffset ValidFromUtc { get; set; }
-        public DateTimeOffset ValidToUtc { get; set; }
-        public DateTimeOffset IssuedUtc { get; set; }
-        public DateTimeOffset LastPollingUtc { get; set; }
+        public DateTimeOffset ValidFrom { get; set; }
+        public DateTimeOffset ValidTo { get; set; }
+        public DateTimeOffset Issued { get; set; }
+        public DateTimeOffset LastPolling { get; set; }
 
         public virtual tbl_Audience Audience { get; set; }
         public virtual tbl_Issuer Issuer { get; set; }

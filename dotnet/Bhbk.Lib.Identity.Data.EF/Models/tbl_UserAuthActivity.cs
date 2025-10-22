@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Data.EF.Models
 {
-    public partial class tbl_AuthActivity
+    public partial class tbl_UserAuthActivity
     {
-        public tbl_AuthActivity()
+        public tbl_UserAuthActivity()
         {
-            tbl_AuthActivityAudiences = new HashSet<tbl_AuthActivityAudience>();
+            tbl_AudienceAuthActivities = new HashSet<tbl_AudienceAuthActivity>();
         }
 
         public Guid Id { get; set; }
@@ -18,9 +18,9 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string LoginOutcome { get; set; }
         public string LocalEndpoint { get; set; }
         public string RemoteEndpoint { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual tbl_User User { get; set; }
-        public virtual ICollection<tbl_AuthActivityAudience> tbl_AuthActivityAudiences { get; set; }
+        public virtual ICollection<tbl_AudienceAuthActivity> tbl_AudienceAuthActivities { get; set; }
     }
 }

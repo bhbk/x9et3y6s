@@ -14,7 +14,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public string ToolResults { get; set; }
         public int? InputTokens { get; set; }
         public int? OutputTokens { get; set; }
-        public DateTimeOffset CreatedUtc { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public virtual tbl_ChatConversation Conversation { get; set; }
     }

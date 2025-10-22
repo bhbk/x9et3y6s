@@ -7,9 +7,9 @@ export interface EmailQueueV1 {
   subject: string;
   body: string;
   isCancelled: boolean;
-  createdUtc: string;
-  sendAtUtc: string;
-  deliveredUtc?: string | null;
+  created: string;
+  sendAt: string;
+  delivered?: string | null;
 }
 
 export interface TextQueueV1 {
@@ -18,9 +18,9 @@ export interface TextQueueV1 {
   toPhoneNumber: string;
   body: string;
   isCancelled: boolean;
-  createdUtc: string;
-  sendAtUtc: string;
-  deliveredUtc?: string | null;
+  created: string;
+  sendAt: string;
+  delivered?: string | null;
 }
 
 export type AlertDeliveryStatus = 'Pending' | 'Cancelled' | 'Delivered';

@@ -4,8 +4,8 @@ export interface LLMProviderV1 {
   isEnabled: boolean;
   failoverOrder: number;
   isDeletable: boolean;
-  createdUtc: string;
-  modifiedUtc?: string;
+  created: string;
+  modified?: string;
   settings: LLMProviderSettingV1[];
 }
 
@@ -16,7 +16,7 @@ export interface LLMProviderSettingV1 {
   configValue: string;
   isSecret: boolean;
   isDeletable: boolean;
-  createdUtc: string;
+  created: string;
 }
 
 export interface LLMProviderOrderUpdate {

@@ -1,5 +1,4 @@
 import { test, expect } from '../fixtures/authenticated.fixture';
-import { KendoGrid } from '../page-objects/kendo-grid.po';
 import { KendoDialog } from '../page-objects/kendo-dialog.po';
 
 test.describe('Admin Login Providers', () => {
@@ -7,11 +6,11 @@ test.describe('Admin Login Providers', () => {
     await adminPage.goto('/login-providers', { waitUntil: 'networkidle' });
   });
 
-  test('grid loads with data', async ({ adminPage }) => {
-    const grid = new KendoGrid(adminPage);
-    await grid.waitForLoaded();
-    const pager = adminPage.locator('kendo-grid kendo-pager');
-    await expect(pager).toBeVisible();
+  test('card list loads with data', async ({ adminPage }) => {
+    /* The login providers page uses a card layout, not kendo-grid */
+    const cards = adminPage.locator('.bg-white.rounded-lg.border');
+    await expect(cards.first()).toBeVisible({ timeout: 10000 });
+    expect(await cards.count()).toBeGreaterThan(0);
   });
 
   test('create login provider dialog opens and submits', async ({ adminPage }) => {
@@ -36,18 +35,19 @@ test.describe('Admin Login Providers', () => {
     expect(body).toHaveProperty('isDeletable');
   });
 
-  test('edit login provider via dialog', async ({ adminPage }) => {
-    const grid = new KendoGrid(adminPage);
-    const dialog = new KendoDialog(adminPage);
+  test('expand settings panel for a login provider', async ({ adminPage }) => {
+    /* Card has a "Settings" button that expands inline editing */
+    const firstCard = adminPage.locator('.bg-white.rounded-lg.border').first();
+    await expect(firstCard).toBeVisible({ timeout: 10000 });
 
-    await grid.waitForLoaded();
-    if (await grid.hasData()) {
-      const firstRow = adminPage.locator('kendo-grid tbody tr[kendogridlogicalrow]').first();
-      await firstRow.locator('button[title="Edit"]').click();
+    const settingsBtn = firstCard.locator('button', { hasText: 'Settings' });
+    await settingsBtn.click();
 
-      await dialog.waitForOpen();
-      expect(await dialog.getTitle()).toContain('Edit Login Provider');
-      await dialog.clickAction('Cancel');
-    }
+    /* Expanded panel has a table with Name, Description, ProviderKey, IsDeletable fields */
+    const nameField = firstCard.locator('td', { hasText: 'Name' });
+    await expect(nameField).toBeVisible();
+
+    const saveBtn = firstCard.locator('button', { hasText: 'Save Settings' });
+    await expect(saveBtn).toBeVisible();
   });
 });
