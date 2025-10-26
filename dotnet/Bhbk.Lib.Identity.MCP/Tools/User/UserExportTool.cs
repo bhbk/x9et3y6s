@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'entity': { 'type': 'string', 'enum': ['profile', 'sessions', 'activity'], 'description': 'The type of your data to export.' },
+                    'entity': { 'type': 'string', 'enum': ['profile', 'sessions', 'activity', 'entitlements'], 'description': 'The type of your data to export.' },
                     'format': { 'type': 'string', 'enum': ['csv', 'json'], 'description': 'Output file format (default: csv).' }
                 },
                 'required': ['entity']
@@ -107,11 +107,19 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
 
                 case "activity":
                 {
-                    var activity = _uow.UserAuthActivities.Get(x => x.UserId == _userId)
+                    var activity = _uow.UserActivities.Get(x => x.UserId == _userId)
                         .OrderByDescending(x => x.Created)
                         .Take(500)
                         .ToList();
                     return JArray.FromObject(activity, serializer);
+                }
+
+                case "entitlements":
+                {
+                    var entitlements = _uow.UserEntitlements.Get(x => x.UserId == _userId)
+                        .OrderBy(x => x.Created)
+                        .ToList();
+                    return JArray.FromObject(entitlements, serializer);
                 }
 
                 default:

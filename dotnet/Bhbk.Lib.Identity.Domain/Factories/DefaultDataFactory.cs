@@ -466,52 +466,58 @@ namespace Bhbk.Lib.Identity.Domain.Factories
             if (_seedData.LLMProviders == null)
                 return;
 
+            var contexts = new[] { "Admin", "User", "Public" };
+
             foreach (var providerSeed in _seedData.LLMProviders)
             {
-                var foundProvider = _uow.LLMProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LLMProvider>()
-                    .Where(x => x.Name == providerSeed.Name).ToLambda())
-                    .FirstOrDefault();
-
-                if (foundProvider == null)
+                foreach (var context in contexts)
                 {
-                    foundProvider = _uow.LLMProviders.Post(
-                        new tbl_LLMProvider
-                        {
-                            Id = Guid.NewGuid(),
-                            Name = providerSeed.Name,
-                            IsEnabled = providerSeed.IsEnabled,
-                            FailoverOrder = providerSeed.FailoverOrder,
-                            IsDeletable = false,
-                            Created = DateTimeOffset.UtcNow,
-                        });
-
-                    _uow.Commit();
-                }
-
-                if (providerSeed.Settings == null)
-                    continue;
-
-                foreach (var settingSeed in providerSeed.Settings)
-                {
-                    var foundSetting = _uow.LLMProviderSettings.Get(
-                        x => x.ProviderId == foundProvider.Id && x.ConfigKey == settingSeed.ConfigKey)
+                    var foundProvider = _uow.LLMProviders.Get(QueryExpressionFactory.GetQueryExpression<tbl_LLMProvider>()
+                        .Where(x => x.Name == providerSeed.Name && x.Context == context).ToLambda())
                         .FirstOrDefault();
 
-                    if (foundSetting == null)
+                    if (foundProvider == null)
                     {
-                        _uow.LLMProviderSettings.Post(
-                            new tbl_LLMProviderSetting
+                        foundProvider = _uow.LLMProviders.Post(
+                            new tbl_LLMProvider
                             {
                                 Id = Guid.NewGuid(),
-                                ProviderId = foundProvider.Id,
-                                ConfigKey = settingSeed.ConfigKey,
-                                ConfigValue = settingSeed.ConfigValue,
-                                IsSecret = settingSeed.IsSecret,
+                                Name = providerSeed.Name,
+                                Context = context,
+                                IsEnabled = providerSeed.IsEnabled,
+                                FailoverOrder = providerSeed.FailoverOrder,
                                 IsDeletable = false,
                                 Created = DateTimeOffset.UtcNow,
                             });
 
                         _uow.Commit();
+                    }
+
+                    if (providerSeed.Settings == null)
+                        continue;
+
+                    foreach (var settingSeed in providerSeed.Settings)
+                    {
+                        var foundSetting = _uow.LLMProviderSettings.Get(
+                            x => x.ProviderId == foundProvider.Id && x.ConfigKey == settingSeed.ConfigKey)
+                            .FirstOrDefault();
+
+                        if (foundSetting == null)
+                        {
+                            _uow.LLMProviderSettings.Post(
+                                new tbl_LLMProviderSetting
+                                {
+                                    Id = Guid.NewGuid(),
+                                    ProviderId = foundProvider.Id,
+                                    ConfigKey = settingSeed.ConfigKey,
+                                    ConfigValue = settingSeed.ConfigValue,
+                                    IsSecret = settingSeed.IsSecret,
+                                    IsDeletable = false,
+                                    Created = DateTimeOffset.UtcNow,
+                                });
+
+                            _uow.Commit();
+                        }
                     }
                 }
             }

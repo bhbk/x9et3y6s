@@ -13,7 +13,7 @@ import { ChatConversation, ChatMessage, ChatStreamChunk, ChatLLMStatus, CreateCo
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
+export class PrivateChatService {
   private readonly http = inject(HttpClient);
   private readonly config = inject(ConfigService);
   private readonly authStore = inject(AuthStore);
@@ -154,7 +154,7 @@ export class ChatService {
       throw new Error('Not authenticated');
     }
 
-    const hubUrl = `${this.getBaseUrl()}${this.config.pathBase}/hubs/chat`;
+    const hubUrl = `${this.getBaseUrl()}${this.config.pathBase}/hubs/private-chat`;
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {

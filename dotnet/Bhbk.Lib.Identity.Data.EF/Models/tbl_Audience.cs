@@ -10,7 +10,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public tbl_Audience()
         {
             tbl_AudienceRoles = new HashSet<tbl_AudienceRole>();
-            tbl_AudienceAuthActivities = new HashSet<tbl_AudienceAuthActivity>();
+            tbl_AudienceActivities = new HashSet<tbl_AudienceActivity>();
             tbl_UserEntitlements = new HashSet<tbl_UserEntitlement>();
             tbl_AudienceEntitlements = new HashSet<tbl_AudienceEntitlement>();
             tbl_Refreshes = new HashSet<tbl_Refresh>();
@@ -35,7 +35,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
 
         public virtual tbl_Issuer Issuer { get; set; }
         public virtual ICollection<tbl_AudienceRole> tbl_AudienceRoles { get; set; }
-        public virtual ICollection<tbl_AudienceAuthActivity> tbl_AudienceAuthActivities { get; set; }
+        public virtual ICollection<tbl_AudienceActivity> tbl_AudienceActivities { get; set; }
         public virtual ICollection<tbl_UserEntitlement> tbl_UserEntitlements { get; set; }
         public virtual ICollection<tbl_AudienceEntitlement> tbl_AudienceEntitlements { get; set; }
         public virtual ICollection<tbl_Refresh> tbl_Refreshes { get; set; }

@@ -93,8 +93,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             else if (audience.IsLockedOut
                 || !PBKDF2.Validate(audience.PasswordHashPBKDF2, input.client_secret))
             {
-                var activity = uow.UserAuthActivities.Post(
-                    map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
+                var activity = uow.UserActivities.Post(
+                    map.Map<tbl_UserActivity>(new UserActivityV1()
                     {
                         LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Failure.ToString(),
@@ -102,9 +102,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
 
-                uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
+                uow.AudienceActivities.Post(new tbl_AudienceActivity
                 {
-                    UserAuthActivityId = activity.Id,
+                    UserActivityId = activity.Id,
                     AudienceId = audience.Id,
                     Created = activity.Created,
                 });
@@ -118,8 +118,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var cc_claims = uow.Audiences.GenerateAccessClaims(issuer, audience);
             var cc = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, cc_claims);
 
-            var ccActivity = uow.UserAuthActivities.Post(
-                map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
+            var ccActivity = uow.UserActivities.Post(
+                map.Map<tbl_UserActivity>(new UserActivityV1()
                 {
                     LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
@@ -127,9 +127,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
-            uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
+            uow.AudienceActivities.Post(new tbl_AudienceActivity
             {
-                UserAuthActivityId = ccActivity.Id,
+                UserActivityId = ccActivity.Id,
                 AudienceId = audience.Id,
                 Created = ccActivity.Created,
             });
@@ -150,8 +150,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserAgent = Request.Headers["User-Agent"].ToString(),
                 }));
 
-            var rtActivity = uow.UserAuthActivities.Post(
-                map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
+            var rtActivity = uow.UserActivities.Post(
+                map.Map<tbl_UserActivity>(new UserActivityV1()
                 {
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
@@ -159,9 +159,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
-            uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
+            uow.AudienceActivities.Post(new tbl_AudienceActivity
             {
-                UserAuthActivityId = rtActivity.Id,
+                UserActivityId = rtActivity.Id,
                 AudienceId = audience.Id,
                 Created = rtActivity.Created,
             });
@@ -271,8 +271,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     UserAgent = Request.Headers["User-Agent"].ToString(),
                 }));
 
-            var activity = uow.UserAuthActivities.Post(
-                map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
+            var activity = uow.UserActivities.Post(
+                map.Map<tbl_UserActivity>(new UserActivityV1()
                 {
                     LoginType = GrantFlowType.RefreshTokenV2.ToString(),
                     LoginOutcome = GrantFlowResultType.Success.ToString(),
@@ -280,9 +280,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
-            uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
+            uow.AudienceActivities.Post(new tbl_AudienceActivity
             {
-                UserAuthActivityId = activity.Id,
+                UserActivityId = activity.Id,
                 AudienceId = audience.Id,
                 Created = activity.Created,
             });

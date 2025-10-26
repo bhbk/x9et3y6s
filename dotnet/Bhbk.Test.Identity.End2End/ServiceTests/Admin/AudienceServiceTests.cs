@@ -731,10 +731,10 @@ namespace Bhbk.Test.Identity.End2End.AdminServiceTests
                 var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
                 service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
 
-                var testActivity = uow.UserAuthActivities.Get().First();
+                var testActivity = uow.UserActivities.Get().First();
 
                 var result = await service.Activity_GetV1(testActivity.Id.ToString());
-                result.Should().BeAssignableTo<UserAuthActivityV1>();
+                result.Should().BeAssignableTo<UserActivityV1>();
             }
         }
 

@@ -10,20 +10,24 @@ using System.Threading.Tasks;
 
 namespace Bhbk.Lib.Identity.MCP.Tools.User
 {
-    public class SessionTool : IMCPTool
+    public class UserEntitlementTool : IMCPTool
     {
         private readonly IUnitOfWork _uow;
         private readonly Guid _userId;
+        private static readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
 
         public MCPToolDefinition Definition => new MCPToolDefinition
         {
-            Name = "sessions",
-            Description = "View your sessions, refresh tokens, and activity.",
+            Name = "entitlements",
+            Description = "View your entitlements and permissions.",
             Scope = MCPScope.User,
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'action': { 'type': 'string', 'enum': ['refreshes', 'activity'], 'description': 'The operation to perform. refreshes returns your active refresh tokens. activity returns your recent authentication activity.' },
+                    'action': { 'type': 'string', 'enum': ['list', 'types', 'scopes'], 'description': 'The operation to perform. list returns your entitlements. types returns available entitlement types. scopes returns available entitlement scopes.' },
                     'skip': { 'type': 'integer', 'description': 'Number of records to skip for pagination (default: 0).' },
                     'take': { 'type': 'integer', 'description': 'Number of records to return (default: 50, max: 100).' }
                 },
@@ -31,7 +35,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
             }")
         };
 
-        public SessionTool(IUnitOfWork uow, Guid userId)
+        public UserEntitlementTool(IUnitOfWork uow, Guid userId)
         {
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
             _userId = userId;
@@ -41,17 +45,20 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
         {
             var action = parameters["action"]?.ToString()?.ToLower();
             var skip = parameters["skip"]?.Value<int>() ?? 0;
-            var take = Math.Min(parameters["take"]?.Value<int>() ?? 20, 50);
+            var take = Math.Min(parameters["take"]?.Value<int>() ?? 50, 100);
 
             try
             {
                 switch (action)
                 {
-                    case "refreshes":
-                        return Task.FromResult(GetRefreshTokens(skip, take));
+                    case "list":
+                        return Task.FromResult(ListEntitlements(skip, take));
 
-                    case "activity":
-                        return Task.FromResult(GetActivity(skip, take));
+                    case "types":
+                        return Task.FromResult(ListTypes());
+
+                    case "scopes":
+                        return Task.FromResult(ListScopes());
 
                     default:
                         return Task.FromResult(MCPToolResult.Fail($"Unknown action: {action}"));
@@ -63,41 +70,51 @@ namespace Bhbk.Lib.Identity.MCP.Tools.User
             }
         }
 
-        private MCPToolResult GetRefreshTokens(int skip, int take)
+        private MCPToolResult ListEntitlements(int skip, int take)
         {
-            var refreshes = _uow.Refreshes.Get(x => x.UserId == _userId)
-                .OrderByDescending(x => x.Issued)
+            var entitlements = _uow.UserEntitlements.Get(x => x.UserId == _userId)
+                .OrderBy(x => x.Created)
                 .Skip(skip)
                 .Take(take)
                 .ToList();
 
-            var total = _uow.Refreshes.Get(x => x.UserId == _userId).Count();
+            var total = _uow.UserEntitlements.Get(x => x.UserId == _userId).Count();
             var result = new JObject
             {
                 ["total"] = total,
                 ["skip"] = skip,
                 ["take"] = take,
-                ["refreshTokens"] = JArray.FromObject(refreshes, JsonSerializer.Create(new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }))
+                ["entitlements"] = JArray.FromObject(entitlements, JsonSerializer.Create(_jsonSettings))
             };
 
             return MCPToolResult.Ok(SensitiveFieldFilter.Filter(result));
         }
 
-        private MCPToolResult GetActivity(int skip, int take)
+        private MCPToolResult ListTypes()
         {
-            var activities = _uow.UserActivities.Get(x => x.UserId == _userId)
-                .OrderByDescending(x => x.Created)
-                .Skip(skip)
-                .Take(take)
+            var types = _uow.EntitlementTypes.Get(x => true)
+                .OrderBy(x => x.SortOrder)
                 .ToList();
 
-            var total = _uow.UserActivities.Get(x => x.UserId == _userId).Count();
             var result = new JObject
             {
-                ["total"] = total,
-                ["skip"] = skip,
-                ["take"] = take,
-                ["activities"] = JArray.FromObject(activities, JsonSerializer.Create(new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }))
+                ["total"] = types.Count,
+                ["types"] = JArray.FromObject(types, JsonSerializer.Create(_jsonSettings))
+            };
+
+            return MCPToolResult.Ok(SensitiveFieldFilter.Filter(result));
+        }
+
+        private MCPToolResult ListScopes()
+        {
+            var scopes = _uow.EntitlementScopes.Get(x => true)
+                .OrderBy(x => x.SortOrder)
+                .ToList();
+
+            var result = new JObject
+            {
+                ["total"] = scopes.Count,
+                ["scopes"] = JArray.FromObject(scopes, JsonSerializer.Create(_jsonSettings))
             };
 
             return MCPToolResult.Ok(SensitiveFieldFilter.Filter(result));

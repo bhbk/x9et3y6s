@@ -8,8 +8,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
     public interface IUnitOfWorkAsync : IGenericUnitOfWorkAsync
     {
         public AudienceRepositoryAsync Audiences { get; }
-        public IGenericRepositoryAsync<tbl_UserAuthActivity> UserAuthActivities { get; }
-        public IGenericRepositoryAsync<tbl_AudienceAuthActivity> AudienceAuthActivities { get; }
+        public IGenericRepositoryAsync<tbl_UserActivity> UserActivities { get; }
+        public IGenericRepositoryAsync<tbl_AudienceActivity> AudienceActivities { get; }
         public IGenericRepositoryAsync<tbl_ChatConversation> ChatConversations { get; }
         public IGenericRepositoryAsync<tbl_ChatFavorite> ChatFavorites { get; }
         public IGenericRepositoryAsync<tbl_ChatFile> ChatFiles { get; }

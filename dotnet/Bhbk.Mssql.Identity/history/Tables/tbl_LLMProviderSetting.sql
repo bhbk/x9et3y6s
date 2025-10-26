@@ -2,7 +2,7 @@ CREATE TABLE [history].[tbl_LLMProviderSetting] (
     [Id]              UNIQUEIDENTIFIER   NOT NULL,
     [ProviderId]      UNIQUEIDENTIFIER   NOT NULL,
     [ConfigKey]       VARCHAR (128)      NOT NULL,
-    [ConfigValue]     NVARCHAR (1024)    NOT NULL,
+    [ConfigValue]     NVARCHAR (1024)    NULL,
     [IsSecret]        BIT                NOT NULL,
     [IsDeletable]     BIT                NOT NULL,
     [Created]      DATETIMEOFFSET (7) NOT NULL,

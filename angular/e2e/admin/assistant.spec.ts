@@ -58,7 +58,7 @@ test.describe('Assistant Status States', () => {
   test('shows "Connecting" initially while hub negotiates', async ({ adminPage }) => {
     // Block the SignalR negotiate so the component stays in "connecting" state
     // This overrides the default 503 mock (Playwright LIFO route matching)
-    await adminPage.route(`${ADMIN_API}/hubs/chat/negotiate**`, (route) => {
+    await adminPage.route(`${ADMIN_API}/hubs/private-chat/negotiate**`, (route) => {
       // Never fulfill — keeps the component in "Connecting to assistant..." state
       // (Playwright auto-aborts on navigation/close)
     });
@@ -73,7 +73,7 @@ test.describe('Assistant Status States', () => {
 
   test('shows "unavailable" after connection failure', async ({ adminPage }) => {
     // Default mock already returns 503 for hub negotiate, but we can be explicit
-    await adminPage.route(`${ADMIN_API}/hubs/chat/negotiate**`, (route) => {
+    await adminPage.route(`${ADMIN_API}/hubs/private-chat/negotiate**`, (route) => {
       route.fulfill({ status: 500, body: 'Internal Server Error' });
     });
 
@@ -87,7 +87,7 @@ test.describe('Assistant Status States', () => {
 
   test('sidebar is hidden when not fully connected', async ({ adminPage }) => {
     // Fail SignalR quickly
-    await adminPage.route(`${ADMIN_API}/hubs/chat/negotiate**`, (route) => {
+    await adminPage.route(`${ADMIN_API}/hubs/private-chat/negotiate**`, (route) => {
       route.fulfill({ status: 500, body: 'Internal Server Error' });
     });
 
@@ -316,7 +316,7 @@ async function setupConnectedChat(page: Page): Promise<{ getWs: () => Promise<Mo
   await mockUserApi(page);
 
   // 2. Override SignalR negotiate (LIFO: wins over hubs/**)
-  await page.route(`${ADMIN_API}/hubs/chat/negotiate**`, (route) =>
+  await page.route(`${ADMIN_API}/hubs/private-chat/negotiate**`, (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -332,7 +332,7 @@ async function setupConnectedChat(page: Page): Promise<{ getWs: () => Promise<Mo
   );
 
   // 3. Mock WebSocket (separate from page.route — no conflict with hubs/**)
-  await page.routeWebSocket(`**/hubs/chat**`, (ws) => {
+  await page.routeWebSocket(`**/hubs/private-chat**`, (ws) => {
     resolveWs(ws);
     ws.onMessage((msg) => {
       const str = typeof msg === 'string' ? msg : '';

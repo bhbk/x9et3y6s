@@ -14,6 +14,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
 
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string Context { get; set; }
         public bool IsEnabled { get; set; }
         public int FailoverOrder { get; set; }
         public bool IsDeletable { get; set; }

@@ -114,8 +114,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                 || state.StateConsume == true
                 || state.UserId != user.Id)
             {
-                var failActivity = uow.UserAuthActivities.Post(
-                    map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
+                var failActivity = uow.UserActivities.Post(
+                    map.Map<tbl_UserActivity>(new UserActivityV1()
                     {
                         UserId = user.Id,
                         LoginType = GrantFlowType.ImplicitV2.ToString(),
@@ -124,9 +124,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                         RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                     }));
 
-                uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
+                uow.AudienceActivities.Post(new tbl_AudienceActivity
                 {
-                    UserAuthActivityId = failActivity.Id,
+                    UserActivityId = failActivity.Id,
                     AudienceId = audience.Id,
                     Created = failActivity.Created,
                 });
@@ -162,8 +162,8 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
             var imp_claims = uow.Users.GenerateAccessClaims(issuer, user);
             var imp = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, imp_claims);
 
-            var impActivity = uow.UserAuthActivities.Post(
-                map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
+            var impActivity = uow.UserActivities.Post(
+                map.Map<tbl_UserActivity>(new UserActivityV1()
                 {
                     UserId = user.Id,
                     LoginType = GrantFlowType.ImplicitV2.ToString(),
@@ -172,9 +172,9 @@ namespace Bhbk.WebApi.Identity.Sts.Controllers
                     RemoteEndpoint = Request.HttpContext.Connection.RemoteIpAddress?.ToString(),
                 }));
 
-            uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
+            uow.AudienceActivities.Post(new tbl_AudienceActivity
             {
-                UserAuthActivityId = impActivity.Id,
+                UserActivityId = impActivity.Id,
                 AudienceId = audience.Id,
                 Created = impActivity.Created,
             });

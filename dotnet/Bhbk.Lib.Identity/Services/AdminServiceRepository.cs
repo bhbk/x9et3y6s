@@ -42,7 +42,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.PostAsync("activities/v1/page",
+            return await _http.PostAsync("activities/v1/users/page",
                 new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
         }
 
@@ -50,7 +50,7 @@ namespace Bhbk.Lib.Identity.Services
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", jwt);
 
-            return await _http.GetAsync("activities/v1/" + activityValue);
+            return await _http.GetAsync("activities/v1/users/" + activityValue);
         }
 
         public async ValueTask<HttpResponseMessage> Audience_AddToRoleV1(string jwt, Guid audienceID, Guid roleID)

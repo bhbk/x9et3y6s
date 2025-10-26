@@ -3,7 +3,7 @@ import { signalStore, withState, withComputed, withMethods, patchState } from '@
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap, catchError, of, takeUntil, Subject } from 'rxjs';
 import { HubConnectionState } from '@microsoft/signalr';
-import { ChatService } from '../services/chat.service';
+import { PrivateChatService } from '../services/private-chat.service';
 import { ChatState, ChatConversation, ChatMessage, ChatStreamChunk, ChatLLMStatus, ChatFileReference } from '../models/chat.model';
 
 const initialState: ChatState = {
@@ -57,7 +57,7 @@ export const ChatStore = signalStore(
       return sorted;
     })
   })),
-  withMethods((store, chatService = inject(ChatService)) => {
+  withMethods((store, chatService = inject(PrivateChatService)) => {
     let destroySubject = new Subject<void>();
     let initialized = false;
 

@@ -1,14 +1,17 @@
-CREATE TABLE [history].[tbl_LLMProvider] (
-    [Id]              UNIQUEIDENTIFIER   NOT NULL,
-    [Name]            VARCHAR (64)       NOT NULL,
-    [IsEnabled]       BIT                NOT NULL,
-    [FailoverOrder]   INT                NOT NULL,
-    [IsDeletable]     BIT                NOT NULL,
-    [Created]      DATETIMEOFFSET (7) NOT NULL,
-    [Modified]     DATETIMEOFFSET (7) NULL,
-    [VersionStart] DATETIME2 (7)      NOT NULL,
-    [VersionEnd]   DATETIME2 (7)      NOT NULL
+﻿CREATE TABLE [history].[tbl_LLMProvider] (
+    [Id]            UNIQUEIDENTIFIER   NOT NULL,
+    [Name]          VARCHAR (64)       NOT NULL,
+    [IsEnabled]     BIT                NOT NULL,
+    [FailoverOrder] INT                NOT NULL,
+    [IsDeletable]   BIT                NOT NULL,
+    [Created]       DATETIMEOFFSET (7) NOT NULL,
+    [Modified]      DATETIMEOFFSET (7) NULL,
+    [VersionStart]  DATETIME2 (7)      NOT NULL,
+    [VersionEnd]    DATETIME2 (7)      NOT NULL,
+    [Context]       VARCHAR (16)       NOT NULL
 );
+
+
 
 GO
 

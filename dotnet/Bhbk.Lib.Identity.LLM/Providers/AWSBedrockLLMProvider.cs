@@ -1,6 +1,7 @@
 using Amazon;
 using Amazon.BedrockRuntime;
 using Amazon.BedrockRuntime.Model;
+using Amazon.Runtime;
 using Bhbk.Lib.Identity.LLM.Abstractions;
 using Bhbk.Lib.Identity.LLM.Configuration;
 using Bhbk.Lib.Identity.LLM.Models;
@@ -29,7 +30,19 @@ namespace Bhbk.Lib.Identity.LLM.Providers
             _settings = options.Value.AWSBedrock;
 
             var region = RegionEndpoint.GetBySystemName(_settings.Region);
-            _client = new AmazonBedrockRuntimeClient(region);
+
+            if (!string.IsNullOrEmpty(_settings.AccessKeyId) && !string.IsNullOrEmpty(_settings.SecretAccessKey))
+            {
+                AWSCredentials credentials = !string.IsNullOrEmpty(_settings.SessionToken)
+                    ? new SessionAWSCredentials(_settings.AccessKeyId, _settings.SecretAccessKey, _settings.SessionToken)
+                    : new BasicAWSCredentials(_settings.AccessKeyId, _settings.SecretAccessKey);
+
+                _client = new AmazonBedrockRuntimeClient(credentials, region);
+            }
+            else
+            {
+                _client = new AmazonBedrockRuntimeClient(region);
+            }
         }
 
         public async Task<LLMResponse> SendMessageAsync(

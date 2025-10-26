@@ -18,7 +18,7 @@ import { plusIcon, pencilIcon, trashIcon, checkIcon, xIcon } from '@progress/ken
 import { DateTime } from 'luxon';
 
 @Component({
-  selector: 'app-entitlements',
+  selector: 'app-user-entitlements',
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -314,7 +314,7 @@ import { DateTime } from 'luxon';
     </div>
   `
 })
-export class EntitlementsComponent implements OnInit {
+export class UserEntitlementsComponent implements OnInit {
   private readonly entitlementService = inject(EntitlementService);
   private readonly userService = inject(UserService);
   private readonly issuerService = inject(IssuerService);

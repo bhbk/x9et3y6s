@@ -243,9 +243,9 @@ export const LOGIN_PROVIDERS = [
   },
 ];
 
-// ── Auth Activity ────────────────────────────────────────────────────
+// ── Activity ─────────────────────────────────────────────────────────
 
-export const USER_AUTH_ACTIVITIES = [
+export const USER_ACTIVITIES = [
   {
     id: '77777777-7777-7777-7777-111111111111',
     audienceIds: [AUDIENCES[0].id],

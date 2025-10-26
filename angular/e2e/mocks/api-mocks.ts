@@ -6,7 +6,7 @@ import {
   USERS,
   CLAIMS,
   LOGIN_PROVIDERS,
-  USER_AUTH_ACTIVITIES,
+  USER_ACTIVITIES,
   REFRESHES,
   ENTITLEMENTS,
   AUDIENCE_ENTITLEMENTS,
@@ -249,10 +249,10 @@ export async function mockAdminApi(page: Page) {
 
   // Auth Activity
   await page.route(`${ADMIN_API}/activities/v1/page`, (route) =>
-    json(route, pagedResult(USER_AUTH_ACTIVITIES)),
+    json(route, pagedResult(USER_ACTIVITIES)),
   );
   await page.route(new RegExp(`${escapeRegex(ADMIN_API)}/activities/v1/[0-9a-f-]+$`), (route) =>
-    json(route, USER_AUTH_ACTIVITIES[0]),
+    json(route, USER_ACTIVITIES[0]),
   );
 
   // Quotes

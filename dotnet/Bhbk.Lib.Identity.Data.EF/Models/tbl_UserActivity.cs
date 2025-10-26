@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace Bhbk.Lib.Identity.Data.EF.Models
 {
-    public partial class tbl_UserAuthActivity
+    public partial class tbl_UserActivity
     {
-        public tbl_UserAuthActivity()
+        public tbl_UserActivity()
         {
-            tbl_AudienceAuthActivities = new HashSet<tbl_AudienceAuthActivity>();
+            tbl_AudienceActivities = new HashSet<tbl_AudienceActivity>();
         }
 
         public Guid Id { get; set; }
@@ -21,6 +21,6 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public DateTimeOffset Created { get; set; }
 
         public virtual tbl_User User { get; set; }
-        public virtual ICollection<tbl_AudienceAuthActivity> tbl_AudienceAuthActivities { get; set; }
+        public virtual ICollection<tbl_AudienceActivity> tbl_AudienceActivities { get; set; }
     }
 }

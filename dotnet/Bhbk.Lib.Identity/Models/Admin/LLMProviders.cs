@@ -10,6 +10,9 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string Name { get; set; }
 
         [Required]
+        public string Context { get; set; }
+
+        [Required]
         public bool IsEnabled { get; set; }
 
         [Required]
@@ -43,7 +46,6 @@ namespace Bhbk.Lib.Identity.Models.Admin
         [Required]
         public string ConfigKey { get; set; }
 
-        [Required]
         public string ConfigValue { get; set; }
 
         public bool IsSecret { get; set; }

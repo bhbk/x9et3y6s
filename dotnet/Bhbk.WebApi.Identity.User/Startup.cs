@@ -77,43 +77,11 @@ namespace Bhbk.WebApi.Identity.User
             });
             sc.AddSingleton<IOAuth2JwtFactory, OAuth2JwtFactory>();
 
-            var llmSettings = LoadLLMProviderSettings(conf["Databases:IdentityEntities_EF"]);
-            sc.AddSingleton(Microsoft.Extensions.Options.Options.Create(llmSettings));
+            var userLlmSettings = LoadLLMProviderSettings(conf["Databases:IdentityEntities_EF"], "User");
+            var publicLlmSettings = LoadLLMProviderSettings(conf["Databases:IdentityEntities_EF"], "Public");
 
-            if (llmSettings.Failover.Count > 0)
-            {
-                sc.AddSingleton<ILLMProvider>(sp =>
-                {
-                    var options = sp.GetRequiredService<IOptions<LLMProviderSettings>>();
-                    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
-                    var providers = new List<ILLMProvider>();
-
-                    foreach (var name in llmSettings.Failover)
-                    {
-                        ILLMProvider provider = name switch
-                        {
-                            "AWSBedrock" when options.Value.AWSBedrock.Enabled =>
-                                new AWSBedrockLLMProvider(options),
-                            "Ollama" when options.Value.Ollama.Enabled =>
-                                new OllamaLLMProvider(options, loggerFactory.CreateLogger<OllamaLLMProvider>()),
-                            "AzureOpenAI" when options.Value.AzureOpenAI.Enabled =>
-                                new AzureOpenAILLMProvider(options),
-                            "GoogleVertexAI" when options.Value.VertexAI.Enabled =>
-                                new GoogleVertexAILLMProvider(options),
-                            _ => null
-                        };
-                        if (provider != null) providers.Add(provider);
-                    }
-
-                    if (providers.Count == 0)
-                        throw new InvalidOperationException(
-                            "LLM providers are configured in the database but none are enabled");
-                    if (providers.Count == 1)
-                        return providers[0];
-
-                    return new FailoverLLMProvider(providers, loggerFactory.CreateLogger<FailoverLLMProvider>());
-                });
-            }
+            RegisterKeyedLLMProvider(sc, userLlmSettings, "User");
+            RegisterKeyedLLMProvider(sc, publicLlmSettings, "Public");
 
             sc.AddSignalR();
 
@@ -307,15 +275,16 @@ namespace Bhbk.WebApi.Identity.User
             app.UseEndpoints(opt =>
             {
                 opt.MapControllers();
-                opt.MapHub<ChatHub>("/hubs/chat");
+                opt.MapHub<PrivateChatHub>("/hubs/private-chat");
+                opt.MapHub<PublicChatHub>("/hubs/public-chat");
             });
         }
 
-        private static LLMProviderSettings LoadLLMProviderSettings(string connectionString)
+        private static LLMProviderSettings LoadLLMProviderSettings(string connectionString, string context)
         {
             using var uow = new UnitOfWork(connectionString);
 
-            var dbProviders = uow.LLMProviders.Get()
+            var dbProviders = uow.LLMProviders.Get(p => p.Context == context)
                 .OrderBy(p => p.FailoverOrder)
                 .ToList();
 
@@ -330,6 +299,43 @@ namespace Bhbk.WebApi.Identity.User
             }
 
             return LLMProviderSettings.FromProviderConfigs(configs);
+        }
+
+        private static void RegisterKeyedLLMProvider(IServiceCollection sc, LLMProviderSettings llmSettings, string key)
+        {
+            sc.AddKeyedSingleton<ILLMProvider>(key, (sp, _) =>
+            {
+                if (llmSettings.Failover.Count == 0)
+                    return null;
+
+                var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+                var providers = new List<ILLMProvider>();
+
+                foreach (var name in llmSettings.Failover)
+                {
+                    var opts = Microsoft.Extensions.Options.Options.Create(llmSettings);
+                    ILLMProvider provider = name switch
+                    {
+                        "AWSBedrock" when llmSettings.AWSBedrock.Enabled =>
+                            new AWSBedrockLLMProvider(opts),
+                        "Ollama" when llmSettings.Ollama.Enabled =>
+                            new OllamaLLMProvider(opts, loggerFactory.CreateLogger<OllamaLLMProvider>()),
+                        "AzureOpenAI" when llmSettings.AzureOpenAI.Enabled =>
+                            new AzureOpenAILLMProvider(opts),
+                        "GoogleVertexAI" when llmSettings.VertexAI.Enabled =>
+                            new GoogleVertexAILLMProvider(opts),
+                        _ => null
+                    };
+                    if (provider != null) providers.Add(provider);
+                }
+
+                if (providers.Count == 0)
+                    return null;
+                if (providers.Count == 1)
+                    return providers[0];
+
+                return new FailoverLLMProvider(providers, loggerFactory.CreateLogger<FailoverLLMProvider>());
+            });
         }
 
         private static Dictionary<string, JobSettingsEntry> LoadJobSettings(string connectionString)

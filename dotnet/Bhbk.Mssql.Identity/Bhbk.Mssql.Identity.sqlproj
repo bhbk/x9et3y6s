@@ -257,7 +257,7 @@
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
     <Build Include="dbo\Tables\tbl_TextActivity.sql" />
-    <Build Include="dbo\Tables\tbl_UserAuthActivity.sql">
+    <Build Include="dbo\Tables\tbl_UserActivity.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>
     </Build>
@@ -318,7 +318,7 @@
     <None Include="Maintenance\Test_PreRefresh.sql" />
     <None Include="Maintenance\Debug_PostRefresh.sql" />
     <None Include="Maintenance\Debug_PreRefresh.sql" />
-    <Build Include="dbo\Tables\tbl_AudienceAuthActivity.sql" />
+    <Build Include="dbo\Tables\tbl_AudienceActivity.sql" />
     <Build Include="dbo\Tables\tbl_ChatConversation.sql">
       <AnsiNulls>On</AnsiNulls>
       <QuotedIdentifier>On</QuotedIdentifier>

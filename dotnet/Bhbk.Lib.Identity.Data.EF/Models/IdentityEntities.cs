@@ -19,8 +19,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
 
         public virtual DbSet<tbl_Audience> tbl_Audiences { get; set; }
         public virtual DbSet<tbl_AudienceRole> tbl_AudienceRoles { get; set; }
-        public virtual DbSet<tbl_UserAuthActivity> tbl_UserAuthActivities { get; set; }
-        public virtual DbSet<tbl_AudienceAuthActivity> tbl_AudienceAuthActivities { get; set; }
+        public virtual DbSet<tbl_UserActivity> tbl_UserActivities { get; set; }
+        public virtual DbSet<tbl_AudienceActivity> tbl_AudienceActivities { get; set; }
         public virtual DbSet<tbl_ChatConversation> tbl_ChatConversations { get; set; }
         public virtual DbSet<tbl_ChatFavorite> tbl_ChatFavorites { get; set; }
         public virtual DbSet<tbl_ChatFile> tbl_ChatFiles { get; set; }
@@ -108,11 +108,11 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                     .HasConstraintName("FK_tbl_AudienceRole_RoleID");
             });
 
-            modelBuilder.Entity<tbl_UserAuthActivity>(entity =>
+            modelBuilder.Entity<tbl_UserActivity>(entity =>
             {
-                entity.ToTable("tbl_UserAuthActivity");
+                entity.ToTable("tbl_UserActivity");
 
-                entity.HasIndex(e => e.Id, "IX_tbl_UserAuthActivity")
+                entity.HasIndex(e => e.Id, "IX_tbl_UserActivity")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -130,29 +130,29 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                 entity.Property(e => e.RemoteEndpoint).HasMaxLength(128);
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.tbl_UserAuthActivities)
+                    .WithMany(p => p.tbl_UserActivities)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_tbl_UserAuthActivity_UserID");
+                    .HasConstraintName("FK_tbl_UserActivity_UserID");
             });
 
-            modelBuilder.Entity<tbl_AudienceAuthActivity>(entity =>
+            modelBuilder.Entity<tbl_AudienceActivity>(entity =>
             {
-                entity.HasKey(e => new { e.UserAuthActivityId, e.AudienceId });
+                entity.HasKey(e => new { e.UserActivityId, e.AudienceId });
 
-                entity.ToTable("tbl_AudienceAuthActivity");
+                entity.ToTable("tbl_AudienceActivity");
 
-                entity.HasIndex(e => new { e.UserAuthActivityId, e.AudienceId }, "IX_tbl_AudienceAuthActivity")
+                entity.HasIndex(e => new { e.UserActivityId, e.AudienceId }, "IX_tbl_AudienceActivity")
                     .IsUnique();
 
-                entity.HasOne(d => d.UserAuthActivity)
-                    .WithMany(p => p.tbl_AudienceAuthActivities)
-                    .HasForeignKey(d => d.UserAuthActivityId)
-                    .HasConstraintName("FK_tbl_AudienceAuthActivity_UserAuthActivityID");
+                entity.HasOne(d => d.UserActivity)
+                    .WithMany(p => p.tbl_AudienceActivities)
+                    .HasForeignKey(d => d.UserActivityId)
+                    .HasConstraintName("FK_tbl_AudienceActivity_UserActivityID");
 
                 entity.HasOne(d => d.Audience)
-                    .WithMany(p => p.tbl_AudienceAuthActivities)
+                    .WithMany(p => p.tbl_AudienceActivities)
                     .HasForeignKey(d => d.AudienceId)
-                    .HasConstraintName("FK_tbl_AudienceAuthActivity_AudienceID");
+                    .HasConstraintName("FK_tbl_AudienceActivity_AudienceID");
             });
 
             modelBuilder.Entity<tbl_ChatConversation>(entity =>
@@ -554,7 +554,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                 entity.HasIndex(e => e.Id, "IX_tbl_LLMProvider")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Name, "IX_tbl_LLMProvider_Name")
+                entity.HasIndex(e => new { e.Name, e.Context }, "IX_tbl_LLMProvider_NameContext")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -562,6 +562,11 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(64)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Context)
+                    .IsRequired()
+                    .HasMaxLength(16)
                     .IsUnicode(false);
             });
 
@@ -583,7 +588,6 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ConfigValue)
-                    .IsRequired()
                     .HasMaxLength(1024);
 
                 entity.HasOne(d => d.Provider)

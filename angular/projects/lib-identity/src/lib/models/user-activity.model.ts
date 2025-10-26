@@ -1,9 +1,9 @@
 /**
- * User Auth Activity Models
- * Maps to: Bhbk.Lib.Identity.Models.Admin.UserAuthActivity
+ * User Activity Models
+ * Maps to: Bhbk.Lib.Identity.Models.Admin.UserActivity
  */
 
-export interface UserAuthActivityV1 {
+export interface UserActivityV1 {
   id: string;
   audienceIds: string[];
   userId?: string;

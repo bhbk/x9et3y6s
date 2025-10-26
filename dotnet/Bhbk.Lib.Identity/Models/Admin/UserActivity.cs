@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bhbk.Lib.Identity.Models.Admin
 {
-    public abstract class UserAuthActivity
+    public abstract class UserActivity
     {
         public List<Guid> AudienceIds { get; set; } = new List<Guid>();
 
@@ -21,7 +21,7 @@ namespace Bhbk.Lib.Identity.Models.Admin
         public string RemoteEndpoint { get; set; }
     }
 
-    public class UserAuthActivityV1 : UserAuthActivity
+    public class UserActivityV1 : UserActivity
     {
         [Required]
         public Guid Id { get; set; }

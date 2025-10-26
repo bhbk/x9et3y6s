@@ -1,1 +1,4 @@
 <router-outlet />
+@if (!authStore.isAuthenticated()) {
+  <lib-chat-bubble />
+}

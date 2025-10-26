@@ -28,7 +28,7 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
             InputSchema = JObject.Parse(@"{
                 'type': 'object',
                 'properties': {
-                    'entity': { 'type': 'string', 'enum': ['users', 'audiences', 'issuers', 'roles', 'claims', 'logins', 'activity', 'email_queue', 'text_queue'], 'description': 'The type of identity data to export.' },
+                    'entity': { 'type': 'string', 'enum': ['users', 'audiences', 'issuers', 'roles', 'claims', 'logins', 'activity', 'user_entitlements', 'audience_entitlements', 'email_queue', 'text_queue'], 'description': 'The type of identity data to export.' },
                     'format': { 'type': 'string', 'enum': ['csv', 'json'], 'description': 'Output file format (default: csv).' },
                     'query': { 'type': 'string', 'description': 'Optional search filter to narrow the exported data.' },
                     'skip': { 'type': 'integer', 'description': 'Number of records to skip (default: 0).' },
@@ -161,8 +161,20 @@ namespace Bhbk.Lib.Identity.MCP.Tools.Admin
 
                 case "activity":
                 {
-                    var q = _uow.UserAuthActivities.Get(x => true);
+                    var q = _uow.UserActivities.Get(x => true);
                     return JArray.FromObject(q.OrderByDescending(x => x.Created).Skip(skip).Take(take).ToList(), serializer);
+                }
+
+                case "user_entitlements":
+                {
+                    var q = _uow.UserEntitlements.Get(x => true);
+                    return JArray.FromObject(q.OrderBy(x => x.Created).Skip(skip).Take(take).ToList(), serializer);
+                }
+
+                case "audience_entitlements":
+                {
+                    var q = _uow.AudienceEntitlements.Get(x => true);
+                    return JArray.FromObject(q.OrderBy(x => x.Created).Skip(skip).Take(take).ToList(), serializer);
                 }
 
                 case "email_queue":

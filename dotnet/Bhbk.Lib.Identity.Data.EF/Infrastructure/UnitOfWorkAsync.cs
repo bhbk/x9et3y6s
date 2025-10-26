@@ -15,8 +15,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
     {
         private readonly ILoggerFactory _logger;
         public AudienceRepositoryAsync Audiences { get; private set; }
-        public IGenericRepositoryAsync<tbl_UserAuthActivity> UserAuthActivities { get; private set; }
-        public IGenericRepositoryAsync<tbl_AudienceAuthActivity> AudienceAuthActivities { get; private set; }
+        public IGenericRepositoryAsync<tbl_UserActivity> UserActivities { get; private set; }
+        public IGenericRepositoryAsync<tbl_AudienceActivity> AudienceActivities { get; private set; }
         public IGenericRepositoryAsync<tbl_ChatConversation> ChatConversations { get; private set; }
         public IGenericRepositoryAsync<tbl_ChatFavorite> ChatFavorites { get; private set; }
         public IGenericRepositoryAsync<tbl_ChatFile> ChatFiles { get; private set; }
@@ -112,8 +112,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
             var context = (IdentityEntities)DbContext;
 
             Audiences = new AudienceRepositoryAsync(context, env);
-            UserAuthActivities = new GenericRepositoryAsync<tbl_UserAuthActivity>(context);
-            AudienceAuthActivities = new GenericRepositoryAsync<tbl_AudienceAuthActivity>(context);
+            UserActivities = new GenericRepositoryAsync<tbl_UserActivity>(context);
+            AudienceActivities = new GenericRepositoryAsync<tbl_AudienceActivity>(context);
             ChatConversations = new GenericRepositoryAsync<tbl_ChatConversation>(context);
             ChatFavorites = new GenericRepositoryAsync<tbl_ChatFavorite>(context);
             ChatFiles = new GenericRepositoryAsync<tbl_ChatFile>(context);

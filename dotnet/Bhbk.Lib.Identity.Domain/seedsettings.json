@@ -57,6 +57,7 @@
         "FailoverOrder": 1,
         "Settings": [
           { "ConfigKey": "BaseUrl", "ConfigValue": "http://localhost:11434", "IsSecret": false },
+          { "ConfigKey": "ApiKey", "ConfigValue": "", "IsSecret": true },
           { "ConfigKey": "ModelName", "ConfigValue": "qwen2.5:7b", "IsSecret": false },
           { "ConfigKey": "MaxTokens", "ConfigValue": "32000", "IsSecret": false },
           { "ConfigKey": "Temperature", "ConfigValue": "0.3", "IsSecret": false },
@@ -69,6 +70,9 @@
         "FailoverOrder": 3,
         "Settings": [
           { "ConfigKey": "Region", "ConfigValue": "us-east-1", "IsSecret": false },
+          { "ConfigKey": "AccessKeyId", "ConfigValue": "", "IsSecret": true },
+          { "ConfigKey": "SecretAccessKey", "ConfigValue": "", "IsSecret": true },
+          { "ConfigKey": "SessionToken", "ConfigValue": "", "IsSecret": true },
           { "ConfigKey": "ModelName", "ConfigValue": "anthropic.claude-3-sonnet-20240229-v1:0", "IsSecret": false },
           { "ConfigKey": "MaxTokens", "ConfigValue": "32000", "IsSecret": false }
         ]
@@ -92,6 +96,7 @@
         "Settings": [
           { "ConfigKey": "ProjectId", "ConfigValue": "", "IsSecret": false },
           { "ConfigKey": "Location", "ConfigValue": "us-central1", "IsSecret": false },
+          { "ConfigKey": "ApiKey", "ConfigValue": "", "IsSecret": true },
           { "ConfigKey": "ModelName", "ConfigValue": "gemini-2.0-flash", "IsSecret": false },
           { "ConfigKey": "MaxOutputTokens", "ConfigValue": "8192", "IsSecret": false },
           { "ConfigKey": "Temperature", "ConfigValue": "0.7", "IsSecret": false }

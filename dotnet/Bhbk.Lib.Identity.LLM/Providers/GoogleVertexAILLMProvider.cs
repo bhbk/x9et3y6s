@@ -2,6 +2,7 @@ using Bhbk.Lib.Identity.LLM.Abstractions;
 using Bhbk.Lib.Identity.LLM.Configuration;
 using Bhbk.Lib.Identity.LLM.Models;
 using Bhbk.Lib.Identity.MCP.Models;
+using Google.Apis.Auth.OAuth2;
 using Google.Cloud.AIPlatform.V1;
 using Microsoft.Extensions.Options;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
@@ -30,10 +31,26 @@ namespace Bhbk.Lib.Identity.LLM.Providers
         {
             _settings = options.Value.VertexAI;
 
-            _client = new PredictionServiceClientBuilder
+            var builder = new PredictionServiceClientBuilder
             {
                 Endpoint = $"{_settings.Location}-aiplatform.googleapis.com"
-            }.Build();
+            };
+
+            if (!string.IsNullOrEmpty(_settings.ApiKey))
+            {
+                GoogleCredential credential;
+
+                if (_settings.ApiKey.TrimStart().StartsWith("{"))
+#pragma warning disable CS0618 // GoogleCredential.FromJson is deprecated but CredentialFactory is not yet available
+                    credential = GoogleCredential.FromJson(_settings.ApiKey);
+                else
+                    credential = GoogleCredential.FromFile(_settings.ApiKey);
+#pragma warning restore CS0618
+
+                builder.GoogleCredential = credential;
+            }
+
+            _client = builder.Build();
 
             _modelName = $"projects/{_settings.ProjectId}/locations/{_settings.Location}/publishers/google/models/{_settings.ModelName}";
         }

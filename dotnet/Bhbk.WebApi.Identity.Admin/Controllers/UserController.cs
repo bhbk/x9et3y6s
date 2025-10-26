@@ -349,7 +349,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
                                 QueryExpressionFactory.GetQueryExpression<tbl_User>().ApplyState(state)),
                                     new List<Expression<Func<tbl_User, object>>>() 
                                     { 
-                                        x => x.tbl_UserAuthActivities,
+                                        x => x.tbl_UserActivities,
                                         x => x.tbl_UserClaims,
                                         x => x.tbl_UserLoginProviders,
                                         x => x.tbl_UserRoles,

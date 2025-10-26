@@ -5,8 +5,8 @@ import { KENDO_INDICATORS } from '@progress/kendo-angular-indicators';
 import { forkJoin } from 'rxjs';
 import {
   UserService,
-  UserAuthActivityService,
-  UserAuthActivityV1,
+  UserActivityService,
+  UserActivityV1,
   UserV1
 } from 'lib-identity';
 
@@ -94,7 +94,7 @@ import {
 })
 export class DashboardComponent implements OnInit {
   private readonly userService = inject(UserService);
-  private readonly activityService = inject(UserAuthActivityService);
+  private readonly activityService = inject(UserActivityService);
 
   readonly isLoading = signal(true);
   readonly error = signal<string | null>(null);
@@ -103,7 +103,7 @@ export class DashboardComponent implements OnInit {
   readonly failedLoginCount = signal('0');
   readonly lockedAccountCount = signal('0');
   readonly pendingConfirmationCount = signal('0');
-  readonly recentActivity = signal<UserAuthActivityV1[]>([]);
+  readonly recentActivity = signal<UserActivityV1[]>([]);
   private userMap = new Map<string, string>();
 
   getUserName(userId?: string): string {

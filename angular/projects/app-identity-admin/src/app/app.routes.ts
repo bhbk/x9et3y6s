@@ -55,7 +55,7 @@ export const routes: Routes = [
       },
       {
         path: 'activity',
-        loadComponent: () => import('./features/activity/activity.component').then(m => m.ActivityComponent)
+        loadComponent: () => import('./features/activity/activity-page.component').then(m => m.ActivityPageComponent)
       },
       {
         path: 'alerts',

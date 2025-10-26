@@ -58,7 +58,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public new async ValueTask<tbl_Audience> DeleteAsync(tbl_Audience audience, CancellationToken ct = default)
         {
-            var activityAudiences = _context.Set<tbl_AudienceAuthActivity>().Where(x => x.AudienceId == audience.Id);
+            var activityAudiences = _context.Set<tbl_AudienceActivity>().Where(x => x.AudienceId == audience.Id);
             var refreshes = _context.Set<tbl_Refresh>().Where(x => x.AudienceId == audience.Id);
             var settings = _context.Set<tbl_Setting>().Where(x => x.AudienceId == audience.Id);
             var states = _context.Set<tbl_State>().Where(x => x.AudienceId == audience.Id);

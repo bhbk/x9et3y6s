@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { UserAuthActivityService, UserAuthActivityV1, UserService, AudienceService, UserV1, AudienceV1 } from 'lib-identity';
+import { UserActivityService, UserActivityV1, UserService, AudienceService, UserV1, AudienceV1 } from 'lib-identity';
 import { KENDO_GRID, GridDataResult, PageChangeEvent, SortSettings, FilterableSettings, PagerSettings } from '@progress/kendo-angular-grid';
 import { KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { KENDO_LABELS } from '@progress/kendo-angular-label';
@@ -11,7 +11,7 @@ import { checkCircleIcon, xCircleIcon, warningTriangleIcon, arrowRotateCwIcon } 
 import { DateTime } from 'luxon';
 
 @Component({
-  selector: 'app-activity',
+  selector: 'app-user-activity',
   standalone: true,
   imports: [
     KENDO_GRID,
@@ -168,8 +168,8 @@ import { DateTime } from 'luxon';
     </div>
   `
 })
-export class ActivityComponent implements OnInit {
-  private readonly activityService = inject(UserAuthActivityService);
+export class UserActivityComponent implements OnInit {
+  private readonly activityService = inject(UserActivityService);
   private readonly userService = inject(UserService);
   private readonly audienceService = inject(AudienceService);
 

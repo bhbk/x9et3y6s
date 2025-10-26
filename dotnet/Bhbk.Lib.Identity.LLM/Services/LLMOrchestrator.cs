@@ -415,8 +415,8 @@ namespace Bhbk.Lib.Identity.LLM.Services
                     sb.Append(SensitiveFieldFilter.Filter(settingsJson).ToString(Formatting.Indented));
                 }
 
-                var activityTotal = uow.UserAuthActivities.Get(x => x.UserId == userId).Count();
-                var activities = uow.UserAuthActivities.Get(x => x.UserId == userId)
+                var activityTotal = uow.UserActivities.Get(x => x.UserId == userId).Count();
+                var activities = uow.UserActivities.Get(x => x.UserId == userId)
                     .OrderByDescending(x => x.Created)
                     .Take(10)
                     .ToList();

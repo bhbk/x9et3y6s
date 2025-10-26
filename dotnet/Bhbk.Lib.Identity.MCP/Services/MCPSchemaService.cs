@@ -36,10 +36,12 @@ namespace Bhbk.Lib.Identity.MCP.Services
             var entityTypes = new[]
             {
                 "User", "Audience", "Issuer", "Role", "Claim", "LoginProvider",
-                "UserAuthActivity", "Setting", "State", "Quote", "Url",
-                "ChatConversation", "ChatMessage", "ChatPrompt",
+                "UserActivity", "AudienceActivity",
+                "UserEntitlement", "AudienceEntitlement", "EntitlementType", "EntitlementScope",
+                "Setting", "State", "Quote", "Url",
+                "ChatConversation", "ChatMessage", "ChatPrompt", "ChatFile", "ChatFavorite",
                 "LLMProvider", "LLMProviderSetting", "Job", "JobSetting",
-                "EmailQueue", "TextQueue", "ChatFile"
+                "EmailQueue", "TextQueue", "Refresh"
             };
 
             foreach (var entityType in entityTypes)

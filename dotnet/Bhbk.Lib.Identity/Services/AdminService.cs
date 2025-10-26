@@ -30,23 +30,23 @@ namespace Bhbk.Lib.Identity.Services
             Endpoints = new AdminServiceRepository(conf, env, http);
         }
 
-        public async ValueTask<UserAuthActivityV1> Activity_GetV1(string activityValue)
+        public async ValueTask<UserActivityV1> Activity_GetV1(string activityValue)
         {
             var response = await Endpoints.Activity_GetV1(Grant.AccessToken.RawData, activityValue);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<UserAuthActivityV1>().ConfigureAwait(false);
+                return await response.Content.ReadAsAsync<UserActivityV1>().ConfigureAwait(false);
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));
         }
 
-        public async ValueTask<PagerStateResult<UserAuthActivityV1>> Activity_GetV1(PagerState model)
+        public async ValueTask<PagerStateResult<UserActivityV1>> Activity_GetV1(PagerState model)
         {
             var response = await Endpoints.Activity_GetV1(Grant.AccessToken.RawData, model);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<PagerStateResult<UserAuthActivityV1>>();
+                return await response.Content.ReadAsAsync<PagerStateResult<UserActivityV1>>();
 
             throw new HttpRequestException(response.RequestMessage.ToString(),
                 new Exception(response.ToString()));

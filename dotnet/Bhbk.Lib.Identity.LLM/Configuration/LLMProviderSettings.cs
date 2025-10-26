@@ -51,6 +51,9 @@ namespace Bhbk.Lib.Identity.LLM.Configuration
     {
         public bool Enabled { get; set; } = false;
         public string Region { get; set; } = "us-east-1";
+        public string AccessKeyId { get; set; }
+        public string SecretAccessKey { get; set; }
+        public string SessionToken { get; set; }
         public string ModelName { get; set; } = "anthropic.claude-3-sonnet-20240229-v1:0";
         public int MaxTokens { get; set; } = 32000;
 
@@ -60,6 +63,12 @@ namespace Bhbk.Lib.Identity.LLM.Configuration
 
             if (settings.TryGetValue("Region", out var region))
                 result.Region = region;
+            if (settings.TryGetValue("AccessKeyId", out var accessKeyId))
+                result.AccessKeyId = accessKeyId;
+            if (settings.TryGetValue("SecretAccessKey", out var secretAccessKey))
+                result.SecretAccessKey = secretAccessKey;
+            if (settings.TryGetValue("SessionToken", out var sessionToken))
+                result.SessionToken = sessionToken;
             if (settings.TryGetValue("ModelName", out var model))
                 result.ModelName = model;
             if (settings.TryGetValue("MaxTokens", out var maxTokens) && int.TryParse(maxTokens, out var mt))
@@ -73,6 +82,7 @@ namespace Bhbk.Lib.Identity.LLM.Configuration
     {
         public bool Enabled { get; set; } = false;
         public string BaseUrl { get; set; } = "http://localhost:11434";
+        public string ApiKey { get; set; }
         public string ModelName { get; set; } = "llama3.2";
         public int MaxTokens { get; set; } = 32000;
         public float Temperature { get; set; } = 0.7f;
@@ -84,6 +94,8 @@ namespace Bhbk.Lib.Identity.LLM.Configuration
 
             if (settings.TryGetValue("BaseUrl", out var baseUrl))
                 result.BaseUrl = baseUrl;
+            if (settings.TryGetValue("ApiKey", out var apiKey))
+                result.ApiKey = apiKey;
             if (settings.TryGetValue("ModelName", out var model))
                 result.ModelName = model;
             if (settings.TryGetValue("MaxTokens", out var maxTokens) && int.TryParse(maxTokens, out var mt))
@@ -130,6 +142,7 @@ namespace Bhbk.Lib.Identity.LLM.Configuration
         public bool Enabled { get; set; } = false;
         public string ProjectId { get; set; }
         public string Location { get; set; } = "us-central1";
+        public string ApiKey { get; set; }
         public string ModelName { get; set; } = "gemini-2.0-flash";
         public int MaxOutputTokens { get; set; } = 8192;
         public float Temperature { get; set; } = 0.7f;
@@ -142,6 +155,8 @@ namespace Bhbk.Lib.Identity.LLM.Configuration
                 result.ProjectId = projectId;
             if (settings.TryGetValue("Location", out var location))
                 result.Location = location;
+            if (settings.TryGetValue("ApiKey", out var apiKey))
+                result.ApiKey = apiKey;
             if (settings.TryGetValue("ModelName", out var model))
                 result.ModelName = model;
             if (settings.TryGetValue("MaxOutputTokens", out var maxTokens) && int.TryParse(maxTokens, out var mt))

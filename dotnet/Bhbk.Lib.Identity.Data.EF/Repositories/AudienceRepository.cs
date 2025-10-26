@@ -59,7 +59,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public new tbl_Audience Delete(tbl_Audience audience)
         {
-            var activityAudiences = _context.Set<tbl_AudienceAuthActivity>()
+            var activityAudiences = _context.Set<tbl_AudienceActivity>()
                 .Where(x => x.AudienceId == audience.Id);
 
             var refreshes = _context.Set<tbl_Refresh>()

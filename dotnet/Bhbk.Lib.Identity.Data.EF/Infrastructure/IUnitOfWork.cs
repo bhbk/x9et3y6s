@@ -8,8 +8,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
     public interface IUnitOfWork : IGenericUnitOfWork
     {
         public AudienceRepository Audiences { get; }
-        public IGenericRepository<tbl_UserAuthActivity> UserAuthActivities { get; }
-        public IGenericRepository<tbl_AudienceAuthActivity> AudienceAuthActivities { get; }
+        public IGenericRepository<tbl_UserActivity> UserActivities { get; }
+        public IGenericRepository<tbl_AudienceActivity> AudienceActivities { get; }
         public IGenericRepository<tbl_ChatConversation> ChatConversations { get; }
         public IGenericRepository<tbl_ChatFavorite> ChatFavorites { get; }
         public IGenericRepository<tbl_ChatFile> ChatFiles { get; }

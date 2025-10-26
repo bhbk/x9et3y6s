@@ -87,7 +87,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Repositories
 
         public new tbl_User Delete(tbl_User user)
         {
-            var activity = _context.Set<tbl_UserAuthActivity>()
+            var activity = _context.Set<tbl_UserActivity>()
                 .Where(x => x.UserId == user.Id);
 
             var entitlements = _context.Set<tbl_UserEntitlement>()

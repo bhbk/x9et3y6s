@@ -13,7 +13,8 @@ export * from './claim.model';
 export * from './login-provider.model';
 export * from './user.model';
 export * from './refresh.model';
-export * from './user-auth-activity.model';
+export * from './user-activity.model';
+export * from './audience-activity.model';
 export * from './setting.model';
 export * from './alert.model';
 

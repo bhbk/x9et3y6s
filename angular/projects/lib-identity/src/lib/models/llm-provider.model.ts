@@ -1,6 +1,9 @@
+export type LLMProviderContext = 'Admin' | 'User' | 'Public';
+
 export interface LLMProviderV1 {
   id: string;
   name: string;
+  context: LLMProviderContext;
   isEnabled: boolean;
   failoverOrder: number;
   isDeletable: boolean;
@@ -13,7 +16,7 @@ export interface LLMProviderSettingV1 {
   id: string;
   providerId: string;
   configKey: string;
-  configValue: string;
+  configValue: string | null;
   isSecret: boolean;
   isDeletable: boolean;
   created: string;

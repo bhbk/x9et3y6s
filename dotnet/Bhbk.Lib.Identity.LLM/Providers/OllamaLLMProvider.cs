@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
@@ -38,6 +39,10 @@ namespace Bhbk.Lib.Identity.LLM.Providers
                 BaseAddress = new Uri(_settings.BaseUrl.TrimEnd('/') + "/"),
                 Timeout = TimeSpan.FromSeconds(_settings.TimeoutSeconds)
             };
+
+            if (!string.IsNullOrEmpty(_settings.ApiKey))
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiKey);
+
             _client = new OllamaApiClient(httpClient);
             _logger = logger ?? NullLogger<OllamaLLMProvider>.Instance;
         }
@@ -47,6 +52,10 @@ namespace Bhbk.Lib.Identity.LLM.Providers
         {
             _settings = options.Value.Ollama;
             httpClient.BaseAddress = new Uri(_settings.BaseUrl.TrimEnd('/') + "/");
+
+            if (!string.IsNullOrEmpty(_settings.ApiKey))
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiKey);
+
             _client = new OllamaApiClient(httpClient);
             _logger = NullLogger<OllamaLLMProvider>.Instance;
         }

@@ -1,4 +1,4 @@
-CREATE TABLE [dbo].[tbl_UserAuthActivity] (
+CREATE TABLE [dbo].[tbl_UserActivity] (
     [Id]             UNIQUEIDENTIFIER   NOT NULL,
     [UserId]         UNIQUEIDENTIFIER   NULL,
     [LoginType]      NVARCHAR (64)      NOT NULL,
@@ -6,8 +6,8 @@ CREATE TABLE [dbo].[tbl_UserAuthActivity] (
     [LocalEndpoint]  NVARCHAR (128)     NULL,
     [RemoteEndpoint] NVARCHAR (128)     NULL,
     [Created]     DATETIMEOFFSET (7) NOT NULL,
-    CONSTRAINT [PK_tbl_UserAuthActivity] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_tbl_UserAuthActivity_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[tbl_User] ([Id])
+    CONSTRAINT [PK_tbl_UserActivity] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_tbl_UserActivity_UserID] FOREIGN KEY ([UserId]) REFERENCES [dbo].[tbl_User] ([Id])
 );
 
 
@@ -16,5 +16,5 @@ CREATE TABLE [dbo].[tbl_UserAuthActivity] (
 
 
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [IX_tbl_UserAuthActivity]
-    ON [dbo].[tbl_UserAuthActivity]([Id] ASC);
+CREATE UNIQUE NONCLUSTERED INDEX [IX_tbl_UserActivity]
+    ON [dbo].[tbl_UserActivity]([Id] ASC);

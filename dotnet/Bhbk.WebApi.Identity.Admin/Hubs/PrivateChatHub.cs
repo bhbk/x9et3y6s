@@ -7,23 +7,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Bhbk.WebApi.Identity.Admin.Hubs
 {
     [Authorize]
-    public class ChatHub : Hub
+    public class PrivateChatHub : Hub
     {
         private readonly ILLMProvider _llmProvider;
         private readonly IUnitOfWork _uow;
-        private readonly ILogger<ChatHub> _logger;
+        private readonly ILogger<PrivateChatHub> _logger;
 
-        public ChatHub(IEnumerable<ILLMProvider> llmProviders, IUnitOfWork uow, ILogger<ChatHub> logger)
+        public PrivateChatHub([FromKeyedServices("Admin")] ILLMProvider llmProvider, IUnitOfWork uow, ILogger<PrivateChatHub> logger)
         {
-            _llmProvider = llmProviders.FirstOrDefault();
+            _llmProvider = llmProvider;
             _uow = uow;
             _logger = logger;
         }

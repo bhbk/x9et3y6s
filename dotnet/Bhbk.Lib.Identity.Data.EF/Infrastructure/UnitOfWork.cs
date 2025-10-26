@@ -15,8 +15,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
     {
         private readonly ILoggerFactory _logger;
         public AudienceRepository Audiences { get; private set; }
-        public IGenericRepository<tbl_UserAuthActivity> UserAuthActivities { get; private set; }
-        public IGenericRepository<tbl_AudienceAuthActivity> AudienceAuthActivities { get; private set; }
+        public IGenericRepository<tbl_UserActivity> UserActivities { get; private set; }
+        public IGenericRepository<tbl_AudienceActivity> AudienceActivities { get; private set; }
         public IGenericRepository<tbl_ChatConversation> ChatConversations { get; private set; }
         public IGenericRepository<tbl_ChatFavorite> ChatFavorites { get; private set; }
         public IGenericRepository<tbl_ChatFile> ChatFiles { get; private set; }
@@ -113,8 +113,8 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
             var context = (IdentityEntities)DbContext;
 
             Audiences = new AudienceRepository(context, env);
-            UserAuthActivities = new GenericRepository<tbl_UserAuthActivity>(context);
-            AudienceAuthActivities = new GenericRepository<tbl_AudienceAuthActivity>(context);
+            UserActivities = new GenericRepository<tbl_UserActivity>(context);
+            AudienceActivities = new GenericRepository<tbl_AudienceActivity>(context);
             ChatConversations = new GenericRepository<tbl_ChatConversation>(context);
             ChatFavorites = new GenericRepository<tbl_ChatFavorite>(context);
             ChatFiles = new GenericRepository<tbl_ChatFile>(context);

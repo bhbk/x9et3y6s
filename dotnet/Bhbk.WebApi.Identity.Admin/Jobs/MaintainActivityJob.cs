@@ -38,16 +38,16 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                     var auditable = int.Parse(jobSettings.Single(x => x.ConfigKey == "HoldAuditable").ConfigValue);
                     var transient = int.Parse(jobSettings.Single(x => x.ConfigKey == "HoldTransient").ConfigValue);
 
-                    var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_UserAuthActivity>()
+                    var expiredExpr = QueryExpressionFactory.GetQueryExpression<tbl_UserActivity>()
                         .Where(x => (x.Created.AddSeconds(transient) < DateTime.UtcNow)
                             || (x.Created.AddSeconds(auditable) < DateTime.UtcNow)).ToLambda();
 
-                    var expired = uow.UserAuthActivities.Get(expiredExpr);
+                    var expired = uow.UserActivities.Get(expiredExpr);
                     var expiredCount = expired.Count();
 
                     if (expired.Any())
                     {
-                        uow.UserAuthActivities.Delete(expired);
+                        uow.UserActivities.Delete(expired);
                         uow.Commit();
 
                         Log.Information($"'{callPath}' success on " + DateTime.UtcNow.ToString() + ". Delete " 

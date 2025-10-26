@@ -9,7 +9,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
     {
         public tbl_User()
         {
-            tbl_UserAuthActivities = new HashSet<tbl_UserAuthActivity>();
+            tbl_UserActivities = new HashSet<tbl_UserActivity>();
             tbl_ChatConversations = new HashSet<tbl_ChatConversation>();
             tbl_ChatFavorites = new HashSet<tbl_ChatFavorite>();
             tbl_ChatPromptHistories = new HashSet<tbl_ChatPromptHistory>();
@@ -41,7 +41,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Models
         public DateTimeOffset? LockoutEnd { get; set; }
         public DateTimeOffset Created { get; set; }
 
-        public virtual ICollection<tbl_UserAuthActivity> tbl_UserAuthActivities { get; set; }
+        public virtual ICollection<tbl_UserActivity> tbl_UserActivities { get; set; }
         public virtual ICollection<tbl_ChatConversation> tbl_ChatConversations { get; set; }
         public virtual ICollection<tbl_ChatFavorite> tbl_ChatFavorites { get; set; }
         public virtual ICollection<tbl_ChatPromptHistory> tbl_ChatPromptHistories { get; set; }

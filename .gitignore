@@ -410,3 +410,4 @@ MigrationBackup/
 .ionide/
 
 # End of https://www.toptal.com/developers/gitignore/api/vscode,visualstudiocode,visualstudio,angular,dotnetcore
+/angular/.claude/settings.local.json

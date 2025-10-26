@@ -72,16 +72,16 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
 
                 _uow.Commit();
 
-                var activity = _uow.UserAuthActivities.Post(
-                    _map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
+                var activity = _uow.UserActivities.Post(
+                    _map.Map<tbl_UserActivity>(new UserActivityV1()
                     {
                         LoginType = GrantFlowType.ClientCredentialV2.ToString(),
                         LoginOutcome = GrantFlowResultType.Success.ToString(),
                     }));
 
-                _uow.AudienceAuthActivities.Post(new tbl_AudienceAuthActivity
+                _uow.AudienceActivities.Post(new tbl_AudienceActivity
                 {
-                    UserAuthActivityId = activity.Id,
+                    UserActivityId = activity.Id,
                     AudienceId = foundAudience.Id,
                     Created = activity.Created,
                 });
@@ -523,8 +523,8 @@ namespace Bhbk.Test.Identity.Integration.RepositoryTests
 
                 _uow.Commit();
 
-                _uow.UserAuthActivities.Post(
-                    _map.Map<tbl_UserAuthActivity>(new UserAuthActivityV1()
+                _uow.UserActivities.Post(
+                    _map.Map<tbl_UserActivity>(new UserActivityV1()
                     {
                         UserId = foundUser.Id,
                         LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),

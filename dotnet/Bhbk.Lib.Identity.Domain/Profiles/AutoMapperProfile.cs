@@ -17,14 +17,22 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
              * activity models
              */
 
-            CreateMap<UserAuthActivityV1, tbl_UserAuthActivity>()
+            CreateMap<UserActivityV1, tbl_UserActivity>()
                 .ForMember(dest => dest.Id, src => src.MapFrom(val => val.Id == default ? Guid.NewGuid() : val.Id))
                 .ForMember(dest => dest.Created, src => src.MapFrom(val => val.Created == default ? DateTime.UtcNow : val.Created))
-                .ForMember(dest => dest.tbl_AudienceAuthActivities, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AudienceActivities, src => src.Ignore())
                 .ForMember(dest => dest.User, src => src.Ignore());
 
-            CreateMap<tbl_UserAuthActivity, UserAuthActivityV1>()
-                .ForMember(dest => dest.AudienceIds, src => src.MapFrom(val => val.tbl_AudienceAuthActivities.Select(x => x.AudienceId).ToList()));
+            CreateMap<tbl_UserActivity, UserActivityV1>()
+                .ForMember(dest => dest.AudienceIds, src => src.MapFrom(val => val.tbl_AudienceActivities.Select(x => x.AudienceId).ToList()));
+
+            CreateMap<tbl_AudienceActivity, AudienceActivityV1>()
+                .ForMember(dest => dest.AudienceName, src => src.MapFrom(val => val.Audience != null ? val.Audience.Name : null))
+                .ForMember(dest => dest.UserId, src => src.MapFrom(val => val.UserActivity != null ? val.UserActivity.UserId : (Guid?)null))
+                .ForMember(dest => dest.LoginType, src => src.MapFrom(val => val.UserActivity != null ? val.UserActivity.LoginType : null))
+                .ForMember(dest => dest.LoginOutcome, src => src.MapFrom(val => val.UserActivity != null ? val.UserActivity.LoginOutcome : null))
+                .ForMember(dest => dest.LocalEndpoint, src => src.MapFrom(val => val.UserActivity != null ? val.UserActivity.LocalEndpoint : null))
+                .ForMember(dest => dest.RemoteEndpoint, src => src.MapFrom(val => val.UserActivity != null ? val.UserActivity.RemoteEndpoint : null));
 
             /*
              * audience models
@@ -36,7 +44,7 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
                 .ForMember(dest => dest.Issuer, src => src.Ignore())
-                .ForMember(dest => dest.tbl_AudienceAuthActivities, src => src.Ignore())
+                .ForMember(dest => dest.tbl_AudienceActivities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_AudienceRoles, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserEntitlements, src => src.Ignore())
                 .ForMember(dest => dest.tbl_AudienceEntitlements, src => src.Ignore())
@@ -286,7 +294,7 @@ namespace Bhbk.Lib.Identity.Domain.Profiles
                 .ForMember(dest => dest.SecurityStamp, src => src.MapFrom(val => val.SecurityStamp == null ? Guid.NewGuid().ToString() : val.SecurityStamp))
                 .ForMember(dest => dest.PasswordHashPBKDF2, src => src.Ignore())
                 .ForMember(dest => dest.PasswordHashSHA256, src => src.Ignore())
-                .ForMember(dest => dest.tbl_UserAuthActivities, src => src.Ignore())
+                .ForMember(dest => dest.tbl_UserActivities, src => src.Ignore())
                 .ForMember(dest => dest.tbl_ChatConversations, src => src.Ignore())
                 .ForMember(dest => dest.tbl_UserEntitlements, src => src.Ignore())
                 .ForMember(dest => dest.tbl_Refreshes, src => src.Ignore())

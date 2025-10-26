@@ -16,7 +16,7 @@ import { KENDO_INDICATORS } from '@progress/kendo-angular-indicators';
 import { KENDO_ICONS } from '@progress/kendo-angular-icons';
 import { AuthStore } from '../../stores/auth.store';
 import { ChatStore } from '../../stores/chat.store';
-import { ChatService } from '../../services/chat.service';
+import { PrivateChatService } from '../../services/private-chat.service';
 import { ChatConversation, ChatFavorite } from '../../models/chat.model';
 import {
   paperPlaneIcon,
@@ -493,7 +493,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   readonly authStore = inject(AuthStore);
   readonly chatStore = inject(ChatStore);
-  private readonly chatService = inject(ChatService);
+  private readonly chatService = inject(PrivateChatService);
 
   @ViewChild('messagesContainer') messagesContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('convRenameInput') convRenameInputRef?: ElementRef<HTMLInputElement>;
