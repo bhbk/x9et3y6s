@@ -54,7 +54,7 @@ namespace Bhbk.WebApi.Identity.User.Controllers
                 .Generate(model.NewEmail, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user.Id.ToString(), user.SecurityStamp));
 
             if (uow.InstanceType != InstanceContext.DeployedOrLocal
-                && uow.InstanceType != InstanceContext.End2EndTest)
+                && uow.InstanceType != InstanceContext.SystemTest)
                 return Ok(token);
 
             var url = UrlFactory.GenerateConfirmEmailV1(conf, user.Id.ToString(), token);
@@ -136,7 +136,7 @@ namespace Bhbk.WebApi.Identity.User.Controllers
                 .Generate(model.NewPassword, TimeSpan.FromSeconds(uint.Parse(expire.ConfigValue)), user.Id.ToString(), user.SecurityStamp));
 
             if (uow.InstanceType != InstanceContext.DeployedOrLocal
-                && uow.InstanceType != InstanceContext.End2EndTest)
+                && uow.InstanceType != InstanceContext.SystemTest)
                 return Ok(token);
 
             var url = UrlFactory.GenerateConfirmPasswordV1(conf, user.Id.ToString(), token);
@@ -246,7 +246,7 @@ namespace Bhbk.WebApi.Identity.User.Controllers
             string token = HttpUtility.UrlEncode(new TimeBasedTokenFactory(8, 10).Generate(model.NewPhoneNumber, user.Id.ToString()));
 
             if (uow.InstanceType != InstanceContext.DeployedOrLocal
-                && uow.InstanceType != InstanceContext.End2EndTest)
+                && uow.InstanceType != InstanceContext.SystemTest)
                 return Ok(token);
 
             var url = UrlFactory.GenerateConfirmPasswordV1(conf, user.Id.ToString(), token);

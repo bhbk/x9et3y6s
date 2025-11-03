@@ -29,7 +29,7 @@ namespace Bhbk.Lib.Identity.Grants
         public ClientCredentialGrantV1(IConfiguration conf, InstanceContext env, HttpClient http)
         {
             if (env == InstanceContext.DeployedOrLocal
-                || env == InstanceContext.End2EndTest)
+                || env == InstanceContext.SystemTest)
             {
                 var connect = new HttpClientHandler();
 

@@ -66,7 +66,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
             switch (env.InstanceType)
             {
                 case InstanceContext.DeployedOrLocal:
-                case InstanceContext.End2EndTest:
+                case InstanceContext.SystemTest:
                     {
 #if !RELEASE
                         var builder = new DbContextOptionsBuilder<IdentityEntities>()
@@ -82,7 +82,7 @@ namespace Bhbk.Lib.Identity.Data.EF.Infrastructure
                         return context;
                     }
 
-                case InstanceContext.SystemTest:
+                case InstanceContext.End2EndTest:
                 case InstanceContext.IntegrationTest:
                     {
 #if !RELEASE

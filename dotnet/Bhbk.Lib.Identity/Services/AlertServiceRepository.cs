@@ -18,7 +18,7 @@ namespace Bhbk.Lib.Identity.Services
         public AlertServiceRepository(IConfiguration conf, InstanceContext env, HttpClient http)
         {
             if (env == InstanceContext.DeployedOrLocal
-                || env == InstanceContext.End2EndTest)
+                || env == InstanceContext.SystemTest)
             {
                 var connect = new HttpClientHandler();
 

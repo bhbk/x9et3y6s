@@ -41,7 +41,7 @@ namespace Bhbk.WebApi.Identity.User.Jobs
                     var map = scope.ServiceProvider.GetRequiredService<IMapper>();
 
                     if (uow.InstanceType == InstanceContext.DeployedOrLocal
-                        || uow.InstanceType == InstanceContext.End2EndTest)
+                        || uow.InstanceType == InstanceContext.SystemTest)
                     {
                         var url = uow.Settings.Get(x => x.IssuerId == null && x.AudienceId == null && x.UserId == null
                             && x.ConfigKey == SettingsConstants.TheySaidSoUrl).Single();

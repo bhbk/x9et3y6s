@@ -1,0 +1,53 @@
+using AutoMapper;
+using Bhbk.Lib.Common.Primitives.Enums;
+using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Identity.Data.EF.Infrastructure;
+using Bhbk.Lib.Identity.Domain.Profiles;
+using Bhbk.WebApi.Identity.Admin.Controllers;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
+
+namespace Bhbk.Test.Identity.Integration.Controllers.Admin
+{
+    public class BaseAdminControllerTests : WebApplicationFactory<WebApi.Identity.Admin.Startup>
+    {
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            var conf = (IConfiguration)new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            var env = new ContextService(InstanceContext.IntegrationTest);
+            var map = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>()).CreateMapper();
+
+            builder.ConfigureServices(sc =>
+            {
+                sc.AddSingleton(conf);
+                sc.AddSingleton<IContextService>(env);
+                sc.AddSingleton(map);
+                sc.AddScoped<IUnitOfWork, UnitOfWork>(_ =>
+                {
+                    return new UnitOfWork(conf["Databases:IdentityEntities_EF"], env);
+                });
+
+                sc.AddControllers()
+                     .AddNewtonsoftJson(opt =>
+                     {
+                         opt.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                     })
+                    /* https://github.com/aspnet/Mvc/issues/5992 */
+                    .AddApplicationPart(typeof(BaseController).Assembly);
+            });
+
+            builder.Configure(app => { });
+        }
+
+        protected override IWebHostBuilder CreateWebHostBuilder()
+        {
+            return new WebHostBuilder();
+        }
+    }
+}

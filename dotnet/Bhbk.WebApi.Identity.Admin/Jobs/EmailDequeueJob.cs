@@ -68,7 +68,7 @@ namespace Bhbk.WebApi.Identity.Admin.Jobs
                 switch (uow.InstanceType)
                 {
                     case InstanceContext.DeployedOrLocal:
-                    case InstanceContext.End2EndTest:
+                    case InstanceContext.SystemTest:
                         {
 #if RELEASE
                             var response = sendgrid.TryEmailHandoff(sendgridApiKey, msg).Result;

@@ -1,0 +1,803 @@
+using AutoMapper;
+using Bhbk.Lib.Common.Services;
+using Bhbk.Lib.Cryptography.Entropy;
+using Bhbk.Lib.DataState.Interfaces;
+using Bhbk.Lib.DataState.Models;
+using Bhbk.Lib.Identity.Data.EF.Infrastructure;
+using Bhbk.Lib.Identity.Data.EF.Models;
+using Bhbk.Lib.Identity.Factories;
+using Bhbk.Lib.Identity.Grants;
+using Bhbk.Lib.Identity.Models.Admin;
+using Bhbk.Lib.Identity.Models.Me;
+using Bhbk.Lib.Identity.Primitives.Enums;
+using Bhbk.Lib.Identity.Services;
+using Bhbk.Lib.QueryExpression.Extensions;
+using Bhbk.Lib.QueryExpression.Factories;
+using Bhbk.Test.Identity.Integration.TestingTools;
+using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Xunit;
+
+namespace Bhbk.Test.Identity.End2End.Services.Admin
+{
+    public class AudienceServiceTests : IClassFixture<BaseAdminServiceTests>
+    {
+        private readonly BaseAdminServiceTests _factory;
+
+        public AudienceServiceTests(BaseAdminServiceTests factory) => _factory = factory;
+
+        [Fact]
+        public async Task Admin_AudienceV1_AddToRole_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                // Create a test audience to add to role
+                using var seed = ScenarioMother.CreateAudienceSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var testAudience = seed.Audiences.Values.First();
+                var testRole = uow.Roles.Post(
+                    map.Map<tbl_Role>(new RoleV1()
+                    {
+                        AudienceId = audience.Id,
+                        Name = Base64.CreateString(4) + "-test-role",
+                        IsEnabled = true,
+                        IsDeletable = false,
+                    }));
+
+                uow.Commit();
+
+                var result = await service.Audience_AddToRoleV1(testAudience.Id, testRole.Id);
+                result.Should().BeTrue();
+
+                var check = uow.Audiences.IsInRole(testAudience, testRole);
+                check.Should().BeTrue();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_Create_Fail()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var result = await service.Endpoints.Audience_CreateV1(Base64.CreateString(8), new AudienceV1());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+                // Create a non-admin user for forbidden check
+                using var seed = ScenarioMother.CreateUserSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var testUser = seed.Users.Values.First();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, testUser);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                result = await service.Endpoints.Audience_CreateV1(rop.RawData, new AudienceV1());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            }
+
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var result = await service.Endpoints.Audience_CreateV1(rop.RawData, new AudienceV1());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_Create_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var result = await service.Audience_CreateV1(
+                    new AudienceV1()
+                    {
+                        IssuerId = issuer.Id,
+                        Name = Base64.CreateString(4) + "-" + audience.Name,
+                        IsLockedOut = false,
+                        IsDeletable = true,
+                    });
+                result.Should().BeAssignableTo<AudienceV1>();
+
+                var check = uow.Audiences.Get(x => x.Id == result.Id).Any();
+                check.Should().BeTrue();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_Delete_Fail()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var result = await service.Endpoints.Audience_DeleteV1(Base64.CreateString(8), Guid.NewGuid());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+                // Create a non-admin user for forbidden check
+                using var seed = ScenarioMother.CreateUserSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var testUser = seed.Users.Values.First();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, testUser);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                result = await service.Endpoints.Audience_DeleteV1(rop.RawData, Guid.NewGuid());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            }
+
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var result = await service.Endpoints.Audience_DeleteV1(rop.RawData, Guid.NewGuid());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                using var seed = ScenarioMother.CreateAudienceSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var testAudience = seed.Audiences.Values.First();
+                testAudience.IsDeletable = false;
+
+                uow.Audiences.Put(testAudience);
+                uow.Commit();
+
+                var result = await service.Endpoints.Audience_DeleteV1(rop.RawData, testAudience.Id);
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+                /* restore deletable state so SeedContext cleanup works */
+                testAudience.IsDeletable = true;
+                uow.Audiences.Put(testAudience);
+                uow.Commit();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_Delete_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                /* no using - the test deletes the audience */
+                var seed = ScenarioMother.CreateAudienceSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var testAudienceId = seed.Audiences.Values.First().Id;
+
+                var result = await service.Audience_DeleteV1(testAudienceId);
+                result.Should().BeTrue();
+
+                var check = uow.Audiences.Get(x => x.Id == testAudienceId).Any();
+                check.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_DeleteRefreshes_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
+                    var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
+
+                    uow.Refreshes.Post(
+                        map.Map<tbl_Refresh>(new RefreshV1()
+                        {
+                            IssuerId = issuer.Id,
+                            AudienceId = audience.Id,
+                            RefreshType = ConsumerType.Client.ToString(),
+                            RefreshValue = rt.RawData,
+                            ValidFrom = rt.ValidFrom,
+                            ValidTo = rt.ValidTo,
+                        }));
+                }
+                uow.Commit();
+
+                var result = await service.Audience_DeleteRefreshesV1(audience.Id);
+                result.Should().BeTrue();
+
+                var check = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+                    .Where(x => x.AudienceId == audience.Id).ToLambda()).Any();
+                check.Should().BeFalse();
+            }
+
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
+                var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
+
+                uow.Refreshes.Post(
+                    map.Map<tbl_Refresh>(new RefreshV1()
+                    {
+                        IssuerId = issuer.Id,
+                        AudienceId = audience.Id,
+                        RefreshType = ConsumerType.Client.ToString(),
+                        RefreshValue = rt.RawData,
+                        ValidFrom = rt.ValidFrom,
+                        ValidTo = rt.ValidTo,
+                    }));
+                uow.Commit();
+
+                var refresh = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+                    .Where(x => x.AudienceId == audience.Id).ToLambda()).Single();
+                var result = await service.Audience_DeleteRefreshV1(audience.Id, refresh.Id);
+                result.Should().BeTrue();
+
+                var check = uow.Refreshes.Get(QueryExpressionFactory.GetQueryExpression<tbl_Refresh>()
+                    .Where(x => x.Id == refresh.Id).ToLambda()).Any();
+                check.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_Get_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                // Create a test audience to get
+                using var seed = ScenarioMother.CreateAudienceSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var testAudience = seed.Audiences.Values.First();
+
+                var result = await service.Audience_GetV1(testAudience.Id.ToString());
+                result.Should().BeAssignableTo<AudienceV1>();
+            }
+
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                int take = 2;
+                var state = new PagerState()
+                {
+                    Sort = new List<IDataStateSort>()
+                    {
+                        new PagerStateSort() { Field = "name", Dir = "asc" },
+                    },
+                    Skip = 0,
+                    Take = take
+                };
+
+                var result = await service.Audience_GetV1(state);
+                result.Data.Count().Should().Be(take);
+                result.Total.Should().Be(uow.Audiences.Count());
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_GetRefreshes_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    var rt_claims = uow.Audiences.GenerateRefreshClaims(issuer, audience);
+                    var rt = auth.ClientCredential(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], audience.Name, rt_claims);
+
+                    uow.Refreshes.Post(
+                        map.Map<tbl_Refresh>(new RefreshV1()
+                        {
+                            IssuerId = issuer.Id,
+                            AudienceId = audience.Id,
+                            RefreshType = ConsumerType.Client.ToString(),
+                            RefreshValue = rt.RawData,
+                            ValidFrom = rt.ValidFrom,
+                            ValidTo = rt.ValidTo,
+                        }));
+                }
+                uow.Commit();
+
+                var result = await service.Audience_GetRefreshesV1(audience.Id.ToString());
+                result.Should().BeAssignableTo<IEnumerable<RefreshV1>>();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_RemoveFromRole_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                // Create a test audience with a role to remove
+                using var seed = ScenarioMother.CreateAudienceSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var testAudience = seed.Audiences.Values.First();
+
+                // Create a role and assign it to the test audience
+                var testRole = uow.Roles.Post(
+                    map.Map<tbl_Role>(new RoleV1()
+                    {
+                        AudienceId = testAudience.Id,
+                        Name = Base64.CreateString(4) + "-test-role",
+                        IsEnabled = true,
+                        IsDeletable = true,
+                    }));
+                uow.Commit();
+
+                uow.Audiences.AddRole(new tbl_AudienceRole
+                {
+                    AudienceId = testAudience.Id,
+                    RoleId = testRole.Id,
+                    IsDeletable = true,
+                    Created = DateTime.UtcNow,
+                });
+                uow.Commit();
+
+                var result = await service.Audience_RemoveFromRoleV1(testAudience.Id, testRole.Id);
+                result.Should().BeTrue();
+
+                var check = uow.Audiences.IsInRole(testAudience, testRole);
+                check.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_RemovePassword_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                // Create a test audience with password
+                using var seed = ScenarioMother.CreateAudienceSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var testAudience = seed.Audiences.Values.First();
+
+                // Set password first so we can remove it
+                uow.Audiences.SetPassword(testAudience, "TestPassword123!");
+                uow.Commit();
+
+                var result = await service.Audience_RemovePasswordV1(testAudience.Id);
+                result.Should().BeTrue();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_SetPassword_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                // Create a test audience to set password
+                using var seed = ScenarioMother.CreateAudienceSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var testAudience = seed.Audiences.Values.First();
+                var newPassword = "NewTestPassword123!";
+                var testAudiencePassword = new PasswordAddV1()
+                {
+                    EntityId = testAudience.Id,
+                    NewPassword = newPassword,
+                    NewPasswordConfirm = newPassword
+                };
+
+                var result = await service.Audience_SetPasswordV1(testAudience.Id, testAudiencePassword);
+                result.Should().BeTrue();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_Update_Fail()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var result = await service.Endpoints.Audience_UpdateV1(Base64.CreateString(8), new AudienceV1());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+                using var seed = ScenarioMother.CreateUserSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var testUser = seed.Users.Values.First();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, testUser);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                result = await service.Endpoints.Audience_UpdateV1(rop.RawData, new AudienceV1());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            }
+
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                var rop = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var result = await service.Endpoints.Audience_UpdateV1(rop.RawData, new AudienceV1());
+                result.Should().BeAssignableTo(typeof(HttpResponseMessage));
+                result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_GetActivities_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                /* ensure activity exists */
+                var testActivity = uow.UserActivities.Get().FirstOrDefault();
+                if (testActivity == null)
+                {
+                    testActivity = uow.UserActivities.Post(
+                        map.Map<tbl_UserActivity>(new UserActivityV1()
+                        {
+                            UserId = user.Id,
+                            LoginType = GrantFlowType.ResourceOwnerPasswordV2.ToString(),
+                            LoginOutcome = GrantFlowResultType.Success.ToString(),
+                        }));
+                    uow.Commit();
+                }
+
+                var result = await service.Activity_GetV1(testActivity.Id.ToString());
+                result.Should().BeAssignableTo<UserActivityV1>();
+            }
+        }
+
+        [Fact]
+        public async Task Admin_AudienceV1_Update_Success()
+        {
+            using (var owin = _factory.CreateClient())
+            using (var scope = _factory.Server.Host.Services.CreateScope())
+            {
+                var map = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var conf = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var auth = scope.ServiceProvider.GetRequiredService<IOAuth2JwtFactory>();
+                var env = scope.ServiceProvider.GetRequiredService<IContextService>();
+
+                var service = new AdminService(conf, env.InstanceType, owin)
+                {
+                    Grant = new ResourceOwnerGrantV2(conf, env.InstanceType, owin)
+                };
+
+                using var seed = ScenarioMother.CreateAudienceSeed(uow);
+
+                var issuer = uow.Issuers.Get(x => x.Name == _factory.TestData.Seed.IssuerName).Single();
+                var audience = uow.Audiences.Get(x => x.Name == _factory.TestData.Seed.AudienceNameIdentity).Single();
+                var user = uow.Users.Get(x => x.UserName == _factory.TestData.Seed.UserNameAdmin).Single();
+
+                var rop_claims = uow.Users.GenerateAccessClaims(issuer, user);
+                service.Grant.AccessToken = auth.ResourceOwnerPassword(issuer.Name, issuer.IssuerKey, conf["IdentityTenant:Salt"], new List<string>() { audience.Name }, rop_claims);
+
+                var testAudience = uow.Audiences.GetAsNoTracking(x => x.Id == seed.Audiences.Values.First().Id).Single();
+                testAudience.Description += "(Updated)";
+
+                var result = await service.Audience_UpdateV1(map.Map<AudienceV1>(testAudience));
+                result.Should().BeAssignableTo<AudienceV1>();
+                result.Description.Should().Be(testAudience.Description);
+            }
+        }
+    }
+}

@@ -20,7 +20,7 @@ namespace Bhbk.Lib.Identity.Services
         public UserServiceRepository(IConfiguration conf, InstanceContext env, HttpClient http)
         {
             if (env == InstanceContext.DeployedOrLocal
-                || env == InstanceContext.End2EndTest)
+                || env == InstanceContext.SystemTest)
             {
                 var connect = new HttpClientHandler();
 

@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.Test.Identity.End2End"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.WebApi.Identity.User", "Bhbk.WebApi.Identity.User\Bhbk.WebApi.Identity.User.csproj", "{B8B83821-5FC0-82F2-6B1E-DC0EEFDB5469}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bhbk.Lib.Identity.Template", "Bhbk.Lib.Identity.Template\Bhbk.Lib.Identity.Template.csproj", "{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -217,6 +219,18 @@ Global
 		{B8B83821-5FC0-82F2-6B1E-DC0EEFDB5469}.Release|x64.Build.0 = Release|Any CPU
 		{B8B83821-5FC0-82F2-6B1E-DC0EEFDB5469}.Release|x86.ActiveCfg = Release|Any CPU
 		{B8B83821-5FC0-82F2-6B1E-DC0EEFDB5469}.Release|x86.Build.0 = Release|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Debug|x64.Build.0 = Debug|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Debug|x86.Build.0 = Debug|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Release|x64.ActiveCfg = Release|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Release|x64.Build.0 = Release|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Release|x86.ActiveCfg = Release|Any CPU
+		{11CD0B82-2BBC-4C7D-AF48-56D37703DC83}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

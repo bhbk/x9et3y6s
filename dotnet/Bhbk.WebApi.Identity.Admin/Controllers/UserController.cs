@@ -183,7 +183,7 @@ namespace Bhbk.WebApi.Identity.Admin.Controllers
 
             if (issuer != null
                 && (uow.InstanceType == InstanceContext.DeployedOrLocal
-                    || uow.InstanceType == InstanceContext.End2EndTest))
+                    || uow.InstanceType == InstanceContext.SystemTest))
             {
                 var expire = uow.Settings.Get(x => x.IssuerId == issuer.Id && x.AudienceId == null && x.UserId == null
                     && x.ConfigKey == SettingsConstants.TotpExpire).Single();
